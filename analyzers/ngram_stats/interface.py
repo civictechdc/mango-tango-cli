@@ -71,7 +71,7 @@ interface = SecondaryAnalyzerInterface(
                 OutputColumn(
                     name=COL_AUTHOR_ID,
                     data_type="identifier",
-                    human_readable_name="unique username",
+                    human_readable_name="unique userID", # Updated from "unique username"
                 ),
                 OutputColumn(
                     name=COL_NGRAM_REPS_PER_USER,
@@ -82,11 +82,6 @@ interface = SecondaryAnalyzerInterface(
                     name=COL_MESSAGE_SURROGATE_ID,
                     data_type="identifier",
                     human_readable_name="UPN",
-                ),
-                OutputColumn(
-                    name=COL_MESSAGE_ID,
-                    data_type="identifier",
-                    human_readable_name="post identifier",
                 ),
                 OutputColumn(
                     name=COL_MESSAGE_TEXT,
