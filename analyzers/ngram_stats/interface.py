@@ -71,7 +71,7 @@ interface = SecondaryAnalyzerInterface(
                 OutputColumn(
                     name=COL_AUTHOR_ID,
                     data_type="identifier",
-                    human_readable_name="unique userID", # Updated from "unique username"
+                    human_readable_name="unique userID",  # Updated from "unique username"
                 ),
                 OutputColumn(
                     name=COL_NGRAM_REPS_PER_USER,
