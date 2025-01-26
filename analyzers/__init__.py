@@ -7,9 +7,15 @@ from .ngrams import ngrams
 from .temporal import temporal
 from .temporal_barplot import temporal_barplot
 from .time_coordination import time_coordination
+from .example.example_base import example_base
+from .example.example_report import example_report
+from .example.example_web import example_web
 
 suite = AnalyzerSuite(
     all_analyzers=[
+        example_base,
+        example_report,
+        example_web,
         ngrams,
         ngram_stats,
         ngrams_web,
