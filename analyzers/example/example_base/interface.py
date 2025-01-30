@@ -22,7 +22,7 @@ interface = AnalyzerInterface(
     # analysis selection process.
     short_description="Example Analyzer (Character Count)",
     long_description="""
-This is an example analzyer that counts the number of characters in each message.
+This is an example analyzer that counts the number of characters in each message.
   """,
     input=AnalyzerInput(
         columns=[
