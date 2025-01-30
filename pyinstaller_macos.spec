@@ -8,7 +8,6 @@ block_cipher = None
 a = Analysis(
     ['mangotango.py'],  # Entry point
     pathex=['.'],    # Ensure all paths are correctly included
-    binaries=[],
     datas=[
         # version file, if defined
         *(
