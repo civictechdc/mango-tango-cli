@@ -113,6 +113,11 @@ If you're new to the project, check out
 [this directory](../analyzers/example/README.md) for a
 workable example.
 
+## Testing
+
+The `testing` module provides testers for the primary and
+secondary analyzer modules. See the [example](../analyzers/example/README.md) for further references.
+
 # Questions, Comments, and Feedback
 
 Talk to us on the [Civic Tech DC Slack workspace](https://civictechdc.slack.com)!

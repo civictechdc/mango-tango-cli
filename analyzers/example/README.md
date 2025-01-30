@@ -9,3 +9,5 @@ message lengths.
 - [Primary Analyzer](./example_base/__init__.py)
 - [Secondary Analyzer](./example_report/__init__.py)
 - [Web Presenter](./example_web/__init__.py)
+- [Test for Primary Analyzer](./example_base/test_example_base.py)
+- [Test for Secondary Analyzer](./example_report/test_example_report.py)
