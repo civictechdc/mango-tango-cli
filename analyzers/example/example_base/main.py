@@ -3,6 +3,7 @@ import polars as pl
 from analyzer_interface.context import PrimaryAnalyzerContext
 from terminal_tools import ProgressReporter
 
+
 def main(context: PrimaryAnalyzerContext):
     # To read the user's input data the way the user intended, you have to do
     # two things:
@@ -24,22 +25,21 @@ def main(context: PrimaryAnalyzerContext):
     # The use of the ProgressReporter is optional. It helps breaking a
     # longer analysis down into sections.
     with ProgressReporter("Counting characters") as progress:
-      df_count = df_input.select(
-          pl.col("message_id"),
+        df_count = df_input.select(
+            pl.col("message_id"),
+            # The input and output columns are as you define in the interface.
+            pl.col("message_text").str.len_chars().alias("character_count"),
+        )
 
-          # The input and output columns are as you define in the interface.
-          pl.col("message_text").str.len_chars().alias("character_count")
-      )
-
-      # If you decide to process the data in small batches
-      # you can update the progress bar with the fraction of the
-      # current batch. Again, this is optional. Here we just use
-      # 1.0 to indicate 100% completion.
-      #
-      # You can still use the ProgressReporter without updating the progress
-      # value, in which case the progress bar will just show a spinner and
-      # the message.
-      progress.update(1.0)
+        # If you decide to process the data in small batches
+        # you can update the progress bar with the fraction of the
+        # current batch. Again, this is optional. Here we just use
+        # 1.0 to indicate 100% completion.
+        #
+        # You can still use the ProgressReporter without updating the progress
+        # value, in which case the progress bar will just show a spinner and
+        # the message.
+        progress.update(1.0)
 
     # The analyzer is expected to write the output to a parquet file for
     # every output that is defined. Make sure that the output ID and the

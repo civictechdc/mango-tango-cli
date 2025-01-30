@@ -6,7 +6,6 @@ from dash.html import Div
 from analyzer_interface.context import WebPresenterContext
 
 
-
 def factory(context: WebPresenterContext):
     df = pl.read_parquet(
         # This gives you the path to the primary analyzer's output.
@@ -30,19 +29,22 @@ def factory(context: WebPresenterContext):
     app = context.dash_app
 
     fig = px.histogram(x=df["character_count"], nbins=50)
-    fig.update_layout({
-        "xaxis": {
-            "title": {"text":"Message Character Count"},
-        },
-        "yaxis": {
-            "title": {"text":"Number of Messages"},
+    fig.update_layout(
+        {
+            "xaxis": {
+                "title": {"text": "Message Character Count"},
+            },
+            "yaxis": {
+                "title": {"text": "Number of Messages"},
+            },
         }
-    })
+    )
 
-    app.layout = Div([
+    app.layout = Div(
+        [
             Graph(
                 figure=fig,
                 style={"height": "100%", "flex-grow": "1"},
             )
-    ])
-
+        ]
+    )
