@@ -43,7 +43,6 @@ def gini(x):
 
 
 def main(context: PrimaryAnalyzerContext):
-
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
 
