@@ -48,7 +48,7 @@ if sys.platform == "darwin":
         upx=True,  # You can set this to False if you don’t want UPX compression
         console=True  # Set to False if you don't want a console window
     )
- else:
+else:
     exe = EXE(
         pyz,
         a.scripts,
