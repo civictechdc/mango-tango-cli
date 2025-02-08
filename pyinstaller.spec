@@ -2,6 +2,7 @@
 # This file tells PyInstaller how to bundle your application
 
 from PyInstaller.utils.hooks import copy_metadata
+import sys
 
 block_cipher = None
 
@@ -34,16 +35,29 @@ a = Analysis(
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    name='mangotango',  # The name of the executable
-    debug=False,
-    strip=True,
-    upx=True,  # You can set this to False if you don’t want UPX compression
-    console=True  # Set to False if you don't want a console window
-)
+if sys.platform == "darwin":
+    exe = EXE(
+        pyz,
+        a.scripts,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        name='mangotango',  # The name of the executable
+        debug=False,
+        strip=True,
+        upx=True,  # You can set this to False if you don’t want UPX compression
+        console=True  # Set to False if you don't want a console window
+    )
+ else:
+    exe = EXE(
+        pyz,
+        a.scripts,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        name='mangotango',  # The name of the executable
+        debug=False,
+        strip=False,
+        upx=True,  # You can set this to False if you don’t want UPX compression
+        console=True  # Set to False if you don't want a console window
+    )
