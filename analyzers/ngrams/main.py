@@ -102,10 +102,7 @@ def main(context: PrimaryAnalyzerContext):
 
 def tokenize(input: str) -> list[str]:
     """Generate words from input string."""
-
-    output = re.split(r"\W+", input.lower())
-    output = [value for value in output if "http" not in value]
-    return output
+    return re.split(" +", input.lower())
 
 
 def ngrams(tokens: list[str], min: int, max: int):
