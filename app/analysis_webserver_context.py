@@ -2,16 +2,14 @@ import logging
 import os.path
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
 from dash import Dash
 from flask import Flask, render_template
 from pydantic import BaseModel
 from waitress import serve
-
 from context import WebPresenterContext
-
 from .analysis_context import AnalysisContext
 from .app_context import AppContext
+from .vite_context import ViteContext
 
 
 class AnalysisWebServerContext(BaseModel):
@@ -24,6 +22,7 @@ class AnalysisWebServerContext(BaseModel):
         template_folder = os.path.join(containing_dir, "web_templates")
 
         web_presenters = self.analysis_context.web_presenters
+        vite_context = ViteContext(app_context=self.app_context)
         web_server = Flask(
             __name__,
             template_folder=template_folder,
@@ -32,6 +31,8 @@ class AnalysisWebServerContext(BaseModel):
         )
         web_server.logger.disabled = True
         temp_dirs: list[TemporaryDirectory] = []
+
+        web_server.register_blueprint(vite_context.create_blueprint())
 
         for presenter in web_presenters:
             dash_app = Dash(

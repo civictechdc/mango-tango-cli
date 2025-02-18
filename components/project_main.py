@@ -40,6 +40,7 @@ def project_main(
 
         if action == "select_analysis":
             analysis = select_analysis(project)
+
             if analysis is not None:
                 analysis_main(context, analysis)
             continue
