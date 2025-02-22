@@ -15,7 +15,12 @@ export default defineConfig({
         emptyOutDir: true,
         copyPublicDir: false,
         rollupOptions: {
-            input: ['./src/index.tsx']
+            input: ['./src/index.tsx', './src/styles/app.css']
+        }
+    },
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, './src')
         }
     }
 });
