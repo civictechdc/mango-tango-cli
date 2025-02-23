@@ -1,5 +1,6 @@
 import logging
 import os.path
+import polars as pl
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from dash import Dash
@@ -10,6 +11,7 @@ from context import WebPresenterContext
 from .analysis_context import AnalysisContext
 from .app_context import AppContext
 from .vite_context import ViteContext
+from .api import APIContext
 
 
 class AnalysisWebServerContext(BaseModel):
@@ -34,6 +36,8 @@ class AnalysisWebServerContext(BaseModel):
 
         web_server.register_blueprint(vite_context.create_blueprint())
 
+        presenter_contexts = []
+
         for presenter in web_presenters:
             dash_app = Dash(
                 presenter.server_name,
@@ -49,11 +53,16 @@ class AnalysisWebServerContext(BaseModel):
                 temp_dir=temp_dir.name,
                 dash_app=dash_app,
             )
+
+            presenter_contexts.append(presenter_context)
             temp_dirs.append(temp_dir)
             presenter.factory(presenter_context)
 
         project_name = self.analysis_context.project_context.display_name
         analyzer_name = self.analysis_context.display_name
+        api_context = APIContext(analysis_context=self.analysis_context, presenters_context=presenter_contexts)
+
+        web_server.register_blueprint(api_context.create_blueprint())
 
         @web_server.route("/")
         def index():
@@ -69,11 +78,11 @@ class AnalysisWebServerContext(BaseModel):
         original_disabled = server_log.disabled
         server_log.setLevel(logging.ERROR)
         server_log.disabled = True
+        server_log.setLevel(original_log_level)
+        server_log.disabled = original_disabled
 
         try:
             serve(web_server, host="127.0.0.1", port=8050)
         finally:
-            server_log.setLevel(original_log_level)
-            server_log.disabled = original_disabled
             for temp_dir in temp_dirs:
                 temp_dir.cleanup()
