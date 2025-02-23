@@ -8,3 +8,4 @@ VERSION
 *.DS_Store
 node_modules/
 .idea/
+/app/web_templates/build
