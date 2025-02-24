@@ -41,7 +41,7 @@ def api_factory(context: WebPresenterContext):
     data_frame = pl.read_parquet(context.base.table(OUTPUT_TABLE_INTERVAL_COUNT).parquet_path)
     presenter_model["figure_type"] = "bar"
     presenter_model["x"] = f"{data_frame[OUTPUT_COL_TIME_INTERVAL_START].dt.strftime("%H:%M")} - {data_frame[OUTPUT_COL_TIME_INTERVAL_END].dt.strftime("%H:%M")}"
-    presenter_model["y"] = data_frame[OUTPUT_COL_POST_COUNT]
+    presenter_model["y"] = data_frame[OUTPUT_COL_POST_COUNT].to_list()
     presenter_model["axis"] = {
         "x": {
             "label": "Time Interval"
