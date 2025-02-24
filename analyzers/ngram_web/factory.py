@@ -158,6 +158,11 @@ def api_factory(context: WebPresenterContext):
     presenter_model["figure_type"] = "scatter"
     presenter_model["grams"] = all_grams
     presenter_model["col_ngram_words"] = COL_NGRAM_WORDS
+    presenter_model["x"] = data_frame[COL_NGRAM_DISTINCT_POSTER_COUNT]
+    presenter_model["y"] = {
+        "total_repetition": data_frame[COL_NGRAM_TOTAL_REPS],
+        "amplification_factor": data_frame[COL_NGRAM_TOTAL_REPS] / data_frame[COL_NGRAM_DISTINCT_POSTER_COUNT],
+    }
     presenter_model["explanation"] = {
         "total_repetition": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times overall.",
         "amplification_factor": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times on average per user."
