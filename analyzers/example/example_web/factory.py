@@ -4,7 +4,7 @@ from json import loads
 from dash.dcc import Graph
 from dash.html import Div
 from analyzer_interface.context import WebPresenterContext
-
+from ...utils.pop import pop_unnecessary_fields
 
 def factory(context: WebPresenterContext):
     df = pl.read_parquet(
@@ -63,8 +63,4 @@ def api_factory(context: WebPresenterContext):
         }
     }
 
-    presenter_model.pop("base_analyzer")
-    presenter_model.pop("factory")
-    presenter_model.pop("api_factory")
-
-    return presenter_model
+    return pop_unnecessary_fields(presenter_model)

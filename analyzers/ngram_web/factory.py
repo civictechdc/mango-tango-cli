@@ -1,7 +1,6 @@
 import re
 from itertools import accumulate
 from typing import Optional
-
 import plotly.express as px
 import plotly.graph_objects as go
 import polars as pl
@@ -11,9 +10,7 @@ from dash.dcc import Graph
 from dash.dcc import Input as DccInput
 from dash.dcc import RadioItems
 from dash.html import H2, Datalist, Div, Em, Label, Option, P
-
 from analyzer_interface.context import WebPresenterContext
-
 from ..ngram_stats.interface import (
     COL_NGRAM_DISTINCT_POSTER_COUNT,
     COL_NGRAM_TOTAL_REPS,
@@ -21,7 +18,7 @@ from ..ngram_stats.interface import (
     OUTPUT_NGRAM_STATS,
 )
 from ..ngram_stats.interface import interface as ngram_stats
-
+from ..utils.pop import pop_unnecessary_fields
 
 def factory(context: WebPresenterContext):
     df = pl.read_parquet(
@@ -176,10 +173,7 @@ def api_factory(context: WebPresenterContext):
         }
     }
 
-    presenter_model.pop("factory")
-    presenter_model.pop("api_factory")
-
-    return presenter_model
+    return pop_unnecessary_fields(presenter_model)
 
 def create_word_matcher(subject: str, col: pl.Expr) -> Optional[pl.Expr]:
     subject = subject.strip().lower()

@@ -2,16 +2,14 @@ import plotly.express as px
 import polars as pl
 from dash.dcc import Graph
 from dash.html import H2, Div, P
-
 from analyzer_interface.context import WebPresenterContext
-
 from ..temporal.interface import (
     OUTPUT_COL_POST_COUNT,
     OUTPUT_COL_TIME_INTERVAL_END,
     OUTPUT_COL_TIME_INTERVAL_START,
     OUTPUT_TABLE_INTERVAL_COUNT,
 )
-
+from ..utils.pop import pop_unnecessary_fields
 
 def factory(context: WebPresenterContext):
     df_interval_count = pl.read_parquet(
@@ -57,7 +55,4 @@ def api_factory(context: WebPresenterContext):
         "description": "The bars indicate the number of posts in each time interval."
     }
 
-    presenter_model.pop("factory")
-    presenter_model.pop("api_factory")
-
-    return presenter_model
+    return pop_unnecessary_fields(presenter_model)
