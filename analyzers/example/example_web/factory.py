@@ -1,8 +1,8 @@
 import plotly.express as px
 import polars as pl
+from json import loads
 from dash.dcc import Graph
 from dash.html import Div
-
 from analyzer_interface.context import WebPresenterContext
 
 
@@ -48,3 +48,23 @@ def factory(context: WebPresenterContext):
             )
         ]
     )
+
+def api_factory(context: WebPresenterContext):
+    presenter_model = context.web_presenter.model_dump()
+    data_frame = pl.read_parquet(context.base.table("character_count").parquet_path)
+    presenter_model["figure_type"] = "histogram"
+    presenter_model["x"] = loads(data_frame["character_count"].hist(bins=50).serialize(format="json"))
+    presenter_model["axis"] = {
+        "x": {
+            "title": {"text": "Message Character Count"},
+        },
+        "y": {
+            "title": {"text": "Number of Messages"},
+        }
+    }
+
+    presenter_model.pop("base_analyzer")
+    presenter_model.pop("factory")
+    presenter_model.pop("api_factory")
+
+    return presenter_model
