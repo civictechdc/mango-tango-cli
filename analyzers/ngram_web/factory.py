@@ -154,6 +154,32 @@ def factory(context: WebPresenterContext):
         ],
     )
 
+def api_factory(context: WebPresenterContext):
+    presenter_model = context.web_presenter.model_dump()
+    data_frame = pl.read_parquet(context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path)
+    all_grams = sorted(set(data_frame[COL_NGRAM_WORDS].str.split(" ").explode()))
+    presenter_model["figure_type"] = "scatter"
+    presenter_model["grams"] = all_grams
+    presenter_model["col_ngram_words"] = COL_NGRAM_WORDS
+    presenter_model["explanation"] = {
+        "total_repetition": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times overall.",
+        "amplification_factor": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times on average per user."
+    }
+    presenter_model["axis"] = {
+        "x": {
+            "label": "Total Repetition",
+            "value": "total_repetition"
+        },
+        "y": {
+            "label": "Amplification Factor",
+            "value": "amplification_factor"
+        }
+    }
+
+    presenter_model.pop("factory")
+    presenter_model.pop("api_factory")
+
+    return presenter_model
 
 def create_word_matcher(subject: str, col: pl.Expr) -> Optional[pl.Expr]:
     subject = subject.strip().lower()

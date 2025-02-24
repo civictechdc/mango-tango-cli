@@ -16,12 +16,9 @@ class APIContext(BaseModel):
         )
 
         for endpoint in endpoints:
-            output.add_url_rule(
-                endpoint.path,
-                view_func=endpoint.view.as_view(
-                    endpoint.name,
-                    self.presenters_context
-                )
-            )
+            output.add_url_rule(endpoint.path, view_func=endpoint.view.as_view(
+                endpoint.name,
+                self.presenters_context
+            ))
 
         return output

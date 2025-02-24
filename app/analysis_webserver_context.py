@@ -1,6 +1,5 @@
 import logging
 import os.path
-import polars as pl
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from dash import Dash
@@ -24,7 +23,6 @@ class AnalysisWebServerContext(BaseModel):
         template_folder = os.path.join(containing_dir, "web_templates")
 
         web_presenters = self.analysis_context.web_presenters
-        vite_context = ViteContext(app_context=self.app_context)
         web_server = Flask(
             __name__,
             template_folder=template_folder,
@@ -33,9 +31,6 @@ class AnalysisWebServerContext(BaseModel):
         )
         web_server.logger.disabled = True
         temp_dirs: list[TemporaryDirectory] = []
-
-        web_server.register_blueprint(vite_context.create_blueprint())
-
         presenter_contexts = []
 
         for presenter in web_presenters:
@@ -60,8 +55,10 @@ class AnalysisWebServerContext(BaseModel):
 
         project_name = self.analysis_context.project_context.display_name
         analyzer_name = self.analysis_context.display_name
+        vite_context = ViteContext(app_context=self.app_context)
         api_context = APIContext(analysis_context=self.analysis_context, presenters_context=presenter_contexts)
 
+        web_server.register_blueprint(vite_context.create_blueprint())
         web_server.register_blueprint(api_context.create_blueprint())
 
         @web_server.route("/")
