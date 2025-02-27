@@ -14,7 +14,9 @@ def new_project(context: ViewContext):
     terminal = context.terminal
 
     with terminal.nest(draw_box("1. Data Source", padding_lines=0)):
-        print("Select a file for your dataset")
+        print(
+            "Select a .csv for your dataset\n\nText in [brackets] identifies the a folder\n\n"
+        )
         selected_file = prompts.file_selector(
             "Select a file", state=app.file_selector_state
         )
