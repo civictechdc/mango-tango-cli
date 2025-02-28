@@ -53,7 +53,7 @@ def api_factory(context: WebPresenterContext):
     presenter_model = context.web_presenter.model_dump()
     data_frame = pl.read_parquet(context.base.table("character_count").parquet_path)
     presenter_model["figure_type"] = "histogram"
-    presenter_model["x"] = loads(data_frame["character_count"].hist(bins=50).serialize(format="json"))["columns"]
+    presenter_model["x"] = data_frame["character_count"].to_list()
     presenter_model["axis"] = {
         "x": {
             "title": {"text": "Message Character Count"},
