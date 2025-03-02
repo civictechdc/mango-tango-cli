@@ -56,10 +56,12 @@ def api_factory(context: WebPresenterContext):
     presenter_model["x"] = data_frame["character_count"].to_list()
     presenter_model["axis"] = {
         "x": {
-            "title": {"text": "Message Character Count"},
+            "label": "Message Character Count",
+            "value": "message_character_count"
         },
         "y": {
-            "title": {"text": "Number of Messages"},
+            "label": "Number of Messages",
+            "value": "number_of_messages"
         }
     }
 
