@@ -152,10 +152,11 @@ def factory(context: WebPresenterContext):
     )
 
 def api_factory(context: WebPresenterContext):
-    presenter_model = context.web_presenter.model_dump()
     data_frame = pl.read_parquet(context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path)
+    presenter_model = context.web_presenter.model_dump()
     presenter_model["figure_type"] = "scatter"
     presenter_model["col_ngram_words"] = COL_NGRAM_WORDS
+    presenter_model["all_grams"] = sorted(set(data_frame[COL_NGRAM_WORDS].str.split(" ").explode()))
     presenter_model["x"] = data_frame[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list()
     presenter_model["y"] = {
         "total_repetition": data_frame[COL_NGRAM_TOTAL_REPS].to_list(),
