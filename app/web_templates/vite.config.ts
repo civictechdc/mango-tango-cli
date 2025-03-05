@@ -2,7 +2,6 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import TanStackRouterVite from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
     root: resolve(__dirname, './src'),
@@ -10,7 +9,6 @@ export default defineConfig({
     base: '/static',
     plugins: [
         react(),
-        TanStackRouterVite({target: 'react', autoCodeSplitting: true}),
         tailwindcss()
     ],
     build: {
@@ -27,5 +25,17 @@ export default defineConfig({
         alias: {
             '@': resolve(__dirname, './src')
         }
+    },
+    server: {
+        cors: true,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Accept, X-Requested-With',
+        },
+        hmr: {
+            overlay: true
+        }
     }
+
 });

@@ -7,14 +7,14 @@ interface GlobalPresentersState {
     clear: () => void;
 }
 
-const userPresentersState = create<GlobalPresentersState>((setState) => ({
+const usePresentersState = create<GlobalPresentersState>((setState): GlobalPresentersState => ({
     presenters: [],
-    set: (presenters: PresenterCollection) => setState((state: GlobalPresentersState) => {
+    set: (presenters: PresenterCollection): void => setState((state: GlobalPresentersState): GlobalPresentersState => {
         state.presenters = presenters;
 
         return state;
     }),
-    clear: () => setState((state: GlobalPresentersState) => {
+    clear: (): void => setState((state: GlobalPresentersState): GlobalPresentersState => {
         state.presenters = [];
 
         return state;
@@ -22,4 +22,4 @@ const userPresentersState = create<GlobalPresentersState>((setState) => ({
 }));
 
 export type { GlobalPresentersState };
-export default userPresentersState;
+export default usePresentersState;
