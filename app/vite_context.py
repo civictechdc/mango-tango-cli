@@ -2,6 +2,7 @@ from os import getenv, path
 from json import load
 from pathlib import Path
 from flask import Blueprint
+from flask_cors import CORS
 from pydantic import BaseModel
 from .app_context import AppContext
 
@@ -38,6 +39,14 @@ class ViteContext(BaseModel):
             except OSError as exception:
                 raise OSError("Manifest file not found. Run `npm run build`.") from exception
 
+        CORS(blueprint, resources={
+            r"/*": {
+                "origins": "*",
+                "allow_headers": ["Content-Type", "Authorization"],
+                "supports_credentials": True
+            }
+        })
+
         @blueprint.app_context_processor
         def add_context():
             def dev_asset(file_path):
@@ -53,6 +62,7 @@ class ViteContext(BaseModel):
             return {
                 "asset": prod_asset if self.is_production else dev_asset,
                 "is_production": self.is_production,
+                "vite_origin": self.vite_origin
             }
 
         return blueprint

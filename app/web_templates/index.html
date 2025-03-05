@@ -66,6 +66,11 @@
     </script>
     <link rel="stylesheet" type="text/css" href="{{ asset('styles/app.css') }}">
     {%- if not is_production %}
+    <script type="module">
+        window.$RefreshReg$ = () => {};
+        window.$RefreshSig$ = () => (type) => type;
+        window.__vite_plugin_react_preamble_installed__ = true;
+    </script>
     <script type="module" src="{{ asset('@vite/client') }}"></script>
     {%- endif %}
   </head>

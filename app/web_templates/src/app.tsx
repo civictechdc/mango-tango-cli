@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
-import { RouterProvider, createRouter, createRootRoute, createRoute, createBrowserHistory } from '@tanstack/react-router';
+import {
+    RouterProvider,
+    createRouter,
+    createRootRoute,
+    createRoute,
+    createBrowserHistory,
+    Outlet
+} from '@tanstack/react-router';
 import {fetchPresenters} from '@/lib/data/presenters.ts';
 import userPresentersState from '@/lib/state/presenters.ts';
-import type { ReactElement, FC, PropsWithChildren } from 'react';
+import type { ReactElement, FC } from 'react';
 import type { Router } from '@tanstack/react-router';
 import type { PresenterCollection } from '@/lib/data/presenters';
 import type { GlobalPresentersState } from '@/lib/state/presenters';
+import {PresenterView} from "@/components/presenter.tsx";
 
-function RootParent({ children }: PropsWithChildren): ReactElement<FC> {
-    return <>{children}</>;
+function RootParent(): ReactElement<FC> {
+    return <Outlet />;
 }
 
 const rootRoute = createRootRoute({
@@ -25,12 +33,16 @@ export default function App(): ReactElement<FC> {
         (async (): Promise<void> => {
             const presenters = await fetchPresenters(controller.signal) as PresenterCollection;
 
+            const indexRoute = createRoute({
+                path: '/',
+                getParentRoute: () => rootRoute,
+                component: () => <PresenterView />,
+                ssr: false
+            });
+
+
             setRoutes(createRouter({
-                routeTree: createRoute({
-                    path: '/',
-                    getParentRoute: () => rootRoute,
-                    component: () => <></>
-                }),
+                routeTree: rootRoute.addChildren([indexRoute]),
                 history: createBrowserHistory(),
             }));
             set(presenters);
@@ -38,8 +50,12 @@ export default function App(): ReactElement<FC> {
 
         return () => {
             controller.abort();
-        };
+        }
     }, []);
 
-    return <RouterProvider router={routes} />;
+    if (!routes) {
+        return <p>loading...</p>;
+    }
+
+    return <RouterProvider  router={routes} />;
 }
