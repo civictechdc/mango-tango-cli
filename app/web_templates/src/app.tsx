@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { fetchPresenters } from '@/lib/data/presenters.ts';
+import userPresentersState from '@/lib/state/presenters.ts';
 import {
     RouterProvider,
     createRouter,
@@ -7,13 +9,11 @@ import {
     createBrowserHistory,
     Outlet
 } from '@tanstack/react-router';
-import {fetchPresenters} from '@/lib/data/presenters.ts';
-import userPresentersState from '@/lib/state/presenters.ts';
+import { PresenterView } from '@/components/presenter.tsx';
 import type { ReactElement, FC } from 'react';
 import type { Router } from '@tanstack/react-router';
 import type { PresenterCollection } from '@/lib/data/presenters';
 import type { GlobalPresentersState } from '@/lib/state/presenters';
-import {PresenterView} from "@/components/presenter.tsx";
 
 function RootParent(): ReactElement<FC> {
     return <Outlet />;
