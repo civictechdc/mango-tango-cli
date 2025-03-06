@@ -1,23 +1,29 @@
 import usePresentersState from '@/lib/state/presenters';
-import type { ReactElement, FC, ReactNode } from 'react';
+import HistogramChart from '@/components/charts/histogram.tsx';
+import type { ReactElement, FC } from 'react';
 import type { Presenter, PresenterCollection } from '@/lib/data/presenters';
 import type { GlobalPresentersState } from '@/lib/state/presenters';
+import type { ChartConfig } from '@/components/ui/chart.tsx';
 
 export function PresenterView(): ReactElement<FC> {
     const presenters: PresenterCollection = usePresentersState((state: GlobalPresentersState) => state.presenters);
-    console.log('PresenterView');
-    if (presenters.length === 0) {
-        return <p>No charts to show yet!</p>;
-    }
+
+    if (presenters.length === 0) return <p>No charts to show yet!</p>;
 
     const presenter: Presenter = presenters[0];
-    let chartComponent: ReactNode | null = null;
+    let chartComponent: ReactElement<FC> | null = null;
 
     if (presenter.figure_type === 'histogram') {
-        chartComponent = <p>Test...</p>
+        const chartConfig: ChartConfig = {
+            count: {
+                label: presenter.axis.y.label,
+                color: "#2563eb"
+            }
+        };
+        chartComponent = <HistogramChart chartConfig={chartConfig} presenter={presenter} />;
     }
 
-    return (
-        <>{chartComponent}</>
-    );
+    if (chartComponent  == null) return <p>No component to show...</p>;
+
+    return chartComponent;
 }
