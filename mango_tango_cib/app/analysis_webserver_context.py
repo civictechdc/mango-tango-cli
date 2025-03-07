@@ -8,7 +8,7 @@ from flask import Flask, render_template
 from pydantic import BaseModel
 from waitress import serve
 
-from context import WebPresenterContext
+from mango_tango_cib.context import WebPresenterContext
 
 from .analysis_context import AnalysisContext
 from .app_context import AppContext
