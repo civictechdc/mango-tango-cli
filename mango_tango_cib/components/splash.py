@@ -1,5 +1,5 @@
+from mango_tango_cib.terminal_tools import clear_terminal, wait_for_key
 from meta import get_version
-from terminal_tools import clear_terminal, wait_for_key
 
 
 def splash():

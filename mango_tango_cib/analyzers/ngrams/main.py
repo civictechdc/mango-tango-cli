@@ -3,7 +3,7 @@ import re
 import polars as pl
 
 from analyzer_interface.context import PrimaryAnalyzerContext
-from terminal_tools import ProgressReporter
+from mango_tango_cib.terminal_tools import ProgressReporter
 
 from .interface import (
     COL_AUTHOR_ID,

@@ -1,6 +1,6 @@
 from sys import exit
 
-from terminal_tools import draw_box, prompts
+from mango_tango_cib.terminal_tools import draw_box, prompts
 
 from .analysis_main import analysis_main
 from .context import ViewContext

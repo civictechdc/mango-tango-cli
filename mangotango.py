@@ -4,8 +4,8 @@ from mango_tango_cib.analyzers import suite
 from mango_tango_cib.app import App, AppContext
 from mango_tango_cib.components import ViewContext, main_menu, splash
 from mango_tango_cib.storage import Storage
-from terminal_tools import enable_windows_ansi_support
-from terminal_tools.inception import TerminalContext
+from mango_tango_cib.terminal_tools import enable_windows_ansi_support
+from mango_tango_cib.terminal_tools.inception import TerminalContext
 
 if __name__ == "__main__":
     freeze_support()

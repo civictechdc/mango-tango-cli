@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 from mango_tango_cib.app import AnalysisContext, ProjectContext
-from terminal_tools import prompts, wait_for_key
+from mango_tango_cib.terminal_tools import prompts, wait_for_key
 
 
 def select_analysis(proj: ProjectContext) -> Optional[AnalysisContext]:

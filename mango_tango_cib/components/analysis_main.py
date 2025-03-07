@@ -1,7 +1,12 @@
 from colorama import Fore
 
 from mango_tango_cib.app import AnalysisContext
-from terminal_tools import draw_box, open_directory_explorer, prompts, wait_for_key
+from mango_tango_cib.terminal_tools import (
+    draw_box,
+    open_directory_explorer,
+    prompts,
+    wait_for_key,
+)
 
 from .context import ViewContext
 from .export_outputs import export_outputs

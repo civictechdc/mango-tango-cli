@@ -3,7 +3,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from analyzer_interface.context import SecondaryAnalyzerContext
-from terminal_tools import ProgressReporter
+from mango_tango_cib.terminal_tools import ProgressReporter
 
 from ..ngrams.interface import (
     COL_AUTHOR_ID,

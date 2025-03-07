@@ -4,7 +4,7 @@ from typing import Callable, Optional
 import polars as pl
 from pydantic import BaseModel
 
-import terminal_tools.prompts as prompts
+import mango_tango_cib.terminal_tools.prompts as prompts
 
 from .importer import Importer, ImporterSession
 

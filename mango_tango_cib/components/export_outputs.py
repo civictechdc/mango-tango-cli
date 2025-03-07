@@ -2,13 +2,13 @@ import os
 
 from mango_tango_cib.app import AnalysisContext, AnalysisOutputContext
 from mango_tango_cib.storage import SupportedOutputExtension
-from terminal_tools import (
+from mango_tango_cib.terminal_tools import (
     ProgressReporter,
     open_directory_explorer,
     prompts,
     wait_for_key,
 )
-from terminal_tools.progress import ProgressReporter
+from mango_tango_cib.terminal_tools.progress import ProgressReporter
 
 from .context import ViewContext
 

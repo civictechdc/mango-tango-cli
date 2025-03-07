@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 from mango_tango_cib.app import App
-from terminal_tools.inception import TerminalContext
+from mango_tango_cib.terminal_tools.inception import TerminalContext
 
 
 class ViewContext(BaseModel):
