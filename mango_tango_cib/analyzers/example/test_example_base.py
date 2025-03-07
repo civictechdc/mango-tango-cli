@@ -1,6 +1,7 @@
 import os
 
 from preprocessing.series_semantic import identifier
+
 from testing import CsvTestData, test_primary_analyzer
 
 from .example_base.interface import interface
