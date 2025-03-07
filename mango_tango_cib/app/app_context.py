@@ -3,7 +3,7 @@ from functools import cached_property
 from pydantic import BaseModel, ConfigDict
 
 from analyzer_interface.suite import AnalyzerSuite
-from storage import Storage
+from mango_tango_cib.storage import Storage
 
 
 class AppContext(BaseModel):

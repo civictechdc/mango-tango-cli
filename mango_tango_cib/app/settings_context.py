@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from storage import SettingsModel
+from mango_tango_cib.storage import SettingsModel
 
 from .app_context import AppContext
 

@@ -10,7 +10,7 @@ from context import (
     PrimaryAnalyzerContext,
     SecondaryAnalyzerContext,
 )
-from storage import AnalysisModel
+from mango_tango_cib.storage import AnalysisModel
 
 from .app_context import AppContext
 from .project_context import ProjectContext

@@ -1,7 +1,7 @@
 import os
 
 from mango_tango_cib.app import AnalysisContext, AnalysisOutputContext
-from storage import SupportedOutputExtension
+from mango_tango_cib.storage import SupportedOutputExtension
 from terminal_tools import (
     ProgressReporter,
     open_directory_explorer,
