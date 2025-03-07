@@ -2,7 +2,7 @@ from multiprocessing import freeze_support
 
 from mango_tango_cib.analyzers import suite
 from mango_tango_cib.app import App, AppContext
-from components import ViewContext, main_menu, splash
+from mango_tango_cib.components import ViewContext, main_menu, splash
 from storage import Storage
 from terminal_tools import enable_windows_ansi_support
 from terminal_tools.inception import TerminalContext

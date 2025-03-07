@@ -10,7 +10,7 @@ from analyzer_interface import (
     column_automap,
     get_data_type_compatibility_score,
 )
-from app import ProjectContext
+from mango_tango_cib.app import ProjectContext
 from terminal_tools import draw_box, print_ascii_table, prompts, wait_for_key
 
 from .context import ViewContext

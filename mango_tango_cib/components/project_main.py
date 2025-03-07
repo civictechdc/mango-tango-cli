@@ -1,6 +1,6 @@
 from colorama import Fore
 
-from app import ProjectContext
+from mango_tango_cib.app import ProjectContext
 from terminal_tools import draw_box, prompts, wait_for_key
 
 from .analysis_main import analysis_main

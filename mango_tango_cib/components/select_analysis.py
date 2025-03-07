@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from app import AnalysisContext, ProjectContext
+from mango_tango_cib.app import AnalysisContext, ProjectContext
 from terminal_tools import prompts, wait_for_key
 
 

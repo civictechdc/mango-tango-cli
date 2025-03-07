@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from app import App
+from mango_tango_cib.app import App
 from terminal_tools.inception import TerminalContext
 
 
