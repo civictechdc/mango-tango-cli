@@ -10,7 +10,7 @@ from analyzer_interface import (
     SecondaryAnalyzerInterface,
     WebPresenterDeclaration,
 )
-from meta import is_development
+from mango_tango_cib.meta import is_development
 
 
 class AnalyzerSuite(BaseModel):
