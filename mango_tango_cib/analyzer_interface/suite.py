@@ -3,7 +3,7 @@ from typing import Union
 
 from pydantic import BaseModel
 
-from analyzer_interface import (
+from mango_tango_cib.analyzer_interface import (
     AnalyzerDeclaration,
     AnalyzerInterface,
     SecondaryAnalyzerDeclaration,

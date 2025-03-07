@@ -1,6 +1,6 @@
 import polars as pl
 
-from analyzer_interface.context import SecondaryAnalyzerContext
+from mango_tango_cib.analyzer_interface.context import SecondaryAnalyzerContext
 
 
 def main(context: SecondaryAnalyzerContext):

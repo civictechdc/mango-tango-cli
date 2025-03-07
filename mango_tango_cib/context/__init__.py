@@ -5,20 +5,20 @@ import polars as pl
 from dash import Dash
 from pydantic import BaseModel
 
-from analyzer_interface import (
+from mango_tango_cib.analyzer_interface import (
     AnalyzerInterface,
     SecondaryAnalyzerInterface,
     WebPresenterInterface,
 )
-from analyzer_interface.context import AssetsReader, InputTableReader
-from analyzer_interface.context import (
+from mango_tango_cib.analyzer_interface.context import AssetsReader, InputTableReader
+from mango_tango_cib.analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
 )
-from analyzer_interface.context import (
+from mango_tango_cib.analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
-from analyzer_interface.context import TableReader, TableWriter
-from analyzer_interface.context import WebPresenterContext as BaseWebPresenterContext
+from mango_tango_cib.analyzer_interface.context import TableReader, TableWriter
+from mango_tango_cib.analyzer_interface.context import WebPresenterContext as BaseWebPresenterContext
 from mango_tango_cib.preprocessing.series_semantic import SeriesSemantic
 from mango_tango_cib.storage import AnalysisModel, Storage
 

@@ -3,7 +3,7 @@ import polars as pl
 from dash.dcc import Graph
 from dash.html import H2, Div, P
 
-from analyzer_interface.context import WebPresenterContext
+from mango_tango_cib.analyzer_interface.context import WebPresenterContext
 
 from ..temporal.interface import (
     OUTPUT_COL_POST_COUNT,

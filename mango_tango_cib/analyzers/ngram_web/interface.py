@@ -1,4 +1,4 @@
-from analyzer_interface import WebPresenterInterface
+from mango_tango_cib.analyzer_interface import WebPresenterInterface
 
 from ..ngram_stats import interface as ngram_stats_interface
 from ..ngrams import interface as ngrams_interface

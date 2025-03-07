@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import polars as pl
 
-from analyzer_interface.context import PrimaryAnalyzerContext
+from mango_tango_cib.analyzer_interface.context import PrimaryAnalyzerContext
 
 from .interface import (
     INPUT_COL_TIMESTAMP,

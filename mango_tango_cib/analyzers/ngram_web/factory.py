@@ -12,7 +12,7 @@ from dash.dcc import Input as DccInput
 from dash.dcc import RadioItems
 from dash.html import H2, Datalist, Div, Em, Label, Option, P
 
-from analyzer_interface.context import WebPresenterContext
+from mango_tango_cib.analyzer_interface.context import WebPresenterContext
 
 from ..ngram_stats.interface import (
     COL_NGRAM_DISTINCT_POSTER_COUNT,

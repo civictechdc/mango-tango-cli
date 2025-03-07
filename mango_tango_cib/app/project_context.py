@@ -3,7 +3,7 @@ from functools import cached_property
 import polars as pl
 from pydantic import BaseModel
 
-from analyzer_interface import UserInputColumn as BaseUserInputColumn
+from mango_tango_cib.analyzer_interface import UserInputColumn as BaseUserInputColumn
 from mango_tango_cib.storage import AnalysisModel, ProjectModel
 from mango_tango_cib.preprocessing.series_semantic import (
     SeriesSemantic,

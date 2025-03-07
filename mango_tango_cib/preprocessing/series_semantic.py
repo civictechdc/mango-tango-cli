@@ -4,7 +4,7 @@ from typing import Callable, Type, Union
 import polars as pl
 from pydantic import BaseModel
 
-from analyzer_interface import DataType
+from mango_tango_cib.analyzer_interface import DataType
 
 
 class SeriesSemantic(BaseModel):

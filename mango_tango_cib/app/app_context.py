@@ -2,7 +2,7 @@ from functools import cached_property
 
 from pydantic import BaseModel, ConfigDict
 
-from analyzer_interface.suite import AnalyzerSuite
+from mango_tango_cib.analyzer_interface.suite import AnalyzerSuite
 from mango_tango_cib.storage import Storage
 
 

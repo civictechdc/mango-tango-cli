@@ -1,4 +1,4 @@
-from analyzer_interface import (
+from mango_tango_cib.analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,

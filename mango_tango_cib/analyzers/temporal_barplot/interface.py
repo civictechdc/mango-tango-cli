@@ -1,4 +1,4 @@
-from analyzer_interface import WebPresenterInterface
+from mango_tango_cib.analyzer_interface import WebPresenterInterface
 
 from ..temporal import interface as temporal_interface
 

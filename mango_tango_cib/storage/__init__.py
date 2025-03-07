@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from tinydb import Query, TinyDB
 from xlsxwriter import Workbook
 
-from analyzer_interface.interface import AnalyzerOutput
+from mango_tango_cib.analyzer_interface.interface import AnalyzerOutput
 
 from .file_selector import FileSelectorStateManager
 

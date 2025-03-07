@@ -1,4 +1,4 @@
-from analyzer_interface import WebPresenterDeclaration
+from mango_tango_cib.analyzer_interface import WebPresenterDeclaration
 
 from .factory import factory
 from .interface import interface

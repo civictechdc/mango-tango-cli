@@ -3,7 +3,7 @@ import polars as pl
 from dash.dcc import Graph
 from dash.html import Div
 
-from analyzer_interface.context import WebPresenterContext
+from mango_tango_cib.analyzer_interface.context import WebPresenterContext
 
 
 def factory(context: WebPresenterContext):

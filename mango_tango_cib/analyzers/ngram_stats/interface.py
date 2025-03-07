@@ -1,4 +1,8 @@
-from analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
+from mango_tango_cib.analyzer_interface import (
+    AnalyzerOutput,
+    OutputColumn,
+    SecondaryAnalyzerInterface,
+)
 
 from ..ngrams import interface as ngrams_interface
 from ..ngrams.interface import (

@@ -1,4 +1,4 @@
-from analyzer_interface import AnalyzerSuite
+from mango_tango_cib.analyzer_interface import AnalyzerSuite
 
 from .example.example_base import example_base
 from .example.example_report import example_report

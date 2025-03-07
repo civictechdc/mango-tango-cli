@@ -3,7 +3,7 @@ from typing import Optional
 
 import polars as pl
 
-from analyzer_interface import (
+from mango_tango_cib.analyzer_interface import (
     AnalyzerInterface,
     InputColumn,
     UserInputColumn,
