@@ -2,7 +2,7 @@ import os
 from traceback import format_exc
 from typing import Optional
 
-from importing import Importer, ImporterSession, importers
+from mango_tango_cib.importing import Importer, ImporterSession, importers
 from mango_tango_cib.terminal_tools import draw_box, prompts, wait_for_key
 from mango_tango_cib.terminal_tools.inception import Scope
 
