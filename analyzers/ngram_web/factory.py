@@ -153,14 +153,15 @@ def factory(context: WebPresenterContext):
 
 def api_factory(context: WebPresenterContext):
     data_frame = pl.read_parquet(context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path)
+    matcher = create_word_matcher("", pl.col(COL_NGRAM_WORDS))
+    plotted_df = data_frame.filter(matcher) if matcher is not None else data_frame
     presenter_model = context.web_presenter.model_dump()
     presenter_model["figure_type"] = "scatter"
-    presenter_model["col_ngram_words"] = COL_NGRAM_WORDS
-    presenter_model["all_grams"] = sorted(set(data_frame[COL_NGRAM_WORDS].str.split(" ").explode()))
-    presenter_model["x"] = data_frame[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list()
+    presenter_model["ngrams"] = plotted_df[COL_NGRAM_WORDS].to_list()
+    presenter_model["x"] = plotted_df[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list()
     presenter_model["y"] = {
-        "total_repetition": data_frame[COL_NGRAM_TOTAL_REPS].to_list(),
-        "amplification_factor": (data_frame[COL_NGRAM_TOTAL_REPS] / data_frame[COL_NGRAM_DISTINCT_POSTER_COUNT]).to_list(),
+        "total_repetition": plotted_df[COL_NGRAM_TOTAL_REPS].to_list(),
+        "amplification_factor": (plotted_df[COL_NGRAM_TOTAL_REPS] / plotted_df[COL_NGRAM_DISTINCT_POSTER_COUNT]).to_list(),
     }
     presenter_model["explanation"] = {
         "total_repetition": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times overall.",
