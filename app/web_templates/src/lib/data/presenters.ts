@@ -1,4 +1,3 @@
-
 export type DependencyOutputColumn = {
     data_type: string;
     description: string | null;
@@ -61,8 +60,6 @@ export type Presenter = {
         x: PresenterAxisLabel;
         y: PresenterAxisLabel;
     },
-    col_ngram_words: string | undefined;
-    all_grams: Array<string> | undefined;
     depends_on: Array<PresenterDependecy>;
     explanation: {
         [index: string]: string;
@@ -75,6 +72,7 @@ export type Presenter = {
     server_name: string | null;
     short_description: string | null;
     version: string;
+    ngrams: Array<string> | undefined;
     x: Array<string> | Array<number> | PresenterAxisData;
     y: Array<string> | Array<number> | PresenterAxisData;
 };
@@ -86,7 +84,6 @@ export type PresentersResponse = {
     count: number;
     data: PresenterCollection;
 };
-
 
 export async function fetchPresenters(signal: AbortSignal | undefined): Promise<PresenterCollection | null> {
     let fetchConf: RequestInit = {

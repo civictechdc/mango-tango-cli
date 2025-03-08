@@ -2,13 +2,7 @@ import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart.tsx';
 import type { ReactElement, FC } from 'react';
-import type {Presenter} from '@/lib/data/presenters.ts';
-import type { ChartConfig } from '@/components/ui/chart.tsx';
-
-interface HistogramProps {
-    presenter: Presenter;
-    chartConfig: ChartConfig;
-}
+import type { ChartProps } from '@/components/charts/props.ts';
 
 type HistogramBin = {
     binStart: number;
@@ -17,9 +11,9 @@ type HistogramBin = {
     label: string;
 };
 
-export default function HistogramChart({ presenter, chartConfig }: HistogramProps): ReactElement<FC> {
+export default function HistogramChart({ presenter }: ChartProps): ReactElement<FC> {
     const data: Array<HistogramBin> = useMemo(() => {
-        if (!Array.isArray(presenter.x)) return [];
+        if (presenter == null) return [];
 
         const rawData = presenter.x as Array<number>;
         const binCount = 50;
@@ -51,7 +45,7 @@ export default function HistogramChart({ presenter, chartConfig }: HistogramProp
     console.log(data);
 
     return (
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={{}}>
             <BarChart accessibilityLayer data={data}>
                 <XAxis
                   dataKey="bin"
@@ -72,17 +66,17 @@ export default function HistogramChart({ presenter, chartConfig }: HistogramProp
                     value: presenter.axis.y.label,
                     angle: -90,
                     position: 'left',
-                    offset: -10,
+                    offset: -1,
                     style: { textAnchor: 'middle' }
                   }}
                 />
                 <CartesianGrid vertical={false} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Bar dataKey="count" name={presenter.axis.y.label} />
+                <Bar dataKey="count" fill="#2563eb" name={presenter.axis.y.label} radius={4} />
             </BarChart>
         </ChartContainer>
     );
 }
 
-export type {HistogramProps, HistogramBin};
+export type { HistogramBin };
