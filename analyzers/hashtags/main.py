@@ -21,21 +21,23 @@ COLS_ALL = [COL_AUTHOR_ID, COL_TIME, COL_HASHTAGS]
 NULL_CHAR = "[]"  # this is taken as the null character for hashtags
 
 
-def gini(x):
+def gini(x: pl.Series) -> float:
     """
     Parameters
     ----------
-    x : list[str]
-        List of values for which to compute the Gini coefficient
+    x : pl.Series
+        polars Series containing values for which to compute the Gini coefficient
 
     Returns
     -------
     float
-        Gini coefficient
+        Gini coefficient (between 0.0 and 1.0)
     """
-    x_counts = Counter(x).values()
+    sorted_x = (
+        x.value_counts()
+        .sort(by="count", descending=False)[:, 1].to_list()
+    )
 
-    sorted_x = sorted(x_counts)
     n = len(sorted_x)
     cumx = list(accumulate(sorted_x))
 
@@ -44,6 +46,7 @@ def gini(x):
 
 def hashtag_analysis(data_frame:pl.DataFrame, every="1h") -> pl.DataFrame:
 
+    # define the expressions
     has_hashtag_symbol = pl.col(COL_HASHTAGS).str.contains("#").any()
     extract_hashtags = pl.col(COL_HASHTAGS).str.extract_all(r'(#\S+)')
     extract_hashtags_by_split = (
@@ -54,48 +57,45 @@ def hashtag_analysis(data_frame:pl.DataFrame, every="1h") -> pl.DataFrame:
         .str.split(",")
         )
 
-    # assign None to messages with no hashtags
+    # if hashtag symbol is detected, extract with regex
     if data_frame.select(has_hashtag_symbol).item():
         df_input = (
             data_frame
             .with_columns(extract_hashtags)
             .filter(pl.col(COL_HASHTAGS) != [])
         )
-    else:
+    else: # otherwise, we assume str: "['hashtag1', 'hashtag2', ...]"
         df_input = (
             data_frame
-            .filter(pl.col(COL_HASHTAGS) == '[]')
+            .filter(pl.col(COL_HASHTAGS) != '[]')
             .with_columns(extract_hashtags_by_split)
         )
 
-    # select columns
-    df_input = df_input.select(pl.col(COLS_ALL))
+    # select columns and sort
+    df_input = (
+        df_input
+        .select(pl.col(COLS_ALL))
+        .sort(pl.col(COL_TIME))
+    )
 
-    breakpoint()
-
-    df_agg = (
-        df_input.drop_nulls(pl.col(COL_HASHTAGS))
-        .select(
-            pl.col(COL_TIME),
-            pl.col(COL_HASHTAGS),
+    df_out = (
+        df_input
+        .explode(pl.col(COL_HASHTAGS))
+        .with_columns(
+            window_start = pl.col(COL_TIME).dt.truncate(every)
         )
-        .sort(COL_TIME)
-        .group_by_dynamic(COL_TIME, every=every)  # this could be a parameter
-        .agg(
-            pl.col(COL_HASHTAGS).explode().alias(OUTPUT_COL_HASHTAGS),
-            pl.col(COL_HASHTAGS).explode().count().alias(OUTPUT_COL_COUNT),
-            pl.col(COL_HASHTAGS)
-            .explode()
-            .map_elements(
-                lambda x: gini(x.to_list()),
-                return_dtype=pl.Float32,
-                returns_scalar=True,
+        .group_by("window_start").agg(
+            users = pl.col(COL_AUTHOR_ID),
+            hashtags = pl.col(COL_HASHTAGS),
+            count = pl.col(COL_HASHTAGS).count(),
+            gini = pl.col(COL_HASHTAGS)
+            .map_batches(
+                gini, returns_scalar=True
             )
-            .alias(OUTPUT_COL_GINI),
         )
     )
 
-    return df_agg
+    return df_out
 
 def main(context: PrimaryAnalyzerContext):
 
