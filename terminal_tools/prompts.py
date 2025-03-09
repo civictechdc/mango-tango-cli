@@ -68,7 +68,7 @@ def file_selector(
     while True:
         print(f"current path: {current_path}")
         choices = [
-            ("[..]", ".."),
+            ("[..]Exit folder/move to higher-level directory", ".."),
             *(
                 (f"[{entry}]" if is_dir(entry) else entry, entry)
                 for entry in sorted(os.listdir(current_path))

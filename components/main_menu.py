@@ -13,21 +13,14 @@ from .select_project import select_project
 def main_menu(context: ViewContext):
     terminal = context.terminal
     while True:
-        exit_instruction = "⟪ Hit Ctrl+C at any time to exit a menu ⟫"
-        welcome_message = "Import your datasets to run analysis for likelihood of coordinated inauthentic behavior."
-        with terminal.nest(
-            draw_box("CIB Mango Tree")
-            + "\n"
-            + exit_instruction
-            + "\n\n"
-            + welcome_message
-            + "\n"
-        ):
+      
+        exit_instruction = "⟪ Hit Ctrl+C at any time to go back ⟫"
+        with terminal.nest(draw_box("CIB Mango Tree") + "\n" + exit_instruction + "\n"):
             action = prompts.list_input(
                 "What would you like to do?",
                 choices=[
-                    ("Import dataset for new project", "new_project"),
-                    ("Review existing project", "load_project"),
+                    ("Import dataset", "new_project"),
+                    ("Load existing Project", "load_project"),
                     ("Exit", "exit"),
                 ],
             )
@@ -51,7 +44,7 @@ def main_menu(context: ViewContext):
 
         if action == "load_project":
             with terminal.nest(
-                draw_box("CIB Mango Tree: Load Dataset")
+                draw_box("CIB Mango Tree: Load Project")
                 + "\n"
                 + exit_instruction
                 + "\n"
