@@ -1,4 +1,3 @@
-from collections import Counter
 from itertools import accumulate
 
 import polars as pl
@@ -9,6 +8,7 @@ from .interface import (
     COL_AUTHOR_ID,
     COL_HASHTAGS,
     COL_TIME,
+    OUTPUT_COL_USERS,
     OUTPUT_COL_COUNT,
     OUTPUT_COL_GINI,
     OUTPUT_COL_HASHTAGS,
@@ -85,13 +85,17 @@ def hashtag_analysis(data_frame:pl.DataFrame, every="1h") -> pl.DataFrame:
             window_start = pl.col(COL_TIME).dt.truncate(every)
         )
         .group_by("window_start").agg(
-            users = pl.col(COL_AUTHOR_ID),
-            hashtags = pl.col(COL_HASHTAGS),
-            count = pl.col(COL_HASHTAGS).count(),
-            gini = pl.col(COL_HASHTAGS)
+            pl.col(COL_AUTHOR_ID).alias(OUTPUT_COL_USERS),
+            pl.col(COL_HASHTAGS).alias(OUTPUT_COL_HASHTAGS),
+            pl.col(COL_HASHTAGS).count().alias(OUTPUT_COL_COUNT),
+            pl.col(COL_HASHTAGS)
             .map_batches(
                 gini, returns_scalar=True
-            )
+            ).alias(OUTPUT_COL_GINI)
+        )
+        .with_columns(
+            pl.col(OUTPUT_COL_USERS).list.join(", ").alias(OUTPUT_COL_USERS),
+            pl.col(OUTPUT_COL_HASHTAGS).list.join(", ").alias(OUTPUT_COL_HASHTAGS)
         )
     )
 
