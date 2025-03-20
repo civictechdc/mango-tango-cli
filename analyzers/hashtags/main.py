@@ -8,10 +8,10 @@ from .interface import (
     COL_AUTHOR_ID,
     COL_HASHTAGS,
     COL_TIME,
-    OUTPUT_COL_USERS,
     OUTPUT_COL_COUNT,
     OUTPUT_COL_GINI,
     OUTPUT_COL_HASHTAGS,
+    OUTPUT_COL_USERS,
     OUTPUT_GINI,
 )
 
@@ -33,10 +33,7 @@ def gini(x: pl.Series) -> float:
     float
         Gini coefficient (between 0.0 and 1.0)
     """
-    sorted_x = (
-        x.value_counts()
-        .sort(by="count", descending=False)[:, 1].to_list()
-    )
+    sorted_x = x.value_counts().sort(by="count", descending=False)[:, 1].to_list()
 
     n = len(sorted_x)
     cumx = list(accumulate(sorted_x))
@@ -44,61 +41,49 @@ def gini(x: pl.Series) -> float:
     return (n + 1 - 2 * sum(cumx) / cumx[-1]) / n
 
 
-def hashtag_analysis(data_frame:pl.DataFrame, every="1h") -> pl.DataFrame:
-
+def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
     # define the expressions
     has_hashtag_symbol = pl.col(COL_HASHTAGS).str.contains("#").any()
-    extract_hashtags = pl.col(COL_HASHTAGS).str.extract_all(r'(#\S+)')
+    extract_hashtags = pl.col(COL_HASHTAGS).str.extract_all(r"(#\S+)")
     extract_hashtags_by_split = (
         pl.col(COL_HASHTAGS)
         .str.strip_chars("[]")
         .str.replace_all("'", "")
         .str.replace_all(" ", "")
         .str.split(",")
-        )
+    )
 
     # if hashtag symbol is detected, extract with regex
     if data_frame.select(has_hashtag_symbol).item():
-        df_input = (
-            data_frame
-            .with_columns(extract_hashtags)
-            .filter(pl.col(COL_HASHTAGS) != [])
+        df_input = data_frame.with_columns(extract_hashtags).filter(
+            pl.col(COL_HASHTAGS) != []
         )
-    else: # otherwise, we assume str: "['hashtag1', 'hashtag2', ...]"
-        df_input = (
-            data_frame
-            .filter(pl.col(COL_HASHTAGS) != '[]')
-            .with_columns(extract_hashtags_by_split)
+    else:  # otherwise, we assume str: "['hashtag1', 'hashtag2', ...]"
+        df_input = data_frame.filter(pl.col(COL_HASHTAGS) != "[]").with_columns(
+            extract_hashtags_by_split
         )
 
     # select columns and sort
-    df_input = (
-        df_input
-        .select(pl.col(COLS_ALL))
-        .sort(pl.col(COL_TIME))
-    )
+    df_input = df_input.select(pl.col(COLS_ALL)).sort(pl.col(COL_TIME))
 
     df_out = (
-        df_input
-        .explode(pl.col(COL_HASHTAGS))
-        .with_columns(
-            window_start = pl.col(COL_TIME).dt.truncate(every)
-        )
-        .group_by("window_start").agg(
+        df_input.explode(pl.col(COL_HASHTAGS))
+        .with_columns(window_start=pl.col(COL_TIME).dt.truncate(every))
+        .group_by("window_start")
+        .agg(
             pl.col(COL_AUTHOR_ID).alias(OUTPUT_COL_USERS),
             pl.col(COL_HASHTAGS).alias(OUTPUT_COL_HASHTAGS),
             pl.col(COL_HASHTAGS).count().alias(OUTPUT_COL_COUNT),
             pl.col(COL_HASHTAGS)
-            .map_batches(
-                gini, returns_scalar=True
-            ).alias(OUTPUT_COL_GINI)
+            .map_batches(gini, returns_scalar=True)
+            .alias(OUTPUT_COL_GINI),
         )
     )
 
     return df_out
 
-def main(context: PrimaryAnalyzerContext):
 
+def main(context: PrimaryAnalyzerContext):
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
 
