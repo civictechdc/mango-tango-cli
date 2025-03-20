@@ -10,8 +10,9 @@ COL_AUTHOR_ID = "user_id"
 COL_TIME = "time"
 COL_HASHTAGS = "hashtags"
 
+OUTPUT_COL_USERS = "users"
 OUTPUT_GINI = "gini_coef"
-OUTPUT_COL_TIMESPAN = "time_span"
+OUTPUT_COL_TIMESPAN = "timewindow_start"
 OUTPUT_COL_GINI = "gini"
 OUTPUT_COL_COUNT = "count"
 OUTPUT_COL_HASHTAGS = COL_HASHTAGS
@@ -19,7 +20,7 @@ OUTPUT_COL_HASHTAGS = COL_HASHTAGS
 interface = AnalyzerInterface(
     id="hashtags",
     version="0.1.0",
-    name="hashtags",
+    name="Hashtags analysis",
     short_description="Computes the gini coefficient over hashtag usage",
     long_description="""
     Analysis of hashtags measures the extent of online coordination among social media users
@@ -81,6 +82,7 @@ interface = AnalyzerInterface(
             name="Gini coefficient over time",
             columns=[
                 OutputColumn(name=OUTPUT_COL_TIMESPAN, data_type="datetime"),
+                OutputColumn(name=OUTPUT_COL_USERS, data_type="text"),
                 OutputColumn(name=OUTPUT_COL_GINI, data_type="float"),
                 OutputColumn(name=OUTPUT_COL_COUNT, data_type="integer"),
                 OutputColumn(name=OUTPUT_COL_HASHTAGS, data_type="text"),
