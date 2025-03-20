@@ -93,10 +93,6 @@ def hashtag_analysis(data_frame:pl.DataFrame, every="1h") -> pl.DataFrame:
                 gini, returns_scalar=True
             ).alias(OUTPUT_COL_GINI)
         )
-        .with_columns(
-            pl.col(OUTPUT_COL_USERS).list.join(", ").alias(OUTPUT_COL_USERS),
-            pl.col(OUTPUT_COL_HASHTAGS).list.join(", ").alias(OUTPUT_COL_HASHTAGS)
-        )
     )
 
     return df_out
