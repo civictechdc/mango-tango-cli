@@ -3,8 +3,6 @@ from functools import cached_property
 from tempfile import TemporaryDirectory
 
 import polars as pl
-from pydantic import BaseModel
-
 from analyzer_interface import SecondaryAnalyzerInterface
 from analyzer_interface.context import AssetsReader, InputTableReader
 from analyzer_interface.context import (
@@ -14,6 +12,7 @@ from analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
 from analyzer_interface.context import TableReader, TableWriter
+from pydantic import BaseModel
 
 
 class TestPrimaryAnalyzerContext(BasePrimaryAnalyzerContext):

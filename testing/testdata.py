@@ -2,9 +2,8 @@ from abc import ABC, abstractmethod
 from typing import TypeVar
 
 import polars as pl
-from pydantic import BaseModel
-
 from preprocessing.series_semantic import SeriesSemantic
+from pydantic import BaseModel
 
 T = TypeVar("T", bound=pl.DataFrame | pl.LazyFrame)
 
