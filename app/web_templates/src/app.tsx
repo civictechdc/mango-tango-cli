@@ -32,14 +32,12 @@ export default function App(): ReactElement<FC> {
 
         (async (): Promise<void> => {
             const presenters = await fetchPresenters(controller.signal) as PresenterCollection;
-
             const indexRoute = createRoute({
                 path: '/',
                 getParentRoute: () => rootRoute,
                 component: () => <PresenterView />,
                 ssr: false
             });
-
 
             setRoutes(createRouter({
                 routeTree: rootRoute.addChildren([indexRoute]),
@@ -53,9 +51,7 @@ export default function App(): ReactElement<FC> {
         }
     }, []);
 
-    if (!routes) {
-        return <p>loading...</p>;
-    }
+    if (!routes) return <p>loading...</p>;
 
     return <RouterProvider  router={routes} />;
 }

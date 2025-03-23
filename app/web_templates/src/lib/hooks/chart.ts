@@ -1,7 +1,9 @@
 import { useRef, useEffect } from 'react';
 import { init } from 'echarts';
 import type { RefObject } from 'react';
-import type { EChartsOption, EChartsType, TopLevelFormatterParams, DatasetOption, XAXisOption, YAXisOption, SeriesOption$1 } from 'echarts';
+import type { EChartsOption, EChartsType, SeriesOption } from 'echarts';
+import type { TopLevelFormatterParams, DatasetOption } from 'echarts/types/dist/shared';
+import type { XAXisComponentOption, YAXisComponentOption } from 'echarts/types/dist/echarts';
 
 export type DataPoint = {
     x: number;
@@ -22,10 +24,10 @@ export type DataPoints = Array<DataPoint>;
 
 export default function useChart(
     data: DatasetOption | Array<DatasetOption>,
-    xAxis: XAXisOption | Array<XAXisOption>,
-    yAxis: YAXisOption | Array<YAXisOption>,
-    series: SeriesOption$1 | Array<SeriesOption$1>,
-    tooltipFormatter: (params: TopLevelFormatterParams) => string,
+    xAxis: XAXisComponentOption | Array<XAXisComponentOption>,
+    yAxis: YAXisComponentOption | Array<YAXisComponentOption>,
+    series: SeriesOption | Array<SeriesOption>,
+    tooltipFormatter?: (params: TopLevelFormatterParams) => string,
 ): ChartProperties {
     const containerRef = useRef<any>(null);
     const chartRef = useRef<EChartsType | null>(null);

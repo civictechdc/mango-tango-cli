@@ -11,11 +11,9 @@ export function PresenterView(): ReactElement<FC> {
     if (presenters.length === 0) return <p>No charts to show yet!</p>;
 
     const presenter: Presenter = presenters[0];
-    let chartComponent: ReactElement<FC> | null = null;
 
-    if (presenter.figure_type === 'histogram') chartComponent = <HistogramChart presenter={presenter} />;
-    if (presenter.figure_type === 'scatter') chartComponent = <NgramScatterPlot presenter={presenter} />
-    if (chartComponent  == null) return <p>No component to show...</p>;
+    if (presenter.figure_type === 'histogram') return <HistogramChart presenter={presenter} />;
+    if (presenter.figure_type === 'scatter') return <NgramScatterPlot presenter={presenter} />
 
-    return chartComponent;
+    return <p>No component to show...</p>;
 }
