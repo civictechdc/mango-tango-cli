@@ -1,6 +1,6 @@
 import usePresentersState from '@/lib/state/presenters';
 import HistogramChart from '@/components/example_histogram.tsx';
-import ScatterPlotChart from '@/components/ngram_scatter.tsx';
+import NgramScatterPlot from '@/components/ngram_scatter.tsx';
 import type { ReactElement, FC } from 'react';
 import type { Presenter, PresenterCollection } from '@/lib/data/presenters';
 import type { GlobalPresentersState } from '@/lib/state/presenters';
@@ -14,7 +14,7 @@ export function PresenterView(): ReactElement<FC> {
     let chartComponent: ReactElement<FC> | null = null;
 
     if (presenter.figure_type === 'histogram') chartComponent = <HistogramChart presenter={presenter} />;
-    if (presenter.figure_type === 'scatter') chartComponent = <ScatterPlotChart presenter={presenter} />
+    if (presenter.figure_type === 'scatter') chartComponent = <NgramScatterPlot presenter={presenter} />
     if (chartComponent  == null) return <p>No component to show...</p>;
 
     return chartComponent;

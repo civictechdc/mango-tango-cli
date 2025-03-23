@@ -1,89 +1,53 @@
 import { useMemo } from 'react';
-import { ScatterChart, Scatter,  XAxis, YAxis, CartesianGrid } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartLegend, ChartLegendContent } from '@/components/ui/chart.tsx';
+import ScatterPlot from '@/components/charts/scatter.tsx';
 import type { ReactElement, FC } from 'react';
 import type { ChartProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
+import type {TopLevelFormatterParams, DatasetOption} from 'echarts';
 
-export type ScatterPlotData = {
+export type NgramScatterPlotDataPoint = {
     ngram: string;
     x: number;
     y: number;
-}
+};
 
-export default function ScatterPlotChart({ presenter }: ChartProps): ReactElement<FC> {
-    const data: Array<ScatterPlotData> = useMemo(() => {
+export type NgramScatterPlotDataPoints = Array<NgramScatterPlotDataPoint>;
+
+export default function NgramScatterPlot({ presenter }: ChartProps): ReactElement<FC> {
+    const data: DatasetOption = useMemo(() => {
         if (presenter == null) return [];
 
         const rawNgrams = presenter.ngrams as Array<string>;
         const rawX = presenter.x as Array<number>;
         const rawY = (presenter.y as PresenterAxisData)['total_repetition'] as Array<number>;
 
-        return Array.from({length: rawX.length}, (_, index: number): ScatterPlotData => ({
-            ngram: rawNgrams[index],
-            x: rawX[index],
-            y: rawY[index],
-        })).filter(item => item.x > 0 && item.y > 0);
+        return {
+            dimensions: ['ngram', 'x', 'y'],
+            source: Array.from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
+                ngram: rawNgrams[index],
+                x: rawX[index],
+                y: rawY[index],
+            }))
+        };
     }, [presenter]);
+    const labels = {x: 'User Repetition', y: 'Total Repetition'};
+    const tooltipFormatter = (params: TopLevelFormatterParams): string => {
+        return `
+            <div class="grid gap-1.5">
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                    <span class="font-bold">${params.data.ngram}</span>
+                </div>
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                    ${labels.x != null && labels.x.length > 0 ? `<span class="font-bold">${labels.x}:</span>` : ''}
+                    <span>${params.data.x}</span>
+                </div>
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                    ${labels.y != null && labels.y.length > 0 ? `<span class="font-bold">${labels.y}:</span>` : ''}
+                    <span>${params.data.y}</span>
+                </div>
+            </div>
+        `;
+    }
 
-    return (
-        <ChartContainer config={{}}>
-            <ScatterChart>
-                <XAxis
-                  type="number"
-                  name="User Count"
-                  dataKey="x"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  domain={['auto', 'auto']}
-                  scale="log"
-                  tickFormatter={(value) => value.toLocaleString()}
-                  label={{
-                    value: presenter.axis.x.label,
-                    position: 'bottom',
-                    offset: 0,
-                    style: { textAnchor: 'middle' }
-                  }}
-                />
-                <YAxis
-                  type="number"
-                  name="Total Repetition"
-                  dataKey="y"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  domain={['auto', 'auto']}
-                  scale="log"
-                  tickFormatter={(value) => value.toLocaleString()}
-                  label={{
-                    value: presenter.axis.y.label,
-                    angle: -90,
-                    position: 'left',
-                    offset: -1,
-                    style: { textAnchor: 'middle' }
-                  }}
-                />
-                <CartesianGrid vertical={false} />
-                <ChartTooltip
-                    formatter={(value: number, name: string) => [value.toLocaleString(), name]}
-                    labelFormatter={(value) => `N-gram: ${value}`}
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        return (
-                          <div className="bg-white p-2 border border-gray-200 shadow-md rounded">
-                            <p className="font-bold">{`"${data.ngram}"`}</p>
-                            <p>{`User Count: ${data.x.toLocaleString()}`}</p>
-                            <p>{`Total Repetition: ${data.y.toLocaleString()}`}</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }} />
-                <ChartLegend content={<ChartLegendContent />} />
-                <Scatter name="N-gram Repetition" data={data} line={false} />
-            </ScatterChart>
-        </ChartContainer>
-    );
+    return <ScatterPlot data={data} labels={labels} tooltipFormatter={tooltipFormatter} />;
 }
