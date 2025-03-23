@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from typing import TypeVar, Literal
 
 import polars as pl
 from preprocessing.series_semantic import SeriesSemantic
@@ -59,7 +59,7 @@ class FileTestData(TestData):
 class CsvConfig(BaseModel):
     has_header: bool = True
     quote_char: str = '"'
-    encoding: str = "utf8"
+    encoding: Literal["utf8", "utf8-lossy"] = "utf8"
     separator: str = ","
 
 
@@ -77,10 +77,22 @@ class CsvTestData(TestData):
         super().__init__(filepath=filepath, semantics=semantics, csv_config=csv_config)
 
     def _load_as_polars(self) -> pl.DataFrame:
-        return pl.read_csv(self.filepath)
+        return pl.read_csv(
+            self.filepath,
+            has_header=self.csv_config.has_header,
+            quote_char=self.csv_config.quote_char,
+            encoding=self.csv_config.encoding,
+            separator=self.csv_config.separator,
+        )
 
     def _scan_as_polars(self) -> pl.LazyFrame:
-        return pl.scan_csv(self.filepath)
+        return pl.scan_csv(
+            self.filepath,
+            has_header=self.csv_config.has_header,
+            quote_char=self.csv_config.quote_char,
+            encoding=self.csv_config.encoding,
+            separator=self.csv_config.separator,
+        )
 
 
 class JsonTestData(FileTestData):

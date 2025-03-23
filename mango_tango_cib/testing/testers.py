@@ -5,7 +5,7 @@ from typing import Callable
 
 import polars as pl
 import pytest
-from analyzer_interface import AnalyzerInterface, SecondaryAnalyzerInterface
+from analyzer_interface import AnalyzerInterface
 from analyzer_interface.context import PrimaryAnalyzerContext, SecondaryAnalyzerContext
 
 from .comparers import compare_dfs

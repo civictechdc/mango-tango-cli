@@ -2,7 +2,7 @@ import os
 
 from preprocessing.series_semantic import identifier
 
-from testing import CsvTestData, test_primary_analyzer
+from testing import CsvTestData, CsvConfig, test_primary_analyzer
 
 from .example_base.interface import interface
 from .example_base.main import main
@@ -24,6 +24,11 @@ def test_example_base():
         # interface schema.
         input=CsvTestData(
             os.path.join(test_data_dir, "input.csv"),
+            # This is optional, it specfies how the CSV file should be parsed.
+            # What's listed below are the defaults, and all are optional.
+            csv_config=CsvConfig(
+                has_header=True, quote_char='"', encoding="utf8", separator=","
+            ),
             # Specifying the column semantics are optional, and are optional for
             # each column. It's useful in CsvTestData, ExcelTestData, and
             # JsonTestData if you have data that need to be interpreted into
