@@ -54,5 +54,5 @@ export default function NgramScatterPlot({ presenter }: ChartProps): ReactElemen
         `;
     }
 
-    return <ScatterPlot data={data} labels={labels} tooltipFormatter={tooltipFormatter} />;
+    return <ScatterPlot data={data} tooltipFormatter={tooltipFormatter} />;
 }
