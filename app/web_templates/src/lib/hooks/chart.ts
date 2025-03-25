@@ -73,18 +73,7 @@ export default function useChart(
                 }
             },
             dataZoom: [
-                {
-                    id: 'dataZoomX',
-                    type: 'inside',
-                    xAxisIndex: 0,
-                    filterMode: 'none'
-                },
-                {
-                    id: 'dataZoomY',
-                    type: 'inside',
-                    yAxisIndex: 0,
-                    filterMode: 'none'
-                },
+                {type: 'inside'}
             ],
             dataset: data,
             xAxis: xAxis,
