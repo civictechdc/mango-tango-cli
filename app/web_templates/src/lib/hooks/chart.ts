@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { init } from 'echarts';
 import type { RefObject } from 'react';
 import type { EChartsOption, EChartsType, SeriesOption } from 'echarts';
@@ -13,6 +13,7 @@ export type DataPoint = {
 
 export type ChartProperties = {
     containerRef: RefObject<any>;
+    chart: EChartsType | null;
 };
 
 export type Dimensions = {
@@ -30,7 +31,7 @@ export default function useChart(
     tooltipFormatter?: (params: TopLevelFormatterParams) => string,
 ): ChartProperties {
     const containerRef = useRef<any>(null);
-    const chartRef = useRef<EChartsType | null>(null);
+    const [chart, setChart] = useState<EChartsType | null>(null);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -50,27 +51,65 @@ export default function useChart(
                 extraCssText: 'display: grid;--tw-shadow: 0 20px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--tw-shadow-color, rgb(0 0 0 / 0.1));box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);'
 
             },
+            toolbox: {
+                show: false,
+                right: 72,
+                itemSize: 16,
+                feature: {
+                    saveAsImage: {},
+                    restore: {},
+                    dataZoom: {}
+                }
+            },
+            brush: {
+                xAxisIndex: 0,
+                throttleType: 'debounce',
+                throttleDelay: 100,
+                outOfBrush: {
+                    colorAlpha: 1
+                },
+                inBrush: {
+                    colorAlpha: .3
+                }
+            },
+            dataZoom: [
+                {
+                    id: 'dataZoomX',
+                    type: 'inside',
+                    xAxisIndex: 0,
+                    filterMode: 'none'
+                },
+                {
+                    id: 'dataZoomY',
+                    type: 'inside',
+                    yAxisIndex: 0,
+                    filterMode: 'none'
+                },
+            ],
             dataset: data,
             xAxis: xAxis,
             yAxis: yAxis,
-            series: series
+            series: series,
         };
 
-        chartRef.current = init(containerRef.current);
-        chartRef.current.setOption(chartOptions);
+        const chartInstance: EChartsType = init(containerRef.current) as EChartsType;
+
+        chartInstance.setOption(chartOptions);
+        setChart(chartInstance);
 
         return () => {
-            chartRef.current?.dispose();
+            chartInstance.dispose();
+            setChart(null);
         };
     }, []);
 
     useEffect(() => {
-        if(chartRef.current == null) return;
-
-        chartRef.current.setOption({dataset: data}, {replaceMerge: ['dataset'], silent: true});
+        chart?.setOption({dataset: data}, {replaceMerge: ['dataset'], silent: true});
     }, [data]);
+
 
     return {
         containerRef,
+        chart
     };
 }
