@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { ZoomIn, ZoomOut } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip.tsx';
 import type { ReactElement, FC } from 'react';
+import type { EChartsCoreOption } from 'echarts/types/dist/echarts';
 import type { FeatureProps } from '@/components/charts/toolbox/feature.ts';
 
 export default function ZoomFeature({ chart }: FeatureProps): ReactElement<FC> {
@@ -32,6 +33,10 @@ export default function ZoomFeature({ chart }: FeatureProps): ReactElement<FC> {
     });
     const handleBrushEnd = (params: any): void => {
         if(chart == null) return;
+
+        const options: EChartsCoreOption | undefined = chart?.getOption();
+
+        if(options === undefined) return;
 
         const { areas } = params
         const { coordRange } = areas[0];
