@@ -5,12 +5,6 @@ import type { EChartsOption, EChartsType, SeriesOption } from 'echarts';
 import type { TopLevelFormatterParams, DatasetOption } from 'echarts/types/dist/shared';
 import type { XAXisComponentOption, YAXisComponentOption } from 'echarts/types/dist/echarts';
 
-export type DataPoint = {
-    x: number;
-    y: number;
-    [index: string]: any;
-};
-
 export type ChartProperties = {
     containerRef: RefObject<any>;
     chart: EChartsType | null;
@@ -20,8 +14,6 @@ export type Dimensions = {
     width: number;
     height: number;
 };
-
-export type DataPoints = Array<DataPoint>;
 
 export default function useChart(
     data: DatasetOption | Array<DatasetOption>,
@@ -40,7 +32,7 @@ export default function useChart(
             tooltip: {
                 show: true,
                 formatter: tooltipFormatter,
-                className: 'items-start min-w-[8rem] gap-1.5 rounded-lg dark:border-zinc-800/50',
+                className: 'items-start min-w-[8rem] gap-1.5 rounded-lg dark:border-zinc-800/50 dark:bg-zinc-900! dark:text-zinc-100!',
                 backgroundColor: 'var(--color-white)',
                 borderColor: '#e4e4e780',
                 borderRadius: undefined,
@@ -63,17 +55,12 @@ export default function useChart(
             },
             brush: {
                 xAxisIndex: 0,
+                yAxisIndex: 0,
                 throttleType: 'debounce',
-                throttleDelay: 100,
-                outOfBrush: {
-                    colorAlpha: 1
-                },
-                inBrush: {
-                    colorAlpha: .3
-                }
+                throttleDelay: 100
             },
             dataZoom: [
-                {type: 'inside'}
+                {type: 'inside', realtime: false}
             ],
             dataset: data,
             xAxis: xAxis,
