@@ -46,7 +46,8 @@ export default function ScatterPlot({ data, labels, tooltipFormatter }: ScatterP
                 x: 'x',
                 y: 'y'
             },
-            large: true
+            large: true,
+            progressive: 0
         }
     ];
     const { containerRef, chart } = useChart(data, xAxis, yAxis, series, tooltipFormatter);
