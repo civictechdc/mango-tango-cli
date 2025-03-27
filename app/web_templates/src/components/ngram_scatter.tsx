@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import ScatterPlot from '@/components/charts/scatter.tsx';
 import type { ReactElement, FC } from 'react';
-import type { ChartProps } from '@/components/charts/props.ts';
+import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
 import type {TopLevelFormatterParams, DatasetOption} from 'echarts/types/dist/shared';
 
@@ -11,7 +11,7 @@ export type NgramScatterPlotDataPoint = {
     y: number;
 };
 
-export default function NgramScatterPlot({ presenter }: ChartProps): ReactElement<FC> {
+export default function NgramScatterPlot({ presenter }: ChartContainerProps): ReactElement<FC> {
     const data= useMemo<DatasetOption>((): DatasetOption => {
         let dataset: DatasetOption = {dimensions: ['ngram', 'x', 'y']};
 
@@ -52,7 +52,7 @@ export default function NgramScatterPlot({ presenter }: ChartProps): ReactElemen
                 </div>
             </div>
         `;
-    }
+    };
 
     return <ScatterPlot data={data} tooltipFormatter={tooltipFormatter} />;
 }

@@ -1,21 +1,12 @@
 import useChart from '@/lib/hooks/chart.ts';
 import ToolBox from '@/components/charts/toolbox.tsx';
 import type { ReactElement, FC } from 'react';
-import type { Dimensions } from '@/lib/hooks/chart.ts';
 import type { SeriesOption } from 'echarts';
-import type { TopLevelFormatterParams, DatasetOption } from 'echarts/types/dist/shared';
-import type { XAXisComponentOption, YAXisComponentOption } from 'echarts/types/dist/echarts'
+import type { XAXisComponentOption, YAXisComponentOption } from 'echarts/types/dist/echarts';
+import type { Dimensions } from '@/lib/hooks/chart.ts';
+import type { ChartProps } from '@/components/charts/props.ts'
 
-interface ScatterPlotProps {
-    data: DatasetOption | Array<DatasetOption>;
-    tooltipFormatter?: (params: TopLevelFormatterParams) => string;
-    labels?: {
-        x: string;
-        y: string;
-    };
-}
-
-export default function ScatterPlot({ data, labels, tooltipFormatter }: ScatterPlotProps): ReactElement<FC> {
+export default function ScatterPlot({ data, labels, tooltipFormatter }: ChartProps): ReactElement<FC> {
     const dimensions: Dimensions = {width: 800, height: 600};
     const xAxis: XAXisComponentOption = {
         type: 'log',
@@ -50,7 +41,7 @@ export default function ScatterPlot({ data, labels, tooltipFormatter }: ScatterP
             progressive: 0
         }
     ];
-    const { containerRef, chart } = useChart(data, xAxis, yAxis, series, tooltipFormatter);
+    const { containerRef, chart } = useChart(data, xAxis, yAxis, series, {formatter: tooltipFormatter});
 
     return (
         <div className="grid" style={dimensions}>
@@ -59,5 +50,3 @@ export default function ScatterPlot({ data, labels, tooltipFormatter }: ScatterP
         </div>
     );
 }
-
-export type { ScatterPlotProps };

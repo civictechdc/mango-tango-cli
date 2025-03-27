@@ -1,26 +1,21 @@
 import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart.tsx';
+import BarChart from '@/components/charts/bar.tsx';
 import type { ReactElement, FC } from 'react';
-import type { ChartProps } from '@/components/charts/props.ts';
+import type { DatasetOption, TopLevelFormatterParams } from 'echarts/types/dist/shared';
+import type { ChartContainerProps } from '@/components/charts/props.ts';
+import type { HistogramBin } from '@/components/charts/bar.tsx';
 
-type HistogramBin = {
-    binStart: number;
-    binEnd: number;
-    count: number;
-    label: string;
-};
-
-export default function HistogramChart({ presenter }: ChartProps): ReactElement<FC> {
-    const data: Array<HistogramBin> = useMemo(() => {
+export default function HistogramChart({ presenter }: ChartContainerProps): ReactElement<FC> {
+    const data = useMemo<Array<DatasetOption>>(() => {
         if (presenter == null) return [];
 
         const rawData = presenter.x as Array<number>;
         const binCount = 50;
+        const minValue = Math.min(...rawData);
         const maxValue = Math.max(...rawData);
-        const binWidth = maxValue / binCount;
+        const binWidth = (maxValue - minValue) / binCount;
         const bins: Array<HistogramBin> = Array.from({length: binCount}, (_, index: number): HistogramBin => {
-            const binStart = maxValue + index * binWidth;
+            const binStart = minValue + index * binWidth;
             const binEnd = binStart + binWidth;
 
             return {
@@ -32,51 +27,35 @@ export default function HistogramChart({ presenter }: ChartProps): ReactElement<
         });
 
         for (const value of rawData) {
-            if (value > maxValue) continue;
-
-            const binIndex = Math.min(Math.floor(value / binWidth), binCount - 1);
+            const binIndex = Math.min(Math.floor((value - minValue) / binWidth), binCount - 1);
 
             if (binIndex >= 0 && binIndex < bins.length) bins[binIndex].count++;
         }
 
-        return bins;
+        return [{
+            dimensions: ['binStart', 'binEnd', 'count', 'label'],
+            source: bins.filter((bin: HistogramBin): boolean => bin.count > 0)
+        }];
     }, [presenter]);
+    const tooltipFormatter = (params: TopLevelFormatterParams): string => {
+        const param: TopLevelFormatterParams = Array.isArray(params) ? params[0] : params;
 
-    console.log(data);
+        if(!param.data) return '';
 
-    return (
-        <ChartContainer config={{}}>
-            <BarChart accessibilityLayer data={data}>
-                <XAxis
-                  dataKey="bin"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  label={{
-                    value: presenter.axis.x.label,
-                    position: 'bottom',
-                    offset: 0,
-                    style: { textAnchor: 'middle' }
-                  }}
-                />
-                <YAxis tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  label={{
-                    value: presenter.axis.y.label,
-                    angle: -90,
-                    position: 'left',
-                    offset: -1,
-                    style: { textAnchor: 'middle' }
-                  }}
-                />
-                <CartesianGrid vertical={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <ChartLegend content={<ChartLegendContent />} />
-                <Bar dataKey="count" fill="#2563eb" name={presenter.axis.y.label} radius={4} />
-            </BarChart>
-        </ChartContainer>
-    );
+        const data = param.data as HistogramBin;
+
+        return `
+            <div class="grid gap-1.5">
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                    <span class="font-bold">Message Count</span>
+                    <span>${data.count}</span>
+                </div>
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                    <span class="font-bold">${data.label}</span>
+                </div>
+            </div>
+        `;
+    };
+
+    return <BarChart data={data} tooltipFormatter={tooltipFormatter} />;
 }
-
-export type { HistogramBin };
