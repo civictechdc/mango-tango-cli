@@ -6,9 +6,9 @@ import type { XAXisComponentOption, YAXisComponentOption } from 'echarts/types/d
 import type { Dimensions } from '@/lib/hooks/chart.ts';
 import type { ChartProps } from '@/components/charts/props.ts'
 
-export default function ScatterPlot({ data, labels, tooltipFormatter }: ChartProps): ReactElement<FC> {
+export default function ScatterPlot({ data, labels, tooltipFormatter, axis, seriesEncoding }: ChartProps): ReactElement<FC> {
     const dimensions: Dimensions = {width: 800, height: 600};
-    const xAxis: XAXisComponentOption = {
+    let xAxis: XAXisComponentOption = {
         type: 'log',
         name: labels != null && labels.x.length > 0 ? labels.x : undefined,
         nameTextStyle: {
@@ -18,7 +18,7 @@ export default function ScatterPlot({ data, labels, tooltipFormatter }: ChartPro
         axisTick: { show: false },
         splitLine: { show: false },
     };
-    const yAxis: YAXisComponentOption = {
+    let yAxis: YAXisComponentOption = {
         type: 'log',
         name: labels != null && labels.y.length > 0 ? labels.y : undefined,
         nameTextStyle: {
@@ -30,17 +30,20 @@ export default function ScatterPlot({ data, labels, tooltipFormatter }: ChartPro
         axisLabel: { show: false },
         splitLine: {lineStyle: { color: '#ccc' }}
     };
-    const series: Array<SeriesOption> = [
-        {
-            type: 'scatter',
-            encode: {
-                x: 'x',
-                y: 'y'
-            },
-            large: true,
-            progressive: 0
-        }
-    ];
+    let series: SeriesOption = {
+        type: 'scatter',
+        encode: {
+            x: 'x',
+            y: 'y'
+        },
+        large: true,
+        progressive: 0
+    };
+
+    if(axis && axis.x) xAxis = {...xAxis, ...axis.x};
+    if(axis && axis.y) yAxis = {...yAxis, ...axis.y};
+    if(seriesEncoding) series.encode = {...series.encode, ...seriesEncoding};
+
     const { containerRef, chart } = useChart(data, xAxis, yAxis, series, {formatter: tooltipFormatter});
 
     return (
