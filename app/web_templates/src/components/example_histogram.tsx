@@ -3,7 +3,13 @@ import BarChart from '@/components/charts/bar.tsx';
 import type { ReactElement, FC } from 'react';
 import type { DatasetOption, TopLevelFormatterParams } from 'echarts/types/dist/shared';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
-import type { HistogramBin } from '@/components/charts/bar.tsx';
+
+export type HistogramBin = {
+    binStart: number;
+    binEnd: number;
+    count: number;
+    label: string;
+};
 
 export default function HistogramChart({ presenter }: ChartContainerProps): ReactElement<FC> {
     const data = useMemo<Array<DatasetOption>>(() => {
@@ -57,5 +63,5 @@ export default function HistogramChart({ presenter }: ChartContainerProps): Reac
         `;
     };
 
-    return <BarChart data={data} tooltipFormatter={tooltipFormatter} />;
+    return <BarChart data={data} tooltipFormatter={tooltipFormatter} seriesEncoding={{x: 'label', y: 'count'}} />;
 }
