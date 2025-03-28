@@ -21,8 +21,8 @@ a = Analysis(
         *copy_metadata('readchar'),
 
         # static assets for web servers
-        ('./mango_tango_cib/app/web_static', 'app/web_static'),
-        ('./mango_tango_cib/app/web_templates', 'app/web_templates')
+        ('./mango_tango_cib/app/web_static', 'mango_tango_cib/app/web_static'),
+        ('./mango_tango_cib/app/web_templates', 'mango_tango_cib/app/web_templates')
     ],
     hiddenimports=[
         'readchar',
