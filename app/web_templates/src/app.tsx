@@ -65,7 +65,6 @@ export default function App(): ReactElement<FC> {
             </header>
             <main className="grid grid-flow-col justify-center items-center">
                 {routes ? <RouterProvider router={routes}/> : <p>loading...</p>}
-
             </main>
             <footer className="grid grid-flow-col row-span-1 justify-end items-center">
                 <DarkModeToggle />
