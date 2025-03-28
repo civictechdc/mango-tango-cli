@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Literal
+from typing import Literal, TypeVar
 
 import polars as pl
 from preprocessing.series_semantic import SeriesSemantic
