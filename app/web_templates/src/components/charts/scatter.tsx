@@ -1,3 +1,4 @@
+
 import useChart from '@/lib/hooks/chart.ts';
 import ToolBox from '@/components/charts/toolbox.tsx';
 import type { ReactElement, FC } from 'react';
@@ -7,7 +8,7 @@ import type { Dimensions } from '@/lib/hooks/chart.ts';
 import type { ChartProps } from '@/components/charts/props.ts'
 
 export default function ScatterPlot({ data, labels, tooltipFormatter, axis, seriesEncoding }: ChartProps): ReactElement<FC> {
-    const dimensions: Dimensions = {width: 800, height: 600};
+    const dimensions: Dimensions = {width: 1200, height: 600};
     let xAxis: XAXisComponentOption = {
         type: 'log',
         name: labels != null && labels.x.length > 0 ? labels.x : undefined,

@@ -7,7 +7,7 @@ import type { SeriesOption } from 'echarts';
 import type { Dimensions } from '@/lib/hooks/chart.ts';
 
 export default function BarChart({ data, labels, tooltipFormatter, axis, seriesEncoding }: ChartProps): ReactElement<FC> {
-    const dimensions: Dimensions = {width: 800, height: 600};
+    const dimensions: Dimensions = {width: 1200, height: 600};
     let xAxis: XAXisComponentOption = {
         type: 'category',
         name: labels != null && labels.x.length > 0 ? labels.x : undefined,
