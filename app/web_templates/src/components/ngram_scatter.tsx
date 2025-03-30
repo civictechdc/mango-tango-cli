@@ -7,7 +7,7 @@ import { Info } from 'lucide-react';
 import type { ReactElement, FC } from 'react';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
-import type {TopLevelFormatterParams, DatasetOption} from 'echarts/types/dist/shared';
+import type { TopLevelFormatterParams, DatasetOption } from 'echarts/types/dist/shared';
 
 export type NgramScatterPlotDataPoint = {
     ngram: string;
@@ -18,7 +18,7 @@ export type NgramScatterPlotDataPoint = {
 export default function NgramScatterPlot({ presenter }: ChartContainerProps): ReactElement<FC> {
     const [searchValue, setSearchValue] = useState<string>('');
     const totalRepetitionData= useMemo<DatasetOption>((): DatasetOption => {
-        let dataset: DatasetOption = {dimensions: ['ngram', 'x', 'y']};
+        let dataset: DatasetOption = {dimensions: ['ngram', 'x', 'y'], source: []};
 
         if (presenter == null) return dataset;
 
