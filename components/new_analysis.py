@@ -205,9 +205,7 @@ def new_analysis(
                 print("<<Hit Ctrl+C at any time to exit a menu>>")
                 print("The test is complete.")
                 print("")
-                print(
-                    "Name the analysis below. Hit enter to continue."
-                )
+                print("Name the analysis below. Hit enter to continue.")
                 new_name = (
                     prompts.text("Analysis name", default=analyzer.name) or ""
                 ).strip()
