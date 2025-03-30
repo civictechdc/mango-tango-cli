@@ -1,8 +1,8 @@
 import re
 
 import polars as pl
-
 from analyzer_interface.context import PrimaryAnalyzerContext
+
 from terminal_tools import ProgressReporter
 
 from .interface import (
