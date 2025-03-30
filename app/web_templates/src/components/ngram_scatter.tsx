@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import ScatterPlot from '@/components/charts/scatter.tsx';
+import SearchBar from '@/components/search.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { Info } from 'lucide-react';
@@ -7,7 +8,6 @@ import type { ReactElement, FC } from 'react';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
 import type {TopLevelFormatterParams, DatasetOption} from 'echarts/types/dist/shared';
-import SearchBar from "@/components/search.tsx";
 
 export type NgramScatterPlotDataPoint = {
     ngram: string;
