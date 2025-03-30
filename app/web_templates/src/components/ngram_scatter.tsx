@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import ScatterPlot from '@/components/charts/scatter.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
+import { Info } from 'lucide-react';
 import type { ReactElement, FC } from 'react';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
@@ -36,6 +38,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
         return dataset;
     }, [presenter, searchValue]);
     const handleSearchSubmit = (value: string) => setSearchValue(value);
+    const handleSearchClear = () => setSearchValue('');
     const amplificationFactorData= useMemo<DatasetOption>((): DatasetOption => {
         let dataset: DatasetOption = {dimensions: ['ngram', 'x', 'y']};
 
@@ -44,15 +47,18 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
         const rawNgrams = presenter.ngrams as Array<string>;
         const rawX = presenter.x as Array<number>;
         const rawY = (presenter.y as PresenterAxisData)['amplification_factor'] as Array<number>;
-
-        dataset.source = Array.from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
+        let dataSource: Array<NgramScatterPlotDataPoint> = Array.from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
             ngram: rawNgrams[index],
             x: rawX[index],
             y: rawY[index],
         }));
 
+        if(searchValue.length > 0) dataSource = dataSource.filter((item: NgramScatterPlotDataPoint): boolean => item.ngram.includes(searchValue));
+
+        dataset.source = dataSource;
+
         return dataset;
-    }, [presenter]);
+    }, [presenter, searchValue]);
     const totalRepetitionTooltipFormatter = (params: TopLevelFormatterParams): string => {
         const param: TopLevelFormatterParams = Array.isArray(params) ? params[0] : params;
 
@@ -102,31 +108,59 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
     };
 
     return (
-        <Tabs defaultValue="total_repetition" className="items-center">
-            <TabsList>
-                <TabsTrigger value="total_repetition">Total Repetition</TabsTrigger>
-                <TabsTrigger value="amplification_factor">Amplification Factor</TabsTrigger>
-            </TabsList>
-            <TabsContent value="total_repetition">
-                <div className="grid grid-flow-col row-span-1">
-                    {
-                        presenter.ngrams ?
-                        <SearchBar searchList={presenter.ngrams} onSubmit={handleSearchSubmit} placeholder="Search Ngram Here..." />
-                        : null
-                    }
-                </div>
-                <ScatterPlot data={totalRepetitionData} tooltipFormatter={totalRepetitionTooltipFormatter} />
-            </TabsContent>
-            <TabsContent value="amplification_factor">
-                <div className="grid grid-flow-col row-span-1">
-                    {
-                        presenter.ngrams ?
-                            <SearchBar searchList={presenter.ngrams} onSubmit={handleSearchSubmit} placeholder="Search Ngram Here..." />
-                            : null
-                    }
-                </div>
-                <ScatterPlot data={amplificationFactorData} tooltipFormatter={amplificationFactorTooltipFormatter} />
-            </TabsContent>
-        </Tabs>
+        <TooltipProvider>
+            <Tabs defaultValue="total_repetition" className="items-center">
+                <TabsList>
+                    <TabsTrigger value="total_repetition">Total Repetition</TabsTrigger>
+                    <TabsTrigger value="amplification_factor">Amplification Factor</TabsTrigger>
+                </TabsList>
+                <TabsContent value="total_repetition">
+                    <div className="grid grid-flow-col row-span-1 justify-end">
+                        <Tooltip delayDuration={300}>
+                            <TooltipTrigger>
+                                <Info className="size-6" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                {presenter.explanation['total_repetition']}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+                    <div className="grid grid-flow-col row-span-1 my-4">
+                        {
+                            presenter.ngrams ?
+                                <SearchBar
+                                    searchList={presenter.ngrams}
+                                    onSubmit={handleSearchSubmit}
+                                    onClear={handleSearchClear}
+                                    placeholder="Search Ngram Here..." />
+                                : null
+                        }
+                    </div>
+                    <ScatterPlot data={totalRepetitionData} tooltipFormatter={totalRepetitionTooltipFormatter} />
+                </TabsContent>
+                <TabsContent value="amplification_factor">
+                    <div className="grid grid-flow-col row-span-1 justify-end">
+                        <Tooltip delayDuration={300}>
+                            <TooltipTrigger><Info /></TooltipTrigger>
+                            <TooltipContent>
+                                {presenter.explanation['amplification_factor']}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+                    <div className="grid grid-flow-col row-span-1 my-4">
+                        {
+                            presenter.ngrams ?
+                                <SearchBar
+                                    searchList={presenter.ngrams}
+                                    onSubmit={handleSearchSubmit}
+                                    onClear={handleSearchClear}
+                                    placeholder="Search Ngram Here..." />
+                                : null
+                        }
+                    </div>
+                    <ScatterPlot data={amplificationFactorData} tooltipFormatter={amplificationFactorTooltipFormatter} />
+                </TabsContent>
+            </Tabs>
+        </TooltipProvider>
     );
 }
