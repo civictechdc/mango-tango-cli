@@ -202,13 +202,10 @@ def new_analysis(
                             print("Running post-analysis: ", event.analyzer.name)
 
                 run_scope.refresh()
+                print("<<Hit Ctrl+C at any time to exit a menu>>")
                 print("The test is complete.")
                 print("")
-
-                print(f"The analysis is named '{analysis.display_name}'.")
-                print(
-                    "You can rename it now if you wish. Or just hit enter to continue."
-                )
+                print("Name the analysis below. Hit enter to continue.")
                 new_name = (
                     prompts.text("Analysis name", default=analyzer.name) or ""
                 ).strip()
