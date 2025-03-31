@@ -67,7 +67,7 @@ def analysis_web_server(
             analyzer_name=analyzer.name,
         )
 
-    print("Web server will run at http://localhost:8050/")
+    print("View the analytics dashboard: http://localhost:8050/")
     print("Stop it with Ctrl+C")
 
     server_log = logging.getLogger("waitress")

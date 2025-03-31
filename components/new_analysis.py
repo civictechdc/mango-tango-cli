@@ -14,7 +14,7 @@ from app import ProjectContext
 from terminal_tools import draw_box, print_ascii_table, prompts, wait_for_key
 
 from .context import ViewContext
-from .export_outputs import export_format_prompt, export_outputs_sequence
+#from .export_outputs import export_format_prompt, export_outputs_sequence
 
 
 def new_analysis(
@@ -213,22 +213,6 @@ def new_analysis(
                     analysis.rename(new_name)
 
                 print("")
-
-                outputs = analysis.get_all_exportable_outputs()
-                print("You now have the option to export the following outputs:")
-                for output in outputs:
-                    print("- " + output.descriptive_qualified_name)
-                print("")
-
-                export_format = export_format_prompt()
-                if export_format is None:
-                    print(
-                        "No problem. You can also export outputs later from the analysis menu."
-                    )
-                    wait_for_key(True)
-                else:
-                    is_export_started = True
-                    export_outputs_sequence(context, analysis, outputs, export_format)
 
                 return analysis
 
