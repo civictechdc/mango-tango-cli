@@ -14,7 +14,7 @@ from app import ProjectContext
 from terminal_tools import draw_box, print_ascii_table, prompts, wait_for_key
 
 from .context import ViewContext
-#from .export_outputs import export_format_prompt, export_outputs_sequence
+from .export_outputs import export_format_prompt, export_outputs_sequence
 
 
 def new_analysis(
@@ -203,16 +203,8 @@ def new_analysis(
 
                 run_scope.refresh()
                 print("<<Hit Ctrl+C at any time to exit a menu>>")
-                print("The test is complete.")
-                print("")
-                print("Name the analysis below. Hit enter to continue.")
-                new_name = (
-                    prompts.text("Analysis name", default=analyzer.name) or ""
-                ).strip()
-                if new_name:
-                    analysis.rename(new_name)
-
-                print("")
+                print("The Analysis is complete.")
+                wait_for_key(prompt=True)
 
                 return analysis
 
