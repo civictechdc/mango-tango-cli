@@ -29,3 +29,5 @@ jobs:
 
       - name: Run tests
         run: pytest
+  test_build:
+    uses: ./.github/workflows/build_exe.yml
