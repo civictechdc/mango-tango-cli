@@ -28,7 +28,7 @@ python -m venv venv
 python -m mangotango
 ```
 
-## Development Guide
+## Development Guide and Documentation
 
 [Development Guide](./docs/dev-guide.md)
 
