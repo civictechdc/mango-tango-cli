@@ -151,12 +151,7 @@ All changes should be made in a feature branch, merged into `develop`, and later
    - Delete the feature branch.
 
 5. **Release**
-   - When ready, merge `develop` into `main`.
-     ```bash
-     git checkout main
-     git merge develop
-     git push origin main
-     ```
+   - When develop is clean and ready for a new major release, we will merge `develop` into `main`.
 
 ## Workflow Diagram
 ```mermaid
