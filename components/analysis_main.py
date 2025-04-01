@@ -34,13 +34,13 @@ def analysis_main(
                     ),
                     *(
                         [
-                            ("Export outputs", "export_output"),
+                            ("Export raw output files", "export_output"),
                         ]
                         if not is_draft
                         else []
                     ),
                     *(
-                        [("Launch Web Server", "web_server")]
+                        [("Initiate browser-based dashboard", "web_server")]
                         if (not is_draft) and has_web_server and not no_web_server
                         else []
                     ),
