@@ -2,6 +2,10 @@ name: Build Executables
 
 on:
   workflow_call:
+    inputs:
+      is_release:
+        required: true
+        type: boolean
 
 jobs:
   build:
