@@ -60,7 +60,6 @@ def analysis_main(
             continue
 
         if action == "export_output":
-            print(context)
             export_outputs(context, analysis)
             continue
 
