@@ -14,7 +14,6 @@ from .context import ViewContext
 
 
 def export_outputs(context: ViewContext, analysis: AnalysisContext):
-    print(context)
     terminal = context.terminal
     with terminal.nest("[Export Output]\n\n") as scope:
         outputs = sorted(
