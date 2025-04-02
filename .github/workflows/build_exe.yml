@@ -93,7 +93,7 @@ jobs:
         run: ${{ matrix.list_command }}
 
       - name: Check that the executable runs
-        if: !inputs.is_release
+        if: inputs.is_release == false
         run: ${{ matrix.check_command}}
 
       - name: Upload artifacts
