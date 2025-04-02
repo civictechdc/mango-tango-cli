@@ -1,10 +1,11 @@
 name: Build Executables
 
 on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+-?*"
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      is_release:
+        required: true
+        type: boolean
 
 jobs:
   build:
@@ -18,18 +19,21 @@ jobs:
             move_command: move dist\mangotango.exe dist\mangotango_windows.exe
             sha_command: pwsh -c "Get-FileHash -Algorithm SHA1 dist\mangotango_windows.exe | Format-Table Hash -HideTableHeaders > dist\mangotango_windows.exe.sha1"
             list_command: dir dist
+            check_command: dist\mangotango_windows.exe --noop
           - platform_name: MacOS 14
             artifact_name: macos-14
             os: macos-14
             move_command: mv dist/mangotango dist/mangotango_macos_14
             sha_command: shasum -a 1 dist/mangotango_macos_14 > dist/mangotango_macos_14.sha1
             list_command: ls -ll dist
+            check_command: dist/mangotango_macos_14 --noop
           - platform_name: MacOS 15
             artifact_name: macos-15
             os: macos-15
             move_command: mv dist/mangotango dist/mangotango_macos_15
             sha_command: shasum -a 1 dist/mangotango_macos_15 > dist/mangotango_macos_15.sha1
             list_command: ls -ll dist
+            check_command: dist/mangotango_macos_15 --noop
 
     name: Build ${{ matrix.platform_name }}
     runs-on: ${{ matrix.os }}
@@ -88,26 +92,15 @@ jobs:
       - name: Inspect the dist/ directory before uploading artifacts
         run: ${{ matrix.list_command }}
 
+      - name: Check that the executable runs
+        if: inputs.is_release == false
+        run: ${{ matrix.check_command}}
+
       - name: Upload artifacts
+        if: inputs.is_release
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: |
             dist/*
 
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            artifacts/**/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
