@@ -1,6 +1,6 @@
 from .testdata import (
-    CsvTestData,
     CsvConfig,
+    CsvTestData,
     ExcelTestData,
     JsonTestData,
     PolarsTestData,
