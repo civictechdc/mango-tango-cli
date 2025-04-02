@@ -19,6 +19,7 @@ jobs:
             move_command: move dist\mangotango.exe dist\mangotango_windows.exe
             sha_command: pwsh -c "Get-FileHash -Algorithm SHA1 dist\mangotango_windows.exe | Format-Table Hash -HideTableHeaders > dist\mangotango_windows.exe.sha1"
             list_command: dir dist
+            #check_command: 
           - platform_name: MacOS 14
             artifact_name: macos-14
             os: macos-14
@@ -88,6 +89,10 @@ jobs:
 
       - name: Inspect the dist/ directory before uploading artifacts
         run: ${{ matrix.list_command }}
+
+      - name: Check that the executable runs
+        if: runner.os == 'Windows' && !inputs.is_release
+        run: ./dist/mangotango.exe --noop
 
       - name: Upload artifacts
         if: inputs.is_release
