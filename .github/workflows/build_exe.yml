@@ -92,7 +92,7 @@ jobs:
 
       - name: Check that the executable runs
         if: runner.os == 'Windows' && !inputs.is_release
-        run: /dist/mangotango_windows.exe --noop
+        run: dist\mangotango_windows.exe --noop
 
       - name: Upload artifacts
         if: inputs.is_release
