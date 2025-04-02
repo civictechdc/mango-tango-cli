@@ -1,11 +1,11 @@
 from typing import Callable
 
 import polars as pl
+from fastexcel import read_excel
 from pydantic import BaseModel
 
 import terminal_tools.prompts as prompts
 from terminal_tools.utils import wait_for_key
-from fastexcel import read_excel
 
 from .importer import Importer, ImporterSession
 
