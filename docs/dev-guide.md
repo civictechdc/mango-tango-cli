@@ -1,4 +1,5 @@
 # CIB 🥭 Development Guide
+Before contributing please refer to our [**Contributor Workflow**](#contributor-workflow)
 
 ## Application Design Overview
 The CIB 🥭 application is a terminal-based tool for performing data analysis and visualization. It is designed to be modular and extensible, allowing developers to contribute new analysis modules and visualization components while providing a consistent user experience around data import, preprocessing, and output generation.
@@ -107,7 +108,6 @@ To contribute a new analysis, you should:
 - When defining a Web Presenter, be sure to specify the "base" Primary Analyzer **and** all Secondary Analyzers that your dashboard needs.
 - Mark any output not intended for user consumption as "internal" in the interface.
 - Add all the defined modules to the [suite](../analyzers/__init__.py).
--
 
 If you're new to the project, check out
 [this directory](../analyzers/example/README.md) for a
@@ -117,6 +117,53 @@ workable example.
 
 The `testing` module provides testers for the primary and
 secondary analyzer modules. See the [example](../analyzers/example/README.md) for further references.
+
+# Contributor Workflow
+
+## Overview
+All changes should be made in a feature branch, merged into `develop`, and later merged into `main` for a new release.
+
+## Steps
+1. **Create a Feature Branch**
+   - Branch from `develop` using `feature/<name>` or `bugfix/<name>`.
+   - Example:
+     ```bash
+     git checkout develop
+     git pull origin develop
+     git checkout -b feature/new-feature
+     ```
+
+2. **Make Changes & Push**
+   - Commit changes with clear messages.
+   - Push the branch.
+     ```bash
+     git add .
+     git commit -m "Description of changes"
+     git push origin feature/new-feature
+     ```
+
+3. **Create a Pull Request**
+   - Open a PR to merge into `develop`.
+   - Address any review feedback.
+
+4. **Merge & Clean Up**
+   - After approval, merge into `develop`.
+   - Delete the feature branch.
+
+5. **Release**
+   - When develop is clean and ready for a new major release, we will merge `develop` into `main`.
+
+## Workflow Diagram
+```mermaid
+graph TD;
+    A[Feature Branch] -->|Commit & Push| B[Pull Request];
+    B -->|Review & Merge| C[Develop Branch];
+    C -->|Release| D[Main Branch];
+```
+
+
+
+
 
 # Questions, Comments, and Feedback
 
