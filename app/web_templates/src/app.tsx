@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchPresenters } from '@/lib/data/presenters.ts';
 import userPresentersState from '@/lib/state/presenters.ts';
-import {
-    RouterProvider,
-    createRouter,
-    createRootRoute,
-    createRoute,
-    createBrowserHistory,
-    Outlet
-} from '@tanstack/react-router';
+import { RouterProvider, createRouter, createRootRoute, createRoute, createBrowserHistory, Outlet } from '@tanstack/react-router';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
 import DarkModeToggle from '@/components/dark-mode-toggle.tsx';
 import { PresenterView } from '@/components/presenter.tsx';
