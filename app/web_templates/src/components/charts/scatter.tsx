@@ -1,4 +1,3 @@
-
 import useChart from '@/lib/hooks/chart.ts';
 import ToolBox from '@/components/charts/toolbox.tsx';
 import type { ReactElement, FC } from 'react';

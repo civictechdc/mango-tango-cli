@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import ScatterPlot from '@/components/charts/scatter.tsx';
 import SearchBar from '@/components/search.tsx';
+import DataTable from '@/components/data_table.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { Info } from 'lucide-react';
@@ -8,6 +9,7 @@ import type { ReactElement, FC } from 'react';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
 import type { TopLevelFormatterParams, DatasetOption } from 'echarts/types/dist/shared';
+import {ColumnDef} from "@tanstack/react-table";
 
 export type NgramScatterPlotDataPoint = {
     ngram: string;
@@ -59,6 +61,23 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
 
         return dataset;
     }, [presenter, searchValue]);
+    const dataTableColumns = useMemo<Array<ColumnDef<NgramScatterPlotDataPoint>>>(() => [
+        {
+            accessorKey: 'ngram',
+            header: () => <span>Ngram</span>,
+            size: 900
+        },
+        {
+            accessorKey: 'x',
+            header: () => <span>Total Repetition</span>,
+            size: 150
+        },
+        {
+            accessorKey: 'y',
+            header: () => <span>User Repetition</span>,
+            size: 150
+        }
+    ], []);
     const totalRepetitionTooltipFormatter = (params: TopLevelFormatterParams): string => {
         const param: TopLevelFormatterParams = Array.isArray(params) ? params[0] : params;
 
@@ -137,6 +156,9 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                         }
                     </div>
                     <ScatterPlot data={totalRepetitionData} tooltipFormatter={totalRepetitionTooltipFormatter} />
+                    <div className="grid grid-flow-col justify-center items-center row-span-1 my-4">
+                        <DataTable columns={dataTableColumns} data={totalRepetitionData.source as Array<NgramScatterPlotDataPoint>} />
+                    </div>
                 </TabsContent>
                 <TabsContent value="amplification_factor">
                     <div className="grid grid-flow-col row-span-1 justify-end">
