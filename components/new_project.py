@@ -116,7 +116,7 @@ def importer_flow(
                     print(f"  [{column}]")
                 print("")
         else:
-            print("Could not figure out how to import this file as {importer.name}.")
+            print(f"Could not figure out how to import this file as {importer.name}.")
 
         import_action = prompts.list_input(
             "What would you like to do?",

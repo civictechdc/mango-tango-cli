@@ -11,3 +11,4 @@ pyarrow==17.0.0
 dash==2.18.1
 waitress==3.0.0
 colorama==0.4.6
+fastexcel==0.13.0
