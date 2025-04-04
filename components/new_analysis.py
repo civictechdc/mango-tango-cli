@@ -203,32 +203,8 @@ def new_analysis(
 
                 run_scope.refresh()
                 print("<<Hit Ctrl+C at any time to exit a menu>>")
-                print("The test is complete.")
-                print("")
-                print("Name the analysis below. Hit enter to continue.")
-                new_name = (
-                    prompts.text("Analysis name", default=analyzer.name) or ""
-                ).strip()
-                if new_name:
-                    analysis.rename(new_name)
-
-                print("")
-
-                outputs = analysis.get_all_exportable_outputs()
-                print("You now have the option to export the following outputs:")
-                for output in outputs:
-                    print("- " + output.descriptive_qualified_name)
-                print("")
-
-                export_format = export_format_prompt()
-                if export_format is None:
-                    print(
-                        "No problem. You can also export outputs later from the analysis menu."
-                    )
-                    wait_for_key(True)
-                else:
-                    is_export_started = True
-                    export_outputs_sequence(context, analysis, outputs, export_format)
+                print("The Analysis is complete.")
+                wait_for_key(prompt=True)
 
                 return analysis
 

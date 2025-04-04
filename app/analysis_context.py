@@ -1,3 +1,4 @@
+import os
 from functools import cached_property
 from tempfile import TemporaryDirectory
 from typing import Literal
@@ -126,6 +127,9 @@ class AnalysisContext(BaseModel):
     @property
     def export_root_path(self):
         return self.app_context.storage._get_project_exports_root_path(self.model)
+
+    def export_directory_exists(self) -> bool:
+        return os.path.exists(self.export_root_path)
 
     def get_all_exportable_outputs(self):
         from .analysis_output_context import AnalysisOutputContext

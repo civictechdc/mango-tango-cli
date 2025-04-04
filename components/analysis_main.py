@@ -7,11 +7,14 @@ from .context import ViewContext
 from .export_outputs import export_outputs
 
 
-def analysis_main(context: ViewContext, analysis: AnalysisContext):
+def analysis_main(
+    context: ViewContext, analysis: AnalysisContext, *, no_web_server=False
+):
     terminal = context.terminal
     while True:
         has_web_server = len(analysis.web_presenters) > 0
         is_draft = analysis.is_draft
+        has_exports = analysis.export_directory_exists()
 
         with terminal.nest(
             draw_box(f"Analysis: {analysis.display_name}", padding_lines=0)
@@ -25,14 +28,20 @@ def analysis_main(context: ViewContext, analysis: AnalysisContext):
                     *(
                         [
                             ("Open output directory", "open_output_dir"),
-                            ("Export outputs", "export_output"),
+                        ]
+                        if has_exports
+                        else []
+                    ),
+                    *(
+                        [
+                            ("Export raw output files", "export_output"),
                         ]
                         if not is_draft
                         else []
                     ),
                     *(
-                        [("Launch Web Server", "web_server")]
-                        if (not is_draft) and has_web_server
+                        [("Initiate browser-based dashboard", "web_server")]
+                        if (not is_draft) and has_web_server and not no_web_server
                         else []
                     ),
                     ("Rename", "rename"),
