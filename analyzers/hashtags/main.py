@@ -43,6 +43,11 @@ def gini(x: pl.Series) -> float:
 
 
 def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
+    if not isinstance(data_frame.schema[COL_TIME], pl.Datetime):
+        data_frame = data_frame.with_columns(
+            pl.col(COL_TIME).str.to_datetime().alias(COL_TIME)
+        )
+
     # define the expressions
     has_hashtag_symbols = pl.col(COL_POST).str.contains("#").any()
     extract_hashtags = pl.col(COL_POST).str.extract_all(r"(#\S+)")
