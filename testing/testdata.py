@@ -78,10 +78,22 @@ class CsvTestData(TestData):
         super().__init__(filepath=filepath, semantics=semantics, csv_config=csv_config)
 
     def _load_as_polars(self) -> pl.DataFrame:
-        return pl.read_csv(self.filepath)
+        return pl.read_csv(
+            self.filepath,
+            separator=self.csv_config.separator,
+            has_header=self.csv_config.has_header,
+            quote_char=self.csv_config.quote_char,
+            encoding=self.csv_config.encoding,
+        )
 
     def _scan_as_polars(self) -> pl.LazyFrame:
-        return pl.scan_csv(self.filepath)
+        return pl.scan_csv(
+            self.filepath,
+            separator=self.csv_config.separator,
+            has_header=self.csv_config.has_header,
+            quote_char=self.csv_config.quote_char,
+            encoding=self.csv_config.encoding,
+        )
 
 
 class JsonTestData(FileTestData):

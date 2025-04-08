@@ -1,7 +1,7 @@
 import os
 
 from preprocessing.series_semantic import identifier
-from testing import CsvTestData, test_primary_analyzer
+from testing import CsvConfig, CsvTestData, test_primary_analyzer
 
 from .example_base.interface import interface
 from .example_base.main import main
@@ -28,6 +28,14 @@ def test_example_base():
             # JsonTestData if you have data that need to be interpreted into
             # types not directly supported by the file format like timestamp.
             semantics={"message_id": identifier},
+            # This is optional; it lets you specify how the CSV file is read.
+            # Every field in this is optional, too. These are the defaults.
+            csv_config=CsvConfig(
+                has_header=True,
+                quote_char='"',
+                encoding="utf8",
+                separator=",",
+            ),
         ),
         # These outputs are the expected outputs of the analyzer.
         # You don't need to specify all the outputs, only the ones you want to test.
