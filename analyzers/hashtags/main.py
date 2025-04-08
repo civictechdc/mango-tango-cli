@@ -21,21 +21,20 @@ COLS_ALL = [COL_AUTHOR_ID, COL_TIME, COL_HASHTAGS]
 NULL_CHAR = "[]"  # this is taken as the null character for hashtags
 
 
-def gini(x):
+def gini(x: pl.Series) -> float:
     """
     Parameters
     ----------
-    x : list[str]
-        List of values for which to compute the Gini coefficient
+    x : pl.Series
+        polars Series containing values for which to compute the Gini coefficient
 
     Returns
     -------
     float
-        Gini coefficient
+        Gini coefficient (between 0.0 and 1.0)
     """
-    x_counts = Counter(x).values()
+    sorted_x = x.value_counts().sort(by="count", descending=False)[:, 1].to_list()
 
-    sorted_x = sorted(x_counts)
     n = len(sorted_x)
     cumx = list(accumulate(sorted_x))
 
@@ -43,7 +42,6 @@ def gini(x):
 
 
 def main(context: PrimaryAnalyzerContext):
-
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
 
