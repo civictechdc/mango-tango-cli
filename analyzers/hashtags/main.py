@@ -12,6 +12,7 @@ from .interface import (
     OUTPUT_COL_COUNT,
     OUTPUT_COL_GINI,
     OUTPUT_COL_HASHTAGS,
+    OUTPUT_COL_TIMESPAN,
     OUTPUT_COL_USERS,
     OUTPUT_GINI,
 )
@@ -67,8 +68,8 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
     # compute gini per timewindow
     df_out = (
         df_input.explode(pl.col(COL_POST))
-        .with_columns(window_start=pl.col(COL_TIME).dt.truncate(every))
-        .group_by("window_start")
+        .with_columns(pl.col(COL_TIME).dt.truncate(every).alias(OUTPUT_COL_TIMESPAN))
+        .group_by(OUTPUT_COL_TIMESPAN)
         .agg(
             pl.col(COL_AUTHOR_ID).alias(OUTPUT_COL_USERS),
             pl.col(COL_POST).alias(OUTPUT_COL_HASHTAGS),
@@ -77,6 +78,11 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
             .map_batches(gini, returns_scalar=True)
             .alias(OUTPUT_COL_GINI),
         )
+    )
+
+    # convert datetime back to string
+    df_out = df_out.with_columns(
+        pl.col(OUTPUT_COL_TIMESPAN).dt.to_string("%Y-%m-%d %H:%M:%S")
     )
 
     return df_out
@@ -89,7 +95,7 @@ def main(context: PrimaryAnalyzerContext):
     # window hard-coded to 1hr for now
     df_out = hashtag_analysis(
         data_frame=df_input,
-        every="1hr",
+        every="12h",
     )
 
     df_out.write_parquet(context.output(OUTPUT_GINI).parquet_path)
