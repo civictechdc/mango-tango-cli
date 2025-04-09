@@ -127,7 +127,7 @@ def export_outputs_sequence(
 def export_format_prompt(analysis: AnalysisContext):
     analysis_id = analysis.analyzer_id
     return prompts.list_input(
-        "choose an export format",
+        "Choose an export format",
         choices=[
             *(
                 [
