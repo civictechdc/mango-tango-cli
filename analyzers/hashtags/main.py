@@ -1,4 +1,3 @@
-from collections import Counter
 from itertools import accumulate
 
 import polars as pl
@@ -16,11 +15,6 @@ from .interface import (
     OUTPUT_COL_USERS,
     OUTPUT_GINI,
 )
-
-# a handy variable
-COLS_ALL = [COL_AUTHOR_ID, COL_TIME, COL_POST]
-
-NULL_CHAR = "[]"  # this is taken as the null character for hashtags
 
 
 def gini(x: pl.Series) -> float:
@@ -63,7 +57,9 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
         raise ValueError(f"The data in {COL_POST} column appear to have no hashtags.")
 
     # select columns and sort
-    df_input = df_input.select(pl.col(COLS_ALL)).sort(pl.col(COL_TIME))
+    df_input = df_input.select(pl.col([COL_AUTHOR_ID, COL_TIME, COL_POST])).sort(
+        pl.col(COL_TIME)
+    )
 
     # compute gini per timewindow
     df_out = (
