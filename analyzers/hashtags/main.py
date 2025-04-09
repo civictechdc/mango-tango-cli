@@ -75,7 +75,7 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
             pl.col(COL_POST).alias(OUTPUT_COL_HASHTAGS),
             pl.col(COL_POST).count().alias(OUTPUT_COL_COUNT),
             pl.col(COL_POST)
-            .map_batches(gini, returns_scalar=True)
+            .map_batches(gini, returns_scalar=True, return_dtype=pl.Float64)
             .alias(OUTPUT_COL_GINI),
         )
     )
