@@ -1,7 +1,7 @@
 import useChart from '@/lib/hooks/chart.ts';
 import ToolBox from '@/components/charts/toolbox.tsx';
 import type { ReactElement, FC } from 'react';
-import type { SeriesOption } from 'echarts';
+import type { SeriesOption} from 'echarts';
 import type { XAXisComponentOption, YAXisComponentOption } from 'echarts/types/dist/echarts';
 import type { Dimensions } from '@/lib/hooks/chart.ts';
 import type { ChartProps } from '@/components/charts/props.ts'
@@ -16,7 +16,7 @@ export default function ScatterPlot({ data, labels, tooltipFormatter, axis, seri
             fontFamily: 'var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")'
         },
         axisTick: { show: false },
-        splitLine: { show: false },
+        splitLine: { show: false }
     };
     let yAxis: YAXisComponentOption = {
         type: 'log',

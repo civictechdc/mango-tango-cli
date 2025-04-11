@@ -59,7 +59,7 @@ export default function useChart(
                 throttleDelay: 100
             },
             dataZoom: [
-                {type: 'inside', realtime: false}
+                {type: 'inside', realtime: false, rangeMode: ['percent', 'percent']}
             ],
             dataset: data,
             xAxis: xAxis,
@@ -81,7 +81,6 @@ export default function useChart(
     useEffect(() => {
         chart?.setOption({dataset: data}, {replaceMerge: ['dataset'], silent: true});
     }, [data]);
-
 
     return {
         containerRef,

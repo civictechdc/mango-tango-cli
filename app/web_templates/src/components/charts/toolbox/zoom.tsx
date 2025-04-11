@@ -2,8 +2,20 @@ import { useEffect } from 'react';
 import { ZoomIn, ZoomOut } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip.tsx';
 import type { ReactElement, FC } from 'react';
-import type { EChartsCoreOption } from 'echarts/types/dist/echarts';
+import type { EChartsCoreOption} from 'echarts/types/dist/echarts';
 import type { FeatureProps } from '@/components/charts/toolbox/feature.ts';
+
+export type ZoomAxisValue = {
+    min: number;
+    max: number;
+};
+
+export type ZoomHandlerValues = {
+    x: ZoomAxisValue | null;
+    y: ZoomAxisValue | null;
+};
+
+export type OnZoomFunctionType = (values: ZoomHandlerValues) => void;
 
 export default function ZoomFeature({ chart }: FeatureProps): ReactElement<FC> {
     const itemClasses: string = 'grid items-center pl-1.5';
@@ -83,7 +95,7 @@ export default function ZoomFeature({ chart }: FeatureProps): ReactElement<FC> {
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Zoom In</p>
+                        <p>Zoom In on Selection</p>
                     </TooltipContent>
                 </Tooltip>
             </li>
