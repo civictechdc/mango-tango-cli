@@ -37,12 +37,12 @@ export default function DataTable({ data, columns }: DataTableProps): ReactEleme
 
     return (
         <Table ref={tableRef} containerHeight={800} className="grid">
-            <TableHeader className="grid sticky top-0 z-10">
+            <TableHeader className="grid sticky top-0 z-10 bg-zinc-950">
                 {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id} className="flex w-full">
                         {headerGroup.headers.map((header) => {
                             return (
-                                <TableHead key={header.id} className="flex" style={{width: header.getSize()}}>
+                                <TableHead key={header.id} className="flex items-center" style={{width: header.getSize()}}>
                                     {header.isPlaceholder
                                         ? null
                                         : flexRender(

@@ -9,7 +9,7 @@ import type { ReactElement, FC } from 'react';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
 import type { TopLevelFormatterParams, DatasetOption } from 'echarts/types/dist/shared';
-import {ColumnDef} from "@tanstack/react-table";
+import type { ColumnDef, CellContext } from '@tanstack/react-table';
 
 export type NgramScatterPlotDataPoint = {
     ngram: string;
@@ -27,11 +27,13 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
         const rawNgrams = presenter.ngrams as Array<string>;
         const rawX = presenter.x as Array<number>;
         const rawY = (presenter.y as PresenterAxisData)['total_repetition'] as Array<number>;
-        let dataSource = Array.from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
-            ngram: rawNgrams[index],
-            x: rawX[index],
-            y: rawY[index],
-        }));
+        let dataSource = Array
+            .from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
+                ngram: rawNgrams[index],
+                x: rawX[index],
+                y: rawY[index],
+            }))
+            .sort((point1: NgramScatterPlotDataPoint, point2: NgramScatterPlotDataPoint): number => point2.x - point1.x)
 
         if(searchValue.length > 0) dataSource = dataSource.filter((item: NgramScatterPlotDataPoint): boolean => item.ngram.includes(searchValue));
 
@@ -49,11 +51,13 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
         const rawNgrams = presenter.ngrams as Array<string>;
         const rawX = presenter.x as Array<number>;
         const rawY = (presenter.y as PresenterAxisData)['amplification_factor'] as Array<number>;
-        let dataSource: Array<NgramScatterPlotDataPoint> = Array.from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
-            ngram: rawNgrams[index],
-            x: rawX[index],
-            y: rawY[index],
-        }));
+        let dataSource: Array<NgramScatterPlotDataPoint> = Array
+            .from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
+                ngram: rawNgrams[index],
+                x: rawX[index],
+                y: rawY[index],
+            }))
+            .sort((point1: NgramScatterPlotDataPoint, point2: NgramScatterPlotDataPoint): number => point2.x - point1.x);
 
         if(searchValue.length > 0) dataSource = dataSource.filter((item: NgramScatterPlotDataPoint): boolean => item.ngram.includes(searchValue));
 
@@ -61,21 +65,42 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
 
         return dataset;
     }, [presenter, searchValue]);
-    const dataTableColumns = useMemo<Array<ColumnDef<NgramScatterPlotDataPoint>>>(() => [
+    const totalRepetitionDataTableColumns = useMemo<Array<ColumnDef<NgramScatterPlotDataPoint>>>(() => [
         {
             accessorKey: 'ngram',
-            header: () => <span>Ngram</span>,
+            header: () => <span className="pl-2">Ngram</span>,
             size: 900
         },
         {
             accessorKey: 'x',
-            header: () => <span>Total Repetition</span>,
+            header: () => <span className="w-full text-center">Total Repetition</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">{info.getValue()}</span>,
             size: 150
         },
         {
             accessorKey: 'y',
-            header: () => <span>User Repetition</span>,
+            header: () => <span className="w-full text-center">User Repetition</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">{info.getValue()}</span>,
             size: 150
+        }
+    ], []);
+    const amplificationFactorDataTableColumns = useMemo<Array<ColumnDef<NgramScatterPlotDataPoint>>>(() => [
+        {
+            accessorKey: 'ngram',
+            header: () => <span className="pl-2">Ngram</span>,
+            size: 900
+        },
+        {
+            accessorKey: 'x',
+            header: () => <span className="w-full text-center">Total Repetition</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">{info.getValue()}</span>,
+            size: 150
+        },
+        {
+            accessorKey: 'y',
+            header: () => <span className="w-full text-center">Amplification Factor</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">{info.getValue()}</span>,
+            size: 200
         }
     ], []);
     const totalRepetitionTooltipFormatter = (params: TopLevelFormatterParams): string => {
@@ -157,7 +182,9 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                     </div>
                     <ScatterPlot data={totalRepetitionData} tooltipFormatter={totalRepetitionTooltipFormatter} />
                     <div className="grid grid-flow-col justify-center items-center row-span-1 my-4">
-                        <DataTable columns={dataTableColumns} data={totalRepetitionData.source as Array<NgramScatterPlotDataPoint>} />
+                        <DataTable
+                            columns={totalRepetitionDataTableColumns}
+                            data={totalRepetitionData.source as Array<NgramScatterPlotDataPoint>} />
                     </div>
                 </TabsContent>
                 <TabsContent value="amplification_factor">
@@ -181,6 +208,11 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                         }
                     </div>
                     <ScatterPlot data={amplificationFactorData} tooltipFormatter={amplificationFactorTooltipFormatter} />
+                    <div className="grid grid-flow-col justify-center items-center row-span-1 my-4">
+                        <DataTable
+                            columns={amplificationFactorDataTableColumns}
+                            data={amplificationFactorData.source as Array<NgramScatterPlotDataPoint>} />
+                    </div>
                 </TabsContent>
             </Tabs>
         </TooltipProvider>

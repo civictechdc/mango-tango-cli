@@ -7,22 +7,22 @@ import type { ReactElement, FC } from 'react';
 import type { Presenter, PresenterCollection } from '@/lib/data/presenters';
 import type { GlobalPresentersState } from '@/lib/state/presenters';
 
-export function PresenterView(): ReactElement<FC> {
+export default function PresenterView(): ReactElement<FC> {
     const presenters: PresenterCollection = usePresentersState((state: GlobalPresentersState) => state.presenters);
-
-    if (presenters.length === 0) return <p>No charts to show yet!</p>;
-
     const presenter: Presenter = presenters[0];
     let component: ReactElement<FC> | null = null;
 
-    if (presenter.figure_type === 'histogram') component = <HistogramChart presenter={presenter} />;
-    if (presenter.figure_type === 'scatter') component = <NgramScatterPlot presenter={presenter} />;
-    if(presenter.figure_type === 'bar') component = <TimeIntervalChart presenter={presenter} />;
-    if(!component) component = <p>No component to show...</p>;
+    if(presenter) {
+        if (presenter.figure_type === 'histogram') component = <HistogramChart presenter={presenter} />;
+        if (presenter.figure_type === 'scatter') component = <NgramScatterPlot presenter={presenter} />;
+        if (presenter.figure_type === 'bar') component = <TimeIntervalChart presenter={presenter} />;
+    }
 
     return (
         <Card>
-            <CardContent>{component}</CardContent>
+            <CardContent>
+                {presenter ? component : <p>No charts to show yet!</p>}
+            </CardContent>
         </Card>
     );
 }
