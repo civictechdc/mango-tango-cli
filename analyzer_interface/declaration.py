@@ -66,7 +66,13 @@ class WebPresenterDeclaration(WebPresenterInterface):
 
     server_name: str
 
-    def __init__(self, interface: WebPresenterInterface, factory: Callable, api_factory: Callable, name: str):
+    def __init__(
+        self,
+        interface: WebPresenterInterface,
+        factory: Callable,
+        api_factory: Callable,
+        name: str,
+    ):
         """Creates a web presenter declaration
 
         Args:
@@ -92,4 +98,9 @@ class WebPresenterDeclaration(WebPresenterInterface):
             https://docs.python.org/3/tutorial/modules.html
 
         """
-        super().__init__(**interface.model_dump(), factory=factory, api_factory=api_factory, server_name=name)
+        super().__init__(
+            **interface.model_dump(),
+            factory=factory,
+            api_factory=api_factory,
+            server_name=name
+        )

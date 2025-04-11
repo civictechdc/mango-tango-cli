@@ -1,10 +1,14 @@
+from json import loads
+
 import plotly.express as px
 import polars as pl
-from json import loads
 from dash.dcc import Graph
 from dash.html import Div
+
 from analyzer_interface.context import WebPresenterContext
+
 from ...utils.pop import pop_unnecessary_fields
+
 
 def factory(context: WebPresenterContext):
     df = pl.read_parquet(
@@ -49,20 +53,15 @@ def factory(context: WebPresenterContext):
         ]
     )
 
+
 def api_factory(context: WebPresenterContext):
     presenter_model = context.web_presenter.model_dump()
     data_frame = pl.read_parquet(context.base.table("character_count").parquet_path)
     presenter_model["figure_type"] = "histogram"
     presenter_model["x"] = data_frame["character_count"].to_list()
     presenter_model["axis"] = {
-        "x": {
-            "label": "Message Character Count",
-            "value": "message_character_count"
-        },
-        "y": {
-            "label": "Number of Messages",
-            "value": "number_of_messages"
-        }
+        "x": {"label": "Message Character Count", "value": "message_character_count"},
+        "y": {"label": "Number of Messages", "value": "number_of_messages"},
     }
 
     return pop_unnecessary_fields(presenter_model)

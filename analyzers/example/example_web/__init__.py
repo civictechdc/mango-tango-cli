@@ -1,6 +1,6 @@
 from analyzer_interface import WebPresenterDeclaration
 
-from .factory import factory, api_factory
+from .factory import api_factory, factory
 from .interface import interface
 
 example_web = WebPresenterDeclaration(
