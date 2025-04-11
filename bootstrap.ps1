@@ -28,4 +28,18 @@ if (-Not (Test-Path $requirements_file)) {
 Write-Host "Installing dependencies from requirements-dev.txt..."
 pip install -r $requirements_file
 
+Write-Host "Installing JS dependencies..."
+
+if (-Not (Get-Command -Name npm -ErrorAction SilentlyContinue)) {
+    Write-Host "npm could not be found..."
+    exit 1
+}
+
+Set-Location (Join-Path -Path $repo_root "app\web_templates")
+npm install
+
+Write-Host "Creating initial build bundle..."
+npm run build
+Set-Location $repo_root
+
 Write-Host "Bootstrap process complete."

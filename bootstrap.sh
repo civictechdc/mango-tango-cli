@@ -25,4 +25,18 @@ fi
 echo "Installing dependencies from requirements-dev.txt..."
 pip install -r "$REQUIREMENTS_FILE"
 
+echo "Installing JS dependencies..."
+
+if[! npm -v &> /dev/null]; then
+  echo "npm could not be found..."
+  exit 1
+fi
+
+cd ./app/web_templates
+npm install
+
+echo "Creating initial build bundle..."
+npm run build
+cd $REPO_ROOT
+
 echo "Bootstrap process complete."
