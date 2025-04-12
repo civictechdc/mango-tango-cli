@@ -17,6 +17,7 @@ def select_analysis(proj: ProjectContext) -> Optional[AnalysisContext]:
         ],
         key=lambda option: option[0],
     )
+
     if not analysis_options:
         print("No tests have been run on this dataset yet.")
         wait_for_key(True)

@@ -11,6 +11,7 @@ from ..temporal.interface import (
     OUTPUT_COL_TIME_INTERVAL_START,
     OUTPUT_TABLE_INTERVAL_COUNT,
 )
+from ..utils.pop import pop_unnecessary_fields
 
 
 def factory(context: WebPresenterContext):
@@ -37,3 +38,30 @@ def factory(context: WebPresenterContext):
             Graph(id="bar-plot", figure=fig),
         ]
     )
+
+
+def api_factory(context: WebPresenterContext):
+    presenter_model = context.web_presenter.model_dump()
+    data_frame = pl.read_parquet(
+        context.base.table(OUTPUT_TABLE_INTERVAL_COUNT).parquet_path
+    )
+    interval_start = data_frame[OUTPUT_COL_TIME_INTERVAL_START].dt.strftime("%H:%M")
+    interval_end = data_frame[OUTPUT_COL_TIME_INTERVAL_END].dt.strftime("%H:%M")
+    intervals = []
+
+    for index in range(0, len(interval_start)):
+        intervals.append(f"{interval_start[index]} - {interval_end[index]}")
+
+    presenter_model["figure_type"] = "bar"
+    presenter_model["x"] = intervals
+    presenter_model["y"] = data_frame[OUTPUT_COL_POST_COUNT].to_list()
+    presenter_model["axis"] = {
+        "x": {"label": "Time Interval", "value": "time_interval"},
+        "y": {"label": "Post Count", "value": "post_count"},
+    }
+    presenter_model["explanation"] = {
+        "title": "Time Frequency Analysis",
+        "description": "The bars indicate the number of posts in each time interval.",
+    }
+
+    return pop_unnecessary_fields(presenter_model)
