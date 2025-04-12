@@ -37,7 +37,7 @@ export default function DataTable({ data, columns }: DataTableProps): ReactEleme
 
     return (
         <Table ref={tableRef} containerHeight={800} className="grid">
-            <TableHeader className="grid sticky top-0 z-10 bg-zinc-950">
+            <TableHeader className="grid sticky top-0 z-10 dark:bg-zinc-950">
                 {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id} className="flex w-full">
                         {headerGroup.headers.map((header) => {
