@@ -28,7 +28,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "src/**/*.d.ts"]
 }
