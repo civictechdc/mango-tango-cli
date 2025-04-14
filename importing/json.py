@@ -1,6 +1,8 @@
 import polars as pl
 from pydantic import BaseModel
+
 from .importer import Importer, ImporterSession
+
 
 class JSONImporter(Importer["JsonImportSession"]):
     @property
@@ -16,8 +18,11 @@ class JSONImporter(Importer["JsonImportSession"]):
     def manual_init_session(self, input_path: str):
         return JsonImportSession(input_file=input_path)
 
-    def modify_session(self, input_path: str, import_session: "JsonImportSession", reset_screen):
+    def modify_session(
+        self, input_path: str, import_session: "JsonImportSession", reset_screen
+    ):
         return import_session
+
 
 class JsonImportSession(ImporterSession, BaseModel):
     input_file: str
