@@ -2,10 +2,10 @@
 # This file tells PyInstaller how to bundle your application
 
 from PyInstaller.utils.hooks import copy_metadata
-from app.vite import init_dashboard_build
+from app import vite
 import sys
 
-init_dashboard_build()
+vite.init_dashboard_build()
 
 block_cipher = None
 a = Analysis(
