@@ -54,3 +54,5 @@ Werkzeug==3.0.6
 XlsxWriter==3.2.0
 xmod==1.8.1
 zipp==3.21.0
+colorama==0.4.6
+fastexcel==0.13.0
