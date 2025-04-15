@@ -13,7 +13,7 @@ from context import WebPresenterContext
 from .analysis_context import AnalysisContext
 from .api import APIContext
 from .app_context import AppContext
-from .vite_context import ViteContext
+from .vite import ViteContext
 
 
 class AnalysisWebServerContext(BaseModel):

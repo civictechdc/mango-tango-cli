@@ -6,7 +6,7 @@ from flask import Blueprint
 from flask_cors import CORS
 from pydantic import BaseModel
 
-from .app_context import AppContext
+from app.app_context import AppContext
 
 
 class ViteContext(BaseModel):
