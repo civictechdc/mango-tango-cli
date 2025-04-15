@@ -2,7 +2,7 @@
 # This file tells PyInstaller how to bundle your application
 
 from PyInstaller.utils.hooks import copy_metadata
-from .app.vite import init_dashboard_build
+from app.vite import init_dashboard_build
 import sys
 
 init_dashboard_build()
