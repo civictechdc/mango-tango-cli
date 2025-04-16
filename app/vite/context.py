@@ -20,20 +20,20 @@ class ViteContext(BaseModel):
             app_context=app_context,
             vite_origin=getenv("VITE_ORIGIN", "http://localhost:5173"),
             is_production=getenv("FLASK_DEBUG", "0") != "1",
-            project_path=Path(path.dirname(path.abspath(__file__))),
+            project_path=Path(path.dirname(path.abspath(__file__))).resolve().parent.parent,
         )
 
     def create_blueprint(self) -> Blueprint:
         blueprint = Blueprint(
             "vite_assets_blueprint",
             __name__,
-            static_folder="./web_templates/build/bundled",
+            static_folder="../web_templates/build/bundled",
             static_url_path="/static/bundled",
         )
         manifest = {}
 
         if self.is_production:
-            manifest_path = self.project_path / "web_templates/build/manifest.json"
+            manifest_path = self.project_path / "app/web_templates/build/manifest.json"
 
             try:
                 with open(manifest_path, "r") as content:
