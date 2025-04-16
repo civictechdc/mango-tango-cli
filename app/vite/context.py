@@ -20,7 +20,9 @@ class ViteContext(BaseModel):
             app_context=app_context,
             vite_origin=getenv("VITE_ORIGIN", "http://localhost:5173"),
             is_production=getenv("FLASK_DEBUG", "0") != "1",
-            project_path=Path(path.dirname(path.abspath(__file__))).resolve().parent.parent,
+            project_path=Path(path.dirname(path.abspath(__file__)))
+            .resolve()
+            .parent.parent,
         )
 
     def create_blueprint(self) -> Blueprint:
