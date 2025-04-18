@@ -1,8 +1,11 @@
-venv
-__pycache__
+venv/
+__pycache__/
 __private__
-/build
-/dist
-/analysis_outputs
+build/
+dist/
+analysis_outputs/
 VERSION
 *.DS_Store
+node_modules/
+.idea/
+/app/web_templates/build/

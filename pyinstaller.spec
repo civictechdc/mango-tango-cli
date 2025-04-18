@@ -5,7 +5,6 @@ from PyInstaller.utils.hooks import copy_metadata
 import sys
 
 block_cipher = None
-
 a = Analysis(
     ['mangotango.py'],  # Entry point
     pathex=['.'],    # Ensure all paths are correctly included
@@ -22,7 +21,8 @@ a = Analysis(
 
         # static assets for web servers
         ('./app/web_static', 'app/web_static'),
-        ('./app/web_templates', 'app/web_templates')
+        ('./app/web_templates/build', 'app/web_templates/build'),
+        ('./app/web_templates/index.html', 'app/web_templates'),
     ],
     hiddenimports=[
         'readchar',
@@ -33,8 +33,8 @@ a = Analysis(
     runtime_hooks=[],
     excludes=[]
 )
-
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
 if sys.platform == "darwin":
     exe = EXE(
         pyz,

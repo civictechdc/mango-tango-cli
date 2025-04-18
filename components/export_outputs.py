@@ -46,7 +46,7 @@ def export_outputs(context: ViewContext, analysis: AnalysisContext):
             return
 
         scope.refresh()
-        format = export_format_prompt()
+        format = export_format_prompt(analysis)
         if format is None:
             print("Export cancelled")
             wait_for_key(True)
@@ -124,12 +124,19 @@ def export_outputs_sequence(
     wait_for_key(True)
 
 
-def export_format_prompt():
+def export_format_prompt(analysis: AnalysisContext):
+    analysis_id = analysis.analyzer_id
     return prompts.list_input(
         "Choose an export format",
         choices=[
-            ("CSV", "csv"),
-            ("Excel", "xlsx"),
+            *(
+                [
+                    ("CSV", "csv"),
+                    ("Excel", "xlsx"),
+                ]
+                if analysis_id != "hashtags"
+                else []
+            ),
             ("JSON", "json"),
             ("(Back)", None),
         ],
