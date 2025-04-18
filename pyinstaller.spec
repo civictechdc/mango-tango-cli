@@ -22,7 +22,7 @@ a = Analysis(
         # static assets for web servers
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates/build', 'app/web_templates/build'),
-        ('./app/web_templates/index.html', 'app/web_templates/index.html'),
+        ('./app/web_templates/index.html', 'app/web_templates'),
     ],
     hiddenimports=[
         'readchar',

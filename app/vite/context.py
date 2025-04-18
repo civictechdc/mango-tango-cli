@@ -29,7 +29,7 @@ class ViteContext(BaseModel):
         blueprint = Blueprint(
             "vite_assets_blueprint",
             __name__,
-            static_folder="../web_templates/build/bundled",
+            static_folder=self.project_path / "app/web_templates/build/bundled",
             static_url_path="/static/bundled",
         )
         manifest = {}
