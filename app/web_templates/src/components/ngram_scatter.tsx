@@ -33,7 +33,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                 x: rawX[index],
                 y: rawY[index],
             }))
-            .sort((point1: NgramScatterPlotDataPoint, point2: NgramScatterPlotDataPoint): number => point2.x - point1.x)
+            .sort((point1: NgramScatterPlotDataPoint, point2: NgramScatterPlotDataPoint): number => point2.x - point1.x);
 
         if(searchValue.length > 0) dataSource = dataSource.filter((item: NgramScatterPlotDataPoint): boolean => item.ngram.includes(searchValue));
 

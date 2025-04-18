@@ -13,7 +13,7 @@ from context import WebPresenterContext
 from .analysis_context import AnalysisContext
 from .api import APIContext
 from .app_context import AppContext
-from .vite_context import ViteContext
+from .vite import ViteContext
 
 
 class AnalysisWebServerContext(BaseModel):
@@ -24,7 +24,6 @@ class AnalysisWebServerContext(BaseModel):
         containing_dir = str(Path(__file__).resolve().parent)
         static_folder = os.path.join(containing_dir, "web_static")
         template_folder = os.path.join(containing_dir, "web_templates")
-
         web_presenters = self.analysis_context.web_presenters
         web_server = Flask(
             __name__,
@@ -33,8 +32,11 @@ class AnalysisWebServerContext(BaseModel):
             static_url_path="/static",
         )
         web_server.logger.disabled = True
+        vite_context = ViteContext(app_context=self.app_context)
         temp_dirs: list[TemporaryDirectory] = []
         presenter_contexts = []
+
+        web_server.register_blueprint(vite_context.create_blueprint())
 
         for presenter in web_presenters:
             dash_app = Dash(
@@ -58,10 +60,8 @@ class AnalysisWebServerContext(BaseModel):
 
         project_name = self.analysis_context.project_context.display_name
         analyzer_name = self.analysis_context.display_name
-        vite_context = ViteContext(app_context=self.app_context)
         api_context = APIContext(presenters_context=presenter_contexts)
 
-        web_server.register_blueprint(vite_context.create_blueprint())
         web_server.register_blueprint(api_context.create_blueprint())
 
         @web_server.route("/")
