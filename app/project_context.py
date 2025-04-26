@@ -3,6 +3,7 @@ from functools import cached_property
 import polars as pl
 from pydantic import BaseModel
 
+from analyzer_interface import ParamValue
 from analyzer_interface import UserInputColumn as BaseUserInputColumn
 from preprocessing.series_semantic import SeriesSemantic, infer_series_semantic
 from storage import AnalysisModel, ProjectModel
@@ -31,14 +32,19 @@ class ProjectContext(BaseModel):
         self.app_context.storage.delete_project(self.id)
         self.is_deleted = True
 
-    def create_analysis(self, primary_analyzer_id: str, column_mapping: dict[str, str]):
+    def create_analysis(
+        self,
+        primary_analyzer_id: str,
+        column_mapping: dict[str, str],
+        param_values: dict[str, ParamValue],
+    ):
         assert not self.is_deleted, "Project is deleted"
 
         analyzer = self.app_context.suite.get_primary_analyzer(primary_analyzer_id)
         assert analyzer, f"Analyzer `{primary_analyzer_id}` not found"
 
         analysis_model = self.app_context.storage.init_analysis(
-            self.id, analyzer.name, primary_analyzer_id, column_mapping
+            self.id, analyzer.name, primary_analyzer_id, column_mapping, param_values
         )
         return self._create_analysis_context(analysis_model)
 
@@ -68,6 +74,10 @@ class ProjectContext(BaseModel):
     @cached_property
     def columns(self):
         return _get_columns_with_semantic(self.preview_data)
+
+    @cached_property
+    def column_dict(self):
+        return {col.name: col for col in self.columns}
 
 
 def _get_columns_with_semantic(df: pl.DataFrame):

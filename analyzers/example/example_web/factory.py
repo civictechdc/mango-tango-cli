@@ -40,11 +40,14 @@ def factory(context: WebPresenterContext):
         }
     )
 
+    fudge_factor_param = context.base_params.get("fudge_factor")
     app.layout = Div(
         [
+            Div(f"Fudge factor: {fudge_factor_param}"),
+            Div("You naughty data scientist") if fudge_factor_param else None,
             Graph(
                 figure=fig,
                 style={"height": "100%", "flex-grow": "1"},
-            )
+            ),
         ]
     )
