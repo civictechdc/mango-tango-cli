@@ -1,8 +1,15 @@
 from colorama import Fore
 
 from app import AnalysisContext
-from terminal_tools import draw_box, open_directory_explorer, prompts, wait_for_key
+from terminal_tools import (
+    draw_box,
+    open_directory_explorer,
+    print_ascii_table,
+    prompts,
+    wait_for_key,
+)
 
+from .analysis_params import print_param_value
 from .context import ViewContext
 from .export_outputs import export_outputs
 
@@ -19,6 +26,22 @@ def analysis_main(
         with terminal.nest(
             draw_box(f"Analysis: {analysis.display_name}", padding_lines=0)
         ):
+            analyzer = analysis.analyzer_spec
+            param_rows = [
+                [
+                    param_spec.print_name,
+                    print_param_value(param_value),
+                ]
+                for param_spec in analyzer.params
+                if (param_value := analysis.backfilled_param_values.get(param_spec.id))
+                is not None
+            ]
+            if param_rows:
+                print_ascii_table(
+                    param_rows,
+                    header=["parameter name", "parameter value"],
+                )
+
             if is_draft:
                 print("⚠️  This analysis didn't complete successfully.  ⚠️")
 

@@ -37,6 +37,10 @@ def test_example_base():
                 separator=",",
             ),
         ),
+        # This is optional if your analyzer doesn't take parameters.
+        # You're responsible for making sure the analyzer you're testing
+        # get the parameters it needs.
+        params={"fudge_factor": 10},
         # These outputs are the expected outputs of the analyzer.
         # You don't need to specify all the outputs, only the ones you want to test.
         # The output IDs must match the IDs in the interface schema.
