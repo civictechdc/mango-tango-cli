@@ -6,6 +6,7 @@ from dash import Dash
 from pydantic import BaseModel
 
 from .interface import SecondaryAnalyzerInterface
+from .params import ParamValue
 
 
 class PrimaryAnalyzerContext(ABC, BaseModel):
@@ -22,6 +23,14 @@ class PrimaryAnalyzerContext(ABC, BaseModel):
 
         **Note that this is in function form** even though one input is expected,
         in anticipation that we may want to support multiple inputs in the future.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def params(self) -> dict[str, ParamValue]:
+        """
+        Gets the analysis parameters.
         """
         pass
 
@@ -43,6 +52,14 @@ class BaseDerivedModuleContext(ABC, BaseModel):
   Gets the temporary directory that the module can freely write content to
   during its lifetime. This directory will not persist between runs.
   """
+
+    @property
+    @abstractmethod
+    def base_params(self) -> dict[str, ParamValue]:
+        """
+        Gets the primary analysis parameters.
+        """
+        pass
 
     @property
     @abstractmethod

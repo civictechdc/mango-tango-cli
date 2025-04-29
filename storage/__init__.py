@@ -14,6 +14,7 @@ from tinydb import Query, TinyDB
 from xlsxwriter import Workbook
 
 from analyzer_interface.interface import AnalyzerOutput
+from analyzer_interface.params import ParamValue
 
 from .file_selector import FileSelectorStateManager
 
@@ -43,6 +44,7 @@ class AnalysisModel(BaseModel):
     path: str
     column_mapping: Optional[dict[str, str]] = None
     create_timestamp: Optional[float] = None
+    param_values: dict[str, ParamValue] = dict()
     is_draft: bool = False
 
     def create_time(self):
@@ -308,6 +310,7 @@ class Storage:
         display_name: str,
         primary_analyzer_id: str,
         column_mapping: dict[str, str],
+        param_values: dict[str, ParamValue],
     ) -> AnalysisModel:
         with self._lock_database():
             analysis_id = self._find_unique_analysis_id(project_id, display_name)
@@ -319,6 +322,7 @@ class Storage:
                 path=os.path.join("analysis", analysis_id),
                 column_mapping=column_mapping,
                 create_timestamp=datetime.now().timestamp(),
+                param_values=param_values,
                 is_draft=True,
             )
             self.db.insert(analysis.model_dump())

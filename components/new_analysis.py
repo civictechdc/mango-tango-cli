@@ -1,3 +1,4 @@
+from tempfile import TemporaryDirectory
 from traceback import format_exc
 from typing import Optional
 
@@ -6,15 +7,17 @@ import polars as pl
 from analyzer_interface import (
     AnalyzerInterface,
     InputColumn,
+    ParamValue,
     UserInputColumn,
     column_automap,
     get_data_type_compatibility_score,
 )
 from app import ProjectContext
+from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
 from terminal_tools import draw_box, print_ascii_table, prompts, wait_for_key
 
+from .analysis_params import customize_analysis
 from .context import ViewContext
-from .export_outputs import export_format_prompt, export_outputs_sequence
 
 
 def new_analysis(
@@ -22,7 +25,8 @@ def new_analysis(
     project: ProjectContext,
 ):
     terminal = context.terminal
-    analyzers = context.app.context.suite.primary_anlyzers
+    app = context.app
+    analyzers = app.context.suite.primary_anlyzers
     with terminal.nest(draw_box("Choose a test", padding_lines=0)):
         analyzer: Optional[AnalyzerInterface] = prompts.list_input(
             "Which test?",
@@ -102,7 +106,7 @@ def new_analysis(
 
                 sample_input_df = pl.DataFrame(
                     {
-                        input_col.human_readable_name_or_fallback(): user_columns_by_name.get(
+                        input_col.human_readable_name_or_fallback(): project.column_dict.get(
                             final_column_mapping.get(input_col.name)
                         )
                         .head(5)
@@ -188,7 +192,18 @@ def new_analysis(
                         selected_user_column.name
                     )
 
-        analysis = project.create_analysis(analyzer.id, final_column_mapping)
+        param_values = customize_analysis(
+            context, project, analyzer, final_column_mapping
+        )
+
+        if param_values is None:
+            print("Canceled")
+            wait_for_key(True)
+            return
+
+        analysis = project.create_analysis(
+            analyzer.id, final_column_mapping, param_values
+        )
 
         with terminal.nest("Analysis") as run_scope:
             is_export_started = False
