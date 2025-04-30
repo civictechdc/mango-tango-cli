@@ -2,13 +2,17 @@ from analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,
+    AnalyzerParam,
     InputColumn,
     OutputColumn,
 )
+from analyzer_interface.params import TimeBinningParam
 
 COL_AUTHOR_ID = "user_id"
 COL_TIME = "time"
 COL_POST = "text"
+
+PARAM_TIME_WINDOW = "time_window"
 
 OUTPUT_GINI = "hashtag_analysis"
 OUTPUT_COL_USERS = "users"
@@ -76,6 +80,29 @@ interface = AnalyzerInterface(
             ),
         ]
     ),
+    params=[
+        AnalyzerParam(
+            id=PARAM_TIME_WINDOW,
+            human_readable_name="Time window of analysis",
+            description="""
+The duration over which to compute the gini coefficient. After
+selecting a time window (e.g. 12 hours), the dataset will be
+chunked into equal-duration (e.g. 12-hour long) time windows. The gini 
+coefficient is computed over hashtags found in each time window chunk. 
+
+This value determines the time granularity of the analysis. The optimal
+value depends on the time span of the dataset. Generally, you want to 
+choose time window long enough that there is a meaningful number of hashtags
+in that time period (if there are none, gini will be 0 for those time windows).
+
+For example, if the full dataset spans multiple years, it makes sense
+to choose a time window that spans multiple days if not months. Conversely,
+if a dataset spans a few weeks, it makes sense to choose a time window of
+a few hours or one day etc.
+            """,
+            type=TimeBinningParam(),
+        )
+    ],
     outputs=[
         AnalyzerOutput(
             id=OUTPUT_GINI,
