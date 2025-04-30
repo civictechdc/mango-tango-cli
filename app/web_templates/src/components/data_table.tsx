@@ -37,6 +37,7 @@ export default function DataTable({ data, columns }: DataTableProps): ReactEleme
 
     return (
         <Table ref={tableRef} containerHeight={800} className="grid">
+            <TableHeader className="grid sticky top-0 z-10 bg-white dark:bg-zinc-950">
                 {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id} className="flex w-full">
                         {headerGroup.headers.map((header) => {
@@ -49,7 +50,7 @@ export default function DataTable({ data, columns }: DataTableProps): ReactEleme
                                             header.getContext()
                                         )}
                                 </TableHead>
-                            )
+                            );
                         })}
                     </TableRow>
                 ))}
@@ -81,7 +82,7 @@ export default function DataTable({ data, columns }: DataTableProps): ReactEleme
                                )
                            })}
                        </TableRow>
-                    )
+                    );
                 })}
             </TableBody>
         </Table>

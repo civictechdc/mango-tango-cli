@@ -9,16 +9,14 @@ interface GlobalPresentersState {
 
 const usePresentersState = create<GlobalPresentersState>((setState): GlobalPresentersState => ({
     presenters: [],
-    set: (presenters: PresenterCollection): void => setState((state: GlobalPresentersState): GlobalPresentersState => {
-        state.presenters = presenters;
-
-        return state;
-    }),
-    clear: (): void => setState((state: GlobalPresentersState): GlobalPresentersState => {
-        state.presenters = [];
-
-        return state;
-    })
+    set: (presenters: PresenterCollection): void => setState((state: GlobalPresentersState): GlobalPresentersState => ({
+        ...state,
+        presenters: presenters,
+    })),
+    clear: (): void => setState((state: GlobalPresentersState): GlobalPresentersState => ({
+        ...state,
+        presenters: [],
+    }))
 }));
 
 export type { GlobalPresentersState };
