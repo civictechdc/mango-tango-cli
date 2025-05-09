@@ -15,7 +15,12 @@ export type NgramScatterPlotDataPoint = {
     ngram: string;
     x: number;
     y: number;
+    ranking: number;
 };
+function calculateRanking(x: Array<number>,index: number){
+    return (x as Array<number>).filter((i)=>i> x[index]).length+1;
+    };
+
 
 export default function NgramScatterPlot({ presenter }: ChartContainerProps): ReactElement<FC> {
     const [searchValue, setSearchValue] = useState<string>('');
@@ -27,15 +32,21 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
         const rawNgrams = presenter.ngrams as Array<string>;
         const rawX = presenter.x as Array<number>;
         const rawY = (presenter.y as PresenterAxisData)['total_repetition'] as Array<number>;
+
         let dataSource = Array
             .from({length: rawX.length}, (_, index: number): NgramScatterPlotDataPoint => ({
                 ngram: rawNgrams[index],
                 x: rawX[index],
                 y: rawY[index],
+                ranking:calculateRanking(rawX,index),
             }))
             .sort((point1: NgramScatterPlotDataPoint, point2: NgramScatterPlotDataPoint): number => point2.x - point1.x);
 
         if(searchValue.length > 0) dataSource = dataSource.filter((item: NgramScatterPlotDataPoint): boolean => item.ngram.includes(searchValue));
+        if(searchValue.length > 0){
+            const newX = dataSource.map(i=>i.x)  as Array<number>;
+            dataSource = dataSource.map(ngram=>Object.assign({},ngram,{ranking:calculateRanking(newX,newX.indexOf(ngram.x))}));
+            };
 
         dataset.source = dataSource;
 
@@ -56,10 +67,15 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                 ngram: rawNgrams[index],
                 x: rawX[index],
                 y: rawY[index],
+                ranking:(presenter.x as Array<number>).filter((i)=>i> rawX[index]).length+1,
             }))
             .sort((point1: NgramScatterPlotDataPoint, point2: NgramScatterPlotDataPoint): number => point2.x - point1.x);
 
         if(searchValue.length > 0) dataSource = dataSource.filter((item: NgramScatterPlotDataPoint): boolean => item.ngram.includes(searchValue));
+        if(searchValue.length > 0){
+            const newX = dataSource.map(i=>i.x)  as Array<number>;
+            dataSource = dataSource.map(ngram=>Object.assign({},ngram,{ranking:calculateRanking(newX,newX.indexOf(ngram.x))}));
+            };
 
         dataset.source = dataSource;
 
@@ -67,8 +83,16 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
     }, [presenter, searchValue]);
     const totalRepetitionDataTableColumns = useMemo<Array<ColumnDef<NgramScatterPlotDataPoint>>>(() => [
         {
+            accessorKey: 'ranking',
+            header: () => <span className="w-full text-center">Ranking</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">
+            {info.getValue()}</span>,
+            size: 150
+        },
+        {
             accessorKey: 'ngram',
             header: () => <span className="pl-2">Ngram</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">{info.getValue()}</span>,
             size: 900
         },
         {
@@ -86,8 +110,15 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
     ], []);
     const amplificationFactorDataTableColumns = useMemo<Array<ColumnDef<NgramScatterPlotDataPoint>>>(() => [
         {
+            accessorKey: 'ranking',
+            header: () => <span className="w-full text-center">Ranking</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">{info.getValue()}</span>,
+            size: 150
+        },
+        {
             accessorKey: 'ngram',
             header: () => <span className="pl-2">Ngram</span>,
+            cell: (info: CellContext<NgramScatterPlotDataPoint, any>) => <span className="w-full text-center">{info.getValue()}</span>,
             size: 900
         },
         {
@@ -116,6 +147,10 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                     <span class="font-bold">${data.ngram}</span>
                 </div>
                 <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                    <span class="font-bold">Ranking:</span>
+                    <span>${data.ranking}</span>
+                </div>
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                     <span class="font-bold">Total Repetition:</span>
                     <span>${data.x}</span>
                 </div>
@@ -137,6 +172,10 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
             <div class="grid gap-1.5">
                 <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                     <span class="font-bold">${data.ngram}</span>
+                </div>
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                    <span class="font-bold">Ranking:</span>
+                    <span>${data.ranking}</span>
                 </div>
                 <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                     <span class="font-bold">Total Repetition:</span>

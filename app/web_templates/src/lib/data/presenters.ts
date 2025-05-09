@@ -73,6 +73,7 @@ export type Presenter = {
     short_description: string | null;
     version: string;
     ngrams: Array<string> | undefined;
+    message_data: (string | number)[][] | undefined;
     x: Array<string> | Array<number> | PresenterAxisData;
     y: Array<string> | Array<number> | PresenterAxisData;
 };

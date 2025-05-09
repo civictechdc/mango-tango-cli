@@ -19,6 +19,10 @@ from ..ngram_stats.interface import (
     COL_NGRAM_TOTAL_REPS,
     COL_NGRAM_WORDS,
     OUTPUT_NGRAM_STATS,
+    OUTPUT_NGRAM_FULL,
+    COL_NGRAM_ID,
+    COL_AUTHOR_ID,
+    COL_MESSAGE_TEXT,
 )
 from ..ngram_stats.interface import interface as ngram_stats
 from ..utils.pop import pop_unnecessary_fields
@@ -160,8 +164,12 @@ def api_factory(context: WebPresenterContext):
     data_frame = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
     )
+    message_frame = pl.read_parquet(
+        context.dependency(ngram_stats).table(OUTPUT_NGRAM_FULL).parquet_path
+    )[[COL_NGRAM_ID,COL_AUTHOR_ID,COL_MESSAGE_TEXT]]
     matcher = create_word_matcher("", pl.col(COL_NGRAM_WORDS))
     plotted_df = data_frame.filter(matcher) if matcher is not None else data_frame
+    plotted_message =  message_frame.filter(matcher) if matcher is not None else message_frame
     presenter_model = context.web_presenter.model_dump()
     presenter_model["figure_type"] = "scatter"
     presenter_model["ngrams"] = plotted_df[COL_NGRAM_WORDS].to_list()
@@ -173,6 +181,7 @@ def api_factory(context: WebPresenterContext):
             / plotted_df[COL_NGRAM_DISTINCT_POSTER_COUNT]
         ).to_list(),
     }
+    #presenter_model['message_data'] = plotted_message.to_pandas().values.tolist()
     presenter_model["explanation"] = {
         "total_repetition": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times overall.",
         "amplification_factor": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times on average per user.",
@@ -181,7 +190,7 @@ def api_factory(context: WebPresenterContext):
         "x": {"label": "Total Repetition", "value": "total_repetition"},
         "y": {"label": "Amplification Factor", "value": "amplification_factor"},
     }
-
+    #print(presenter_model['message_data'][:10])
     return pop_unnecessary_fields(presenter_model)
 
 

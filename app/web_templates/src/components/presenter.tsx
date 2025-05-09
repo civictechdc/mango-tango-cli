@@ -10,7 +10,10 @@ import type { GlobalPresentersState } from '@/lib/state/presenters';
 export default function PresenterView(): ReactElement<FC> {
     const presenters: PresenterCollection = usePresentersState((state: GlobalPresentersState) => state.presenters);
     const presenter: Presenter = presenters[0];
+    console.log(presenters)
     let component: ReactElement<FC> | null = null;
+
+    console.log(presenter)
 
     if(presenter) {
         if (presenter.figure_type === 'histogram') component = <HistogramChart presenter={presenter} />;
