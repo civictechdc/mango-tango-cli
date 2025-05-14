@@ -27,14 +27,14 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
 
         for(let index: number = 0; index < dataSourceLength; index++) {
             if(searchValue.length > 0) {
-                if((presenter.ngrams as Array<string>)[index].includes(searchValue)) {
-                    dataSource[dataSourceIndex] = {
-                        ngram: (presenter.ngrams as Array<string>)[index],
-                        x: (presenter.x as Array<number>)[index],
-                        y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index]
-                    };
-                    dataSourceIndex++;
-                }
+                if(!((presenter.ngrams as Array<string>)[index].includes(searchValue))) continue;
+
+                dataSource[dataSourceIndex] = {
+                    ngram: (presenter.ngrams as Array<string>)[index],
+                    x: (presenter.x as Array<number>)[index],
+                    y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index]
+                };
+                dataSourceIndex++;
                 continue;
             }
 

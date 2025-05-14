@@ -1,9 +1,8 @@
 import { Download } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip.tsx';
 import type { ReactElement, FC } from 'react';
-import type { FeatureProps } from '@/components/charts/toolbox/feature.ts';
 
-export default function SaveAsFeature({ chart }: FeatureProps): ReactElement<FC> {
+export default function SaveAsFeature(): ReactElement<FC> {
     const handleClick = (): void => {
         if(chart == null) return;
 

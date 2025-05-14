@@ -1,4 +1,4 @@
-import type { ScaleLinear, ScaleLogarithmic, ScaleOrdinal } from 'd3-scale';
+import type { AnyD3Scale } from '@visx/scale';
 import type { Dimensions } from '@/lib/types/dimensions.ts';
 
 export type AxisType = 'linear' | 'log' | 'category';
@@ -21,12 +21,8 @@ export type ChartAxisSettingsType = {
     y?: AxisSettingType;
 };
 
-export type DynamicScale = ScaleLinear<number, number, any> | ScaleLogarithmic<number, number, any> | ScaleOrdinal<string, number, any>;
-export type AxisTicks = Array<string> | Array<number>;
-
 export type AxisScaleType = {
-    scale: DynamicScale;
-    ticks: AxisTicks;
+    scale: AnyD3Scale;
 };
 
 export interface AxesProps {
@@ -34,4 +30,4 @@ export interface AxesProps {
     xAxis: AxisScaleType & AxisSettingType;
     yAxis: AxisScaleType & AxisSettingType;
     darkMode?: boolean;
-};
+}

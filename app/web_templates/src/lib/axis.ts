@@ -1,23 +1,24 @@
-import type { ScaleLinear, ScaleLogarithmic, ScaleOrdinal } from 'd3-scale';
-import type { AxisType, DynamicScale } from '@/lib/types/axis';
+import type { AnyD3Scale, ScaleConfigToD3Scale, LinearScaleConfig, LogScaleConfig, OrdinalScaleConfig } from '@visx/scale';
 
-export function isLinearScale(scale: DynamicScale): scale is ScaleLinear<number, number> {
-    return (scale as any).ticks !== undefined && (scale as any).interpolate !== undefined;
+export function isLinearScale(scale: AnyD3Scale): boolean {
+    return (scale as ScaleConfigToD3Scale<LinearScaleConfig>).ticks !== undefined &&
+        (scale as ScaleConfigToD3Scale<LinearScaleConfig>).interpolate !== undefined;
 }
 
-export function isLogScale(scale: DynamicScale): scale is ScaleLogarithmic<number, number> {
-    return (scale as any).base !== undefined;
+export function isLogScale(scale: AnyD3Scale): boolean {
+    return (scale as ScaleConfigToD3Scale<LogScaleConfig>).base !== undefined;
 }
 
-export function isOrdinalScale(scale: DynamicScale): scale is ScaleOrdinal<string, number, never> {
-    return (scale as any).domain !== undefined && (scale as any).unknown !== undefined;
+export function isOrdinalScale(scale: AnyD3Scale): boolean {
+    return (scale as ScaleConfigToD3Scale<OrdinalScaleConfig>).domain !== undefined &&
+        (scale as ScaleConfigToD3Scale<OrdinalScaleConfig>).unknown !== undefined;
 }
 
-export function calculatePosition(scale: DynamicScale, value: string | number, scaleType: AxisType): number {
+export function calculatePosition(scale: AnyD3Scale, value: string | number): number {
     try {
-        if(scaleType === 'category' && isOrdinalScale(scale)) return scale(value as string);
-        if(scaleType === 'log' && isLogScale(scale)) return scale(Math.max((value as number) || 1, 1));
-        if(scaleType === 'linear' && isLinearScale(scale)) return scale(value as number);
+        if(isOrdinalScale(scale)) return (scale as ScaleConfigToD3Scale<OrdinalScaleConfig>)(value as string) as number ?? 0;
+        if(isLogScale(scale)) return scale(Math.max((value as number) || 0.9, 0.9));
+        if(isLinearScale(scale)) return scale(value as number);
 
     } catch(err){
         console.error('Error calculating position:', err);

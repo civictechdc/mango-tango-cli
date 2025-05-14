@@ -1,18 +1,25 @@
+import { useRef, useState } from 'react';
 import useChart from '@/lib/hooks/chart.ts';
 import { ScatterplotLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import DeckGL from '@deck.gl/react';
-import ChartAxes from '@/components/charts/axis.tsx';
+import { AxisLeft, AxisBottom } from '@visx/axis';
+import ToolBox from '@/components/charts/toolbox.tsx';
 import type { ReactElement, FC } from 'react';
+import type { Deck } from '@deck.gl/core';
+import type { DeckGLRef } from '@deck.gl/react';
 import type { ChartProps } from '@/components/charts/props.ts';
 
 export default function ScatterPlot({
     data,
     tooltip,
     darkMode = true,
-    axis = {x: {type: 'log'}, y: {type: 'log'}},
-    dimensions = {width: 800, height: 600, margins: { top: 60, right: 60, bottom: 80, left: 80 }}}: ChartProps): ReactElement<FC> {
-    const {data: plotData, deckProps, axis: chartAxes} = useChart(data, tooltip, axis);
+    axis = {x: {type: 'log', show: true}, y: {type: 'log', show: true}},
+    dimensions = {width: 800, height: 600, margins: { top: 20, right: 40, bottom: 21, left: 40 }}
+}: ChartProps): ReactElement<FC> {
+    const [deckInstance, setDeckInstance] = useState<Deck | null>(null);
+    const deckRef = useRef<DeckGLRef | null>(null);
+    const {data: plotData, deckProps, axis: chartAxes, viewport} = useChart(data, tooltip, deckInstance, axis, dimensions);
     const layers = [
         new ScatterplotLayer({
             id: `scatter-${Math.random().toString(36)}`,
@@ -28,7 +35,8 @@ export default function ScatterPlot({
             getPosition: d => d.position,
             getFillColor: d => d.color,
             updateTriggers: {
-                getFillColor: [darkMode]  // Only update colors when darkMode changes
+                getFillColor: [darkMode, viewport.viewState.zoom],
+                getPosition: [viewport.viewState.zoom, viewport.viewState.target]
             },
             transitions: {
                 getPosition: {
@@ -42,32 +50,66 @@ export default function ScatterPlot({
                 }
             },
             parameters: {
-                depthTest: false // Can improve performance for 2D visualization
+                depthTest: false
             }
         })
     ];
 
+    console.log('visible data in view port: ', viewport.visibleData);
     return (
-        <div style={{ position: 'relative', width: dimensions.width, height: dimensions.height, zIndex: 0 }}>
-            <DeckGL {...deckProps} layers={layers} />
-            {axis && (
-                <ChartAxes
-                    dimensions={dimensions}
-                    xAxis={{
-                        ...chartAxes.x,
-                        type: axis?.x?.type,
-                        label: axis?.x?.label,
-                        showGridLines: axis?.x?.showGridLines
-                    }}
-                    yAxis={{
-                        ...chartAxes.y,
-                        type: axis?.y?.type,
-                        label: axis?.y?.label,
-                        showGridLines: axis?.y?.showGridLines
-                    }}
-                    darkMode={darkMode}
-                />
-            )}
-        </div>
+        <>
+            <div className="grid grid-flow-col justify-end">
+                <div className="grid grid-flow-row">
+                    <ToolBox
+                        features={['zoom', 'restore']}
+                        zoomIncrement={viewport.hooks.increment}
+                        zoomDecrement={viewport.hooks.decrement}
+                        zoomReset={viewport.hooks.reset} />
+                </div>
+            </div>
+            <div style={{ position: 'relative', width: dimensions.width, height: dimensions.height, zIndex: 0 }}>
+                <DeckGL {...deckProps}
+                        ref={deckRef}
+                        layers={layers}
+                        onAfterRender={() => {
+                            if(deckRef.current != null && deckInstance == null) setDeckInstance(deckRef.current?.deck as Deck);
+                        }}/>
+                <svg
+                    width={dimensions.width}
+                    height={dimensions.height}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        pointerEvents: 'none',
+                        fontFamily: 'sans-serif',
+                        fontSize: '12px',
+                        zIndex: 1
+                }}>
+                    {(axis.x && axis.x.show) && (
+                        <AxisBottom scale={chartAxes.x.scale}
+                                top={dimensions.height - (dimensions.margins?.bottom as number)}
+                                tickLabelProps={{
+                                    fill: darkMode ? '#fff' : '#000',
+                                    fontSize: 10,
+                                    textAnchor: 'middle'
+                                }}
+                                stroke="#fff"
+                                tickStroke="#fff" />
+                    )}
+                    {(axis.y && axis.y.show) && (
+                        <AxisLeft scale={chartAxes.y.scale}
+                              left={dimensions.margins?.left as number}
+                              tickLabelProps={{
+                                  fill: darkMode ? '#fff' : '#000',
+                                  fontSize: 10,
+                                  textAnchor: 'end'
+                              }}
+                              stroke="#fff"
+                              tickStroke="#fff" />
+                    )}
+                </svg>
+            </div>
+        </>
     );
 }
