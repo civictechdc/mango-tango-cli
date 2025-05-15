@@ -8,7 +8,9 @@ nav:
   - "Home":
     - "Overview": "index.md"
     - "License": "license.md"
-  - "Contributing guide": "dev-guide.md"
+  - "Guides":
+    - "CLI design philosophy": "guides/dev-guide.md"
+    - "Development guide": "guides/contributing.md"
   - "Reference (CLI)":
       - "Analyzer interface": "reference/analyzer_interface.md"
       - "Components": "reference/components.md"
