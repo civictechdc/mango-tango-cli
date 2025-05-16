@@ -173,7 +173,6 @@ export default function useChart<DataPointType>(
             if(yScale) plotData[index].position[1] = calculatePosition(yScale, data[index].y);
         }
 
-
         return { plotData, xScale, yScale };
     }, [data, width, height, margin, baseScales]);
     const visibleData = useMemo(() => {
@@ -280,12 +279,11 @@ export default function useChart<DataPointType>(
             maxY *= 1.1;
         }
 
-        // Create new scales based on visible data
         let newXScale = xScale;
         let newYScale = yScale;
 
         if (xAxis === 'linear') newXScale = scaleLinear({
-            domain: [minX * 0.9, maxX * 1.1],
+            domain: [minX, maxX],
             range: [margin.left, width - margin.right],
             clamp: true
         });
@@ -338,9 +336,8 @@ export default function useChart<DataPointType>(
         };
     }, [visibleData, baseScales, width, height, margin, xScale, yScale, viewState.target, viewState.zoom]);
     const onViewStateChange = useCallback(({viewState}: ViewStateChangeParameters) => {
-        console.log('ViewState change:', viewState);
         setViewState(viewState);
-    }, [deck]);
+    }, []);
     const incrementZoom = (step: number = 1): void => {
         setViewState((state: OrthographicViewState): OrthographicViewState => ({...state, zoom: (state.zoom as number) + step}));
         if(deck) deck.setProps({

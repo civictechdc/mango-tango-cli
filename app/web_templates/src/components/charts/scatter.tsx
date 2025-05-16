@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import useChart from '@/lib/hooks/chart.ts';
 import { ScatterplotLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
@@ -6,19 +6,20 @@ import DeckGL from '@deck.gl/react';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 import ToolBox from '@/components/charts/toolbox.tsx';
 import type { ReactElement, FC } from 'react';
-import type { Deck } from '@deck.gl/core';
+import type { Deck, OrthographicView } from '@deck.gl/core';
 import type { DeckGLRef } from '@deck.gl/react';
 import type { ChartProps } from '@/components/charts/props.ts';
 
 export default function ScatterPlot({
     data,
     tooltip,
-    darkMode = true,
+    darkMode = false,
     axis = {x: {type: 'log', show: true}, y: {type: 'log', show: true}},
     dimensions = {width: 800, height: 600, margins: { top: 20, right: 40, bottom: 21, left: 40 }}
 }: ChartProps): ReactElement<FC> {
-    const [deckInstance, setDeckInstance] = useState<Deck | null>(null);
-    const deckRef = useRef<DeckGLRef | null>(null);
+    const axesFillColor = useMemo<string>(() => darkMode ? '#fff' : '#000', [darkMode]);
+    const [deckInstance, setDeckInstance] = useState<Deck<OrthographicView> | null>(null);
+    const deckRef = useRef<DeckGLRef<OrthographicView> | null>(null);
     const {data: plotData, deckProps, axis: chartAxes, viewport} = useChart(data, tooltip, deckInstance, axis, dimensions);
     const layers = [
         new ScatterplotLayer({
@@ -35,8 +36,7 @@ export default function ScatterPlot({
             getPosition: d => d.position,
             getFillColor: d => d.color,
             updateTriggers: {
-                getFillColor: [darkMode, viewport.viewState.zoom],
-                getPosition: [viewport.viewState.zoom, viewport.viewState.target]
+                getFillColor: [darkMode, viewport.viewState.zoom]
             },
             transitions: {
                 getPosition: {
@@ -72,41 +72,32 @@ export default function ScatterPlot({
                         ref={deckRef}
                         layers={layers}
                         onAfterRender={() => {
-                            if(deckRef.current != null && deckInstance == null) setDeckInstance(deckRef.current?.deck as Deck);
+                            if(deckRef.current != null && deckInstance == null) setDeckInstance(deckRef.current?.deck as Deck<OrthographicView>);
                         }}/>
                 <svg
                     width={dimensions.width}
-                    height={dimensions.height}
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        pointerEvents: 'none',
-                        fontFamily: 'sans-serif',
-                        fontSize: '12px',
-                        zIndex: 1
-                }}>
+                    height={dimensions.height}>
                     {(axis.x && axis.x.show) && (
                         <AxisBottom scale={chartAxes.x.scale}
                                 top={dimensions.height - (dimensions.margins?.bottom as number)}
                                 tickLabelProps={{
-                                    fill: darkMode ? '#fff' : '#000',
+                                    fill: axesFillColor,
                                     fontSize: 10,
                                     textAnchor: 'middle'
                                 }}
-                                stroke="#fff"
-                                tickStroke="#fff" />
+                                stroke={axesFillColor}
+                                tickStroke={axesFillColor} />
                     )}
                     {(axis.y && axis.y.show) && (
                         <AxisLeft scale={chartAxes.y.scale}
                               left={dimensions.margins?.left as number}
                               tickLabelProps={{
-                                  fill: darkMode ? '#fff' : '#000',
+                                  fill: axesFillColor,
                                   fontSize: 10,
                                   textAnchor: 'end'
                               }}
-                              stroke="#fff"
-                              tickStroke="#fff" />
+                              stroke={axesFillColor}
+                              tickStroke={axesFillColor} />
                     )}
                 </svg>
             </div>

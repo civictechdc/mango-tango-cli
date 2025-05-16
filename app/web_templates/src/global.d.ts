@@ -5,4 +5,9 @@ declare global {
     }
 }
 
+declare module '*.css' {
+    const content: any;
+    export default content;
+}
+
 export {};

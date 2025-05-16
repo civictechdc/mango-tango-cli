@@ -1,10 +1,13 @@
 import { useMemo, useState, Suspense } from 'react';
+import { useTheme } from '@/components/theme-provider.tsx';
 import ScatterPlot from '@/components/charts/scatter.tsx';
 import SearchBar from '@/components/search.tsx';
+import DataTable from '@/components/data_table.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { Info } from 'lucide-react';
 import type { ReactElement, FC } from 'react';
+import type { GridColumn } from '@glideapps/glide-data-grid';
 import type { DataPoint } from '@/lib/types/datapoint';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
@@ -18,6 +21,19 @@ export type NgramScatterPlotYAxisType = 'total_repetition' | 'amplification_fact
 export default function NgramScatterPlot({ presenter }: ChartContainerProps): ReactElement<FC> {
     const [searchValue, setSearchValue] = useState<string>('');
     const [currentTab, setCurrentTab] = useState<NgramScatterPlotYAxisType>('total_repetition');
+    const {theme} = useTheme();
+    const isDark = useMemo<boolean>(() =>
+            (theme === 'system' &&  window.matchMedia("(prefers-color-scheme: dark)").matches) || theme === 'dark'
+    , [theme]);
+    const dataTableColumns = useMemo<Array<GridColumn>>(() => ([
+        { id: 'ngram', title: 'Ngram', width: 500 },
+        { id: 'x', title: 'User Repetition', width: 150 },
+        {
+            id: 'y',
+            width: 150,
+            title: currentTab === 'total_repetition' ? 'Total Repetition' : 'Amplification Factor'
+        },
+    ]), [currentTab]);
     const data = useMemo<Array<NgramScatterPlotDataPoint>>(() => {
         if (presenter == null) return [];
 
@@ -96,12 +112,12 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
 
     if(currentTab === 'total_repetition') ScatterPlotComponent = (
         <Suspense fallback={<p>Loading...</p>}>
-            <ScatterPlot data={data} tooltip={totalRepetitionTooltipFormatter} />
+            <ScatterPlot data={data} darkMode={isDark} tooltip={totalRepetitionTooltipFormatter} />
         </Suspense>
     );
     if(currentTab === 'amplification_factor') ScatterPlotComponent = (
         <Suspense fallback={<p>Loading...</p>}>
-            <ScatterPlot data={data} tooltip={amplificationFactorTooltipFormatter} />
+            <ScatterPlot data={data} darkMode={isDark} tooltip={amplificationFactorTooltipFormatter} />
         </Suspense>
     );
 
@@ -125,6 +141,9 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                     </div>
                     <div className="grid grid-flow-col row-span-1 my-4">{SearchComponent}</div>
                     {ScatterPlotComponent}
+                    <div className="grid grid-flow-col row-span-1 my-4">
+                        <DataTable darkMode={isDark} columns={dataTableColumns} data={data} />
+                    </div>
                 </TabsContent>
                 <TabsContent value="amplification_factor">
                     <div className="grid grid-flow-col row-span-1 justify-end">
@@ -137,6 +156,9 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                     </div>
                     <div className="grid grid-flow-col row-span-1 my-4">{SearchComponent}</div>
                     {ScatterPlotComponent}
+                    <div className="grid grid-flow-col row-span-1 my-4">
+                        <DataTable darkMode={isDark} columns={dataTableColumns} data={data} />
+                    </div>
                 </TabsContent>
             </Tabs>
         </TooltipProvider>

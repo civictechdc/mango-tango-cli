@@ -5,7 +5,6 @@ import { RouterProvider, createRouter, createRootRoute, createRoute, createBrows
 import { ThemeProvider } from '@/components/theme-provider.tsx';
 import DarkModeToggle from '@/components/dark-mode-toggle.tsx';
 import type { ReactElement, FC } from 'react';
-
 import type { PresenterCollection } from '@/lib/data/presenters';
 import type { GlobalPresentersState } from '@/lib/state/presenters';
 

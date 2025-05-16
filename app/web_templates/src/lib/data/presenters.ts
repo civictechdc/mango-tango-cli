@@ -101,5 +101,4 @@ export async function fetchPresenters(signal: AbortSignal | undefined): Promise<
     const presenters = await response.json() as PresentersResponse;
 
     return presenters.data;
-
 }

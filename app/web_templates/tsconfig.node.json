@@ -7,6 +7,9 @@
     "skipLibCheck": true,
     "allowJs": true,
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "types": ["vite/client"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
