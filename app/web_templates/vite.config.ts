@@ -18,7 +18,8 @@ export default defineConfig({
         emptyOutDir: true,
         copyPublicDir: false,
         rollupOptions: {
-            input: ['./src/index.tsx', './src/styles/app.css']
+            input: ['./src/index.tsx', './src/styles/app.css'],
+            external: ['@deck.gl/widgets'],
         }
     },
     resolve: {
