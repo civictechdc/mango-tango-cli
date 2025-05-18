@@ -1,7 +1,3 @@
-import re
-from itertools import accumulate
-from typing import Optional
-
 import plotly.express as px
 import plotly.graph_objects as go
 import polars as pl
@@ -11,18 +7,25 @@ from dash.dcc import Graph
 from dash.dcc import Input as DccInput
 from dash.dcc import RadioItems
 from dash.html import H2, Datalist, Div, Em, Label, Option, P
-
+from typing import Optional, Any, Union
 from analyzer_interface.context import WebPresenterContext
-
 from ..ngram_stats.interface import (
     COL_NGRAM_DISTINCT_POSTER_COUNT,
     COL_NGRAM_TOTAL_REPS,
     COL_NGRAM_WORDS,
     OUTPUT_NGRAM_STATS,
+    OUTPUT_NGRAM_FULL,
+    COL_MESSAGE_TIMESTAMP,
+    COL_MESSAGE_SURROGATE_ID,
+    COL_NGRAM_ID,
+    COL_AUTHOR_ID,
+    COL_NGRAM_LENGTH,
+    COL_NGRAM_REPS_PER_USER,
+    COL_MESSAGE_TEXT
 )
 from ..ngram_stats.interface import interface as ngram_stats
 from ..utils.pop import pop_unnecessary_fields
-
+from ..utils.matcher import create_word_matcher
 
 def factory(context: WebPresenterContext):
     df = pl.read_parquet(
@@ -156,42 +159,63 @@ def factory(context: WebPresenterContext):
     )
 
 
-def api_factory(context: WebPresenterContext):
-    data_frame = pl.read_parquet(
+def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
+    filter_value = options["matcher"] if (not options is None and "matcher" in options and not options["matcher"] is None) else ""
+    data_frame_full = pl.read_parquet(
+        context.dependency(ngram_stats).table(OUTPUT_NGRAM_FULL).parquet_path
+    )
+    data_frame_stats = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
     )
-    matcher = create_word_matcher("", pl.col(COL_NGRAM_WORDS))
-    plotted_df = data_frame.filter(matcher) if matcher is not None else data_frame
-    presenter_model = context.web_presenter.model_dump()
-    presenter_model["figure_type"] = "scatter"
-    presenter_model["ngrams"] = plotted_df[COL_NGRAM_WORDS].to_list()
-    presenter_model["x"] = plotted_df[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list()
-    presenter_model["y"] = {
-        "total_repetition": plotted_df[COL_NGRAM_TOTAL_REPS].to_list(),
-        "amplification_factor": (
-            plotted_df[COL_NGRAM_TOTAL_REPS]
-            / plotted_df[COL_NGRAM_DISTINCT_POSTER_COUNT]
-        ).to_list(),
-    }
-    presenter_model["explanation"] = {
+    matcher_full = create_word_matcher(filter_value, pl.col(COL_NGRAM_WORDS))
+    matcher_stats = create_word_matcher(filter_value, pl.col(COL_NGRAM_WORDS))
+    plotted_df_full = data_frame_full.filter(matcher_full) if not matcher_full is None else data_frame_full
+    plotted_df_stats = data_frame_stats.filter(matcher_stats) if not matcher_stats is None else data_frame_stats
+    presenter_model_stats = context.web_presenter.model_dump()
+    presenter_model_full = context.web_presenter.model_dump()
+    explanations = {
         "total_repetition": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times overall.",
         "amplification_factor": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times on average per user.",
     }
-    presenter_model["axis"] = {
+    axes = {
         "x": {"label": "Total Repetition", "value": "total_repetition"},
         "y": {"label": "Amplification Factor", "value": "amplification_factor"},
     }
+    presenter_model_full["figure_type"] = "scatter"
+    presenter_model_full["explanation"] = explanations
+    presenter_model_full["axis"] = axes
+    presenter_model_full["ids"] = plotted_df_full[COL_NGRAM_ID].to_list()
+    presenter_model_full["timestamps"] = plotted_df_full[COL_MESSAGE_TIMESTAMP].to_list()
+    presenter_model_full["ngrams"] = plotted_df_full[COL_NGRAM_WORDS].to_list()
+    presenter_model_full["ngram_length"] = plotted_df_full[COL_NGRAM_LENGTH].to_list()
+    presenter_model_full["messages"] = plotted_df_full[COL_MESSAGE_TEXT].to_list()
+    presenter_model_full["users"] = plotted_df_full[COL_AUTHOR_ID].to_list()
+    presenter_model_full["user_reps"] = plotted_df_full[COL_NGRAM_REPS_PER_USER].to_list()
+    presenter_model_full["upns"] = plotted_df_full[COL_MESSAGE_SURROGATE_ID].to_list()
+    presenter_model_full["poster_counts"] = plotted_df_full[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list()
+    presenter_model_full["x"] = plotted_df_full[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list()
+    presenter_model_full["y"] = {
+        "total_repetition": plotted_df_full[COL_NGRAM_TOTAL_REPS].to_list(),
+        "amplification_factor": (
+                plotted_df_full[COL_NGRAM_TOTAL_REPS]
+                / plotted_df_full[COL_NGRAM_DISTINCT_POSTER_COUNT]
+        ).to_list(),
+    }
+    presenter_model_stats["figure_type"] = "scatter"
+    presenter_model_stats["explanation"] = explanations
+    presenter_model_stats["axis"] = axes
+    presenter_model_stats["ngrams"] = plotted_df_stats[COL_NGRAM_WORDS].to_list()
+    presenter_model_stats["x"] = plotted_df_stats[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list()
+    presenter_model_stats["y"] = {
+        "total_repetition": plotted_df_stats[COL_NGRAM_TOTAL_REPS].to_list(),
+        "amplification_factor": (
+                plotted_df_stats[COL_NGRAM_TOTAL_REPS]
+                / plotted_df_stats[COL_NGRAM_DISTINCT_POSTER_COUNT]
+        ).to_list(),
+    }
 
-    return pop_unnecessary_fields(presenter_model)
-
-
-def create_word_matcher(subject: str, col: pl.Expr) -> Optional[pl.Expr]:
-    subject = subject.strip().lower()
-    words = re.split(r"[^\w]", subject)
-    words = [word for word in words if word]
-    if not words:
-        return None
-    return accumulate(
-        (col.str.contains("(^|[^\\w])" + re.escape(word)) for word in words),
-        lambda a, b: a & b,
-    )
+    return {
+        "default_output": "stats",
+        "stats": pop_unnecessary_fields(presenter_model_stats),
+        "full": pop_unnecessary_fields(presenter_model_full)
+    }
