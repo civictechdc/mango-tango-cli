@@ -20,6 +20,5 @@ jobs:
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: 
             - build-base
-            - cmake
           # GITHUB_DOMAIN: github.myenterprise.com
           REQUIREMENTS: requirements-mkdocs.txt
