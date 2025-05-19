@@ -1,8 +1,8 @@
-<h3 align="center">mango-tango-cli</h3>
-<h4 align="center">A Python command-line tool for detecting coordinated inauthentic behavior</h4>
+<h2 align="center">mango-tango-cli</h2>
+<h3 align="center">A Python command-line tool for detecting coordinated inauthentic behavior</h3>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/docs/images/mango-text.PNG" alt="Mango logo" style="width:200px;"/>
+<img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG" alt="Mango logo" style="width:200px;"/>
 </p>
 
 <p align="center">
