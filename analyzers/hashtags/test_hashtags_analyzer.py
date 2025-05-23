@@ -3,6 +3,7 @@ import os
 import numpy as np
 import polars as pl
 
+from analyzer_interface.params import TimeBinningValue
 from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from testing import CsvTestData, JsonTestData, test_primary_analyzer
 
@@ -88,6 +89,7 @@ def test_hashtag_analyzer():
                 COL_POST: text_catch_all,
             },
         ),
+        params={"time_window": TimeBinningValue(unit="hour", amount=12)},
         outputs={
             OUTPUT_GINI: JsonTestData(
                 os.path.join(test_data_dir, "hashtag_test_output.json")

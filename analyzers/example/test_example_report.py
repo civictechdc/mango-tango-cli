@@ -15,6 +15,16 @@ def test_example_report():
     test_secondary_analyzer(
         interface,  # You provide the interface ...
         main,  # ... and the analyzer's entry point.
+        # This is optional if your secondar analyzer doesn't need reference
+        # to the primary analyzer parameters.
+        #
+        # You're responsible for making sure the analyzer you're testing
+        # get the parameters it needs.
+        #
+        # In this particular case, the value doesn't matter becuase it isn't used
+        # by the `example_report` secondary analyzer, but we have an `assert`
+        # statement for the parameter's existence just to make a point.
+        primary_params={"fudge_factor": 10},
         # A secondary analyzer requires the primary outputs to be provided.
         # All the outputs required by the secondary analyzer being tested
         # must be provided. But not all the primary outputs need to be provided

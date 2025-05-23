@@ -14,6 +14,7 @@ from .interface import (
     OUTPUT_COL_TIMESPAN,
     OUTPUT_COL_USERS,
     OUTPUT_GINI,
+    PARAM_TIME_WINDOW,
 )
 
 
@@ -88,10 +89,12 @@ def main(context: PrimaryAnalyzerContext):
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
 
+    time_window_param = context.params.get(PARAM_TIME_WINDOW)
+
     # window hard-coded to 1hr for now
     df_out = hashtag_analysis(
         data_frame=df_input,
-        every="12h",
+        every=time_window_param.to_polars_truncate_spec(),  # returns '12h', '5d' etc.
     )
 
     df_out.write_parquet(context.output(OUTPUT_GINI).parquet_path)

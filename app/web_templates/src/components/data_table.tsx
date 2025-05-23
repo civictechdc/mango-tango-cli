@@ -1,141 +1,86 @@
-import { useRef, useMemo, useState } from 'react';
-import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable, getPaginationRowModel } from '@tanstack/react-table';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { Table, TableBody, TableHeader, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import { useMemo, useCallback } from 'react';
+import {DataEditor, GridCellKind} from '@glideapps/glide-data-grid';
 import type { ReactElement, FC } from 'react';
-import type { ColumnDef, Row } from '@tanstack/react-table';
-import type { VirtualItem } from '@tanstack/react-virtual';
+import type { GridColumn, Item, GridCell, Theme } from '@glideapps/glide-data-grid';
+import type { CoordinateType } from '@/lib/types/datapoint.ts';
+import '@glideapps/glide-data-grid/dist/index.css';
 
-export interface DataTableProps {
-    columns: Array<ColumnDef<any>>;
-    data: Array<{[index: string]: any;}>;
+export interface BaseRow {
+    [index: string]: any;
+    x: CoordinateType;
+    y: CoordinateType;
 }
 
-export default function DataTable({ data, columns }: DataTableProps): ReactElement<FC> {
-    const tableRef = useRef<HTMLDivElement>(null);
-    const columnDefinitions = useMemo<Array<ColumnDef<any>>>(() => columns, []);
-    const [pagination, setPagination] = useState({
-      pageIndex: 0, //initial page index
-      pageSize: 50, //default page size
-    });
-    const table = useReactTable({
-        data: data,
-        columns: columnDefinitions,
-        getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        onPaginationChange: setPagination, //update the pagination state when internal APIs mutate the pagination state
-          state: {
-            //...
-            pagination,
-          },
-        debugTable: true,
-    });
+export interface DataTableProps<RowType extends BaseRow> {
+    columns: Array<GridColumn>;
+    data: Array<RowType>;
+    darkMode?: boolean;
+    theme?: Partial<Theme>;
+}
 
-    const { rows } = table.getRowModel();
-    const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
-        count: rows.length,
-        estimateSize: () => 33,
-        getScrollElement: () => tableRef.current,
-        measureElement:
-            typeof window !== 'undefined' &&
-            navigator.userAgent.indexOf('Firefox') === -1
-                ? element => element?.getBoundingClientRect().height
-                : undefined,
-        overscan: 5,
-    });
+export default function DataTable<RowType extends BaseRow>({ data, columns, theme, darkMode }: DataTableProps<RowType>): ReactElement<FC> {
+    const mainTheme = useMemo<Partial<Theme>>(() => {
+        if(theme != null) return theme;
+        if(darkMode) return {
+            accentColor: "#8c96ff",
+            accentLight: "rgba(202, 206, 255, 0.253)",
+            textDark: "#ffffff",
+            textMedium: "#b8b8b8",
+            textLight: "#a0a0a0",
+            textBubble: "#ffffff",
+            bgIconHeader: "#b8b8b8",
+            fgIconHeader: "#000000",
+            textHeader: "#a1a1a1",
+            textHeaderSelected: "#000000",
+            bgCell: "#16161b",
+            bgCellMedium: "#202027",
+            bgHeader: "#212121",
+            bgHeaderHasFocus: "#474747",
+            bgHeaderHovered: "#404040",
+            bgBubble: "#212121",
+            bgBubbleSelected: "#000000",
+            bgSearchResult: "#423c24",
+            borderColor: "rgba(225,225,225,0.2)",
+            drilldownBorder: "rgba(225,225,225,0.4)",
+            linkColor: "#4F5DFF",
+            headerFontStyle: "bold 14px",
+            baseFontStyle: "13px",
+            fontFamily: "Inter, Roboto, -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, noto, arial, sans-serif"
+        };
 
+        return {};
+    }, [theme, darkMode]);
+    const columnsIndexes = useMemo<Array<string>>(() =>
+        columns.reduce<Array<string>>((accumValue: Array<string>, currentValue: GridColumn): Array<string> => {
+            if(currentValue.id == null || currentValue.id?.length === 0) return accumValue;
 
-    return (
-        <div>
-        <Table ref={tableRef} containerHeight={800} className="grid">
-            <TableHeader className="grid sticky top-0 z-10 dark:bg-zinc-950">
-                {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className="flex w-full">
-                        {headerGroup.headers.map((header) => {
-                            return (
-                                <TableHead key={header.id} className="flex items-center" style={{width: header.getSize()}}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                </TableHead>
-                            )
-                        })}
-                    </TableRow>
-                ))}
-            </TableHeader>
-            <TableBody className="grid relative" style={{height: `${rowVirtualizer.getTotalSize()}px`}}>
-                {rowVirtualizer.getVirtualItems().map((virtualRow: VirtualItem) => {
-                    const row = rows[virtualRow.index] as Row<any>;
+            accumValue.push(currentValue.id);
+            return accumValue;
+        }, new Array<string>())
+    , [columns]);
+    const getCellContent = useCallback(([column, row]: Item): GridCell => {
+        const dataRow: RowType = data[row];
+        const item: any = dataRow[columnsIndexes[column]];
+        let cellType: GridCellKind = GridCellKind.Text;
 
-                    return (
-                       <TableRow
-                           data-index={virtualRow.index}
-                            ref={(node: HTMLTableRowElement) => rowVirtualizer.measureElement(node)}
-                            key={row.id}
-                            className="flex absolute w-full"
-                            style={{
-                                transform: `translateY(${virtualRow.start}px)`
-                            }}>
-                           {row.getVisibleCells().map(cell => {
-                               return (
-                                   <TableCell
-                                       key={cell.id}
-                                       className="flex"
-                                       style={{
-                                           width: cell.column.getSize(),
-                                       }}
-                                   >
-                                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                   </TableCell>
-                               )
-                           })}
-                       </TableRow>
-                    )
-                })}
-            </TableBody>
-        </Table>
-        <div>
-              <button type="button" className="btn btn-outline-dark" onClick={() => table.firstPage()} disabled={!table.getCanPreviousPage()}>
-                        {'<<'}
-              </button>
-              <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                        {'<'}
-              </button>
-              <select value={table.getState().pagination.pageIndex}
-                  onChange={e => {
-                    table.setPageIndex(Number(e.target.value))
-                  }}>
-                  {Array.from({length: table.getPageCount()}, (_, i) => i).map(pageNum => (
-                    <option key={pageNum} value={pageNum}>
-                      {pageNum+1}
-                    </option>
-                  ))}
-              </select>
-              <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                    {'>'}
-              </button>
-              <button onClick={() => table.lastPage()} disabled={!table.getCanNextPage()}>
-                    {'>>'}
-              </button>
-              <select
-                  value={table.getState().pagination.pageSize}
-                  onChange={e => {
-                    table.setPageSize(Number(e.target.value))
-                  }}
-                >
-                  {[10, 50, 100, 150].map(pageSize => (
-                    <option key={pageSize} value={pageSize}>
-                      {pageSize}
-                    </option>
-                  ))}
-              </select>
-        </div>
-    </div>
+        if(typeof item === 'number') cellType = GridCellKind.Number;
+        if(typeof item === 'boolean') cellType = GridCellKind.Boolean;
 
-    );
+        return {
+            kind: cellType,
+            allowOverlay: false,
+            displayData: `${item}`,
+            data: item
+        };
+    }, [columnsIndexes]);
 
+    return <DataEditor
+                scaleToRem
+                width="100%"
+                height="50rem"
+                className="rounded-md border border-zinc-200 dark:border-zinc-800 shadow-md"
+                columns={columns}
+                getCellContent={getCellContent}
+                theme={mainTheme}
+                rows={data.length} />;
 }

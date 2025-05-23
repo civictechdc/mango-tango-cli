@@ -10,10 +10,12 @@ from .interface import (
     SecondaryAnalyzerInterface,
     WebPresenterInterface,
 )
+from .params import ParamValue
 
 
 class AnalyzerDeclaration(AnalyzerInterface):
     entry_point: Callable[[PrimaryAnalyzerContext], None]
+    default_params: Callable[[PrimaryAnalyzerContext], dict[str, ParamValue]]
     is_distributed: bool
 
     def __init__(
@@ -21,7 +23,10 @@ class AnalyzerDeclaration(AnalyzerInterface):
         interface: AnalyzerInterface,
         main: Callable,
         *,
-        is_distributed: bool = False
+        is_distributed: bool = False,
+        default_params: Callable[[PrimaryAnalyzerContext], dict[str, ParamValue]] = (
+            lambda _: dict()
+        )
     ):
         """Creates a primary analyzer declaration
 
@@ -39,7 +44,10 @@ class AnalyzerDeclaration(AnalyzerInterface):
             executable.
         """
         super().__init__(
-            **interface.model_dump(), entry_point=main, is_distributed=is_distributed
+            **interface.model_dump(),
+            entry_point=main,
+            default_params=default_params,
+            is_distributed=is_distributed
         )
 
 

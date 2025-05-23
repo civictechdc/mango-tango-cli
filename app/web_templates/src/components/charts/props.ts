@@ -1,26 +1,19 @@
 import type { Presenter } from '@/lib/data/presenters';
-import type { DatasetOption, TopLevelFormatterParams } from "echarts/types/dist/shared";
-import type { XAXisComponentOption, YAXisComponentOption } from "echarts/types/dist/echarts";
+import type { AxisSettingType } from '@/lib/types/axis';
+import type { Dimensions } from '@/lib/types/dimensions';
+import type { TooltipFunction } from '@/lib/types/tooltip';
 
-interface ChartContainerProps {
+export interface ChartContainerProps {
     presenter: Presenter;
 }
 
-interface ChartProps {
-    data: DatasetOption | Array<DatasetOption>;
-    tooltipFormatter?: (params: TopLevelFormatterParams) => string;
+export interface ChartProps {
+    data: Array<any>;
+    tooltip: TooltipFunction<any>;
+    dimensions?: Dimensions,
+    darkMode?: boolean,
     axis?: {
-        x?: XAXisComponentOption;
-        y?: YAXisComponentOption;
-    };
-    seriesEncoding?: {
-        x?: string | number;
-        y?: string | number;
-    };
-    labels?: {
-        x: string;
-        y: string;
+        x?: AxisSettingType;
+        y?: AxisSettingType;
     };
 }
-
-export type { ChartContainerProps, ChartProps };

@@ -20,6 +20,15 @@ def main(context: PrimaryAnalyzerContext):
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
 
+    # The analysis parameters are provided in a dictionary. This is how you
+    # access them. The dictionary key must match the parameter ID in the interface.
+    fudge_factor_param = context.params.get("fudge_factor")
+
+    # You don't actually need to do this as the app will make sure all
+    # parameters are of the right type. But it's a good idea anyway.
+    # It also lets python narrow the type for you.
+    assert isinstance(fudge_factor_param, int), "Fudge factor must be an integer"
+
     # Now you can start your analysis. The following code is just a minimal example.
     #
     # The use of the ProgressReporter is optional. It helps breaking a
@@ -28,7 +37,10 @@ def main(context: PrimaryAnalyzerContext):
         df_count = df_input.select(
             pl.col("message_id"),
             # The input and output columns are as you define in the interface.
-            pl.col("message_text").str.len_chars().alias("character_count"),
+            pl.col("message_text")
+            .str.len_chars()
+            .add(fudge_factor_param)
+            .alias("character_count"),
         )
 
         # If you decide to process the data in small batches

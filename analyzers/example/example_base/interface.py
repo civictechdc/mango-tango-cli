@@ -2,7 +2,9 @@ from analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,
+    AnalyzerParam,
     InputColumn,
+    IntegerParam,
     OutputColumn,
 )
 
@@ -66,6 +68,45 @@ This is an example analyzer that counts the number of characters in each message
             ),
         ]
     ),
+    params=[
+        AnalyzerParam(
+            # This corresponds to the key in the parameter dictionary when accessed
+            # from the analyzer context.
+            id="fudge_factor",
+            # This is the human readable name that will be displayed in the user
+            # interface. It's optional and will fall back to the ID.
+            human_readable_name="Character Count Fudge Factor",
+            # Also optional, shown in the UI if provided.
+            description="""
+Adds to the character count, because data manipulation is
+good data science and ethically no-problemo.
+
+/s: In seriousness, please *don't* manipulate data.
+It's wrong. We are trying to fight misinformation :)
+            """,
+            # Follow the definition here to the module where all the supported
+            # param types are defined.
+            type=IntegerParam(
+                # Depending on the parameter type, you may be required to
+                # provide extra ranges/bounds for validation.
+                min=-1000,
+                max=1000,
+            ),
+            # Optional.
+            # Sets the default/initial value. This is one of the two ways to set
+            # a default parameter value, the other being using a default_params
+            # function (see the `__init__.py` file), which can suggest defaults
+            # in a data-dependent manner.
+            default=0,
+            # Optional.
+            # If you have an existing analyzer that previously hardcoded a parameter
+            # that you now want to customize, you can set this to the value it was
+            # hardcoded, and older analysis saves will use this value when the
+            # parameter is shown in the UI and accessed in the web presenter.
+            # Note: This is NOT a default value!
+            backfill_value=0,
+        )
+    ],
     outputs=[
         AnalyzerOutput(
             # This should be locally unique to the analyzer.
