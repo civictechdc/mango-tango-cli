@@ -11,9 +11,11 @@ import type { GridColumn } from '@glideapps/glide-data-grid';
 import type { DataPoint } from '@/lib/types/datapoint';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
+import  calculateRankings  from '@/lib/ranking.ts';
 
 export type NgramScatterPlotDataPoint = DataPoint & {
     ngram: string;
+    ranking: number;
 };
 
 export type NgramScatterPlotYAxisType = 'total_repetition' | 'amplification_factor';
@@ -26,7 +28,8 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
             (theme === 'system' &&  window.matchMedia("(prefers-color-scheme: dark)").matches) || theme === 'dark'
     , [theme]);
     const dataTableColumns = useMemo<Array<GridColumn>>(() => ([
-        { id: 'ngram', title: 'Ngram', width: 500 },
+        { id: 'ranking', title: 'Ranking', width: 100 },
+        { id: 'ngram', title: 'Ngram', width: 400 },
         { id: 'x', title: 'User Repetition', width: 150 },
         {
             id: 'y',
@@ -37,40 +40,43 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
     const data = useMemo<Array<NgramScatterPlotDataPoint>>(() => {
         if (presenter == null) return [];
 
-        const dataSourceLength: number = (presenter.ngrams as Array<string>).length;
+
         let dataSource = new Array<NgramScatterPlotDataPoint>();
         let dataSourceIndex: number = 0;
 
+        let nGramsArray = (presenter.ngrams as Array<string>).filter(item => item.includes(searchValue));
+        let nGramsIndex = nGramsArray.map(x => nGramsArray.indexOf(x));
+        let xArray = nGramsIndex.map(x => (presenter.x as Array<number>)[x]);
+        let yArray = nGramsIndex.map(x => ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[x]);
+        const dataSourceLength: number = nGramsArray.length;
+        const rankings = calculateRankings(xArray);
+
         for(let index: number = 0; index < dataSourceLength; index++) {
-            if(searchValue.length > 0) {
-                if(!((presenter.ngrams as Array<string>)[index].includes(searchValue))) continue;
-
-                dataSource[dataSourceIndex] = {
-                    ngram: (presenter.ngrams as Array<string>)[index],
-                    x: (presenter.x as Array<number>)[index],
-                    y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index]
-                };
-                dataSourceIndex++;
-                continue;
-            }
-
             dataSource[index] = {
-                ngram: (presenter.ngrams as Array<string>)[index],
-                x: (presenter.x as Array<number>)[index],
-                y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index]
+                ngram: nGramsArray[index],
+                x: xArray[index],
+                y: yArray[index],
+                ranking: rankings[index]
             };
-        }
+            dataSourceIndex++;
 
+        }
         return dataSource;
     }, [presenter, searchValue, currentTab]);
+
     const handleSearchSubmit = (value: string) => setSearchValue(value);
     const handleSearchClear = () => setSearchValue('');
     const handleTabChange = (value: string) => setCurrentTab(value as NgramScatterPlotYAxisType);
+
     const totalRepetitionTooltipFormatter = (params: NgramScatterPlotDataPoint): string => {
         return `
             <div class="grid gap-1.5">
                 <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                     <span class="font-bold">${params.ngram}</span>
+                </div>
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                                 <span class="font-bold">Ranking:</span>
+                                 <span>${params.ranking}</span>
                 </div>
                 <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                     <span class="font-bold">Total Repetition:</span>
@@ -88,6 +94,10 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
             <div class="grid gap-1.5">
                 <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                     <span class="font-bold">${params.ngram}</span>
+                </div>
+                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                                 <span class="font-bold">Ranking:</span>
+                                 <span>${params.ranking}</span>
                 </div>
                 <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                     <span class="font-bold">Total Repetition:</span>

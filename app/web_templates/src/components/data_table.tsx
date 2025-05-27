@@ -3,6 +3,7 @@ import {DataEditor, GridCellKind} from '@glideapps/glide-data-grid';
 import type { ReactElement, FC } from 'react';
 import type { GridColumn, Item, GridCell, Theme } from '@glideapps/glide-data-grid';
 import type { CoordinateType } from '@/lib/types/datapoint.ts';
+
 import '@glideapps/glide-data-grid/dist/index.css';
 
 export interface BaseRow {
