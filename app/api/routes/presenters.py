@@ -1,9 +1,7 @@
 from flask import jsonify, request
 from flask.views import MethodView
 from typing import Any
-
 from pydantic import ValidationError
-
 from analyzer_interface.context import WebPresenterContext
 from ..validators.presenters import PresenterQueryParamsValidator
 

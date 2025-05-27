@@ -1,9 +1,13 @@
-import { useMemo, useCallback } from 'react';
-import {DataEditor, GridCellKind} from '@glideapps/glide-data-grid';
+import { useMemo, useCallback, useState } from 'react';
+import {CompactSelection , DataEditor, GridCellKind } from '@glideapps/glide-data-grid';
 import type { ReactElement, FC } from 'react';
-import type { GridColumn, Item, GridCell, Theme } from '@glideapps/glide-data-grid';
+import type { GridColumn, Item, GridCell, Theme, GridSelection } from '@glideapps/glide-data-grid';
 import type { CoordinateType } from '@/lib/types/datapoint.ts';
 import '@glideapps/glide-data-grid/dist/index.css';
+
+export type ColumnsAlignmentProperties = {
+    [index: string]: 'left' | 'center' | 'right';
+};
 
 export interface BaseRow {
     [index: string]: any;
@@ -14,11 +18,24 @@ export interface BaseRow {
 export interface DataTableProps<RowType extends BaseRow> {
     columns: Array<GridColumn>;
     data: Array<RowType>;
+    onSelect?: (item: RowType | null) => void;
     darkMode?: boolean;
     theme?: Partial<Theme>;
+    columnContentAlignment?: ColumnsAlignmentProperties;
 }
 
-export default function DataTable<RowType extends BaseRow>({ data, columns, theme, darkMode }: DataTableProps<RowType>): ReactElement<FC> {
+export default function DataTable<RowType extends BaseRow>({
+   data,
+   columns,
+   theme,
+   darkMode,
+   onSelect,
+   columnContentAlignment
+}: DataTableProps<RowType>): ReactElement<FC> {
+    const [gridSelection, setGridSelection] = useState<GridSelection>({
+        columns: CompactSelection.empty(),
+        rows: CompactSelection.empty(),
+    });
     const mainTheme = useMemo<Partial<Theme>>(() => {
         if(theme != null) return theme;
         if(darkMode) return {
@@ -60,11 +77,20 @@ export default function DataTable<RowType extends BaseRow>({ data, columns, them
     , [columns]);
     const getCellContent = useCallback(([column, row]: Item): GridCell => {
         const dataRow: RowType = data[row];
-        const item: any = dataRow[columnsIndexes[column]];
+        const index: string = columnsIndexes[column];
+        const item: any = dataRow[index];
         let cellType: GridCellKind = GridCellKind.Text;
 
         if(typeof item === 'number') cellType = GridCellKind.Number;
         if(typeof item === 'boolean') cellType = GridCellKind.Boolean;
+
+        if(columnContentAlignment && columnContentAlignment[index]) return {
+            kind: cellType,
+            allowOverlay: false,
+            displayData: `${item}`,
+            data: item,
+            contentAlign: columnContentAlignment[index]
+        };
 
         return {
             kind: cellType,
@@ -72,15 +98,27 @@ export default function DataTable<RowType extends BaseRow>({ data, columns, them
             displayData: `${item}`,
             data: item
         };
-    }, [columnsIndexes]);
+    }, [columnsIndexes, data]);
+    const onGridSelection = useCallback((selectionChange: GridSelection): void => {
+        setGridSelection(selectionChange);
+        console.log(selectionChange);
+        const row: number | undefined = selectionChange.rows.first();
+        const item: RowType | null = row != null ? data[row] : null;
+
+        if(onSelect) onSelect(item);
+    }, []);
 
     return <DataEditor
                 scaleToRem
                 width="100%"
                 height="50rem"
                 className="rounded-md border border-zinc-200 dark:border-zinc-800 shadow-md"
+                rowSelect="single"
+                rowMarkers="checkbox-visible"
                 columns={columns}
+                gridSelection={gridSelection}
                 getCellContent={getCellContent}
+                onGridSelectionChange={onGridSelection}
                 theme={mainTheme}
                 rows={data.length} />;
 }

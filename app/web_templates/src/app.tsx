@@ -5,7 +5,7 @@ import { RouterProvider, createRouter, createRootRoute, createRoute, createBrows
 import { ThemeProvider } from '@/components/theme-provider.tsx';
 import DarkModeToggle from '@/components/dark-mode-toggle.tsx';
 import type { ReactElement, FC } from 'react';
-import type { PresenterCollection } from '@/lib/data/presenters';
+import type { PresenterCollection } from '@/lib/types/presenters';
 import type { GlobalPresentersState } from '@/lib/state/presenters';
 
 function RootParent(): ReactElement<FC> {
@@ -40,7 +40,7 @@ export default function App(): ReactElement<FC> {
             set(presenters);
         })();
 
-        return () => {
+        return (): void => {
             controller.abort();
         }
     }, []);

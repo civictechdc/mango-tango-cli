@@ -1,104 +1,45 @@
-export type DependencyOutputColumn = {
-    data_type: string;
-    description: string | null;
-    human_readable_name: string | null;
-    name: string;
-};
+import type {
+    Presenter,
+    PresenterCollection,
+    PresenterQueryParams,
+    PresenterResponse,
+    PresentersResponse
+} from '@/lib/types/presenters.ts';
 
-export type DependencyAnalyzerInput = {
-    columns: Array<{
-        data_type: string;
-        description: string | null;
-        human_readable_name: string | null;
-        name: string;
-        name_hints: Array<string>;
-    }>;
-};
-
-export type DependencyOutput = {
-    columns: Array<DependencyOutputColumn>;
-    description: string | null;
-    id: string;
-    internal: boolean;
-    name: string;
-};
-
-export type DependencyAnalyzer = {
-    id: string;
-    input: DependencyAnalyzerInput;
-    kind: string;
-    long_description: string | null;
-    name: string;
-    outputs: Array<DependencyOutput>;
-    short_description: string | null;
-    version: string;
-};
-
-export type PresenterDependecy = {
-    base_analyzer: DependencyAnalyzer;
-    depends_on: Array<PresenterDependecy>;
-    id: string;
-    kind: string;
-    long_description: string | null;
-    name: string;
-    outputs: Array<DependencyOutput>;
-    short_description: string | null;
-    version: string;
-};
-
-export type PresenterAxisLabel = {
-    label: string;
-    value: string;
-};
-
-export type PresenterAxisData = {
-    [index: string]: Array<number>;
-};
-
-export type Presenter = {
-    axis: {
-        x: PresenterAxisLabel;
-        y: PresenterAxisLabel;
-    },
-    depends_on: Array<PresenterDependecy>;
-    explanation: {
-        [index: string]: string;
-    };
-    figure_type: 'histogram' | 'scatter' | 'bar';
-    id: string;
-    kind: string;
-    long_description: string | null;
-    name: string;
-    server_name: string | null;
-    short_description: string | null;
-    version: string;
-    ngrams: Array<string> | undefined;
-    x: Array<string> | Array<number> | PresenterAxisData;
-    y: Array<string> | Array<number> | PresenterAxisData;
-};
-
-export type PresenterCollection = Array<Presenter>;
-
-export type PresentersResponse = {
-    code: number;
-    count: number;
-    data: PresenterCollection;
-};
-
-export async function fetchPresenters(signal: AbortSignal | undefined): Promise<PresenterCollection | null> {
+export async function fetchPresenters(signal?: AbortSignal, queryParams?: PresenterQueryParams): Promise<PresenterCollection | null> {
+    let url: string = 'http://localhost:8050/api/presenters';
     let fetchConf: RequestInit = {
         method: 'GET'
     };
 
-    if (signal !== undefined) fetchConf.signal = signal;
+    if (signal) fetchConf.signal = signal;
+    if (queryParams) url += `?${new URLSearchParams(queryParams).toString()}`;
 
-    const response: Response = await fetch(`http://localhost:8050/api/presenters`, fetchConf);
+    const response: Response = await fetch(url, fetchConf);
 
-    if (!response.ok) {
-        return null;
-    }
+    if (!response.ok) return null;
 
     const presenters = await response.json() as PresentersResponse;
 
     return presenters.data;
+}
+
+export async function fetchPresenter<PresenterType extends Presenter>(id: string, signal?: AbortSignal, queryParams?: PresenterQueryParams): Promise<PresenterType | null> {
+    if(id.length === 0) return null;
+
+    let url: string = `http://localhost:8050/api/presenters/${id}`;
+    let fetchConf: RequestInit = {
+        method: 'GET'
+    };
+
+    if (signal) fetchConf.signal = signal;
+    if (queryParams) url += `?${new URLSearchParams(queryParams).toString()}`;
+
+    const response: Response = await fetch(url, fetchConf);
+
+    if (!response.ok) return null;
+
+    const presenter = await response.json() as PresenterResponse<PresenterType>;
+
+    return presenter.data;
 }

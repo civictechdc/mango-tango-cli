@@ -1,5 +1,6 @@
-import { useMemo, useState, Suspense } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTheme } from '@/components/theme-provider.tsx';
+import { fetchPresenter } from '@/lib/data/presenters.ts';
 import ScatterPlot from '@/components/charts/scatter.tsx';
 import SearchBar from '@/components/search.tsx';
 import DataTable from '@/components/data_table.tsx';
@@ -9,60 +10,125 @@ import { Info } from 'lucide-react';
 import type { ReactElement, FC } from 'react';
 import type { GridColumn } from '@glideapps/glide-data-grid';
 import type { DataPoint } from '@/lib/types/datapoint';
+import type { Presenter, PresenterAxisData } from '@/lib/types/presenters';
+import type { ColumnsAlignmentProperties } from '@/components/data_table';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
-import type { PresenterAxisData } from '@/lib/data/presenters.ts';
 
-export type NgramScatterPlotDataPoint = DataPoint & {
+export type NgramScatterPlotDataPointStats = DataPoint & {
     ngram: string;
 };
 
+export type NgramScatterPlotDataPointFull = NgramScatterPlotDataPointStats & {
+    user: string;
+    userReps: number;
+    upn: number;
+    message: string;
+    timestamp: string;
+};
+
+export type NgramPresenterStats = Presenter & {
+    ngrams: Array<string>;
+};
+
+export type NgramPresenterFull = NgramPresenterStats & {
+    users: Array<string>;
+    user_reps: Array<number>;
+    upns: Array<number>;
+    messages: Array<string>;
+    timestamps: Array<string>;
+};
+
+export type NgramScatterPlotDataPoint = NgramScatterPlotDataPointStats | NgramScatterPlotDataPointFull;
 export type NgramScatterPlotYAxisType = 'total_repetition' | 'amplification_factor';
 
-export default function NgramScatterPlot({ presenter }: ChartContainerProps): ReactElement<FC> {
+export default function NgramScatterPlot({ presenter }: ChartContainerProps<NgramPresenterStats>): ReactElement<FC> {
     const [searchValue, setSearchValue] = useState<string>('');
+    const [selectedNgram, setSelectedNgram] = useState<string>('');
+    const [selectedPresenter, setSelectedPresenter] = useState<NgramPresenterFull | null>(null);
     const [currentTab, setCurrentTab] = useState<NgramScatterPlotYAxisType>('total_repetition');
-    const {theme} = useTheme();
+    const { theme } = useTheme();
     const isDark = useMemo<boolean>(() =>
             (theme === 'system' &&  window.matchMedia("(prefers-color-scheme: dark)").matches) || theme === 'dark'
     , [theme]);
-    const dataTableColumns = useMemo<Array<GridColumn>>(() => ([
-        { id: 'ngram', title: 'Ngram', width: 500 },
-        { id: 'x', title: 'User Repetition', width: 150 },
-        {
-            id: 'y',
-            width: 150,
-            title: currentTab === 'total_repetition' ? 'Total Repetition' : 'Amplification Factor'
-        },
-    ]), [currentTab]);
-    const data = useMemo<Array<NgramScatterPlotDataPoint>>(() => {
-        if (presenter == null) return [];
+    const dataTableColumns = useMemo<Array<GridColumn>>(() => {
+        if(selectedNgram) return [
+            { id: 'ngram', title: 'Ngram', width: 200 },
+            { id: 'user', title: 'User', width: 150 },
+            { id: 'userReps', title: 'User Reps', width: 75 },
+            { id: 'upn', title: 'UPN', width: 75 },
+            { id: 'message', title: 'Post Content', width: 500 },
+            { id: 'timestamp', title: 'Timestamp', width: 225 },
+        ];
 
-        const dataSourceLength: number = (presenter.ngrams as Array<string>).length;
+        return [
+            { id: 'ngram', title: 'Ngram', width: 400 },
+            { id: 'x', title: 'User Repetition', width: 150 },
+            {
+                id: 'y',
+                width: 150,
+                title: currentTab === 'total_repetition' ? 'Total Repetition' : 'Amplification Factor'
+            },
+        ];
+    }, [currentTab, selectedNgram]);
+    const data = useMemo<Array<NgramScatterPlotDataPoint>>(() => {
+        const currentPresenter: NgramPresenterStats | NgramPresenterFull = selectedPresenter ?? presenter;
+        const dataSourceLength: number = (currentPresenter.ngrams as Array<string>).length;
+        const rawNgrams = currentPresenter.ngrams as Array<string>;
+        const rawX = currentPresenter.x as Array<number>;
+        const rawY = currentPresenter.y as PresenterAxisData;
         let dataSource = new Array<NgramScatterPlotDataPoint>();
         let dataSourceIndex: number = 0;
 
         for(let index: number = 0; index < dataSourceLength; index++) {
             if(searchValue.length > 0) {
-                if(!((presenter.ngrams as Array<string>)[index].includes(searchValue))) continue;
-
-                dataSource[dataSourceIndex] = {
-                    ngram: (presenter.ngrams as Array<string>)[index],
-                    x: (presenter.x as Array<number>)[index],
-                    y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index]
+                if(!(rawNgrams[index].includes(searchValue))) continue;
+                if(!selectedPresenter) dataSource[dataSourceIndex] = {
+                    ngram: rawNgrams[index],
+                    x: rawX[index],
+                    y: (rawY[currentTab] as Array<number>)[index]
                 };
+                if(selectedPresenter) {
+                    const rawCurrentPresenter = currentPresenter as NgramPresenterFull;
+                    dataSource[dataSourceIndex] = {
+                        ngram: rawNgrams[index],
+                        x: rawX[index],
+                        y: (rawY[currentTab] as Array<number>)[index],
+                        user: rawCurrentPresenter.users[index],
+                        userReps: rawCurrentPresenter.user_reps[index],
+                        upn: rawCurrentPresenter.upns[index],
+                        message: rawCurrentPresenter.messages[index],
+                        timestamp: rawCurrentPresenter.timestamps[index]
+                    };
+                }
+
                 dataSourceIndex++;
                 continue;
             }
 
-            dataSource[index] = {
-                ngram: (presenter.ngrams as Array<string>)[index],
-                x: (presenter.x as Array<number>)[index],
-                y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index]
+            if(!selectedPresenter) dataSource[index] = {
+                ngram: rawNgrams[index],
+                x: rawX[index],
+                y: (rawY[currentTab] as Array<number>)[index]
             };
+            if(selectedPresenter) {
+                const rawCurrentPresenter = currentPresenter as NgramPresenterFull;
+                dataSource[index] = {
+                    ngram: rawNgrams[index],
+                    x: rawX[index],
+                    y: (rawY[currentTab] as Array<number>)[index],
+                    user: rawCurrentPresenter.users[index],
+                    userReps: rawCurrentPresenter.user_reps[index],
+                    upn: rawCurrentPresenter.upns[index],
+                    message: rawCurrentPresenter.messages[index],
+                    timestamp: rawCurrentPresenter.timestamps[index]
+                };
+            }
+
         }
 
         return dataSource;
-    }, [presenter, searchValue, currentTab]);
+    }, [selectedPresenter, searchValue, currentTab]);
+    const onNgramSelect = (item: NgramScatterPlotDataPointStats | null): void => setSelectedNgram(item ? item.ngram : '');
     const handleSearchSubmit = (value: string) => setSearchValue(value);
     const handleSearchClear = () => setSearchValue('');
     const handleTabChange = (value: string) => setCurrentTab(value as NgramScatterPlotYAxisType);
@@ -101,25 +167,34 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
             </div>
         `;
     };
-    const SearchComponent: ReactElement<FC> | null = presenter.ngrams ? (
-        <SearchBar
-            searchList={presenter.ngrams}
-            onSubmit={handleSearchSubmit}
-            onClear={handleSearchClear}
-            placeholder="Search Ngram Here..." />
-    ): null;
-    let ScatterPlotComponent: ReactElement<FC> | null = null;
+    const columnAlignment: ColumnsAlignmentProperties = {
+        x: 'center',
+        y: 'center',
+    };
 
-    if(currentTab === 'total_repetition') ScatterPlotComponent = (
-        <Suspense fallback={<p>Loading...</p>}>
-            <ScatterPlot data={data} darkMode={isDark} tooltip={totalRepetitionTooltipFormatter} />
-        </Suspense>
-    );
-    if(currentTab === 'amplification_factor') ScatterPlotComponent = (
-        <Suspense fallback={<p>Loading...</p>}>
-            <ScatterPlot data={data} darkMode={isDark} tooltip={amplificationFactorTooltipFormatter} />
-        </Suspense>
-    );
+    useEffect(() => {
+        if(selectedNgram.length === 0 && !selectedPresenter) return;
+        if(selectedNgram.length === 0 && selectedPresenter) {
+            setSelectedPresenter(null);
+            return;
+        }
+
+        const controller = new AbortController();
+
+        (async (): Promise<void> => {
+            const fullPresenter = await fetchPresenter<NgramPresenterFull>(presenter.id, controller.signal, {
+                output: 'full',
+                filter_field: 'ngram',
+                filter_value: selectedNgram
+            });
+
+            if(fullPresenter) setSelectedPresenter(fullPresenter);
+        })();
+
+        return () => {
+            controller.abort();
+        };
+    }, [selectedNgram]);
 
     return (
         <TooltipProvider>
@@ -139,10 +214,21 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                             </TooltipContent>
                         </Tooltip>
                     </div>
-                    <div className="grid grid-flow-col row-span-1 my-4">{SearchComponent}</div>
-                    {ScatterPlotComponent}
                     <div className="grid grid-flow-col row-span-1 my-4">
-                        <DataTable darkMode={isDark} columns={dataTableColumns} data={data} />
+                        <SearchBar
+                            searchList={presenter.ngrams as Array<string>}
+                            onSubmit={handleSearchSubmit}
+                            onClear={handleSearchClear}
+                            placeholder="Search Ngram Here..." />
+                    </div>
+                    <ScatterPlot data={data} darkMode={isDark} tooltip={totalRepetitionTooltipFormatter} />
+                    <div className="grid grid-flow-col row-span-1 my-4">
+                        <DataTable
+                            darkMode={isDark}
+                            columns={dataTableColumns}
+                            columnContentAlignment={columnAlignment}
+                            onSelect={onNgramSelect}
+                            data={data} />
                     </div>
                 </TabsContent>
                 <TabsContent value="amplification_factor">
@@ -154,10 +240,21 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
                             </TooltipContent>
                         </Tooltip>
                     </div>
-                    <div className="grid grid-flow-col row-span-1 my-4">{SearchComponent}</div>
-                    {ScatterPlotComponent}
                     <div className="grid grid-flow-col row-span-1 my-4">
-                        <DataTable darkMode={isDark} columns={dataTableColumns} data={data} />
+                        <SearchBar
+                            searchList={presenter.ngrams as Array<string>}
+                            onSubmit={handleSearchSubmit}
+                            onClear={handleSearchClear}
+                            placeholder="Search Ngram Here..." />
+                    </div>
+                    <ScatterPlot data={data} darkMode={isDark} tooltip={amplificationFactorTooltipFormatter} />
+                    <div className="grid grid-flow-col row-span-1 my-4">
+                        <DataTable
+                            darkMode={isDark}
+                            columns={dataTableColumns}
+                            columnContentAlignment={columnAlignment}
+                            onSelect={onNgramSelect}
+                            data={data} />
                     </div>
                 </TabsContent>
             </Tabs>

@@ -176,52 +176,32 @@ export default function useChart<DataPointType>(
         return { plotData, xScale, yScale };
     }, [data, width, height, margin, baseScales]);
     const visibleData = useMemo(() => {
-        console.log('deck instance: ', deck);
         if(!deck) return [];
 
         const viewport = deck.getViewports()[0];
 
         if(!viewport) return [];
 
-        console.log('Zoom level:', viewState.zoom);
-        console.log('Viewport width:', viewport.width, 'height:', viewport.height, 'zoom: ', viewport.zoom);
-        console.log('viewport: ', viewport);
-
         return deck.pickObjects({
             x: 0,
             y: 0,
             width: viewport.width,
             height: viewport.height,
-
         });
     }, [deck, viewState.target, viewState.zoom]);
     const updatedScales = useMemo(() => {
-        console.log('Recalculating scales with zoom level:', viewState.zoom);
-        if (!baseScales || !xScale || !yScale) {
-            console.log('scales not initialized. exiting early...');
-            return { xScale, yScale };
-        }
-
-        if(visibleData.length === 0){
-            console.log('no visible points. exiting early...');
-            return { xScale, yScale };
-        }
-
-        if(viewState.zoom === 0){
-            console.log('not zoomed in. exiting early...');
-            return { xScale, yScale };
-        }
+        if(!baseScales || !xScale || !yScale) return { xScale, yScale };
+        if(visibleData.length === 0) return { xScale, yScale };
+        if(viewState.zoom === 0) return { xScale, yScale };
 
         const { xAxis, yAxis } = baseScales;
+        const xCategoryValues = new Set<string>();
+        const yCategoryValues = new Set<string>();
+        const visibleDataLength: number = visibleData.length;
         let maxX = -Infinity;
         let maxY = -Infinity;
         let minX = Infinity;
         let minY = Infinity;
-        const xCategoryValues = new Set<string>();
-        const yCategoryValues = new Set<string>();
-        const visibleDataLength: number = visibleData.length;
-
-        console.log('visible data array size:', visibleDataLength);
 
         for(let index = 0; index < visibleDataLength; index++) {
             const point = visibleData[index].object as (DataPoint & DataPointType);
@@ -246,34 +226,21 @@ export default function useChart<DataPointType>(
         console.log(`y: min=${minY}, max=${maxY}`);
 
         if (xAxis !== 'category' && (minX === Infinity || maxX === -Infinity)) {
-            // Fall back to the original domain if no visible data
             const originalDomain = (xScale as any).domain();
             minX = originalDomain[0];
             maxX = originalDomain[1];
-            console.log('Using fallback X domain:', [minX, maxX]);
         }
-
         if (yAxis !== 'category' && (minY === Infinity || maxY === -Infinity)) {
-            // Fall back to the original domain if no visible data
             const originalDomain = (yScale as any).domain();
             minY = originalDomain[0];
             maxY = originalDomain[1];
-            console.log('Using fallback Y domain:', [minY, maxY]);
         }
-
-        if (xAxis === 'log' && minX <= 0) {
-            minX = MIN_LOG_VALUE;
-        }
-
-        if (yAxis === 'log' && minY <= 0) {
-            minY = MIN_LOG_VALUE;
-        }
-
+        if (xAxis === 'log' && minX <= 0) minX = MIN_LOG_VALUE;
+        if (yAxis === 'log' && minY <= 0) minY = MIN_LOG_VALUE;
         if (xAxis !== 'category' && viewState.zoom === 0) {
             minX = Math.max(minX * 0.9, xAxis === 'log' ? MIN_LOG_VALUE : 0);
             maxX *= 1.1;
         }
-
         if (yAxis !== 'category' && viewState.zoom === 0) {
             minY = Math.max(minY * 0.9, yAxis === 'log' ? MIN_LOG_VALUE : 0);
             maxY *= 1.1;
@@ -287,13 +254,11 @@ export default function useChart<DataPointType>(
             range: [margin.left, width - margin.right],
             clamp: true
         });
-
         if (xAxis === 'log') newXScale = scaleLog({
             domain: [minX, maxX],
             range: [margin.left, width - margin.right],
             clamp: true
         });
-
         if (xAxis === 'category') {
             const xCategories = Array.from(xCategoryValues);
             const xCatCount = xCategories.length;
@@ -305,19 +270,16 @@ export default function useChart<DataPointType>(
                 range: xRange,
             });
         }
-
         if (yAxis === 'linear') newYScale = scaleLinear({
             domain: [minY, maxY],
             range: [height - margin.bottom, margin.top],
             clamp: true
         });
-
         if (yAxis === 'log') newYScale = scaleLog({
             domain: [minY, maxY],
             range: [height - margin.bottom, margin.top],
             clamp: true
         });
-
         if (yAxis === 'category') {
             const yCategories = Array.from(yCategoryValues);
             const yCatCount = yCategories.length;
