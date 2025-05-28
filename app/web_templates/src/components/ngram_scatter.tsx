@@ -1,6 +1,7 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/components/theme-provider.tsx';
 import { fetchPresenter } from '@/lib/data/presenters.ts';
+import { CompactSelection } from '@glideapps/glide-data-grid';
 import ScatterPlot from '@/components/charts/scatter.tsx';
 import SearchBar from '@/components/search.tsx';
 import DataTable from '@/components/data_table.tsx';
@@ -8,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.t
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { Info } from 'lucide-react';
 import type { ReactElement, FC } from 'react';
-import type { GridColumn } from '@glideapps/glide-data-grid';
+import type { PickingInfo } from '@deck.gl/core';
+import type { GridColumn, GridSelection, DataEditorRef } from '@glideapps/glide-data-grid';
 import type { DataPoint } from '@/lib/types/datapoint';
 import type { Presenter, PresenterAxisData } from '@/lib/types/presenters';
 import type { ColumnsAlignmentProperties } from '@/components/data_table';
@@ -42,8 +44,10 @@ export type NgramScatterPlotDataPoint = NgramScatterPlotDataPointStats | NgramSc
 export type NgramScatterPlotYAxisType = 'total_repetition' | 'amplification_factor';
 
 export default function NgramScatterPlot({ presenter }: ChartContainerProps<NgramPresenterStats>): ReactElement<FC> {
+    const dataTableRef = useRef<DataEditorRef | null>(null);
     const [searchValue, setSearchValue] = useState<string>('');
     const [selectedNgram, setSelectedNgram] = useState<string>('');
+    const [rowGridSelection, setRowGridSelection] = useState<CompactSelection>(CompactSelection.empty());
     const [selectedPresenter, setSelectedPresenter] = useState<NgramPresenterFull | null>(null);
     const [currentTab, setCurrentTab] = useState<NgramScatterPlotYAxisType>('total_repetition');
     const { theme } = useTheme();
@@ -128,45 +132,44 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
 
         return dataSource;
     }, [selectedPresenter, searchValue, currentTab]);
-    const onNgramSelect = (item: NgramScatterPlotDataPointStats | null): void => setSelectedNgram(item ? item.ngram : '');
+    const onNgramSelect = (item: NgramScatterPlotDataPointStats | null, selectionChange?: GridSelection): void => {
+        setSelectedNgram(item ? item.ngram : '');
+        if(selectionChange) setRowGridSelection(selectionChange.rows);
+    };
+    const onDeckClick = (item: PickingInfo<NgramScatterPlotDataPointStats>): void => setSelectedNgram(item.object ? item.object.ngram : '');
     const handleSearchSubmit = (value: string) => setSearchValue(value);
     const handleSearchClear = () => setSearchValue('');
     const handleTabChange = (value: string) => setCurrentTab(value as NgramScatterPlotYAxisType);
-    const totalRepetitionTooltipFormatter = (params: NgramScatterPlotDataPoint): string => {
-        return `
-            <div class="grid gap-1.5">
-                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
-                    <span class="font-bold">${params.ngram}</span>
-                </div>
-                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
-                    <span class="font-bold">Total Repetition:</span>
-                    <span>${params.x}</span>
-                </div>
-                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
-                    <span class="font-bold">User Repetition:</span>
-                    <span>${params.y}</span>
-                </div>
+    const totalRepetitionTooltipFormatter = (params: NgramScatterPlotDataPoint): string => `
+        <div class="grid gap-1.5">
+            <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                <span class="font-bold">${params.ngram}</span>
             </div>
-        `;
-    };
-    const amplificationFactorTooltipFormatter = (params: NgramScatterPlotDataPoint): string => {
-        return `
-            <div class="grid gap-1.5">
-                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
-                    <span class="font-bold">${params.ngram}</span>
-                </div>
-                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
-                    <span class="font-bold">Total Repetition:</span>
-                    <span>${params.x}</span>
-                </div>
-                <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
-                    
-                    <span class="font-bold">Amplification Factor:</span>
-                    <span>${params.y}</span>
-                </div>
+            <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                <span class="font-bold">Total Repetition:</span>
+                <span>${params.x}</span>
             </div>
-        `;
-    };
+            <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                <span class="font-bold">User Repetition:</span>
+                <span>${params.y}</span>
+            </div>
+        </div>
+    `;
+    const amplificationFactorTooltipFormatter = (params: NgramScatterPlotDataPoint): string => `
+        <div class="grid gap-1.5">
+            <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                <span class="font-bold">${params.ngram}</span>
+            </div>
+            <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                <span class="font-bold">Total Repetition:</span>
+                <span>${params.x}</span>
+            </div>
+            <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">          
+                <span class="font-bold">Amplification Factor:</span>
+                <span>${params.y}</span>
+            </div>
+        </div>
+    `;
     const columnAlignment: ColumnsAlignmentProperties = {
         x: 'center',
         y: 'center',
@@ -188,12 +191,37 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                 filter_value: selectedNgram
             });
 
-            if(fullPresenter) setSelectedPresenter(fullPresenter);
+            if(fullPresenter) {
+                let ngramIndex: number = 0;
+                const ngramLength: number = fullPresenter.ngrams.length;
+
+                for(let index: number = 0; index < ngramLength; index++) {
+                    if(selectedNgram === fullPresenter.ngrams[index]) {
+                        ngramIndex = index;
+                        break;
+                    }
+                }
+
+                setSelectedPresenter(fullPresenter);
+                setRowGridSelection((state: CompactSelection): CompactSelection => {
+                    const firstRowSelection: number | undefined = state.first();
+
+                    if(firstRowSelection) return state.remove(firstRowSelection).add(ngramIndex);
+
+                    return state.add(ngramIndex);
+                });
+                if(dataTableRef.current) dataTableRef.current.scrollTo(
+                    0,
+                    ngramIndex,
+                    'vertical',
+                    0,
+                    0,
+                    {vAlign: 'center'}
+                );
+            }
         })();
 
-        return () => {
-            controller.abort();
-        };
+        return () => controller.abort();
     }, [selectedNgram]);
 
     return (
@@ -221,12 +249,18 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                             onClear={handleSearchClear}
                             placeholder="Search Ngram Here..." />
                     </div>
-                    <ScatterPlot data={data} darkMode={isDark} tooltip={totalRepetitionTooltipFormatter} />
+                    <ScatterPlot
+                        data={data}
+                        darkMode={isDark}
+                        onClick={onDeckClick}
+                        tooltip={totalRepetitionTooltipFormatter} />
                     <div className="grid grid-flow-col row-span-1 my-4">
                         <DataTable
+                            ref={dataTableRef}
                             darkMode={isDark}
                             columns={dataTableColumns}
                             columnContentAlignment={columnAlignment}
+                            rowSelection={rowGridSelection}
                             onSelect={onNgramSelect}
                             data={data} />
                     </div>
@@ -253,6 +287,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                             darkMode={isDark}
                             columns={dataTableColumns}
                             columnContentAlignment={columnAlignment}
+                            rowSelection={rowGridSelection}
                             onSelect={onNgramSelect}
                             data={data} />
                     </div>

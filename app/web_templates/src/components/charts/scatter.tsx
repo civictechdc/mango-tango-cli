@@ -13,6 +13,7 @@ import type { ChartProps } from '@/components/charts/props.ts';
 export default function ScatterPlot({
     data,
     tooltip,
+    onClick,
     darkMode = false,
     axis = {x: {type: 'log', show: true}, y: {type: 'log', show: true}},
     dimensions = {width: 800, height: 600, margins: { top: 20, right: 40, bottom: 21, left: 40 }}
@@ -55,7 +56,6 @@ export default function ScatterPlot({
         })
     ];
 
-    console.log('visible data in view port: ', viewport.visibleData);
     return (
         <>
             <div className="grid grid-flow-col justify-end">
@@ -71,6 +71,7 @@ export default function ScatterPlot({
                 <DeckGL {...deckProps}
                         ref={deckRef}
                         layers={layers}
+                        onClick={onClick}
                         onAfterRender={() => {
                             if(deckRef.current != null && deckInstance == null) setDeckInstance(deckRef.current?.deck as Deck<OrthographicView>);
                         }}/>
