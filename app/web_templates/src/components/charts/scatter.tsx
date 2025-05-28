@@ -15,13 +15,21 @@ export default function ScatterPlot({
     tooltip,
     onClick,
     darkMode = false,
+    resetZoomOnChange = true,
     axis = {x: {type: 'log', show: true}, y: {type: 'log', show: true}},
     dimensions = {width: 800, height: 600, margins: { top: 20, right: 40, bottom: 21, left: 40 }}
 }: ChartProps): ReactElement<FC> {
     const axesFillColor = useMemo<string>(() => darkMode ? '#fff' : '#000', [darkMode]);
     const [deckInstance, setDeckInstance] = useState<Deck<OrthographicView> | null>(null);
     const deckRef = useRef<DeckGLRef<OrthographicView> | null>(null);
-    const {data: plotData, deckProps, axis: chartAxes, viewport} = useChart(data, tooltip, deckInstance, axis, dimensions);
+    const {data: plotData, deckProps, axis: chartAxes, viewport} = useChart(
+        data,
+        tooltip,
+        deckInstance,
+        resetZoomOnChange,
+        axis,
+        dimensions
+    );
     const layers = [
         new ScatterplotLayer({
             id: `scatter-${Math.random().toString(36)}`,

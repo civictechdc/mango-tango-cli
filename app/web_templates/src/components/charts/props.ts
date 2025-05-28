@@ -14,6 +14,7 @@ export interface ChartProps {
     dimensions?: Dimensions;
     darkMode?: boolean;
     onClick?: (info: PickingInfo) => void;
+    resetZoomOnChange?: boolean;
     axis?: {
         x?: AxisSettingType;
         y?: AxisSettingType;

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { OrthographicView } from '@deck.gl/core';
 import { scaleLog, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { calculatePosition } from '@/lib/axis';
@@ -40,8 +40,9 @@ export default function useChart<DataPointType>(
     data: Array<DataPoint & DataPointType>,
     tooltip: TooltipFunction<DataPointType>,
     deck: Deck<OrthographicView> | null,
+    resetZoomOnChange: boolean = true,
     axis?: ChartAxisSettingsType,
-    dimensions?: Dimensions
+    dimensions?: Dimensions,
 ): ChartProperties<DataPointType> {
     const width: number = dimensions?.width ?? 800;
     const height: number = dimensions?.height ?? 600;
@@ -343,7 +344,6 @@ export default function useChart<DataPointType>(
     };
     const resetViewState = (): void => {
         setViewState(initViewState);
-
         if(deck) deck.setProps({
             views: new OrthographicView({
                 id: 'custom-view',
@@ -352,9 +352,7 @@ export default function useChart<DataPointType>(
         });
     };
     const renderTooltip = ({object, x, y}: PickingInfo<DataPointType>): TooltipContent => {
-        if (!object) {
-            return null;
-        }
+        if(!object) return null;
 
         let tooltipStyles = {
             backgroundColor: 'var(--color-white)',
@@ -382,6 +380,11 @@ export default function useChart<DataPointType>(
             className: 'border rounded-lg shadow-xl border-zinc-200 items-start min-w-[8rem] gap-1.5 rounded-lg dark:border-zinc-800 dark:bg-zinc-950! dark:text-zinc-100!'
         };
     };
+
+    useEffect(() => {
+        if(!viewState) return;
+        if((viewState.zoom as number) > 0 && resetZoomOnChange) setViewState(initViewState);
+    }, [data]);
 
     return {
         data: plotData,
