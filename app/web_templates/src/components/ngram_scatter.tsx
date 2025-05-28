@@ -45,6 +45,7 @@ export type NgramScatterPlotYAxisType = 'total_repetition' | 'amplification_fact
 
 export default function NgramScatterPlot({ presenter }: ChartContainerProps<NgramPresenterStats>): ReactElement<FC> {
     const dataTableRef = useRef<DataEditorRef | null>(null);
+    const dataTableRef2 = useRef<DataEditorRef | null>(null);
     const [searchValue, setSearchValue] = useState<string>('');
     const [selectedNgram, setSelectedNgram] = useState<string>('');
     const [rowGridSelection, setRowGridSelection] = useState<CompactSelection>(CompactSelection.empty());
@@ -210,7 +211,15 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
 
                     return state.add(ngramIndex);
                 });
-                if(dataTableRef.current) dataTableRef.current.scrollTo(
+                if(dataTableRef.current && currentTab === 'total_repetition') dataTableRef.current.scrollTo(
+                    0,
+                    ngramIndex,
+                    'vertical',
+                    0,
+                    0,
+                    {vAlign: 'center'}
+                );
+                if(dataTableRef2.current && currentTab === 'amplification_factor') dataTableRef2.current.scrollTo(
                     0,
                     ngramIndex,
                     'vertical',
@@ -281,9 +290,14 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                             onClear={handleSearchClear}
                             placeholder="Search Ngram Here..." />
                     </div>
-                    <ScatterPlot data={data} darkMode={isDark} tooltip={amplificationFactorTooltipFormatter} />
+                    <ScatterPlot
+                        data={data}
+                        darkMode={isDark}
+                        onClick={onDeckClick}
+                        tooltip={amplificationFactorTooltipFormatter} />
                     <div className="grid grid-flow-col row-span-1 my-4">
                         <DataTable
+                            ref={dataTableRef2}
                             darkMode={isDark}
                             columns={dataTableColumns}
                             columnContentAlignment={columnAlignment}
