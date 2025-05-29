@@ -11,7 +11,6 @@ import type { GridColumn } from '@glideapps/glide-data-grid';
 import type { DataPoint } from '@/lib/types/datapoint';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 import type { PresenterAxisData } from '@/lib/data/presenters.ts';
-import  calculateRankings  from '@/lib/ranking.ts';
 
 export type NgramScatterPlotDataPoint = DataPoint & {
     ngram: string;
@@ -40,27 +39,50 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
     const data = useMemo<Array<NgramScatterPlotDataPoint>>(() => {
         if (presenter == null) return [];
 
-
+        const dataSourceLength: number = (presenter.ngrams as Array<string>).length;
         let dataSource = new Array<NgramScatterPlotDataPoint>();
         let dataSourceIndex: number = 0;
 
-        let nGramsArray = (presenter.ngrams as Array<string>).filter(item => item.includes(searchValue));
-        let nGramsIndex = nGramsArray.map(x => nGramsArray.indexOf(x));
-        let xArray = nGramsIndex.map(x => (presenter.x as Array<number>)[x]);
-        let yArray = nGramsIndex.map(x => ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[x]);
-        const dataSourceLength: number = nGramsArray.length;
-        const rankings = calculateRankings(xArray);
 
         for(let index: number = 0; index < dataSourceLength; index++) {
+            let ranking = 1;
+
+
+            if(searchValue.length > 0) {
+                if(!((presenter.ngrams as Array<string>)[index].includes(searchValue))) continue;
+                for (let index2: number = 0;index2 < dataSourceLength;index2++){
+                     if (((presenter.x as Array<number>)[index] < (presenter.x as Array<number>)[index2]) &&
+                     ((presenter.ngrams as Array<string>)[index2].includes(searchValue))){
+                         ranking += 1
+                         }
+                        }
+
+                dataSource[dataSourceIndex] = {
+                    ngram: (presenter.ngrams as Array<string>)[index],
+                    x: (presenter.x as Array<number>)[index],
+                    y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index],
+                    ranking: ranking
+                };
+                dataSourceIndex++;
+                continue;
+            }
+            for (let index2: number = 0;index2 < dataSourceLength;index2++){
+                     if (((presenter.x as Array<number>)[index] < (presenter.x as Array<number>)[index2])){
+                         ranking += 1
+                         }
+                        }
             dataSource[index] = {
-                ngram: nGramsArray[index],
-                x: xArray[index],
-                y: yArray[index],
-                ranking: rankings[index]
+                ngram: (presenter.ngrams as Array<string>)[index],
+                x: (presenter.x as Array<number>)[index],
+                y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index],
+                ranking: ranking
             };
+
+
             dataSourceIndex++;
 
         }
+
         return dataSource;
     }, [presenter, searchValue, currentTab]);
 
