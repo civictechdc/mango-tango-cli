@@ -192,42 +192,42 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                 filter_value: selectedNgram
             });
 
-            if(fullPresenter) {
-                let ngramIndex: number = 0;
-                const ngramLength: number = fullPresenter.ngrams.length;
+            if(!fullPresenter) return;
 
-                for(let index: number = 0; index < ngramLength; index++) {
-                    if(selectedNgram === fullPresenter.ngrams[index]) {
-                        ngramIndex = index;
-                        break;
-                    }
+            let ngramIndex: number = 0;
+            const ngramLength: number = fullPresenter.ngrams.length;
+
+            for(let index: number = 0; index < ngramLength; index++) {
+                if(selectedNgram === fullPresenter.ngrams[index]) {
+                    ngramIndex = index;
+                    break;
                 }
-
-                setSelectedPresenter(fullPresenter);
-                setRowGridSelection((state: CompactSelection): CompactSelection => {
-                    const firstRowSelection: number | undefined = state.first();
-
-                    if(firstRowSelection) return state.remove(firstRowSelection).add(ngramIndex);
-
-                    return state.add(ngramIndex);
-                });
-                if(dataTableRef.current && currentTab === 'total_repetition') dataTableRef.current.scrollTo(
-                    0,
-                    ngramIndex,
-                    'vertical',
-                    0,
-                    0,
-                    {vAlign: 'center'}
-                );
-                if(dataTableRef2.current && currentTab === 'amplification_factor') dataTableRef2.current.scrollTo(
-                    0,
-                    ngramIndex,
-                    'vertical',
-                    0,
-                    0,
-                    {vAlign: 'center'}
-                );
             }
+
+            setSelectedPresenter(fullPresenter);
+            setRowGridSelection((state: CompactSelection): CompactSelection => {
+                const firstRowSelection: number | undefined = state.first();
+
+                if(firstRowSelection) return state.remove(firstRowSelection).add(ngramIndex);
+
+                return state.add(ngramIndex);
+            });
+            if(dataTableRef.current && currentTab === 'total_repetition') dataTableRef.current.scrollTo(
+                0,
+                ngramIndex,
+                'vertical',
+                0,
+                0,
+                {vAlign: 'center'}
+            );
+            if(dataTableRef2.current && currentTab === 'amplification_factor') dataTableRef2.current.scrollTo(
+                0,
+                ngramIndex,
+                'vertical',
+                0,
+                0,
+                {vAlign: 'center'}
+            );
         })();
 
         return () => controller.abort();
