@@ -1,7 +1,9 @@
 import re
 from itertools import accumulate
 from typing import Optional
+
 import polars as pl
+
 
 def create_word_matcher(subject: str, col: pl.Expr) -> Optional[pl.Expr]:
     subject = subject.strip().lower()

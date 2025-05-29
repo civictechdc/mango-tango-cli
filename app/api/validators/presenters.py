@@ -1,5 +1,7 @@
+from typing import Optional, Union
+
 from pydantic import BaseModel, field_validator
-from typing import Union, Optional
+
 
 class PresenterQueryParamsValidator(BaseModel):
     output: Optional[str] = None
@@ -25,12 +27,18 @@ class PresenterQueryParamsValidator(BaseModel):
     @field_validator("filter_value", mode="after")
     @classmethod
     def validate_filter_value(cls, value, validation_information):
-        filter_key = validation_information.data["filter_key"] if "filter_key" in validation_information.data else None
+        filter_key = (
+            validation_information.data["filter_key"]
+            if "filter_key" in validation_information.data
+            else None
+        )
 
         if not value is None and len(value) == 0:
             raise ValueError("'filter_value' cannot be empty")
 
-        if (filter_key is None and not value is None) or (not filter_key is None and len(filter_key) == 0):
+        if (filter_key is None and not value is None) or (
+            not filter_key is None and len(filter_key) == 0
+        ):
             raise ValueError("'filter_key' must be defined")
 
         return value
