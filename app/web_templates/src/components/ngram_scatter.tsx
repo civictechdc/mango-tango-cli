@@ -45,41 +45,29 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps): Re
 
 
         for(let index: number = 0; index < dataSourceLength; index++) {
-            let ranking = 1;
+
 
 
             if(searchValue.length > 0) {
                 if(!((presenter.ngrams as Array<string>)[index].includes(searchValue))) continue;
-                for (let index2: number = 0;index2 < dataSourceLength;index2++){
-                     if (((presenter.x as Array<number>)[index] < (presenter.x as Array<number>)[index2]) &&
-                     ((presenter.ngrams as Array<string>)[index2].includes(searchValue))){
-                         ranking += 1
-                         }
-                        }
+
 
                 dataSource[dataSourceIndex] = {
                     ngram: (presenter.ngrams as Array<string>)[index],
                     x: (presenter.x as Array<number>)[index],
                     y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index],
-                    ranking: ranking
+                    ranking: dataSourceIndex + 1
                 };
                 dataSourceIndex++;
                 continue;
             }
-            for (let index2: number = 0;index2 < dataSourceLength;index2++){
-                     if (((presenter.x as Array<number>)[index] < (presenter.x as Array<number>)[index2])){
-                         ranking += 1
-                         }
-                        }
+
             dataSource[index] = {
                 ngram: (presenter.ngrams as Array<string>)[index],
                 x: (presenter.x as Array<number>)[index],
                 y: ((presenter.y as PresenterAxisData)[currentTab] as Array<number>)[index],
-                ranking: ranking
+                ranking: index + 1
             };
-
-
-            dataSourceIndex++;
 
         }
 
