@@ -1,7 +1,12 @@
 from typing import Optional, Union
-
+from enum import Enum
 from pydantic import BaseModel, field_validator
 
+
+class FileDownloadChoiceEnum(str, Enum):
+    Excel = "excel"
+    JSON = "json"
+    CSV = "csv"
 
 class PresenterQueryParamsValidator(BaseModel):
     output: Optional[str] = None
@@ -42,3 +47,7 @@ class PresenterQueryParamsValidator(BaseModel):
             raise ValueError("'filter_key' must be defined")
 
         return value
+
+
+class PresenterQueryDownloadValidator(PresenterQueryParamsValidator):
+    file_type: FileDownloadChoiceEnum

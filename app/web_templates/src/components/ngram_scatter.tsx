@@ -187,7 +187,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
 
         (async (): Promise<void> => {
             const fullPresenter = await fetchPresenter<NgramPresenterFull>(presenter.id, controller.signal, {
-                output: 'full',
+                output: 'ngram_full',
                 filter_field: 'ngram',
                 filter_value: selectedNgram
             });

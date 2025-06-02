@@ -245,7 +245,7 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
     }
 
     return {
-        "default_output": "stats",
-        "stats": pop_unnecessary_fields(presenter_model_stats),
-        "full": pop_unnecessary_fields(presenter_model_full),
+        "default_output": OUTPUT_NGRAM_STATS,
+        OUTPUT_NGRAM_STATS: pop_unnecessary_fields(presenter_model_stats),
+        OUTPUT_NGRAM_FULL: pop_unnecessary_fields(presenter_model_full),
     }

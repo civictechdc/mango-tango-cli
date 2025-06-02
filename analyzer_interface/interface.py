@@ -184,7 +184,6 @@ represent how the data is intended to be interpreted.
 - `url` is a string that represents a URL.
 """
 
-
 class Column(BaseModel):
     name: str
     human_readable_name: Optional[str] = None
@@ -208,7 +207,9 @@ class InputColumn(Column):
 
 
 class OutputColumn(Column):
-    pass
+    api_name: Optional[str] = None
+    api_field: Optional[str] = None
+    dict_field: Optional[str] = None
 
 
 def backfill_param_values(

@@ -34,9 +34,9 @@ interface = SecondaryAnalyzerInterface(
             columns=[
                 OutputColumn(name=COL_NGRAM_ID, data_type="identifier"),
                 OutputColumn(name=COL_NGRAM_LENGTH, data_type="integer"),
-                OutputColumn(name=COL_NGRAM_WORDS, data_type="text"),
-                OutputColumn(name=COL_NGRAM_TOTAL_REPS, data_type="integer"),
-                OutputColumn(name=COL_NGRAM_DISTINCT_POSTER_COUNT, data_type="integer"),
+                OutputColumn(name=COL_NGRAM_WORDS, api_field="ngrams", data_type="text"),
+                OutputColumn(name=COL_NGRAM_TOTAL_REPS, api_name="Total Repetition", dict_field="total_repetition", api_field="y", data_type="integer"),
+                OutputColumn(name=COL_NGRAM_DISTINCT_POSTER_COUNT, api_name="User Repetition", api_field="x",  data_type="integer"),
             ],
         ),
         AnalyzerOutput(
