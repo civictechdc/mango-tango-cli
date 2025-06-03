@@ -61,16 +61,11 @@ interface = SecondaryAnalyzerInterface(
                 OutputColumn(
                     name=COL_NGRAM_DISTINCT_POSTER_COUNT,
                     data_type="integer",
-                    api_name="User Repetition",
-                    api_field="x",
                     human_readable_name="distinct user count",
                 ),
                 OutputColumn(
                     name=COL_NGRAM_TOTAL_REPS,
                     data_type="integer",
-                    api_name="Total Repetition",
-                    dict_field="total_repetition",
-                    api_field="y",
                     human_readable_name="ngram frequency",
                 ),
                 OutputColumn(

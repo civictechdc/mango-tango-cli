@@ -1,5 +1,5 @@
 from io import BytesIO, StringIO
-from typing import Any, Union
+from typing import Any
 from datetime import datetime
 from json import dumps
 from csv import DictWriter
@@ -151,9 +151,7 @@ class PresenterDownloadView(MethodView):
             )
 
             for presenter in presenters:
-                presenter_key = (
-                    output_name if not output_name is None else presenter["default_output"]
-                )
+                presenter_key = output_name if not output_name is None else presenter["default_output"]
                 presenter_data = presenter.get(presenter_key, None)
 
                 if presenter_data is None:
@@ -202,17 +200,20 @@ class PresenterDownloadView(MethodView):
 
                 for column in columns:
                     item_key = column["api_name"] if not column.get("api_name", None) is None else column["api_field"]
+                    column_data = output[column["api_field"]]
                     item_value = None
 
-                    if column["data_type"] == "text" or column["data_type"] == "datetime":
-                        column_data = output[column["api_field"]]
+                    if column["data_type"] == "text" or column["data_type"] == "identifier":
                         item_value = column_data[column["dict_field"]][index] if type(column_data) is dict else column_data[index]
 
                     if column["data_type"] == "integer":
-                        column_data = output[column["api_field"]]
                         item_value = int(
                             column_data[column["dict_field"]][index] if type(column_data) is dict else column_data[index]
                         )
+
+                    if column["data_type"] == "datetime":
+                        item_value = column_data[column["dict_field"]][index] if type(column_data) is dict else column_data[index]
+                        item_value = item_value.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
                     item[item_key] = item_value
 
@@ -241,7 +242,9 @@ class PresenterDownloadView(MethodView):
                 row_index = 1
                 file_format = "xlsx"
                 mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                workbook = Workbook(buffer)
+                workbook = Workbook(buffer, {
+                    "remove_timezone": True
+                })
                 worksheet = workbook.add_worksheet(output["id"])
                 column_names = [
                     column["api_name"] if not column.get("api_name", None) is None else column["api_field"] for column
