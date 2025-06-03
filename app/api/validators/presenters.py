@@ -1,5 +1,6 @@
-from typing import Optional, Union
 from enum import Enum
+from typing import Optional, Union
+
 from pydantic import BaseModel, field_validator
 
 
@@ -7,6 +8,7 @@ class FileDownloadChoiceEnum(str, Enum):
     Excel = "excel"
     JSON = "json"
     CSV = "csv"
+
 
 class PresenterQueryParamsValidator(BaseModel):
     output: Optional[str] = None

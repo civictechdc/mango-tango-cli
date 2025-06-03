@@ -184,6 +184,7 @@ represent how the data is intended to be interpreted.
 - `url` is a string that represents a URL.
 """
 
+
 class Column(BaseModel):
     name: str
     human_readable_name: Optional[str] = None
