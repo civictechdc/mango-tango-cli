@@ -161,7 +161,7 @@ def api_factory(context: WebPresenterContext):
     data_frame = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
     )
-    data_frame = data_frame.sort(COL_NGRAM_DISTINCT_POSTER_COUNT,descending=True)
+    data_frame = data_frame.sort(COL_NGRAM_DISTINCT_POSTER_COUNT, descending=True)
     matcher = create_word_matcher("", pl.col(COL_NGRAM_WORDS))
     plotted_df = data_frame.filter(matcher) if matcher is not None else data_frame
     presenter_model = context.web_presenter.model_dump()
