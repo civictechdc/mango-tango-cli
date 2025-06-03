@@ -3,6 +3,7 @@ import {CompactSelection, DataEditor, GridCellKind} from '@glideapps/glide-data-
 import type { ReactElement, FC, RefObject } from 'react';
 import type { GridColumn, Item, GridCell, Theme, GridSelection, DataEditorRef } from '@glideapps/glide-data-grid';
 import type { CoordinateType } from '@/lib/types/datapoint.ts';
+
 import '@glideapps/glide-data-grid/dist/index.css';
 
 export type ColumnsAlignmentProperties = {

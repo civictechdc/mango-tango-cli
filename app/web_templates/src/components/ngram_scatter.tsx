@@ -19,6 +19,7 @@ import type { ChartContainerProps } from '@/components/charts/props.ts';
 
 export type NgramScatterPlotDataPointStats = DataPoint & {
     ngram: string;
+    ranking: number;
 };
 
 export type NgramScatterPlotDataPointFull = NgramScatterPlotDataPointStats & {
@@ -74,6 +75,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
         ];
 
         return [
+            { id: 'ranking', title: 'Ranking', width: 100 },
             { id: 'ngram', title: 'Ngram', width: 400 },
             { id: 'x', title: 'User Repetition', width: 150 },
             {
@@ -98,7 +100,8 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                 if(!selectedPresenter) dataSource[dataSourceIndex] = {
                     ngram: rawNgrams[index],
                     x: rawX[index],
-                    y: (rawY[currentTab] as Array<number>)[index]
+                    y: (rawY[currentTab] as Array<number>)[index],
+                    ranking: dataSourceIndex + 1
                 };
                 if(selectedPresenter) {
                     const rawCurrentPresenter = currentPresenter as NgramPresenterFull;
@@ -110,7 +113,8 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                         userReps: rawCurrentPresenter.user_reps[index],
                         upn: rawCurrentPresenter.upns[index],
                         message: rawCurrentPresenter.messages[index],
-                        timestamp: rawCurrentPresenter.timestamps[index]
+                        timestamp: rawCurrentPresenter.timestamps[index],
+                        ranking: dataSourceIndex + 1
                     };
                 }
 
@@ -118,11 +122,6 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                 continue;
             }
 
-            if(!selectedPresenter) dataSource[index] = {
-                ngram: rawNgrams[index],
-                x: rawX[index],
-                y: (rawY[currentTab] as Array<number>)[index]
-            };
             if(selectedPresenter) {
                 const rawCurrentPresenter = currentPresenter as NgramPresenterFull;
                 dataSource[index] = {
@@ -133,10 +132,18 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                     userReps: rawCurrentPresenter.user_reps[index],
                     upn: rawCurrentPresenter.upns[index],
                     message: rawCurrentPresenter.messages[index],
-                    timestamp: rawCurrentPresenter.timestamps[index]
+                    timestamp: rawCurrentPresenter.timestamps[index],
+                    ranking: index + 1
                 };
+                continue;
             }
 
+            dataSource[index] = {
+                ngram: rawNgrams[index],
+                x: rawX[index],
+                y: (rawY[currentTab] as Array<number>)[index],
+                ranking: index + 1
+            };
         }
 
         return dataSource;
@@ -155,6 +162,10 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                 <span class="font-bold">${params.ngram}</span>
             </div>
             <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                <span class="font-bold">Ranking:</span>
+                <span>${params.ranking}</span>
+            </div>
+            <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                 <span class="font-bold">Total Repetition:</span>
                 <span>${params.x}</span>
             </div>
@@ -168,6 +179,10 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
         <div class="grid gap-1.5">
             <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                 <span class="font-bold">${params.ngram}</span>
+            </div>
+             <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
+                <span class="font-bold">Ranking:</span>
+                <span>${params.ranking}</span>
             </div>
             <div class="[&>svg]:text-zinc-500 flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 dark:[&>svg]:text-zinc-400">
                 <span class="font-bold">Total Repetition:</span>
