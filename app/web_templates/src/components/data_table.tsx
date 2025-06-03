@@ -122,11 +122,6 @@ export default function DataTable<RowType extends BaseRow>({
         }
     }, []);
 
-    console.log('row selection', rowSelection);
-    console.log('column selection', columnSelection);
-    console.log('grid selection', gridSelection);
-    console.log('data', data);
-
     useEffect(() => {
         if(
             (!rowSelection && !columnSelection) ||
