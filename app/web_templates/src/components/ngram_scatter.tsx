@@ -13,7 +13,7 @@ import type { ReactElement, FC } from 'react';
 import type { PickingInfo } from '@deck.gl/core';
 import type { GridColumn, GridSelection, DataEditorRef } from '@glideapps/glide-data-grid';
 import type { DataPoint } from '@/lib/types/datapoint';
-import type { Presenter, PresenterAxisData } from '@/lib/types/presenters';
+import type { Presenter, PresenterAxisData, PresenterQueryParams } from '@/lib/types/presenters';
 import type { ColumnsAlignmentProperties } from '@/components/data_table';
 import type { ChartContainerProps } from '@/components/charts/props.ts';
 
@@ -53,6 +53,13 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
     const [selectedPresenter, setSelectedPresenter] = useState<NgramPresenterFull | null>(null);
     const [currentTab, setCurrentTab] = useState<NgramScatterPlotYAxisType>('total_repetition');
     const { theme } = useTheme();
+    const filterQueryParams = useMemo<PresenterQueryParams | undefined>(() => {
+        return selectedNgram.length > 0 ? {
+            output: 'ngram_full',
+            filter_field: 'ngram',
+            filter_value: selectedNgram
+        } : undefined;
+    }, [selectedNgram]);
     const isDark = useMemo<boolean>(() =>
             (theme === 'system' &&  window.matchMedia("(prefers-color-scheme: dark)").matches) || theme === 'dark'
     , [theme]);
@@ -187,11 +194,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
         const controller = new AbortController();
 
         (async (): Promise<void> => {
-            const fullPresenter = await fetchPresenter<NgramPresenterFull>(presenter.id, controller.signal, {
-                output: 'ngram_full',
-                filter_field: 'ngram',
-                filter_value: selectedNgram
-            });
+            const fullPresenter = await fetchPresenter<NgramPresenterFull>(presenter.id, controller.signal, filterQueryParams);
 
             if(!fullPresenter) return;
 
@@ -266,7 +269,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                         tooltip={totalRepetitionTooltipFormatter} />
                     <div className="grid grid-flow-col justify-end row-span-1 my-4">
                         <div className="grid grid-flow-row">
-                            <DownloadDatasetButton presenterID={presenter.id} />
+                            <DownloadDatasetButton presenterID={presenter.id} queryParams={filterQueryParams} />
                         </div>
                     </div>
                     <div className="grid grid-flow-col row-span-1 mb-4">
