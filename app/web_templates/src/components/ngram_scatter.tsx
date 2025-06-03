@@ -5,6 +5,7 @@ import { CompactSelection } from '@glideapps/glide-data-grid';
 import ScatterPlot from '@/components/charts/scatter.tsx';
 import SearchBar from '@/components/search.tsx';
 import DataTable from '@/components/data_table.tsx';
+import { DownloadDatasetButton } from '@/components/download';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { Info } from 'lucide-react';
@@ -263,7 +264,12 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps<Ngra
                         darkMode={isDark}
                         onClick={onDeckClick}
                         tooltip={totalRepetitionTooltipFormatter} />
-                    <div className="grid grid-flow-col row-span-1 my-4">
+                    <div className="grid grid-flow-col justify-end row-span-1 my-4">
+                        <div className="grid grid-flow-row">
+                            <DownloadDatasetButton presenterID={presenter.id} />
+                        </div>
+                    </div>
+                    <div className="grid grid-flow-col row-span-1 mb-4">
                         <DataTable
                             ref={dataTableRef}
                             darkMode={isDark}

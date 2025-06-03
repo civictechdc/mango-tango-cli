@@ -66,7 +66,7 @@ export default function ScatterPlot({
 
     return (
         <>
-            <div className="grid grid-flow-col justify-end">
+            <div className="grid grid-flow-col row-span-1 justify-end">
                 <div className="grid grid-flow-row">
                     <ToolBox
                         features={['zoom', 'restore']}
