@@ -8,6 +8,7 @@ import type { GlobalPresentersState } from '@/lib/state/presenters';
 export default function PresenterView(): ReactElement<FC> {
     const presenters: PresenterCollection = usePresentersState((state: GlobalPresentersState) => state.presenters);
     const presenter: Presenter = presenters[0];
+
     let component: ReactElement<FC> | null = null;
 
     if(presenter) {

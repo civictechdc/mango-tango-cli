@@ -28,6 +28,7 @@ def factory(context: WebPresenterContext):
     df = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
     )
+    df = df.sort(COL_NGRAM_DISTINCT_POSTER_COUNT)
     all_grams = sorted(set(df[COL_NGRAM_WORDS].str.split(" ").explode()))
     explanation_total = "N-grams to the right are repeated by more users. N-grams higher up are repeated more times overall."
     explanation_amplification = "N-grams to the right are repeated by more users. N-grams higher up are repeated more times on average per user."
@@ -160,6 +161,7 @@ def api_factory(context: WebPresenterContext):
     data_frame = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
     )
+    data_frame = data_frame.sort(COL_NGRAM_DISTINCT_POSTER_COUNT, descending=True)
     matcher = create_word_matcher("", pl.col(COL_NGRAM_WORDS))
     plotted_df = data_frame.filter(matcher) if matcher is not None else data_frame
     presenter_model = context.web_presenter.model_dump()
@@ -173,6 +175,7 @@ def api_factory(context: WebPresenterContext):
             / plotted_df[COL_NGRAM_DISTINCT_POSTER_COUNT]
         ).to_list(),
     }
+
     presenter_model["explanation"] = {
         "total_repetition": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times overall.",
         "amplification_factor": "N-grams to the right are repeated by more users. N-grams higher up are repeated more times on average per user.",
