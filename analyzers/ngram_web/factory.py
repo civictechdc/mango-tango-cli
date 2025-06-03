@@ -201,6 +201,7 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
         "x": {"label": "Total Repetition", "value": "total_repetition"},
         "y": {"label": "Amplification Factor", "value": "amplification_factor"},
     }
+    presenter_model_full["depends_on"][0]["id"] = OUTPUT_NGRAM_FULL
     presenter_model_full["figure_type"] = "scatter"
     presenter_model_full["explanation"] = explanations
     presenter_model_full["axis"] = axes

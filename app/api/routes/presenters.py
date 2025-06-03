@@ -1,5 +1,5 @@
 from io import BytesIO, StringIO
-from typing import Any
+from typing import Any, Union
 from datetime import datetime
 from json import dumps
 from csv import DictWriter
@@ -135,7 +135,7 @@ class PresenterDownloadView(MethodView):
                 )
 
             except ValidationError as e:
-                return jsonify({"code": 422, "error": e.json()}), 422
+                return str(e), 422
 
             output = None
             output_key = ""
@@ -157,14 +157,15 @@ class PresenterDownloadView(MethodView):
                 presenter_data = presenter.get(presenter_key, None)
 
                 if presenter_data is None:
-                    return jsonify({"code": 404, "error": "Presenter not found"}), 404
+                    continue
 
                 if id == presenter_data["id"]:
                     output = presenter_data
                     output_key = presenter_key
+                    break
 
             if output is None:
-                return jsonify({"code": 404, "error": "Presenter not found"}), 404
+                return "Presenter not found", 404
 
             analyzer_output = None
 
@@ -178,7 +179,7 @@ class PresenterDownloadView(MethodView):
                         break
 
             if analyzer_output is None:
-                return jsonify({"code": 404, "error": "analyzer output could not be found"}), 404
+                return "analyzer output could not be found", 404
 
             buffer = BytesIO()
             file_format = ""
@@ -194,7 +195,7 @@ class PresenterDownloadView(MethodView):
                     if type(output[column["api_field"]]) is dict \
                     else len(output[column["api_field"]])
 
-            file_payload = [None] * data_length
+            file_payload = [{}] * data_length
 
             for index in range(0, data_length):
                 item = {}
