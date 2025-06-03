@@ -175,10 +175,10 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
     )
     data_frame_full = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_FULL).parquet_path
-    )
+    ).sort(COL_NGRAM_DISTINCT_POSTER_COUNT, descending=True)
     data_frame_stats = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
-    )
+    ).sort(COL_NGRAM_DISTINCT_POSTER_COUNT, descending=True)
     matcher_full = create_word_matcher(filter_value, pl.col(COL_NGRAM_WORDS))
     matcher_stats = create_word_matcher(filter_value, pl.col(COL_NGRAM_WORDS))
     plotted_df_full = (
