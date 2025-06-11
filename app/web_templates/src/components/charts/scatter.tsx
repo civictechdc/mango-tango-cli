@@ -13,14 +13,23 @@ import type { ChartProps } from '@/components/charts/props.ts';
 export default function ScatterPlot({
     data,
     tooltip,
+    onClick,
     darkMode = false,
+    resetZoomOnChange = true,
     axis = {x: {type: 'log', show: true}, y: {type: 'log', show: true}},
     dimensions = {width: 800, height: 600, margins: { top: 20, right: 40, bottom: 21, left: 40 }}
 }: ChartProps): ReactElement<FC> {
     const axesFillColor = useMemo<string>(() => darkMode ? '#fff' : '#000', [darkMode]);
     const [deckInstance, setDeckInstance] = useState<Deck<OrthographicView> | null>(null);
     const deckRef = useRef<DeckGLRef<OrthographicView> | null>(null);
-    const {data: plotData, deckProps, axis: chartAxes, viewport} = useChart(data, tooltip, deckInstance, axis, dimensions);
+    const {data: plotData, deckProps, axis: chartAxes, viewport} = useChart(
+        data,
+        tooltip,
+        deckInstance,
+        resetZoomOnChange,
+        axis,
+        dimensions
+    );
     const layers = [
         new ScatterplotLayer({
             id: `scatter-${Math.random().toString(36)}`,
@@ -55,10 +64,9 @@ export default function ScatterPlot({
         })
     ];
 
-    console.log('visible data in view port: ', viewport.visibleData);
     return (
         <>
-            <div className="grid grid-flow-col justify-end">
+            <div className="grid grid-flow-col row-span-1 justify-end">
                 <div className="grid grid-flow-row">
                     <ToolBox
                         features={['zoom', 'restore']}
@@ -71,6 +79,7 @@ export default function ScatterPlot({
                 <DeckGL {...deckProps}
                         ref={deckRef}
                         layers={layers}
+                        onClick={onClick}
                         onAfterRender={() => {
                             if(deckRef.current != null && deckInstance == null) setDeckInstance(deckRef.current?.deck as Deck<OrthographicView>);
                         }}/>
