@@ -6,7 +6,12 @@ on:
       is_release:
         required: true
         type: boolean
-
+  workflow_dispatch:
+    inputs:
+      is_release:
+        required: true
+        type: boolean
+        default: false
 jobs:
   build:
     strategy:
