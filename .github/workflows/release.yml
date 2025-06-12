@@ -3,14 +3,12 @@ name: New Release
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+-?*"
+      - "v*.*.*"
   workflow_dispatch:
 
 jobs:
   call-build_exe:
     uses: ./.github/workflows/build_exe.yml
-    with:
-        is_release: true 
   release:
     needs: call-build_exe
     runs-on: ubuntu-latest
@@ -21,7 +19,8 @@ jobs:
           path: artifacts
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
           files: |
             artifacts/**/*
