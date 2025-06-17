@@ -139,7 +139,12 @@ def text(message: str, **kwargs):
 
 
 def int_input(
-    message: str, *, min: Optional[int] = None, max: Optional[int] = None, **kwargs
+    message: str,
+    *,
+    min: Optional[int] = None,
+    max: Optional[int] = None,
+    default: Optional[int] = None,
+    **kwargs,
 ) -> Optional[int]:
     """
     Wraps `inquirer`'s text input and catches KeyboardInterrupt
@@ -165,6 +170,7 @@ def int_input(
         lambda: inquirer_text(
             message,
             validate=lambda previous_answers, value: validate_value(value),
+            default=str(default) if default is not None else None,
             **kwargs,
         ),
         None,

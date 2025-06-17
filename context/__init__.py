@@ -3,12 +3,14 @@ from functools import cached_property
 
 import polars as pl
 from dash import Dash
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from analyzer_interface import (
     AnalyzerInterface,
+    ParamValue,
     SecondaryAnalyzerInterface,
     WebPresenterInterface,
+    backfill_param_values,
 )
 from analyzer_interface.context import AssetsReader, InputTableReader
 from analyzer_interface.context import (
@@ -21,6 +23,31 @@ from analyzer_interface.context import TableReader, TableWriter
 from analyzer_interface.context import WebPresenterContext as BaseWebPresenterContext
 from preprocessing.series_semantic import SeriesSemantic
 from storage import AnalysisModel, Storage
+
+
+class PrimaryAnalyzerDefaultParametersContext(BasePrimaryAnalyzerContext):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    analyzer: AnalyzerInterface
+    store: Storage
+    input_columns: dict[str, "InputColumnProvider"]
+
+    def input(self) -> InputTableReader:
+        return PrimaryAnalyzerInputTableReader(
+            project_id=self.analysis.project_id,
+            analyzer=self.analyzer,
+            store=self.store,
+            input_columns=self.input_columns,
+        )
+
+    @property
+    def params(self) -> dict[str, ParamValue]:
+        raise NotImplementedError(
+            "Default parameters context does not support getting parameter values."
+        )
+
+    def output(self, output_id: str) -> TableWriter:
+        raise NotImplementedError("Default parameters context does not support output")
 
 
 class PrimaryAnalyzerContext(BasePrimaryAnalyzerContext):
@@ -39,6 +66,10 @@ class PrimaryAnalyzerContext(BasePrimaryAnalyzerContext):
             store=self.store,
             input_columns=self.input_columns,
         )
+
+    @property
+    def params(self) -> dict[str, ParamValue]:
+        return self.analysis.param_values
 
     def output(self, output_id: str) -> TableWriter:
         return PrimaryAnalyzerOutputWriter(
@@ -111,6 +142,12 @@ class SecondaryAnalyzerContext(BaseSecondaryAnalyzerContext):
             analysis=self.analysis, store=self.store
         )
 
+    @property
+    def base_params(self) -> dict[str, ParamValue]:
+        return backfill_param_values(
+            self.analysis.param_values, self.secondary_analyzer.base_analyzer
+        )
+
     def dependency(self, interface: SecondaryAnalyzerInterface) -> AssetsReader:
         return SecondaryAnalyzerOutputReaderGroupContext(
             analysis=self.analysis, secondary_analyzer_id=interface.id, store=self.store
@@ -149,6 +186,12 @@ class WebPresenterContext(BaseWebPresenterContext):
     def base(self) -> AssetsReader:
         return PrimaryAnalyzerOutputReaderGroupContext(
             analysis=self.analysis, store=self.store
+        )
+
+    @cached_property
+    def base_params(self) -> dict[str, ParamValue]:
+        return backfill_param_values(
+            self.analysis.param_values, self.web_presenter.base_analyzer
         )
 
     def dependency(self, interface: SecondaryAnalyzerInterface) -> AssetsReader:

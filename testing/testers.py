@@ -6,7 +6,7 @@ from typing import Callable
 import polars as pl
 import pytest
 
-from analyzer_interface import AnalyzerInterface, SecondaryAnalyzerInterface
+from analyzer_interface import AnalyzerInterface, ParamValue
 from analyzer_interface.context import PrimaryAnalyzerContext, SecondaryAnalyzerContext
 
 from .comparers import compare_dfs
@@ -21,6 +21,7 @@ def test_primary_analyzer(
     *,
     input: TestData,
     outputs: dict[str, TestData],
+    params: dict[str, ParamValue] = dict(),
 ):
     """
     Runs the primary analyzer test.
@@ -29,6 +30,7 @@ def test_primary_analyzer(
         interface (AnalyzerInterface): The interface of the analyzer.
         main (Callable[[PrimaryAnalyzerContext], None]): The main function of the analyzer.
         input (TestData): The input data.
+        params (dict[str, ParamValue]): (Optional) The analysis parameters.
         outputs (dict[str, TestData]): The output data, keyed by output ID.
     """
     with ExitStack() as exit_stack:
@@ -42,6 +44,7 @@ def test_primary_analyzer(
         context = TestPrimaryAnalyzerContext(
             temp_dir=temp_dir,
             input_parquet_path=input_path,
+            param_values=params,
             output_parquet_root_path=actual_output_dir,
         )
         main(context)
@@ -80,6 +83,7 @@ def test_secondary_analyzer(
     interface: AnalyzerInterface,
     main: Callable[[SecondaryAnalyzerContext], None],
     *,
+    primary_params: dict[str, ParamValue] = dict(),
     primary_outputs: dict[str, TestData],
     dependency_outputs: dict[str, dict[str, TestData]] = dict(),
     expected_outputs: dict[str, TestData],
@@ -90,6 +94,7 @@ def test_secondary_analyzer(
     Args:
         interface (AnalyzerInterface): The interface of the analyzer.
         main (Callable[[SecondaryAnalyzerInterface], None]): The main function of the analyzer.
+        primary_params (dict[str, ParamValue]): (Optional) The primary analysis parameters.
         primary_outputs (dict[str, TestData]): The primary output data, keyed by output ID.
         dependency_outputs (dict[str, dict[str, TestData]]): The dependency output data, keyed by dependency ID and then by output ID.
         expected_outputs (dict[str, TestData]): The expected output data, keyed by output ID.
@@ -121,6 +126,7 @@ def test_secondary_analyzer(
 
         context = TestSecondaryAnalyzerContext(
             temp_dir=temp_dir,
+            primary_param_values=primary_params,
             primary_output_parquet_paths={
                 output_id: os.path.join(actual_base_output_dir, f"{output_id}.parquet")
                 for output_id in primary_outputs.keys()

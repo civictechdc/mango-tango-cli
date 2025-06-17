@@ -3,6 +3,8 @@ from typing import Literal, Optional
 import polars as pl
 from pydantic import BaseModel
 
+from .params import ParamType, ParamValue
+
 
 class BaseAnalyzerInterface(BaseModel):
     id: str
@@ -35,6 +37,49 @@ class BaseAnalyzerInterface(BaseModel):
 
 class AnalyzerInput(BaseModel):
     columns: list["InputColumn"]
+
+
+class AnalyzerParam(BaseModel):
+    id: str
+    """
+    The name of the parameter. This becomes the key in the parameters dictionary
+    that is passed to the analyzer.
+    """
+
+    human_readable_name: Optional[str] = None
+    """
+    The human-friendly name for the parameter. This is used in the UI to
+    represent the parameter.
+    """
+
+    description: Optional[str] = None
+    """
+    A short description of the parameter. This is used in the UI to represent
+    the parameter.
+    """
+
+    type: ParamType
+    """
+    The type of the parameter. This is used for validation and for customizing
+    the UX for parameter input.
+    """
+
+    default: Optional[ParamValue] = None
+    """
+    Optional: define a static default value for this parameter. A parameter
+    without a default will need to be chosen explicitly by the user.
+    """
+
+    backfill_value: Optional[ParamValue] = None
+    """
+    Recommended if this is a parameter that is newly introduced in a previously
+    released analyzer. The backfill is show what this parameter was before it
+    became customizable.
+    """
+
+    @property
+    def print_name(self):
+        return self.human_readable_name or self.id
 
 
 class AnalyzerOutput(BaseModel):
@@ -78,6 +123,11 @@ class AnalyzerInterface(BaseAnalyzerInterface):
     input: AnalyzerInput
     """
   Specifies the input data schema for the analyzer.
+  """
+
+    params: list[AnalyzerParam] = []
+    """
+  A list of parameters that the analyzer accepts.
   """
 
     outputs: list["AnalyzerOutput"]
@@ -159,3 +209,12 @@ class InputColumn(Column):
 
 class OutputColumn(Column):
     pass
+
+
+def backfill_param_values(
+    param_values: dict[str, ParamValue], analyzer_spec: AnalyzerInterface
+) -> dict[str, ParamValue]:
+    return {
+        param_spec.id: param_values.get(param_spec.id) or param_spec.backfill_value
+        for param_spec in analyzer_spec.params
+    }

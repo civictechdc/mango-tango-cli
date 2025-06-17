@@ -16,6 +16,9 @@ def main(context: SecondaryAnalyzerContext):
         .alias("is_long")
     )
 
+    # This will have been provided or backfilled by the app.
+    assert context.base_params.get("fudge_factor") is not None
+
     # Save the output to a parquet file. The output ID comes from the secondary
     # analyzer's interface.
     df_export.write_parquet(context.output("example_report").parquet_path)

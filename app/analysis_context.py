@@ -5,7 +5,11 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from analyzer_interface import AnalyzerDeclaration, SecondaryAnalyzerDeclaration
+from analyzer_interface import (
+    AnalyzerDeclaration,
+    SecondaryAnalyzerDeclaration,
+    backfill_param_values,
+)
 from context import (
     InputColumnProvider,
     PrimaryAnalyzerContext,
@@ -54,6 +58,10 @@ class AnalysisContext(BaseModel):
     def create_time(self):
         return self.model.create_time()
 
+    @cached_property
+    def backfilled_param_values(self):
+        return backfill_param_values(self.model.param_values, self.analyzer_spec)
+
     @property
     def is_draft(self):
         return self.model.is_draft
@@ -87,10 +95,6 @@ class AnalysisContext(BaseModel):
 
         with TemporaryDirectory() as temp_dir:
             yield AnalysisRunProgressEvent(analyzer=self.analyzer_spec, event="start")
-            user_columns_by_name = {
-                user_column.name: user_column
-                for user_column in self.project_context.columns
-            }
             analyzer_context = PrimaryAnalyzerContext(
                 analysis=self.model,
                 analyzer=self.analyzer_spec,
@@ -99,7 +103,9 @@ class AnalysisContext(BaseModel):
                 input_columns={
                     analyzer_column_name: InputColumnProvider(
                         user_column_name=user_column_name,
-                        semantic=user_columns_by_name[user_column_name].semantic,
+                        semantic=self.project_context.column_dict[
+                            user_column_name
+                        ].semantic,
                     )
                     for analyzer_column_name, user_column_name in self.column_mapping.items()
                 },

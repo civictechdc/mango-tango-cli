@@ -1,4 +1,4 @@
 message_id,character_count,is_long
-msg_1,14,False
-msg_2,20,False
-msg_3,170,True
+msg_1,24,False
+msg_2,30,False
+msg_3,180,True

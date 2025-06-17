@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 import polars as pl
 from pydantic import BaseModel
 
-from analyzer_interface import SecondaryAnalyzerInterface
+from analyzer_interface import ParamValue, SecondaryAnalyzerInterface
 from analyzer_interface.context import AssetsReader, InputTableReader
 from analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
@@ -19,9 +19,14 @@ from analyzer_interface.context import TableReader, TableWriter
 class TestPrimaryAnalyzerContext(BasePrimaryAnalyzerContext):
     input_parquet_path: str
     output_parquet_root_path: str
+    param_values: dict[str, ParamValue]
 
     def input(self) -> InputTableReader:
         return TestTableReader(parquet_path=self.input_parquet_path)
+
+    @property
+    def params(self) -> dict[str, ParamValue]:
+        return self.param_values
 
     def output(self, output_id: str) -> TableWriter:
         return TestOutputWriter(parquet_path=self.output_path(output_id))
@@ -61,6 +66,7 @@ class TestSecondaryAnalyzerContext(BaseSecondaryAnalyzerContext):
     primary_output_parquet_paths: dict[str, str]
     dependency_output_parquet_paths: dict[str, dict[str, str]] = dict()
     output_parquet_root_path: str
+    primary_param_values: dict[str, ParamValue]
 
     class Config:
         arbitrary_types_allowed = True
@@ -70,6 +76,10 @@ class TestSecondaryAnalyzerContext(BaseSecondaryAnalyzerContext):
         return TestOutputReaderGroupContext(
             output_parquet_paths=self.primary_output_parquet_paths
         )
+
+    @property
+    def base_params(self) -> dict[str, ParamValue]:
+        return self.primary_param_values
 
     def dependency(self, interface: SecondaryAnalyzerInterface) -> AssetsReader:
         return TestOutputReaderGroupContext(
