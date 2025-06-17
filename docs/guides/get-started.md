@@ -101,5 +101,4 @@ npm install --legacy-peer-deps
 
 
 # Next Steps
-Once you have everything installed and running without any problems
-[Development Guide](./dev-guide.md)
+Once you have everything installed and running without any problems, the next step is to check out the [Contributor Workflow](./contributing.md)
