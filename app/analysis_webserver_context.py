@@ -4,10 +4,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from dash import Dash
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from flask import Flask, render_template
 from pydantic import BaseModel
 from waitress import serve
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from context import WebPresenterContext
 
