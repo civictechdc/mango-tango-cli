@@ -18,31 +18,26 @@ question_circle_fill = ui.HTML(
 )
 
 
-def create_app(df_output, context):
+def create_app(df_output, df_input):
     """Create Shiny app with CLI context data"""
 
     # Store data and context for use in server functions
-    global df_global, context_global, df_raw
+    global df_global, df_raw
     df_global = df_output
-    context_global = context
-    df_raw = None  # Will be loaded from context when needed
+    df_raw = df_input  # Will be loaded from context when needed
 
     return App(app_ui, server)
 
 
-def load_raw_data():
-    """Load raw data from CLI context"""
-    # This would need to access the original dataset through context
-    # For now, return None - this needs to be implemented based on your data source
-    return None
-
-
 @lru_cache(maxsize=32)
 def get_raw_data_subset(time_start, time_end, user_id, hashtag):
-    """Get subset of raw data - placeholder for CLI integration"""
-    # This would need to access raw data through the CLI context
-    # For now, return empty dataframe
-    return pl.DataFrame({COL_AUTHOR_ID: [], COL_TIME: [], COL_POST: []})
+    """Get subset of raw input data for a timewindow, user and a hashtag"""
+
+    return df_raw.filter(
+        pl.col(COL_AUTHOR_ID) == user_id,
+        pl.col(COL_TIME).is_between(lower_bound=time_start, upper_bound=time_end),
+        pl.col(COL_POST).str.contains(hashtag),
+    )
 
 
 # Global variables for CLI integration
@@ -233,7 +228,7 @@ def server(input, output, session):
         ui.update_selectize(
             "date_picker",
             choices=choices,
-            selected=df["timewindow_start"].first().strftime("%B %d, %Y"),
+            selected=df["timewindow_start"].to_list()[0].strftime("%B %d, %Y"),
             session=session,
         )
 
@@ -245,7 +240,7 @@ def server(input, output, session):
         for dt in df["timewindow_start"].to_list():
             if dt.strftime("%B %d, %Y") == selected_formatted:
                 return dt
-        return df["timewindow_start"].first()  # fallback
+        return df["timewindow_start"].to_list()[0]  # fallback
 
     def get_selected_datetime():
         return get_selected_datetime_cached(input.date_picker())
@@ -360,7 +355,7 @@ def server(input, output, session):
             )
         else:
             # Return empty dataframe if no time step available
-            df_posts = pl.DataFrame({COL_TIME: [], COL_POST: []})
+            return pl.DataFrame({COL_TIME: [], COL_POST: []})
 
         # format strings
         df_posts = df_posts.with_columns(
