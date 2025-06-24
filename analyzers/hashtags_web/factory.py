@@ -4,12 +4,18 @@ from pydantic import BaseModel
 from analyzer_interface.context import WebPresenterContext
 
 from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME, OUTPUT_GINI
+from .app import _set_df_global_state, app_layout, server
 
 
 # config used by AnalysisWebServerContext._start_shiny_server()
 class ShinyServerConfig(BaseModel):
-    shiny_app: object
+    server: object
     port: int = 8051
+
+
+class ShinyAppConfig(BaseModel):
+    app_layout: object
+    server_config: ShinyServerConfig
 
 
 def factory(
@@ -35,10 +41,8 @@ def factory(
         pl.col(COL_TIME)
     )
 
-    # Create and configure the Shiny app with CLI data
-    from .app import create_app
-
-    shiny_app = create_app(df_output=df_hashtags, df_input=df_raw)
+    # Create app layout and server with processed data
+    _set_df_global_state(df_input=df_raw, df_output=df_hashtags)
 
     # For now, mount the Shiny app via iframe in Dash
     # This preserves the existing CLI integration
@@ -57,4 +61,6 @@ def factory(
     )
 
     # Return Shiny app configuration for the webserver context to handle
-    return ShinyServerConfig(shiny_app=shiny_app, port=8051)
+    return ShinyAppConfig(
+        app_layout=app_layout, server_config=ShinyServerConfig(server=server, port=8051)
+    )

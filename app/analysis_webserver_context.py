@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 from dash import Dash
 from flask import Flask, render_template
 from pydantic import BaseModel
+from shiny import App
 from waitress import serve
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
@@ -44,19 +45,29 @@ class AnalysisWebServerContext(BaseModel):
                 external_stylesheets=["/static/dashboard_base.css"],
             )
             temp_dir = TemporaryDirectory()
+
             presenter_context = WebPresenterContext(
                 analysis=self.analysis_context.model,
                 web_presenter=presenter,
                 store=self.app_context.storage,
                 temp_dir=temp_dir.name,
                 dash_app=dash_app,
+                shiny_app=None,
             )
             temp_dirs.append(temp_dir)
             result = presenter.factory(presenter_context)
 
             # Handle Shiny app if returned by factory
-            if hasattr(result, "shiny_app") and result.shiny_app:
-                self._start_shiny_server(result.shiny_app, result.port)
+            if presenter.id == "hashtags_dashboard":
+                # initiate Shiny app instance
+                presenter_context.shiny_app = App(
+                    ui=result.app_layout, server=result.server_config.server
+                )
+
+                self._start_shiny_server(
+                    shiny_app=presenter_context.shiny_app,
+                    port=result.server_config.port,
+                )
 
         project_name = self.analysis_context.project_context.display_name
         analyzer_name = self.analysis_context.display_name

@@ -18,15 +18,10 @@ question_circle_fill = ui.HTML(
 )
 
 
-def create_app(df_output, df_input):
-    """Create Shiny app with CLI context data"""
-
-    # Store data and context for use in server functions
+def _set_df_global_state(df_input, df_output):
     global df_global, df_raw
     df_global = df_output
     df_raw = df_input  # Will be loaded from context when needed
-
-    return App(app_ui, server)
 
 
 @lru_cache(maxsize=32)
@@ -183,7 +178,7 @@ A project of [Civic Tech DC](https://www.civictechdc.org/), our mission is to sh
 
 """
 )
-app_ui = ui.page_navbar(
+app_layout = ui.page_navbar(
     ui.nav_panel(
         "Dashboard",
         analysis_panel_elements,
@@ -367,6 +362,3 @@ def server(input, output, session):
         df_posts = df_posts.drop(pl.col(COL_AUTHOR_ID))
 
         return render.DataGrid(df_posts, width="100%", filters=True)
-
-
-app = App(app_ui, server)
