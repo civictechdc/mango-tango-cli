@@ -55,7 +55,7 @@ def factory(
     from shiny import run_app
 
     def run_shiny():
-        run_app(shiny_app, host="127.0.0.1", port=8051, launch_browser=False)
+        run_app(shiny_app, host="127.0.0.1", port=8051, launch_browser=True)
 
     shiny_thread = threading.Thread(target=run_shiny, daemon=True)
     shiny_thread.start()
