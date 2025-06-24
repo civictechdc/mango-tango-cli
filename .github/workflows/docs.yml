@@ -2,14 +2,15 @@
 name: Publish docs via GitHub Pages
 
 on: pull_request
-
+permissions:
+  pages: write
 jobs:
   build:
     name: Deploy docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
