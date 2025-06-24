@@ -1,5 +1,6 @@
 import logging
 import os.path
+import threading
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -18,6 +19,7 @@ from .app_context import AppContext
 class AnalysisWebServerContext(BaseModel):
     app_context: AppContext
     analysis_context: AnalysisContext
+    _shiny_threads: list = []
 
     def start(self):
         containing_dir = str(Path(__file__).resolve().parent)
@@ -50,7 +52,11 @@ class AnalysisWebServerContext(BaseModel):
                 dash_app=dash_app,
             )
             temp_dirs.append(temp_dir)
-            presenter.factory(presenter_context)
+            result = presenter.factory(presenter_context)
+
+            # Handle Shiny app if returned by factory
+            if hasattr(result, "shiny_app") and result.shiny_app:
+                self._start_shiny_server(result.shiny_app, result.port)
 
         project_name = self.analysis_context.project_context.display_name
         analyzer_name = self.analysis_context.display_name
@@ -79,3 +85,14 @@ class AnalysisWebServerContext(BaseModel):
         finally:
             for temp_dir in temp_dirs:
                 temp_dir.cleanup()
+
+    def _start_shiny_server(self, shiny_app, port=8051):
+        """Start a Shiny server in a separate thread"""
+        from shiny import run_app
+
+        def run_shiny():
+            run_app(shiny_app, host="127.0.0.1", port=port, launch_browser=True)
+
+        shiny_thread = threading.Thread(target=run_shiny, daemon=True)
+        shiny_thread.start()
+        self._shiny_threads.append(shiny_thread)
