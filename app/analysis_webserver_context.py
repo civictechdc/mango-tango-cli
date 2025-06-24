@@ -7,6 +7,7 @@ from dash import Dash
 from flask import Flask, render_template
 from pydantic import BaseModel
 from waitress import serve
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from context import WebPresenterContext
 
@@ -63,6 +64,7 @@ class AnalysisWebServerContext(BaseModel):
                 analyzer_name=analyzer_name,
             )
 
+        app_dispatcher = DispatcherMiddleware(web_server)
         server_log = logging.getLogger("waitress")
         original_log_level = server_log.level
         original_disabled = server_log.disabled
@@ -70,9 +72,10 @@ class AnalysisWebServerContext(BaseModel):
         server_log.disabled = True
 
         try:
-            serve(web_server, host="127.0.0.1", port=8050)
-        finally:
             server_log.setLevel(original_log_level)
             server_log.disabled = original_disabled
+
+            serve(app_dispatcher, host="127.0.0.1", port=8050)
+        finally:
             for temp_dir in temp_dirs:
                 temp_dir.cleanup()
