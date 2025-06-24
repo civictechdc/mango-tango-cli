@@ -144,7 +144,7 @@ jobs:
           APPLE_DEV_EMAIL: ${{secrets.APPLE_DEV_EMAIL}}
           APPLE_TEAM_ID: ${{secrets.TEAM_ID}}
           APP_SPEC_PASS: ${{secrets.APP_SPEC_PASS}}
-        run: xcrun notarytool submit dist/mangotango_${{matrix.artifact_name}}_signed.pkg --apple-id $APPLE_DEV_EMAIL --team-id $APPLE_TEAM_ID --password $APP_SPEC_PASS --wait > notarization_output.txt
+        run: xcrun notarytool submit dist/mangotango_${{matrix.artifact_name}}_signed.pkg --apple-id $APPLE_DEV_EMAIL --team-id $APPLE_TEAM_ID --password $APP_SPEC_PASS --wait
 
       - name: Staple the notarization ticket
         if: runner.os == 'macOS'
