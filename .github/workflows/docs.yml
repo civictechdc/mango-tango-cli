@@ -2,7 +2,7 @@
 name: Publish docs via GitHub Pages
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - reopened
@@ -24,6 +24,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # ✅ Explicitly checkout the PR branch
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Build
         uses: Tiryoh/actions-mkdocs@v0.24.0
         if: github.event.action != 'closed'
@@ -33,7 +36,7 @@ jobs:
           requirements: 'requirements-mkdocs.txt' # option
           configfile: 'mkdocs.yml' # option
       - uses: rossjrw/pr-preview-action@v1
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         with:
           source-dir: site/
           preview-branch: gh-pages
