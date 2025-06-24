@@ -2,7 +2,7 @@
 
 # Define the virtual environment and requirements file paths
 REPO_ROOT=$(pwd)
-VENV_PATH="$REPO_ROOT/venv"
+VENV_PATH="${VIRTUAL_ENV:=$REPO_ROOT/venv}"
 REQUIREMENTS_FILE="$REPO_ROOT/requirements-dev.txt"
 
 # Check if virtual environment exists

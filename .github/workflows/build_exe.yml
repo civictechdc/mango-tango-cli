@@ -4,9 +4,10 @@ on:
   workflow_call:
     inputs:
       is_release:
-        required: true
+        default: false
+        description: 'Is this a release?'
         type: boolean
-
+        required: false
 jobs:
   build:
     strategy:
@@ -20,40 +21,35 @@ jobs:
             sha_command: pwsh -c "Get-FileHash -Algorithm SHA1 dist\mangotango_windows.exe | Format-Table Hash -HideTableHeaders > dist\mangotango_windows.exe.sha1"
             list_command: dir dist
             check_command: dist\mangotango_windows.exe --noop
-          - platform_name: MacOS 14
-            artifact_name: macos-14
-            os: macos-14
-            move_command: mv dist/mangotango dist/mangotango_macos_14
-            sha_command: shasum -a 1 dist/mangotango_macos_14 > dist/mangotango_macos_14.sha1
+          - platform_name: MacOS (x86)
+            artifact_name: macos-x86
+            os: macos-13
+            move_command: mv dist/mangotango dist/mangotango_macos-x86
+            sha_command: shasum -a 1 dist/mangotango_macos-x86 > dist/mangotango_macos-x86.sha1
+            sha_command_pkg: shasum -a 1 dist/mangotango_macos-x86.pkg > dist/mangotango_macos-x86.pkg.sha1
             list_command: ls -ll dist
-            check_command: dist/mangotango_macos_14 --noop
-          - platform_name: MacOS 15
-            artifact_name: macos-15
+            check_command: dist/mangotango_macos-x86 --noop
+          - platform_name: MacOS (arm64)
+            artifact_name: macos-arm64
             os: macos-15
-            move_command: mv dist/mangotango dist/mangotango_macos_15
-            sha_command: shasum -a 1 dist/mangotango_macos_15 > dist/mangotango_macos_15.sha1
+            move_command: mv dist/mangotango dist/mangotango_macos-arm64
+            sha_command: shasum -a 1 dist/mangotango_macos-arm64 > dist/mangotango_macos-arm64.sha1
+            sha_command_pkg: shasum -a 1 dist/mangotango_macos-arm64.pkg > dist/mangotango_macos-arm64.pkg.sha1
             list_command: ls -ll dist
-            check_command: dist/mangotango_macos_15 --noop
+            check_command: dist/mangotango_macos-arm64 --noop
 
     name: Build ${{ matrix.platform_name }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/pip
-          key: ${{ matrix.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ matrix.os }}-pip-
+          cache: 'pip'
+          cache-dependency-path: '**/requirements*.txt'
 
       - name: Install dependencies
         run: |
@@ -61,8 +57,34 @@ jobs:
           pip install -r requirements.txt
 
       - name: Install PyInstaller
-        run: pip install pyinstaller
-
+        run: |
+          pip install pyinstaller
+          echo "PYINST_BIN=\"$(which pyinstaller)\"" >> "$GITHUB_ENV"
+      - name: Create macOS keychain
+        id: keychain
+        if: runner.os == 'macOS'
+        env:
+          APPLE_DEV_EMAIL: ${{secrets.APPLE_DEV_EMAIL}}
+          APP_SPEC_PASS: ${{secrets.APP_SPEC_PASS}}
+          APPLE_APP_CERTIFICATE: ${{secrets.DEV_APP_CERT}}
+          APPLE_APP_CERT_PASSWORD: ${{secrets.DEV_APP_CERT_PASS}}
+          APPLE_INST_CERTIFICATE: ${{secrets.DEV_INST_CERT}}
+          APPLE_INST_CERT_PASSWORD: ${{secrets.DEV_INST_CERT_PASS}}
+          APPLE_KEYCHAIN_PASS: ${{secrets.APPLE_KEY_PASS}}
+        run: |
+          echo "$APPLE_APP_CERTIFICATE" | base64 --decode > app_certificate.p12
+          echo "$APPLE_INST_CERTIFICATE" | base64 --decode > inst_certificate.p12
+          security create-keychain -p $APPLE_KEYCHAIN_PASS build.keychain
+          security default-keychain -s build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+          security unlock-keychain -p $APPLE_KEYCHAIN_PASS build.keychain
+          security import app_certificate.p12 -k build.keychain -P $APPLE_APP_CERT_PASSWORD -A
+          security import inst_certificate.p12 \
+          -k build.keychain \
+          -P "$APPLE_INST_CERT_PASSWORD" \
+          -A
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $APPLE_KEYCHAIN_PASS build.keychain
+          security find-identity -v -p codesigning -p macappstore
       - name: Print version string (for tag)
         id: get_version_tag
         if: ${{ github.ref_type == 'tag' }}
@@ -80,8 +102,9 @@ jobs:
         run: ${{ matrix.version_command }}
 
       - name: Build the executable
-        run: |
-          pyinstaller pyinstaller.spec
+        env:
+          APPLE_APP_CERT_ID: ${{secrets.APPLE_APP_CERT_ID}}
+        run: pyinstaller pyinstaller.spec
 
       - name: Rename the executable to include platform suffix
         run: ${{ matrix.move_command }}
@@ -89,16 +112,50 @@ jobs:
       - name: Compute the SHA1 hashsum
         run: ${{ matrix.sha_command }}
 
+      - name: Create and sign mac package
+        if: runner.os == 'macOS'
+        env:
+          APPLE_INST_CERT_ID: ${{secrets.APPLE_INST_CERT_ID}}
+          APPLE_KEYCHAIN_PASS: ${{secrets.APPLE_KEY_PASS}}
+        run: |
+          mkdir -p /tmp/mangotango/
+          ditto dist/mangotango_${{matrix.artifact_name}} /tmp/mangotango/mangotango
+          chmod +x /tmp/mangotango/mangotango
+          security unlock-keychain -p $APPLE_KEYCHAIN_PASS build.keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$APPLE_KEYCHAIN_PASS" build.keychain
+          security find-identity -v -p codesigning build.keychain
+          pkgbuild --identifier "org.mangotango.cli" --timestamp --root /tmp/mangotango --install-location /Applications "./dist/mangotango_${{matrix.artifact_name}}_signed.pkg" --sign "$APPLE_INST_CERT_ID"
+
+      - name: Notarize Mac package
+        if: runner.os == 'macOS'
+        env:
+          APPLE_DEV_EMAIL: ${{secrets.APPLE_DEV_EMAIL}}
+          APPLE_TEAM_ID: ${{secrets.TEAM_ID}}
+          APP_SPEC_PASS: ${{secrets.APP_SPEC_PASS}}
+        run: xcrun notarytool submit dist/mangotango_${{matrix.artifact_name}}_signed.pkg --apple-id $APPLE_DEV_EMAIL --team-id $APPLE_TEAM_ID --password $APP_SPEC_PASS --wait > notarization_output.txt
+
+      - name: Staple the notarization ticket
+        if: runner.os == 'macOS'
+        run: xcrun stapler staple dist/mangotango_${{matrix.artifact_name}}_signed.pkg
+
+      - name: Clean up macOS Artifacts
+        if: runner.os == 'macOS'
+        run: |
+          rm -rf /tmp/mangotango
+          rm -rf dist/mangotango_${{matrix.artifact_name}}
+          rm -rf dist/mangotango_${{matrix.artifact_name}}.pkg
+          mv dist/mangotango_${{matrix.artifact_name}}_signed.pkg dist/mangotango_${{matrix.artifact_name}}.pkg
+
+      - name: Compute the SHA1 hashsum for macOS .pkg
+        if: runner.os == 'macOS'
+        run: ${{ matrix.sha_command_pkg }}
+
       - name: Inspect the dist/ directory before uploading artifacts
         run: ${{ matrix.list_command }}
 
-      - name: Check that the executable runs
-        if: inputs.is_release == false
-        run: ${{ matrix.check_command}}
-
       - name: Upload artifacts
-        if: inputs.is_release
         uses: actions/upload-artifact@v4
+        if: inputs.is_release
         with:
           name: ${{ matrix.artifact_name }}
           path: |

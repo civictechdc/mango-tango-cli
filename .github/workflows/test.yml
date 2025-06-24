@@ -8,19 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/pip
-          key: linux-pip-dev-${{ hashFiles('requirements-dev.txt') }}
+          cache: 'pip'
+          cache-dependency-path: '**/requirements*.txt'
 
       - name: Install dependencies
         run: |
@@ -32,4 +27,4 @@ jobs:
   test_build:
       uses: ./.github/workflows/build_exe.yml
       with:
-        is_release: false 
+        is_release: false
