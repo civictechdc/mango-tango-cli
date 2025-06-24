@@ -2,6 +2,18 @@ name: Build Executables
 
 on:
   workflow_call:
+    secrets:
+      APPLE_DEV_EMAIL:
+      APP_SPEC_PASS:
+      DEV_APP_CERT:
+      DEV_APP_CERT_PASS:
+      DEV_INST_CERT:
+      DEV_INST_CERT_PASS:
+      APPLE_KEY_PASS:
+      APPLE_APP_CERT_ID:
+      APPLE_INST_CERT_ID:
+      TEAM_ID:
+
     inputs:
       is_release:
         default: false
