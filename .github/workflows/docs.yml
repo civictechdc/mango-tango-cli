@@ -11,6 +11,15 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      deploy_to:
+        description: 'Deployment destination'
+        type: choice
+        options:
+          - prod
+          - preview
+
 
 permissions:
   contents: write
@@ -36,14 +45,14 @@ jobs:
           requirements: 'requirements-mkdocs.txt' # option
           configfile: 'mkdocs.yml' # option
       - uses: rossjrw/pr-preview-action@v1
-        if: github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request_target' || (github.event_name == 'workflow_dispatch' && inputs.deploy_to == 'preview')
         with:
           source-dir: site/
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           action: auto
       - uses: JamesIves/github-pages-deploy-action@v4
-        if: github.event_name == 'push' && github.ref_name == 'main'
+        if: (github.event_name == 'push' && github.ref_name == 'main') ||  (github.event_name == 'workflow_dispatch' && inputs.deploy_to == 'prod')
         with:
           folder: site/
           branch: gh-pages
