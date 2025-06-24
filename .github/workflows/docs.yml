@@ -2,7 +2,7 @@
 name: Publish docs via GitHub Pages
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - reopened
@@ -45,7 +45,7 @@ jobs:
           requirements: 'requirements-mkdocs.txt' # option
           configfile: 'mkdocs.yml' # option
       - uses: rossjrw/pr-preview-action@v1
-        if: github.event_name == 'pull_request_target' || (github.event_name == 'workflow_dispatch' && inputs.deploy_to == 'preview')
+        if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.deploy_to == 'preview')
         with:
           source-dir: site/
           preview-branch: gh-pages
