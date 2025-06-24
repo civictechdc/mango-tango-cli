@@ -1,8 +1,15 @@
 import polars as pl
+from pydantic import BaseModel
 
 from analyzer_interface.context import WebPresenterContext
 
 from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME, OUTPUT_GINI
+
+
+# config used by AnalysisWebServerContext._start_shiny_server()
+class ShinyServerConfig(BaseModel):
+    shiny_app: object
+    port: int = 8051
 
 
 def factory(
@@ -49,15 +56,5 @@ def factory(
         ]
     )
 
-    # Start the Shiny app server
-    import threading
-
-    from shiny import run_app
-
-    def run_shiny():
-        run_app(shiny_app, host="127.0.0.1", port=8051, launch_browser=True)
-
-    shiny_thread = threading.Thread(target=run_shiny, daemon=True)
-    shiny_thread.start()
-
-    return None
+    # Return Shiny app configuration for the webserver context to handle
+    return ShinyServerConfig(shiny_app=shiny_app, port=8051)
