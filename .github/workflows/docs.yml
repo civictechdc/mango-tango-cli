@@ -20,12 +20,6 @@ on:
           - prod
           - preview
 
-
-permissions:
-  contents: write
-  deployments: write
-  pages: write
-
 jobs:
   build:
     name: Deploy docs
