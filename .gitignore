@@ -6,3 +6,4 @@ __private__
 /analysis_outputs
 VERSION
 *.DS_Store
+.env*

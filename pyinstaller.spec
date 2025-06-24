@@ -1,8 +1,11 @@
+# code: language=python
 # main.spec
 # This file tells PyInstaller how to bundle your application
-
 from PyInstaller.utils.hooks import copy_metadata
+from PyInstaller.building.api import EXE,PYZ
+from PyInstaller.building.build_main import Analysis
 import sys
+import os
 
 block_cipher = None
 
@@ -35,6 +38,7 @@ a = Analysis(
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
 if sys.platform == "darwin":
     exe = EXE(
         pyz,
@@ -46,7 +50,9 @@ if sys.platform == "darwin":
         debug=False,
         strip=True,
         upx=True,  # You can set this to False if you don’t want UPX compression
-        console=True  # Set to False if you don't want a console window
+        console=True,  # Set to False if you don't want a console window
+        entitlements_file="./mango.entitlements",
+        codesign_identity=os.getenv('APPLE_APP_CERT_ID'),
     )
 else:
     exe = EXE(
