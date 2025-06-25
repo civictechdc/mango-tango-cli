@@ -1,11 +1,13 @@
 import logging
 import os.path
+import threading
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from dash import Dash
 from flask import Flask, render_template
 from pydantic import BaseModel
+from shiny import App
 from waitress import serve
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
@@ -18,6 +20,7 @@ from .app_context import AppContext
 class AnalysisWebServerContext(BaseModel):
     app_context: AppContext
     analysis_context: AnalysisContext
+    _shiny_threads: list = []
 
     def start(self):
         containing_dir = str(Path(__file__).resolve().parent)
@@ -42,15 +45,29 @@ class AnalysisWebServerContext(BaseModel):
                 external_stylesheets=["/static/dashboard_base.css"],
             )
             temp_dir = TemporaryDirectory()
+
             presenter_context = WebPresenterContext(
                 analysis=self.analysis_context.model,
                 web_presenter=presenter,
                 store=self.app_context.storage,
                 temp_dir=temp_dir.name,
                 dash_app=dash_app,
+                shiny_app=None,
             )
             temp_dirs.append(temp_dir)
-            presenter.factory(presenter_context)
+            result = presenter.factory(presenter_context)
+
+            # Handle Shiny app if returned by factory
+            if presenter.id == "hashtags_dashboard":
+                # initiate Shiny app instance
+                presenter_context.shiny_app = App(
+                    ui=result.app_layout, server=result.server_config.server
+                )
+
+                self._start_shiny_server(
+                    shiny_app=presenter_context.shiny_app,
+                    port=result.server_config.port,
+                )
 
         project_name = self.analysis_context.project_context.display_name
         analyzer_name = self.analysis_context.display_name
@@ -79,3 +96,14 @@ class AnalysisWebServerContext(BaseModel):
         finally:
             for temp_dir in temp_dirs:
                 temp_dir.cleanup()
+
+    def _start_shiny_server(self, shiny_app, port=8051):
+        """Start a Shiny server in a separate thread"""
+        from shiny import run_app
+
+        def run_shiny():
+            run_app(shiny_app, host="127.0.0.1", port=port, launch_browser=True)
+
+        shiny_thread = threading.Thread(target=run_shiny, daemon=True)
+        shiny_thread.start()
+        self._shiny_threads.append(shiny_thread)

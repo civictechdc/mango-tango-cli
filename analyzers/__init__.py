@@ -4,6 +4,7 @@ from .example.example_base import example_base
 from .example.example_report import example_report
 from .example.example_web import example_web
 from .hashtags import hashtags
+from .hashtags_web import hashtags_web
 from .ngram_stats import ngram_stats
 from .ngram_web import ngrams_web
 from .ngrams import ngrams
@@ -23,5 +24,6 @@ suite = AnalyzerSuite(
         temporal,
         temporal_barplot,
         hashtags,
+        hashtags_web,
     ]
 )

@@ -17,6 +17,8 @@ from .interface import (
     PARAM_TIME_WINDOW,
 )
 
+SMOOTH_WINDOW_SIZE = 3
+
 
 def gini(x: pl.Series) -> float:
     """
@@ -45,8 +47,12 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
         )
 
     # define the expressions
-    has_hashtag_symbols = pl.col(COL_POST).str.contains("#").any()
-    extract_hashtags = pl.col(COL_POST).str.extract_all(r"(#\S+)")
+    has_hashtag_symbols = (
+        pl.col(COL_POST).str.contains("#").any()
+    )  # find posts containing hasthag symbols
+    extract_hashtags = pl.col(COL_POST).str.extract_all(
+        r"(#\S+)"
+    )  # fetch all hashtags based on `#` symbol
 
     # if hashtag symbol is detected, extract with regex
     if data_frame.select(has_hashtag_symbols).item():
@@ -57,7 +63,8 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
     else:  # otherwise, we assume str: "['hashtag1', 'hashtag2', ...]"
         raise ValueError(f"The data in {COL_POST} column appear to have no hashtags.")
 
-    # select columns and sort
+    # select columns and sort by time in ascending order
+    # (expected by .group_by_dynamic below)
     df_input = df_input.select(pl.col([COL_AUTHOR_ID, COL_TIME, COL_POST])).sort(
         pl.col(COL_TIME)
     )
@@ -65,8 +72,9 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
     # compute gini per timewindow
     df_out = (
         df_input.explode(pl.col(COL_POST))
-        .with_columns(pl.col(COL_TIME).dt.truncate(every).alias(OUTPUT_COL_TIMESPAN))
-        .group_by(OUTPUT_COL_TIMESPAN)
+        .group_by_dynamic(
+            pl.col(COL_TIME), every=every, period=every, start_by="datapoint"
+        )
         .agg(
             pl.col(COL_AUTHOR_ID).alias(OUTPUT_COL_USERS),
             pl.col(COL_POST).alias(OUTPUT_COL_HASHTAGS),
@@ -75,6 +83,12 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
             .map_batches(gini, returns_scalar=True, return_dtype=pl.Float64)
             .alias(OUTPUT_COL_GINI),
         )
+        .with_columns(
+            pl.col(OUTPUT_COL_GINI)
+            .rolling_mean(window_size=SMOOTH_WINDOW_SIZE, center=True)
+            .alias(OUTPUT_COL_GINI + "_smooth")
+        )
+        .rename({COL_TIME: OUTPUT_COL_TIMESPAN})
     )
 
     # convert datetime back to string

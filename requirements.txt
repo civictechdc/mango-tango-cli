@@ -12,3 +12,5 @@ dash==2.18.1
 waitress==3.0.2
 colorama==0.4.6
 fastexcel==0.13.0
+shiny==1.4.0
+shinywidgets==0.6.2
