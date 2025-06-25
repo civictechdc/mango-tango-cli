@@ -9,6 +9,9 @@ on:
 jobs:
   call-build_exe:
     uses: ./.github/workflows/build_exe.yml
+    secrets: inherit
+    with:
+      is_release: true
   release:
     needs: call-build_exe
     runs-on: ubuntu-latest
