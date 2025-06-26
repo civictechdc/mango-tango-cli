@@ -21,6 +21,7 @@ df_global = None
 context_global = None
 df_raw = None
 
+
 def set_df_global_state(df_input, df_output):
     global df_global, df_raw
     df_global = df_output

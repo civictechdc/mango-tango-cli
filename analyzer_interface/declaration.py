@@ -73,7 +73,13 @@ class WebPresenterDeclaration(WebPresenterInterface):
     shiny: bool
     server_name: str
 
-    def __init__(self, interface: WebPresenterInterface, factory: Callable, name: str, shiny: bool):
+    def __init__(
+        self,
+        interface: WebPresenterInterface,
+        factory: Callable,
+        name: str,
+        shiny: bool,
+    ):
         """Creates a web presenter declaration
 
         Args:
@@ -99,4 +105,6 @@ class WebPresenterDeclaration(WebPresenterInterface):
             https://docs.python.org/3/tutorial/modules.html
 
         """
-        super().__init__(**interface.model_dump(), factory=factory, server_name=name, shiny=shiny)
+        super().__init__(
+            **interface.model_dump(), factory=factory, server_name=name, shiny=shiny
+        )
