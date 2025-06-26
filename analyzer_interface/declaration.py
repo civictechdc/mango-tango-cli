@@ -70,10 +70,10 @@ class SecondaryAnalyzerDeclaration(SecondaryAnalyzerInterface):
 
 class WebPresenterDeclaration(WebPresenterInterface):
     factory: Callable[["WebPresenterContext"], None]
-
+    shiny: bool
     server_name: str
 
-    def __init__(self, interface: WebPresenterInterface, factory: Callable, name: str):
+    def __init__(self, interface: WebPresenterInterface, factory: Callable, name: str, shiny: bool):
         """Creates a web presenter declaration
 
         Args:
@@ -99,4 +99,4 @@ class WebPresenterDeclaration(WebPresenterInterface):
             https://docs.python.org/3/tutorial/modules.html
 
         """
-        super().__init__(**interface.model_dump(), factory=factory, server_name=name)
+        super().__init__(**interface.model_dump(), factory=factory, server_name=name, shiny=shiny)

@@ -4,5 +4,5 @@ from .factory import factory
 from .interface import interface
 
 temporal_barplot = WebPresenterDeclaration(
-    interface=interface, factory=factory, name=__name__
+    interface=interface, factory=factory, name=__name__, shiny=False
 )

@@ -1,21 +1,7 @@
 import polars as pl
-from pydantic import BaseModel
-
+from dash import html
 from analyzer_interface.context import WebPresenterContext
-
 from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME, OUTPUT_GINI
-from .app import _set_df_global_state, app_layout, server
-
-
-# config used by AnalysisWebServerContext._start_shiny_server()
-class ShinyServerConfig(BaseModel):
-    server: object
-    port: int = 8051
-
-
-class ShinyAppConfig(BaseModel):
-    app_layout: object
-    server_config: ShinyServerConfig
 
 
 def factory(
@@ -41,26 +27,14 @@ def factory(
         pl.col(COL_TIME)
     )
 
-    # Create app layout and server with processed data
-    _set_df_global_state(df_input=df_raw, df_output=df_hashtags)
-
-    # For now, mount the Shiny app via iframe in Dash
-    # This preserves the existing CLI integration
-    from dash import html
-
-    app = web_context.dash_app
-
-    app.layout = html.Div(
+    web_context.dash_app.layout = html.Div(
         [
             html.H1("Hashtag Analysis Dashboard"),
             html.Iframe(
-                src="http://localhost:8051",  # Shiny app will run on port 8051
+                src="http://localhost:8050/shiny",  # Shiny app will run on port 8051
                 style={"width": "100%", "height": "800px", "border": "none"},
             ),
         ]
     )
 
-    # Return Shiny app configuration for the webserver context to handle
-    return ShinyAppConfig(
-        app_layout=app_layout, server_config=ShinyServerConfig(server=server, port=8051)
-    )
+    return dict(raw_dataframe=df_raw, hashtags_dataframe=df_hashtags)
