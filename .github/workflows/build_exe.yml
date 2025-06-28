@@ -159,7 +159,7 @@ jobs:
           mv dist/mangotango_${{matrix.artifact_name}}_signed.pkg dist/mangotango_${{matrix.artifact_name}}.pkg
 
       - name: Compute the SHA1 hashsum for macOS .pkg
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && inputs.is_release
         run: ${{ matrix.sha_command_pkg }}
 
       - name: Inspect the dist/ directory before uploading artifacts
