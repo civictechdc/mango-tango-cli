@@ -9,8 +9,9 @@ plotly==5.24.1
 pandas==2.2.3 # needed by plotly
 pyarrow==17.0.0
 dash==2.18.1
-waitress==3.0.2
 colorama==0.4.6
 fastexcel==0.13.0
 shiny==1.4.0
 shinywidgets==0.6.2
+starlette==0.47.1
+uvicorn==0.34.3
