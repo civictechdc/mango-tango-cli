@@ -1,6 +1,5 @@
 from functools import lru_cache
 
-import numpy as np
 import plotly.graph_objects as go
 import polars as pl
 from shiny import reactive, render, ui
@@ -8,7 +7,14 @@ from shinywidgets import output_widget, render_widget
 
 from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
 from .analysis import secondary_analyzer
-from .plots import plot_bar_plotly, plot_gini_plotly, plot_users_plotly
+from .plots import (
+    MANGO_DARK_GREEN,
+    plot_bar_plotly,
+    plot_gini_plotly,
+    plot_users_plotly,
+)
+
+LOGO_URL = "https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG"
 
 # https://icons.getbootstrap.com/icons/question-circle-fill/
 question_circle_fill = ui.HTML(
@@ -241,7 +247,7 @@ def server(input, output, session):
             if (
                 hasattr(existing_trace, "marker")
                 and hasattr(existing_trace.marker, "color")
-                and existing_trace.marker.color == "red"
+                and existing_trace.marker.color == MANGO_DARK_GREEN
             ):
                 traces_to_remove.append(i)
 
@@ -254,7 +260,7 @@ def server(input, output, session):
             x=[points.xs[0]],
             y=[points.ys[0]],
             mode="markers",
-            marker=dict(size=10, color="red"),
+            marker=dict(size=8, color=MANGO_DARK_GREEN),
             showlegend=False,
         )
 

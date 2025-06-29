@@ -2,6 +2,9 @@ import plotly.graph_objects as go
 import polars as pl
 
 FS = 16
+MANGO_DARK_GREEN = "#609949"
+MANGO_DARK_ORANGE = "#f3921e"
+LIGHT_BLUE = "#acd7e5"
 
 
 def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
@@ -33,7 +36,6 @@ def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
                 mode="lines",
                 name="Smoothed",
                 line=dict(color="orange", width=2),
-                opacity=0.8,
             )
         )
 
@@ -43,6 +45,7 @@ def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
         title="Concentration of hashtags over time",
         xaxis_title="Time",
         yaxis_title="Hashtag Concentration<br>(Gini coefficient)",
+        hovermode="x unified",
         showlegend=False,
         height=300,
         margin=dict(l=50, r=50, t=50, b=50),
@@ -86,7 +89,7 @@ def plot_bar_plotly(data_frame, selected_date=None, show_title=True):
             x=percentages,
             y=hashtags,
             orientation="h",
-            marker_color="#609949",
+            marker_color=MANGO_DARK_GREEN,
             hovertemplate="<b>%{y}</b><br>%{x:.1f}% of all hashtags<extra></extra>",
             width=0.8,  # Fixed bar width
             text=hashtags,  # Add text labels on bars
@@ -117,7 +120,7 @@ def plot_bar_plotly(data_frame, selected_date=None, show_title=True):
         xaxis_title="% all hashtags in the selected time period",
         yaxis_title="",
         height=dynamic_height,
-        margin=dict(l=0, r=100, t=10, b=50),
+        margin=dict(l=0, r=50, t=10, b=50),
         showlegend=False,
     )
 
@@ -167,7 +170,7 @@ def plot_users_plotly(users_data):
             x=counts,
             y=users,
             orientation="h",
-            marker_color="#609949",
+            marker_color=MANGO_DARK_GREEN,
             hovertemplate="<b>%{y}</b><br>%{x} posts<extra></extra>",
             width=0.8,  # Fixed bar width
             text=users,  # Add text labels on bars
