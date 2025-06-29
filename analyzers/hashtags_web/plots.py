@@ -22,6 +22,7 @@ def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
             y=y,
             mode="lines",
             name="Gini coefficient",
+            hovertemplate="<b>Gini:</b> %{y:.3f}<extra></extra>",
             line=dict(color="black", width=1.5),
         )
     )
@@ -35,6 +36,7 @@ def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
                 y=y2,
                 mode="lines",
                 name="Smoothed",
+                hovertemplate="<b>Gini (Smoothed):</b> %{y:.3f}<extra></extra>",
                 line=dict(color="orange", width=2),
             )
         )
