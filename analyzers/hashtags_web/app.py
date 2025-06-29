@@ -36,9 +36,6 @@ def get_raw_data_subset(time_start, time_end, user_id, hashtag):
     )
 
 
-# Global variables for CLI integration
-
-
 def select_users(secondary_output, selected_hashtag):
     users_df = (
         secondary_output.filter(pl.col("hashtags") == selected_hashtag)["users_all"]
@@ -58,27 +55,20 @@ page_dependencies = ui.tags.head(
 )
 
 # main panel showing the line plot
-analysis_panel = ui.accordion(
-    ui.accordion_panel(
-        "",
-        [
-            ui.card(
-                ui.card_header(
-                    "Full time scale analysis ",
-                    ui.tooltip(
-                        ui.tags.span(
-                            question_circle_fill,
-                            style="cursor: help; font-size: 14px;",
-                        ),
-                        "This analysis shows the gini coefficient over the entire dataset. Select specific timepoints below to explore narrow time windows.",
-                        placement="top",
-                    ),
-                ),
-                ui.input_checkbox("smooth_checkbox", "Show smoothed line", value=False),
-                output_widget("line_plot", height="300px"),
-            )
-        ],
-    )
+analysis_panel = ui.card(
+    ui.card_header(
+        "Full time window analysis ",
+        ui.tooltip(
+            ui.tags.span(
+                question_circle_fill,
+                style="cursor: help; font-size: 14px;",
+            ),
+            "This analysis shows the gini coefficient over the entire dataset. Select specific timepoints below to explore narrow time windows.",
+            placement="top",
+        ),
+    ),
+    ui.input_checkbox("smooth_checkbox", "Show smoothed line", value=False),
+    output_widget("line_plot", height="300px"),
 )
 
 # panel to show hashtag distributions
@@ -319,4 +309,4 @@ def server(input, output, session):
 
         df_posts = df_posts.drop(pl.col(COL_AUTHOR_ID))
 
-        return render.DataGrid(df_posts, width="100%", filters=True)
+        return render.DataGrid(df_posts, width="100%")
