@@ -1,11 +1,10 @@
-import numpy as np
 import plotly.graph_objects as go
 import polars as pl
 
-FS = 14
+FS = 16
 
 
-def plot_gini_plotly(df: pl.DataFrame, x_selected, smooth: bool = False):
+def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
     """Create a plotly line plot with white theme"""
 
     y = df.select(pl.col("gini")).to_numpy().flatten()
@@ -38,15 +37,12 @@ def plot_gini_plotly(df: pl.DataFrame, x_selected, smooth: bool = False):
             )
         )
 
-    # Add vertical line for selected date (x_selected is now the datetime value directly)
-    fig.add_vline(x=x_selected, line_dash="dash", line_color="red", line_width=2)
-
     # Update layout with white theme
     fig.update_layout(
         template="plotly_white",
         title="Concentration of hashtags over time",
         xaxis_title="Time",
-        yaxis_title="Gini coefficient",
+        yaxis_title="Hashtag Concentration<br>(Gini coefficient)",
         showlegend=False,
         height=300,
         margin=dict(l=50, r=50, t=50, b=50),
