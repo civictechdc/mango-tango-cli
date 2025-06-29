@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 import numpy as np
+import plotly.graph_objects as go
 import polars as pl
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
@@ -80,16 +81,9 @@ hashtag_plot_panel = ui.card(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Select a date to display the hashtags that users posted most frequently in the time period starting with that date.",
+            "Displayed are the hashtags that users posted most frequently in the time period starting with selected date.",
             placement="top",
         ),
-    ),
-    ui.input_selectize(
-        id="date_picker",
-        label="Show hashtags for time period starting on:",
-        choices=[],  # Will be populated by reactive effect
-        selected=None,
-        width="100%",
     ),
     output_widget("bar_plot", height="1500px"),
     max_height="500px",
@@ -181,21 +175,24 @@ def server(input, output, session):
         df = get_df()
         # Find the datetime that matches the formatted string
         for dt in df["timewindow_start"].to_list():
-            if dt.strftime("%B %d, %Y") == selected_formatted:
+            if dt.strftime("%Y-%m-%d %H:%M") == selected_formatted:
                 return dt
         return df["timewindow_start"].to_list()[0]  # fallback
 
     def get_selected_datetime():
-        return get_selected_datetime_cached(input.date_picker())
-
-    @reactive.calc
-    def selected_date():
-        df = get_df()
-        x_selected = df.with_columns(
-            sel=pl.col("timewindow_start") == input.date_picker()
-        ).select(pl.col("sel"))
-
-        return np.where(x_selected)[0].item()
+        click_data = clicked_data.get()
+        if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
+            # Convert the clicked datetime to the format expected by get_selected_datetime_cached
+            clicked_datetime = click_data.xs[0]
+            if hasattr(clicked_datetime, "strftime"):
+                formatted_datetime = clicked_datetime.strftime("%Y-%m-%d %H:%M")
+                return get_selected_datetime_cached(formatted_datetime)
+            else:
+                # If it's already a string, use it directly
+                return get_selected_datetime_cached(clicked_datetime)
+        else:
+            # Return the first datetime as default
+            return df_global["timewindow_start"].first()
 
     @reactive.calc
     def secondary_analysis():
@@ -229,12 +226,50 @@ def server(input, output, session):
             session=session,
         )
 
+    clicked_data = reactive.value()
+
+    # whenever line plot is clicked, update `click_reactive`
+    def on_point_click(trace, points, state):
+        clicked_data.set(points)
+
+        # Get the parent figure widget from the trace
+        fig_widget = trace.parent
+
+        # Remove existing red marker traces
+        traces_to_remove = []
+        for i, existing_trace in enumerate(fig_widget.data):
+            if (
+                hasattr(existing_trace, "marker")
+                and hasattr(existing_trace.marker, "color")
+                and existing_trace.marker.color == "red"
+            ):
+                traces_to_remove.append(i)
+
+        # Remove old red markers in reverse order
+        for i in reversed(traces_to_remove):
+            fig_widget.data = fig_widget.data[:i] + fig_widget.data[i + 1 :]
+
+        # Add new red marker at clicked point
+        fig_widget.add_scatter(
+            x=[points.xs[0]],
+            y=[points.ys[0]],
+            mode="markers",
+            marker=dict(size=10, color="red"),
+            showlegend=False,
+        )
+
     @render_widget
     def line_plot():
-        selected_date = get_selected_datetime()
         smooth_enabled = input.smooth_checkbox()
+
         df = get_df()
-        return plot_gini_plotly(df=df, x_selected=selected_date, smooth=smooth_enabled)
+
+        fig = plot_gini_plotly(df=df, smooth=smooth_enabled)
+
+        fig_widget = go.FigureWidget(fig.data, fig.layout)
+        fig_widget.data[0].on_click(on_point_click)
+
+        return fig_widget
 
     @render_widget
     def bar_plot():
