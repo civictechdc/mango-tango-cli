@@ -89,7 +89,7 @@ hashtag_plot_panel = ui.card(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Displayed are the hashtags that users posted most frequently in the time period starting with selected date.",
+            "Displayed are the hashtags that users posted most frequently in the time window starting with selected date.",
             placement="top",
         ),
     ),
@@ -101,19 +101,19 @@ hashtag_plot_panel = ui.card(
 # panel to show hashtag count per user distribution
 users_plot_panel = ui.card(
     ui.card_header(
-        "Hashtag usage by users ",
+        "Hashtag usage by accounts ",
         ui.tooltip(
             ui.tags.span(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Select a user account to show the number of times it used a specific hashtag.",
+            "Select an account to show the number of times it used the selected hashtag.",
             placement="top",
         ),
     ),
     ui.input_selectize(
         id="hashtag_picker",
-        label="Show users for hashtag:",
+        label="Show accounts that used hashtag:",
         choices=[],
         width="100%",
     ),
@@ -130,13 +130,13 @@ tweet_explorer = ui.card(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Inspect the posts containing the hashtag for the specific user in the selected time period.",
+            "Inspect the posts containing the hashtag for the specific user in the selected time window.",
             placement="top",
         ),
     ),
     ui.input_selectize(
         id="user_picker",
-        label="Show tweets for user:",
+        label="Show posts for account:",
         choices=[],
         width="100%",
     ),
@@ -208,6 +208,11 @@ def server(input, output, session):
 
     @reactive.calc
     def secondary_analysis():
+        # Only run analysis if user has clicked on line plot
+        click_data = clicked_data()
+        if not (click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0):
+            return None
+
         timewindow = get_selected_datetime()
         df = get_df()
         df_out2 = secondary_analyzer(df, timewindow)
@@ -215,7 +220,12 @@ def server(input, output, session):
 
     @reactive.effect
     def update_hashtag_choices():
-        hashtags = secondary_analysis()["hashtags"].to_list()
+        analysis_result = secondary_analysis()
+        if analysis_result is None:
+            hashtags = []
+        else:
+            hashtags = analysis_result["hashtags"].to_list()
+
         ui.update_selectize(
             "hashtag_picker",
             choices=hashtags,
@@ -225,11 +235,16 @@ def server(input, output, session):
 
     @reactive.effect
     def update_user_choices():
-        df_users = select_users(
-            secondary_analysis(), selected_hashtag=input.hashtag_picker()
-        ).sort("count", descending=True)
+        analysis_result = secondary_analysis()
+        selected_hashtag = input.hashtag_picker()
 
-        users = df_users["users_all"].to_list()
+        if analysis_result is None or not selected_hashtag:
+            users = []
+        else:
+            df_users = select_users(
+                analysis_result, selected_hashtag=selected_hashtag
+            ).sort("count", descending=True)
+            users = df_users["users_all"].to_list()
 
         ui.update_selectize(
             "user_picker",
@@ -284,12 +299,12 @@ def server(input, output, session):
 
     @render_widget
     def hashtag_bar_plot():
-        # Access clicked_data to make this reactive
-        click_data = clicked_data()
-        if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
+        analysis_result = secondary_analysis()
+
+        if analysis_result is not None:
             selected_date = get_selected_datetime()
             return plot_bar_plotly(
-                data_frame=secondary_analysis(),
+                data_frame=analysis_result,
                 selected_date=selected_date,
                 show_title=False,
             )
@@ -299,9 +314,11 @@ def server(input, output, session):
 
     @render_widget
     def user_bar_plot():
+        analysis_result = secondary_analysis()
         selected_hashtag = input.hashtag_picker()
-        if selected_hashtag:
-            users_data = select_users(secondary_analysis(), selected_hashtag)
+
+        if analysis_result is not None and selected_hashtag:
+            users_data = select_users(analysis_result, selected_hashtag)
             return plot_users_plotly(users_data)
         else:
             # Return empty plot if no hashtag selected
