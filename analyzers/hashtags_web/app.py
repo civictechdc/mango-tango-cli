@@ -9,6 +9,7 @@ from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
 from .analysis import secondary_analyzer
 from .plots import (
     MANGO_DARK_GREEN,
+    _plot_hashtags_placeholder_fig,
     _plot_users_placeholder_fig,
     plot_bar_plotly,
     plot_gini_plotly,
@@ -92,7 +93,7 @@ hashtag_plot_panel = ui.card(
             placement="top",
         ),
     ),
-    output_widget("bar_plot", height="1500px"),
+    output_widget("hashtag_bar_plot", height="1500px"),
     max_height="500px",
     full_screen=True,
 )
@@ -116,7 +117,7 @@ users_plot_panel = ui.card(
         choices=[],
         width="100%",
     ),
-    output_widget("user_plot", height="800px"),
+    output_widget("user_bar_plot", height="800px"),
     max_height="500px",
     full_screen=True,
 )
@@ -282,7 +283,7 @@ def server(input, output, session):
         return fig_widget
 
     @render_widget
-    def bar_plot():
+    def hashtag_bar_plot():
         selected_date = get_selected_datetime()
         return plot_bar_plotly(
             data_frame=secondary_analysis(),
@@ -291,7 +292,7 @@ def server(input, output, session):
         )
 
     @render_widget
-    def user_plot():
+    def user_bar_plot():
         selected_hashtag = input.hashtag_picker()
         if selected_hashtag:
             users_data = select_users(secondary_analysis(), selected_hashtag)
