@@ -93,6 +93,7 @@ hashtag_plot_panel = ui.card(
             placement="top",
         ),
     ),
+    ui.output_text(id="hashtag_card_info"),
     output_widget("hashtag_bar_plot", height="1500px"),
     max_height="500px",
     full_screen=True,
@@ -164,6 +165,20 @@ def server(input, output, session):
         if len(df) > 1:
             return df["timewindow_start"][1] - df["timewindow_start"][0]
         return None
+
+    def _get_timewindow_info_text():
+        """Format selected timewindow into a short info text for feedback"""
+        click_data = clicked_data.get()
+
+        if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
+            timewindow = get_selected_datetime()
+            time_step = get_time_step()
+            timewindow_end = timewindow + time_step
+            format_code = "%B %d, %Y"
+            dates_formatted = f"{timewindow.strftime(format_code)} - {timewindow_end.strftime(format_code)}"
+            return "Time window: " + dates_formatted
+        else:
+            return "Time window not available (select first)"
 
     @reactive.effect
     def populate_date_choices():
@@ -312,6 +327,10 @@ def server(input, output, session):
             # Return placeholder plot if no data clicked
             return _plot_hashtags_placeholder_fig()
 
+    @render.text
+    def hashtag_card_info():
+        return _get_timewindow_info_text()
+
     @render_widget
     def user_bar_plot():
         analysis_result = secondary_analysis()
@@ -326,14 +345,7 @@ def server(input, output, session):
 
     @render.text
     def tweets_title():
-        timewindow = get_selected_datetime()
-        time_step = get_time_step()
-        if time_step:
-            timewindow_end = timewindow + time_step
-            format_code = "%B %d, %Y"
-            dates_formatted = f"{timewindow.strftime(format_code)} - {timewindow_end.strftime(format_code)}"
-            return "Showing posts in time window: " + dates_formatted
-        return "Time window information not available"
+        return _get_timewindow_info_text()
 
     @render.data_frame
     def tweets():
