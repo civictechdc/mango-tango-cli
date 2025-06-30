@@ -188,7 +188,7 @@ def server(input, output, session):
         return df["timewindow_start"].to_list()[0]  # fallback
 
     # this will store line plot values when clicked
-    clicked_data = reactive.value()
+    clicked_data = reactive.value(None)
 
     def get_selected_datetime():
         """Get date value from when a line plot is clicked on"""
@@ -204,7 +204,7 @@ def server(input, output, session):
                 return get_selected_datetime_cached(clicked_datetime)
         else:
             # Return the first datetime as default
-            return df_global["timewindow_start"].first()
+            return get_df()["timewindow_start"][0]
 
     @reactive.calc
     def secondary_analysis():
@@ -284,12 +284,18 @@ def server(input, output, session):
 
     @render_widget
     def hashtag_bar_plot():
-        selected_date = get_selected_datetime()
-        return plot_bar_plotly(
-            data_frame=secondary_analysis(),
-            selected_date=selected_date,
-            show_title=False,
-        )
+        # Access clicked_data to make this reactive
+        click_data = clicked_data()
+        if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
+            selected_date = get_selected_datetime()
+            return plot_bar_plotly(
+                data_frame=secondary_analysis(),
+                selected_date=selected_date,
+                show_title=False,
+            )
+        else:
+            # Return placeholder plot if no data clicked
+            return _plot_hashtags_placeholder_fig()
 
     @render_widget
     def user_bar_plot():
