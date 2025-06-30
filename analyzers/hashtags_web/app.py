@@ -295,7 +295,7 @@ def server(input, output, session):
             y=[points.ys[0]],
             mode="markers",
             marker=dict(size=8, color=MANGO_DARK_GREEN),
-            hovertemplate=None,
+            hoverinfo="skip",  # Disable hover for this marker
             showlegend=False,
         )
 
