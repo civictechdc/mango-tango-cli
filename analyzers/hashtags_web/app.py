@@ -186,7 +186,11 @@ def server(input, output, session):
                 return dt
         return df["timewindow_start"].to_list()[0]  # fallback
 
+    # this will store line plot values when clicked
+    clicked_data = reactive.value()
+
     def get_selected_datetime():
+        """Get date value from when a line plot is clicked on"""
         click_data = clicked_data.get()
         if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
             # Convert the clicked datetime to the format expected by get_selected_datetime_cached
@@ -232,8 +236,6 @@ def server(input, output, session):
             selected=users[0] if users else None,
             session=session,
         )
-
-    clicked_data = reactive.value()
 
     # whenever line plot is clicked, update `click_reactive`
     def on_point_click(trace, points, state):
