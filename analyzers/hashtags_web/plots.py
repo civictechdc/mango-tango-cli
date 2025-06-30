@@ -144,7 +144,7 @@ def _plot_hashtags_placeholder_fig():
     fig.add_annotation(
         x=0.5,
         y=0.5,
-        text="Click on line plot above to show distribution of hashtags in that time window",
+        text="Click on line plot above to display<br>hashtags in that time window",
         showarrow=False,
         font=dict(size=16),
         xref="paper",
