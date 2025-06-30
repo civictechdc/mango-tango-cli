@@ -137,6 +137,29 @@ def plot_bar_plotly(data_frame, selected_date=None, show_title=True):
     return fig
 
 
+def _plot_hashtags_placeholder_fig():
+    """Create a an empty placeholder figure for hashtags barplot"""
+    fig = go.Figure()
+
+    fig.add_annotation(
+        x=0.5,
+        y=0.5,
+        text="Click on line plot above to show distribution of hashtags in that time window",
+        showarrow=False,
+        font=dict(size=16),
+        xref="paper",
+        yref="paper",
+    )
+    fig.update_layout(
+        template="plotly_white",
+        xaxis=dict(range=[0, 1]),
+        yaxis=dict(range=[0, 1]),
+        height=400,
+    )
+
+    return fig
+
+
 def plot_users_plotly(users_data):
     """Create an interactive plotly bar plot for user distribution"""
 
@@ -201,5 +224,27 @@ def plot_users_plotly(users_data):
         range=[0, max(counts) * 1.5], side="top"
     )  # Extra space for text, x-axis on top
     fig.update_yaxes(categoryorder="array", categoryarray=users, showticklabels=False)
+
+    return fig
+
+
+def _plot_users_placeholder_fig():
+    fig = go.Figure()
+
+    fig.add_annotation(
+        x=0.5,
+        y=0.5,
+        text="Select a hashtag to see user distribution",
+        showarrow=False,
+        font=dict(size=16),
+        xref="paper",
+        yref="paper",
+    )
+    fig.update_layout(
+        template="plotly_white",
+        xaxis=dict(range=[0, 1]),
+        yaxis=dict(range=[0, 1]),
+        height=400,
+    )
 
     return fig

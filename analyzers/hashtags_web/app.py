@@ -9,6 +9,7 @@ from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
 from .analysis import secondary_analyzer
 from .plots import (
     MANGO_DARK_GREEN,
+    _plot_users_placeholder_fig,
     plot_bar_plotly,
     plot_gini_plotly,
     plot_users_plotly,
@@ -261,6 +262,7 @@ def server(input, output, session):
             y=[points.ys[0]],
             mode="markers",
             marker=dict(size=8, color=MANGO_DARK_GREEN),
+            hovertemplate=None,
             showlegend=False,
         )
 
@@ -294,25 +296,7 @@ def server(input, output, session):
             return plot_users_plotly(users_data)
         else:
             # Return empty plot if no hashtag selected
-            import plotly.graph_objects as go
-
-            fig = go.Figure()
-            fig.add_annotation(
-                x=0.5,
-                y=0.5,
-                text="Select a hashtag to see user distribution",
-                showarrow=False,
-                font=dict(size=16),
-                xref="paper",
-                yref="paper",
-            )
-            fig.update_layout(
-                template="plotly_white",
-                xaxis=dict(range=[0, 1]),
-                yaxis=dict(range=[0, 1]),
-                height=400,
-            )
-            return fig
+            return _plot_users_placeholder_fig()
 
     @render.text
     def tweets_title():
