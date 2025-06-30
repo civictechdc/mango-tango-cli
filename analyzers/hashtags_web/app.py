@@ -108,7 +108,7 @@ users_plot_panel = ui.card(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Select an account to show the number of times it used the selected hashtag.",
+            "Select a hashtag to show the number of times it was used by specific accounts.",
             placement="top",
         ),
     ),
