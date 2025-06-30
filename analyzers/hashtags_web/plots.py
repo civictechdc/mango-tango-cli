@@ -144,7 +144,7 @@ def _plot_hashtags_placeholder_fig():
     fig.add_annotation(
         x=0.5,
         y=0.5,
-        text="Click on line plot above to display<br>hashtags in that time window",
+        text="Select a time window on line plot above<br>hashtags in that time window",
         showarrow=False,
         font=dict(size=16),
         xref="paper",
@@ -234,7 +234,7 @@ def _plot_users_placeholder_fig():
     fig.add_annotation(
         x=0.5,
         y=0.5,
-        text="Select a hashtag to see user distribution",
+        text="Select a time window and a hashtag<br>to see user distribution",
         showarrow=False,
         font=dict(size=16),
         xref="paper",
