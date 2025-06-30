@@ -45,7 +45,7 @@ def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
     fig.update_layout(
         template="plotly_white",
         title="Concentration of hashtags over time",
-        xaxis_title="Time",
+        xaxis_title="Time window (start date)",
         yaxis_title="Hashtag Concentration<br>(Gini coefficient)",
         hovermode="x unified",
         showlegend=False,
@@ -119,7 +119,7 @@ def plot_bar_plotly(data_frame, selected_date=None, show_title=True):
     fig.update_layout(
         template="plotly_white",
         title=title,
-        xaxis_title="% all hashtags in the selected time period",
+        xaxis_title="% all hashtags in the selected time window",
         yaxis_title="",
         height=dynamic_height,
         margin=dict(l=0, r=50, t=10, b=50),
