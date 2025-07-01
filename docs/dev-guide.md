@@ -1,7 +1,9 @@
 # CIB 🥭 Development Guide
+
 Before contributing please refer to our [**Contributor Workflow**](#contributor-workflow)
 
 ## Application Design Overview
+
 The CIB 🥭 application is a terminal-based tool for performing data analysis and visualization. It is designed to be modular and extensible, allowing developers to contribute new analysis modules and visualization components while providing a consistent user experience around data import, preprocessing, and output generation.
 
 This design is motivated by a common pain point when moving from a data analysis script for private use to a tool that can be shared with others: A script for private consumption carries assumptions about the desired input and output data format and structure that are convenient to its author. When such a script is made available to others, debates on these aspects often arise. For a suite of analyses that this project aims to offer, if left decentralized, this debate can lead to inconsistent UX offerings across analyses, code duplication, and even bugs.
@@ -11,6 +13,7 @@ The architecture of the CIB 🥭 application is designed to address this problem
 ## Architecture Overview
 
 The application has three "domains":
+
 - The [**Core**](#core-domain) domain is responsible for workspace management, user flow, and integration of analysis runs and data import/export in a generic sense. It has three parts that correspond loosely to the MVC paradigm.
   - The [**Application**](#application) defines the workspace logic and exposes generic capabilities for importing and exporting data as well as analyses and dashboards. This is the "controller" part.
   - The [**Terminal Components**](#terminal-components) render the terminal interface and handle user input. This is the "view" part.
@@ -48,19 +51,19 @@ flowchart TD
 
 ### Application
 
-The Application lives [here](../app/__init__.py). It is responsible for defining and executing all capabilities of the application's workspace. Any extension or modification of the application's workspace capabilities should be done here.
+The Application [lives here](../app/__init__.py). It is responsible for defining and executing all capabilities of the application's workspace. Any extension or modification of the application's workspace capabilities should be done here.
 
 The application code should be free of specific storage implementation and be agnostic about the specifics of the terminal interface and the available analyzers.
 
 ### Terminal Components
 
-The Terminal Components live [here](../components/__init__.py). Their main responsibility is user flow, rendering the terminal interface, and handling user input.
+The Terminal Components [live here](../components/__init__.py). Their main responsibility is user flow, rendering the terminal interface, and handling user input.
 
 The user flow understandably depends on the set of capabilities offered by the [Application](#application), so an adjustment there may require an adjustment here.
 
 ### Storage IO
 
-The Storage IO lives [here](../storage/__init__.py). It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.
+The Storage IO [lives here](../storage/__init__.py). It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.
 
 ## Edge Domain
 
@@ -68,13 +71,13 @@ The Edge domain governs data import and export.
 
 ### Importers
 
-The Importers live [here](../importing/__init__.py). Each importer offers a new way to import data into the workspace. The importers should be agnostic about the available analyzers. However, the Importers currently provide a terminal user flow so that their options can be customized by the user—a necessity since each importer may expose different sets of options and may have different UX approaches for their configuration.
+The Importers [live here](../importing/__init__.py). Each importer offers a new way to import data into the workspace. The importers should be agnostic about the available analyzers. However, the Importers currently provide a terminal user flow so that their options can be customized by the user—a necessity since each importer may expose different sets of options and may have different UX approaches for their configuration.
 
 The importers eventually write data to a parquet file, whose path is provisioned by the application.
 
 ### Semantic Preprocessor
 
-The Semantic Preprocessor lives [here](../preprocessing/series_semantic.py). It defines all the column data semantics—a kind of type system that is used to guide the user in selecting the right columns for the right analysis. It is agnostic about the specific analyzers but does depend on them in a generic way—the available semantics exist to support the needs of analyzers and will be extended as necessary.
+The Semantic Preprocessor [lives here](../preprocessing/series_semantic.py). It defines all the column data semantics—a kind of type system that is used to guide the user in selecting the right columns for the right analysis. It is agnostic about the specific analyzers but does depend on them in a generic way—the available semantics exist to support the needs of analyzers and will be extended as necessary.
 
 ## Content Domain
 
@@ -99,6 +102,7 @@ The Primary Analyzer, the Secondary Analyzer, and the Web Presenter are all defi
 ### Contributing a New Analysis
 
 To contribute a new analysis, you should:
+
 - Think about what you need from the user as input and what you want to show the user as output.
 - Define a new Primary Analyzer interface and implementation. To start, you might want to output the exportable tables directly. However, as soon as you want to offer a dashboard or more elaborate sets of exportable outputs, you should consider outputting a more normalized set of tables in the Primary Analyzer and then define a Secondary Analyzer to produce the user-friendly outputs.
 
@@ -118,15 +122,18 @@ workable example.
 The `testing` module provides testers for the primary and
 secondary analyzer modules. See the [example](../analyzers/example/README.md) for further references.
 
-# Contributor Workflow
+## Contributor Workflow
 
-## Overview
+### Overview
+
 All changes should be made in a feature branch, merged into `develop`, and later merged into `main` for a new release.
 
-## Steps
+#### Steps
+
 1. **Create a Feature Branch**
    - Branch from `develop` using `feature/<name>` or `bugfix/<name>`.
    - Example:
+
      ```bash
      git checkout develop
      git pull origin develop
@@ -136,6 +143,7 @@ All changes should be made in a feature branch, merged into `develop`, and later
 2. **Make Changes & Push**
    - Commit changes with clear messages.
    - Push the branch.
+
      ```bash
      git add .
      git commit -m "Description of changes"
@@ -153,7 +161,8 @@ All changes should be made in a feature branch, merged into `develop`, and later
 5. **Release**
    - When develop is clean and ready for a new major release, we will merge `develop` into `main`.
 
-## Workflow Diagram
+### Workflow Diagram
+
 ```mermaid
 graph TD;
     A[Feature Branch] -->|Commit & Push| B[Pull Request];
@@ -161,11 +170,6 @@ graph TD;
     C -->|Release| D[Main Branch];
 ```
 
-
-
-
-
-# Questions, Comments, and Feedback
+## Questions, Comments, and Feedback
 
 Talk to us on the [Civic Tech DC Slack workspace](https://civictechdc.slack.com)!
-
