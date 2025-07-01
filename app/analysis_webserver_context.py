@@ -82,10 +82,10 @@ class AnalysisWebServerContext(BaseModel):
         shiny_app = App(
             ui=layout_manager.build_layout(),
             server=server_handler_manager.call_handlers,
-            debug=True,
+            debug=False,
         )
         app = Starlette(
-            debug=True,
+            debug=False,
             routes=[
                 Route("/", relay),
                 Mount("/dash", app=WSGIMiddleware(web_server), name="dash_app"),
