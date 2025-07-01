@@ -63,6 +63,7 @@ pytest analyzers/[analyzer_name]/test_*.py
 ### 3. Pull Request
 
 - Target `develop` branch
+- Use the template file `.github/PULL_REQUEST_TEMPALTE.md`
 - Include description of changes
 - Wait for CI/CD checks to pass
 - Address any review feedback
