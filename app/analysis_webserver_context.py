@@ -6,17 +6,17 @@ from a2wsgi import WSGIMiddleware
 from dash import Dash
 from flask import Flask, render_template
 from pydantic import BaseModel
-from shiny import App
+from shiny import App, ui
 from starlette.applications import Starlette
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
 from uvicorn import Config, Server
 
-from analyzers.hashtags_web.app import app_layout, server, set_df_global_state
 from context import WebPresenterContext
 
 from .analysis_context import AnalysisContext
 from .app_context import AppContext
+from .shiny import LayoutManager, ServerHandleManager
 
 
 class AnalysisWebServerContext(BaseModel):
@@ -30,25 +30,13 @@ class AnalysisWebServerContext(BaseModel):
         web_presenters = self.analysis_context.web_presenters
         project_name = self.analysis_context.project_context.display_name
         analyzer_name = self.analysis_context.display_name
-
-        async def relay(_):
-            return RedirectResponse("/shiny" if web_presenters[0].shiny else "/dash")
-
+        server_handler_manager = ServerHandleManager()
+        layout_manager = LayoutManager()
         web_server = Flask(
             __name__,
             template_folder=template_folder,
             static_folder=static_folder,
             static_url_path="/static",
-        )
-        wsgi_middleware = WSGIMiddleware(web_server)
-        shiny_app = App(ui=app_layout, server=server, debug=True)
-        app = Starlette(
-            debug=True,
-            routes=[
-                Route("/", relay),
-                Mount("/dash", app=wsgi_middleware, name="dash_app"),
-                Mount("/shiny", app=shiny_app, name="shiny_app"),
-            ],
         )
 
         @web_server.route("/")
@@ -78,16 +66,32 @@ class AnalysisWebServerContext(BaseModel):
                 store=self.app_context.storage,
                 temp_dir=temp_dir.name,
                 dash_app=dash_app,
-                shiny_app=shiny_app,
             )
             temp_dirs.append(temp_dir)
             result = presenter.factory(presenter_context)
 
-            if presenter.id == "hashtags_dashboard":
-                set_df_global_state(
-                    df_input=result["raw_dataframe"],
-                    df_output=result["hashtags_dataframe"],
-                )
+            if result is None or result.shiny is None:
+                continue
+
+            server_handler_manager.add(result.shiny.server_handler)
+            layout_manager.add(result.shiny.panel)
+
+        async def relay(_):
+            return RedirectResponse("/shiny" if web_presenters[0].shiny else "/dash")
+
+        shiny_app = App(
+            ui=layout_manager.build_layout(),
+            server=server_handler_manager.call_handlers,
+            debug=True,
+        )
+        app = Starlette(
+            debug=True,
+            routes=[
+                Route("/", relay),
+                Mount("/dash", app=WSGIMiddleware(web_server), name="dash_app"),
+                Mount("/shiny", app=shiny_app, name="shiny_app"),
+            ],
+        )
 
         try:
             config = Config(app, host="0.0.0.0", port=8050, log_level="error")

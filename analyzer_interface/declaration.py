@@ -1,6 +1,7 @@
-from typing import Callable
+from typing import Callable, Union
 
 from .context import (
+    FactoryOutputContext,
     PrimaryAnalyzerContext,
     SecondaryAnalyzerContext,
     WebPresenterContext,
@@ -69,7 +70,7 @@ class SecondaryAnalyzerDeclaration(SecondaryAnalyzerInterface):
 
 
 class WebPresenterDeclaration(WebPresenterInterface):
-    factory: Callable[["WebPresenterContext"], None]
+    factory: Callable[["WebPresenterContext"], Union[FactoryOutputContext, None]]
     shiny: bool
     server_name: str
 
