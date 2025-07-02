@@ -2,23 +2,24 @@ from functools import lru_cache
 
 import numpy as np
 import polars as pl
-from shiny import App, reactive, render, ui
+from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
 from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
 from .analysis import secondary_analyzer
 from .plots import plot_bar_plotly, plot_gini_plotly, plot_users_plotly
 
-MANGO_ORANGE2 = "#f3921e"
-LOGO_URL = "https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG"
-
 # https://icons.getbootstrap.com/icons/question-circle-fill/
 question_circle_fill = ui.HTML(
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill mb-1" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/></svg>'
 )
 
+df_global = None
+context_global = None
+df_raw = None
 
-def _set_df_global_state(df_input, df_output):
+
+def set_df_global_state(df_input, df_output):
     global df_global, df_raw
     df_global = df_output
     df_raw = df_input  # Will be loaded from context when needed
@@ -36,9 +37,6 @@ def get_raw_data_subset(time_start, time_end, user_id, hashtag):
 
 
 # Global variables for CLI integration
-df_global = None
-context_global = None
-df_raw = None
 
 
 def select_users(secondary_output, selected_hashtag):
@@ -152,46 +150,6 @@ tweet_explorer = ui.card(
     ),
     ui.output_text(id="tweets_title"),
     ui.output_data_frame("tweets"),
-)
-
-analysis_panel_elements = [
-    page_dependencies,
-    analysis_panel,
-    ui.layout_columns(
-        hashtag_plot_panel,
-        users_plot_panel,
-    ),
-    tweet_explorer,
-]
-
-
-ABOUT_TEXT = ui.markdown(
-    f"""
-
-<img src="{LOGO_URL}" alt="logo" style="width:200px;"/>
-
-CIB Mango Tree, a collaborative and open-source project to develop software that tests for coordinated inauthentic behavior (CIB) in datasets of online activity.
-
-[mangotree.org](https://mangotree.org)
-
-A project of [Civic Tech DC](https://www.civictechdc.org/), our mission is to share methods to uncover how disruptive actors seek to hack our legitimate online discourse regarding health, politics, and society. The CIB Mango Tree presents the most simple tests for CIB first – the low-hanging fruit. These tests are easy to run and interpret. They will reveal signs of unsophisticated CIB. As you move up the Mango Tree, tests become harder and will scavenge for higher-hanging fruit.
-
-"""
-)
-app_layout = ui.page_navbar(
-    ui.nav_panel(
-        "Dashboard",
-        analysis_panel_elements,
-    ),
-    ui.nav_panel(
-        "About",
-        ui.card(
-            ui.card_header("About the Mango Tree project"),
-            ABOUT_TEXT,
-            ui.card_footer("PolyForm Noncommercial License 1.0.0"),
-        ),
-    ),
-    title="Hashtag analysis dashboard",
 )
 
 
