@@ -178,7 +178,6 @@ class WebPresenterContext(BaseWebPresenterContext):
     web_presenter: WebPresenterInterface
     store: Storage
     dash_app: Dash
-    shiny_app: object = None
 
     class Config:
         arbitrary_types_allowed = True

@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from typing import Any, Callable, Optional, TypeVar, Union
 
 import polars as pl
 from dash import Dash
+from polars import DataFrame
 from pydantic import BaseModel
+from shiny import Inputs, Outputs, Session
+from shiny.ui._navs import NavPanel
 
 from .interface import SecondaryAnalyzerInterface
 from .params import ParamValue
@@ -155,3 +158,25 @@ class TableWriter(ABC):
         file to it.
         """
         pass
+
+
+ServerCallback = Union[
+    Callable[[Inputs], None], Callable[[Inputs, Outputs, Session], None]
+]
+
+
+class ShinyContext(BaseModel):
+    panel: NavPanel = None
+    server_handler: Optional[ServerCallback] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class FactoryOutputContext(BaseModel):
+    shiny: Optional[ShinyContext] = None
+    api: Optional[dict[str, Any]] = None
+    data_frames: Optional[dict[str, DataFrame]] = None
+
+    class Config:
+        arbitrary_types_allowed = True
