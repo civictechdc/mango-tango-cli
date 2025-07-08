@@ -15,7 +15,6 @@ We welcome contributions to the Mango Tango CLI project! This document provides 
 - [Code Review Process](#code-review-process)
 - [Release Process](#release-process)
 - [Getting Help](#getting-help)
-- [Recognition](#recognition)
 - [License](#license)
 
 ## Code of Conduct
@@ -299,7 +298,6 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 - **Slack**: Join the [Civic Tech DC Slack workspace](https://civictechdc.slack.com)
 - **Issues**: Use GitHub Issues for bug reports and feature requests
-- **Discussions**: Use GitHub Discussions for questions and general discussion
 
 ### AI Development Assistance
 
@@ -308,14 +306,6 @@ This project includes comprehensive AI assistant integration:
 - **Claude Code users**: See `CLAUDE.md` + Serena MCP integration
 - **Cursor users**: See `.cursorrules` + `.ai-context/`
 - **Other AI tools**: Start with `.ai-context/README.md`
-
-## Recognition
-
-Contributors will be recognized in:
-
-- Release notes for significant contributions
-- Project documentation
-- Community acknowledgments
 
 ## License
 
