@@ -2,7 +2,7 @@
 
 ## Project Context
 
-Mango Tango CLI is a Python terminal-based tool for social media data analysis with a modular analyzer system. See @docs/ai-context/README.md for comprehensive overview.
+Mango Tango CLI is a Python terminal-based tool for social media data analysis with a modular analyzer system. See @.ai-context/README.md for comprehensive overview.
 
 **Architecture**: Three-domain system (Core/Edge/Content) with context-based dependency injection
 **Tech Stack**: Python 3.12, Polars, Dash/Shiny, TinyDB, Parquet files
@@ -10,10 +10,10 @@ Mango Tango CLI is a Python terminal-based tool for social media data analysis w
 
 ## Key Documentation References
 
-- **Complete Context**: @docs/ai-context/README.md
-- **Architecture Deep Dive**: @docs/ai-context/architecture-overview.md
-- **Symbol Navigation**: @docs/ai-context/symbol-reference.md
-- **Development Setup**: @docs/ai-context/setup-guide.md
+- **Complete Context**: @.ai-context/README.md
+- **Architecture Deep Dive**: @.ai-context/architecture-overview.md
+- **Symbol Navigation**: @.ai-context/symbol-reference.md
+- **Development Setup**: @.ai-context/setup-guide.md
 - **Development Guide**: @docs/dev-guide.md
 
 ## Core Development Rules
@@ -137,9 +137,9 @@ python -m mangotango
 
 **For Claude Code users**: This project includes Serena MCP integration. Always start sessions with "Read the initial instructions" and see @CLAUDE.md for full guidance.
 
-**Context loading**: Reference @docs/ai-context/ files for efficient context without reading entire codebase.
+**Context loading**: Reference @.ai-context/ files for efficient context without reading entire codebase.
 
-**Symbol navigation**: Use semantic analysis tools when available, or reference @docs/ai-context/symbol-reference.md for precise code locations.
+**Symbol navigation**: Use semantic analysis tools when available, or reference @.ai-context/symbol-reference.md for precise code locations.
 
 ## External Dependencies
 

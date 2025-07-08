@@ -36,7 +36,7 @@ Before contributing, familiarize yourself with:
 
 - **Project Overview**: Read the [README.md](README.md) for basic information
 - **Architecture**: Review the [Development Guide](docs/dev-guide.md) for architectural understanding
-- **AI Documentation**: Check `docs/ai-context/` for comprehensive project context
+- **AI Documentation**: Check `.ai-context/` for comprehensive project context
 
 The Mango Tango CLI is a modular, extensible Python terminal application for social media data analysis with three main domains:
 
@@ -291,9 +291,9 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 ### Documentation
 
 - **Development Guide**: [docs/dev-guide.md](docs/dev-guide.md)
-- **AI Context Docs**: `docs/ai-context/` directory
-- **Architecture Overview**: `docs/ai-context/architecture-overview.md`
-- **Symbol Reference**: `docs/ai-context/symbol-reference.md`
+- **AI Context Docs**: `.ai-context/` directory
+- **Architecture Overview**: `.ai-context/architecture-overview.md`
+- **Symbol Reference**: `.ai-context/symbol-reference.md`
 
 ### Community Support
 
@@ -306,8 +306,8 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 This project includes comprehensive AI assistant integration:
 
 - **Claude Code users**: See `CLAUDE.md` + Serena MCP integration
-- **Cursor users**: See `.cursorrules` + `docs/ai-context/`
-- **Other AI tools**: Start with `docs/ai-context/README.md`
+- **Cursor users**: See `.cursorrules` + `.ai-context/`
+- **Other AI tools**: Start with `.ai-context/README.md`
 
 ## Recognition
 

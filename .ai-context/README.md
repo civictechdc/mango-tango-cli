@@ -92,9 +92,9 @@ Dependency injection through context objects:
 
 ### For Development
 
-1. **Setup**: See @docs/ai-context/setup-guide.md
-2. **Architecture**: See @docs/ai-context/architecture-overview.md  
-3. **Symbol Reference**: See @docs/ai-context/symbol-reference.md
+1. **Setup**: See @.ai-context/setup-guide.md
+2. **Architecture**: See @.ai-context/architecture-overview.md  
+3. **Symbol Reference**: See @.ai-context/symbol-reference.md
 4. **Development Guide**: See @docs/dev-guide.md
 
 ### For AI Assistants

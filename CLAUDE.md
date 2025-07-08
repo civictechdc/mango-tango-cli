@@ -14,23 +14,23 @@ This initializes Serena semantic analysis capabilities and loads project context
 
 ### Core Documentation
 
-- **Repository Overview**: @docs/ai-context/README.md
-- **Architecture Deep Dive**: @docs/ai-context/architecture-overview.md
-- **Symbol Reference**: @docs/ai-context/symbol-reference.md
-- **Setup Guide**: @docs/ai-context/setup-guide.md
+- **Repository Overview**: @.ai-context/README.md
+- **Architecture Deep Dive**: @.ai-context/architecture-overview.md
+- **Symbol Reference**: @.ai-context/symbol-reference.md
+- **Setup Guide**: @.ai-context/setup-guide.md
 - **Development Guide**: @docs/dev-guide.md
 
 ### Quick Context Loading
 
 ```markdown
 # Start with this for comprehensive context
-@docs/ai-context/README.md
+@.ai-context/README.md
 
 # For architectural understanding
-@docs/ai-context/architecture-overview.md
+@.ai-context/architecture-overview.md
 
 # For precise symbol navigation
-@docs/ai-context/symbol-reference.md
+@.ai-context/symbol-reference.md
 ```
 
 ## Serena MCP Integration
@@ -111,7 +111,7 @@ find_symbol("AppContext", include_body=True)
 ### Session Startup Checklist
 
 1. ✅ **Call `initial_instructions`**
-2. ✅ Load @docs/ai-context/README.md for project overview
+2. ✅ Load @.ai-context/README.md for project overview
 3. ✅ Check `.serena/memories/` for deep insights if needed
 4. ✅ Use semantic tools for code exploration
 5. ✅ Maintain context throughout development
@@ -169,12 +169,12 @@ read_memory("task_completion_checklist") # Before committing
 
 ```markdown
 # Core context (always load)
-@docs/ai-context/README.md
+@.ai-context/README.md
 
 # Task-specific context
-@docs/ai-context/symbol-reference.md      # For code navigation
-@docs/ai-context/architecture-overview.md # For system design
-@docs/ai-context/setup-guide.md          # For environment issues
+@.ai-context/symbol-reference.md      # For code navigation
+@.ai-context/architecture-overview.md # For system design
+@.ai-context/setup-guide.md          # For environment issues
 
 # Deep domain knowledge
 @.serena/memories/analyzer_architecture.md # For analyzer work
@@ -203,7 +203,7 @@ find_symbol("main_menu", include_body=True)
 
 ### Documentation Structure
 
-- **AI Context**: `docs/ai-context/` - Token-efficient documentation
+- **AI Context**: `.ai-context/` - Token-efficient documentation
 - **Development**: `docs/dev-guide.md` - Comprehensive development guide
 - **Serena Memories**: `.serena/memories/` - Semantic project knowledge
 
@@ -226,7 +226,7 @@ find_symbol("main_menu", include_body=True)
 
 ### Serena + Manual Documentation Bridge
 
-- **Manual docs** (`docs/ai-context/`) provide structured overviews
+- **Manual docs** (`.ai-context/`) provide structured overviews
 - **Serena memories** (`.serena/memories/`) provide deep semantic insights
 - **Both systems** complement each other for comprehensive understanding
 - **Symbol reference** links to actual code locations for navigation

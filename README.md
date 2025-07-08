@@ -37,15 +37,15 @@ This repository includes hybrid AI documentation enhanced with semantic code ana
 
 - **For Claude Code users**: See `CLAUDE.md` + Serena MCP integration
   - **Important**: Always start sessions with "Read the initial instructions"
-- **For Cursor users**: See `.cursorrules` + `docs/ai-context/`
-- **For other AI tools**: See `docs/ai-context/README.md`
+- **For Cursor users**: See `.cursorrules` + `.ai-context/`
+- **For other AI tools**: See `.ai-context/README.md`
 - **For deep semantic analysis**: Serena memories in `.serena/memories/`
 
 ### Quick Start for Contributors
 
 1. **Claude Code**: Start with "Read the initial instructions", then follow CLAUDE.md
 2. **Cursor**: Reference .cursorrules for quick setup
-3. **Other tools**: Begin with docs/ai-context/README.md
+3. **Other tools**: Begin with .ai-context/README.md
 
 The AI documentation provides:
 
