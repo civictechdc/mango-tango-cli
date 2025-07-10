@@ -111,7 +111,32 @@ def main(context: PrimaryAnalyzerContext):
 def tokenize(input: str, non_spaced=False) -> list[str]:
     """Generate words from input string."""
     if non_spaced:
-        return list(input)
+        # Define patterns for tokens that should be kept whole
+        latin_patterns = [
+            r'^@[a-zA-Z0-9_]+$',     # @mentions
+            r'^#[a-zA-Z0-9_]+$',     # #hashtags
+            r'^https?://[^\s]+$',    # URLs
+            r'^[a-zA-Z]+$',          # Latin script words
+        ]
+
+        # Split by spaces first to get natural word boundaries
+        space_tokens = input.split()
+
+        tokens = []
+        for token in space_tokens:
+            # Check if this token matches any Latin script pattern
+            is_latin = False
+            for pattern in latin_patterns:
+                if re.match(pattern, token):
+                    tokens.append(token)
+                    is_latin = True
+                    break
+
+            # If no Latin pattern matched, split into individual characters
+            if not is_latin:
+                tokens.extend(list(token))
+
+        return tokens
     else:
         return re.split(" +", input.lower())
 
