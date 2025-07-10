@@ -18,12 +18,18 @@ from .interface import (
     OUTPUT_MESSAGE,
     OUTPUT_MESSAGE_NGRAMS,
     OUTPUT_NGRAM_DEFS,
+    PARAM_NON_SPACED_TEXT,
 )
 
 
 def main(context: PrimaryAnalyzerContext):
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
+    
+    # Get the non_spaced_text parameter from the context
+    non_spaced_text_param = context.params.get(PARAM_NON_SPACED_TEXT)
+    assert isinstance(non_spaced_text_param, bool), "Non-spaced text parameter must be a boolean"
+    
     with ProgressReporter("Preprocessing messages"):
         df_input = df_input.with_columns(
             (pl.int_range(pl.len()) + 1).alias(COL_MESSAGE_SURROGATE_ID)
@@ -42,7 +48,7 @@ def main(context: PrimaryAnalyzerContext):
             num_rows = df_input.height
             current_row = 0
             for row in df_input.iter_rows(named=True):
-                tokens = tokenize(row[COL_MESSAGE_TEXT])
+                tokens = tokenize(row[COL_MESSAGE_TEXT], non_spaced_text_param)
                 for ngram in ngrams(tokens, 3, 5):
                     serialized_ngram = serialize_ngram(ngram)
                     if serialized_ngram not in ngrams_by_id:
@@ -100,9 +106,12 @@ def main(context: PrimaryAnalyzerContext):
         )
 
 
-def tokenize(input: str) -> list[str]:
+def tokenize(input: str, non_spaced=False) -> list[str]:
     """Generate words from input string."""
-    return re.split(" +", input.lower())
+    if non_spaced:
+        return list(input)
+    else:
+        return re.split(" +", input.lower())
 
 
 def ngrams(tokens: list[str], min: int, max: int):

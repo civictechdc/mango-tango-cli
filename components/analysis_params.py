@@ -8,6 +8,7 @@ from analyzer_interface import (
     IntegerParam,
     ParamValue,
     TimeBinningValue,
+    BooleanParam
 )
 from app import ProjectContext
 from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
@@ -151,6 +152,8 @@ def edit_param(state: ParamState) -> ParamValue | None:
         return edit_int_param(param_type, current_value)
     if param_type.type == "time_binning":
         return edit_time_binning_param(current_value)
+    if param_type.type == "boolean":
+        return edit_bool_param(state.param_spec.human_readable_name, current_value)
     raise ValueError("Unsupported parameter type")
 
 
@@ -195,3 +198,11 @@ def edit_time_binning_param(
         return None
 
     return TimeBinningValue(unit=unit, amount=amount)
+def edit_bool_param(param_name: str, current_value: bool | None):
+    options = [
+        ("True",True),
+        ("False", False)
+    ]
+    print(param_name)
+    print(current_value)
+    return prompts.list_input(param_name,choices=options)

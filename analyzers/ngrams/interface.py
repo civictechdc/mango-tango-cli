@@ -2,6 +2,8 @@ from analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,
+    AnalyzerParam,
+    BooleanParam,
     InputColumn,
     OutputColumn,
 )
@@ -15,6 +17,8 @@ COL_NGRAM_ID = "ngram_id"
 COL_NGRAM_WORDS = "words"
 COL_NGRAM_LENGTH = "n"
 COL_MESSAGE_TIMESTAMP = "timestamp"
+
+PARAM_NON_SPACED_TEXT = "non_spaced_text"
 
 OUTPUT_MESSAGE_NGRAMS = "message_ngrams"
 OUTPUT_NGRAM_DEFS = "ngrams"
@@ -89,6 +93,22 @@ the corpus of text, and whether certain authors use these sequences more often.
             ),
         ]
     ),
+    params=[
+        AnalyzerParam(
+            id=PARAM_NON_SPACED_TEXT,
+            human_readable_name="Non-spaced Text Processing",
+            description="""
+Enable this for languages without spaces between words (e.g., Chinese, Japanese, Thai).
+When enabled, each character is treated as a separate token instead of splitting on spaces.
+This is essential for proper n-gram analysis of non-spaced writing systems.
+
+For most Western languages (English, Spanish, French, etc.), leave this disabled.
+For East Asian languages and other non-spaced scripts, enable this option.
+            """,
+            type=BooleanParam(),
+            default=False,
+        )
+    ],
     outputs=[
         AnalyzerOutput(
             id=OUTPUT_MESSAGE_NGRAMS,

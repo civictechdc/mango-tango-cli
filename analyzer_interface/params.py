@@ -87,6 +87,15 @@ class TimeBinningValue(BaseModel):
         raise ValueError("Invalid time binning value")
 
 
-ParamType = Union[TimeBinningParam, IntegerParam]
+class BooleanParam(BaseModel):
+    """
+    Represents a boolean value
 
-ParamValue = Union[TimeBinningValue, int]
+    The corresponding value will be of type `bool`.
+    """
+
+    type: Literal["boolean"] = "boolean"
+
+ParamType = Union[TimeBinningParam, IntegerParam, BooleanParam]
+
+ParamValue = Union[TimeBinningValue, int, bool]
