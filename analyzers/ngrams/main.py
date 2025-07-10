@@ -25,11 +25,13 @@ from .interface import (
 def main(context: PrimaryAnalyzerContext):
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
-    
+
     # Get the non_spaced_text parameter from the context
     non_spaced_text_param = context.params.get(PARAM_NON_SPACED_TEXT)
-    assert isinstance(non_spaced_text_param, bool), "Non-spaced text parameter must be a boolean"
-    
+    assert isinstance(
+        non_spaced_text_param, bool
+    ), "Non-spaced text parameter must be a boolean"
+
     with ProgressReporter("Preprocessing messages"):
         df_input = df_input.with_columns(
             (pl.int_range(pl.len()) + 1).alias(COL_MESSAGE_SURROGATE_ID)

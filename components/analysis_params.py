@@ -5,10 +5,10 @@ from pydantic import BaseModel
 from analyzer_interface import (
     AnalyzerInterface,
     AnalyzerParam,
+    BooleanParam,
     IntegerParam,
     ParamValue,
     TimeBinningValue,
-    BooleanParam
 )
 from app import ProjectContext
 from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
@@ -198,11 +198,10 @@ def edit_time_binning_param(
         return None
 
     return TimeBinningValue(unit=unit, amount=amount)
+
+
 def edit_bool_param(param_name: str, current_value: bool | None):
-    options = [
-        ("True",True),
-        ("False", False)
-    ]
+    options = [("True", True), ("False", False)]
     print(param_name)
     print(current_value)
-    return prompts.list_input(param_name,choices=options)
+    return prompts.list_input(param_name, choices=options)

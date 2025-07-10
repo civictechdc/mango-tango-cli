@@ -96,6 +96,7 @@ class BooleanParam(BaseModel):
 
     type: Literal["boolean"] = "boolean"
 
+
 ParamType = Union[TimeBinningParam, IntegerParam, BooleanParam]
 
 ParamValue = Union[TimeBinningValue, int, bool]
