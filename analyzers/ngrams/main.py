@@ -113,10 +113,10 @@ def tokenize(input: str, non_spaced=False) -> list[str]:
     if non_spaced:
         # Define patterns for tokens that should be kept whole
         latin_patterns = [
-            r'^@[a-zA-Z0-9_]+$',     # @mentions
-            r'^#[a-zA-Z0-9_]+$',     # #hashtags
-            r'^https?://[^\s]+$',    # URLs
-            r'^[a-zA-Z]+$',          # Latin script words
+            r"^@[a-zA-Z0-9_]+$",  # @mentions
+            r"^#[a-zA-Z0-9_]+$",  # #hashtags
+            r"^https?://[^\s]+$",  # URLs
+            r"^[a-zA-Z]+$",  # Latin script words
         ]
 
         # Split by spaces first to get natural word boundaries
