@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { PresenterCollection } from '@/lib/data/presenters';
+import type { PresenterCollection } from '@/lib/types/presenters';
 
 interface GlobalPresentersState {
     presenters: PresenterCollection;

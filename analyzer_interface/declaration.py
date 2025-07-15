@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable
 
 from .context import (
     PrimaryAnalyzerContext,
@@ -70,7 +70,7 @@ class SecondaryAnalyzerDeclaration(SecondaryAnalyzerInterface):
 
 class WebPresenterDeclaration(WebPresenterInterface):
     factory: Callable[["WebPresenterContext"], None]
-    api_factory: Callable[["WebPresenterContext"], None]
+    api_factory: Callable[["WebPresenterContext", dict[str, Any]], None]
 
     server_name: str
 

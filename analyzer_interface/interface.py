@@ -208,7 +208,9 @@ class InputColumn(Column):
 
 
 class OutputColumn(Column):
-    pass
+    api_name: Optional[str] = None
+    api_field: Optional[str] = None
+    dict_field: Optional[str] = None
 
 
 def backfill_param_values(
