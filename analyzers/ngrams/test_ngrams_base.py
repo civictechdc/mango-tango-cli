@@ -4,7 +4,7 @@ from pathlib import Path
 from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from testing import CsvTestData, ParquetTestData, test_primary_analyzer
 
-from .interface import (
+from .ngrams_base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
     COL_MESSAGE_TEXT,
@@ -14,7 +14,7 @@ from .interface import (
     OUTPUT_NGRAM_DEFS,
     interface,
 )
-from .main import main, ngrams, serialize_ngram, tokenize
+from .ngrams_base.main import main, ngrams, serialize_ngram, tokenize
 from .test_data import test_data_dir
 
 TEST_CSV_FILENAME = "ngrams_test_input.csv"
