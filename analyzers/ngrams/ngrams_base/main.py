@@ -63,7 +63,7 @@ def main(context: PrimaryAnalyzerContext):
         (
             pl.DataFrame(df_ngram_instances)
             .group_by(COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID)
-            .agg(pl.count().alias(COL_MESSAGE_NGRAM_COUNT))
+            .agg(pl.len().alias(COL_MESSAGE_NGRAM_COUNT))
             .sort(by=[COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
             .write_parquet(context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path)
         )
