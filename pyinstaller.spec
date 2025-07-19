@@ -8,7 +8,7 @@ import sys
 import os
 
 
-shiny = os.path.abspath("./venv/Lib/site-packages/shiny")
+site_packages_path = sys.path[-1]
 block_cipher = None
 
 a = Analysis(
@@ -26,8 +26,8 @@ a = Analysis(
         *copy_metadata('readchar'),
 
         # static assets for web servers
-        ('venv/lib/python3.12/site-packages/shiny/www', 'shiny/www'),
-        ('venv/lib/python3.12/site-packages/htmltools/deps', 'htmltools/deps'),
+        (os.path.join(site_packages_path, 'shiny/www'), 'shiny/www'),
+        (os.path.join(site_packages_path, 'htmltools/deps'), 'htmltools/deps'),
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates', 'app/web_templates')
     ],
