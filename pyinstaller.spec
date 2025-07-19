@@ -6,9 +6,10 @@ from PyInstaller.building.api import EXE,PYZ
 from PyInstaller.building.build_main import Analysis
 import sys
 import os
+import site
 
 
-site_packages_path = sys.path[-1]
+site_packages_path = site.getsitepackages()[0]
 block_cipher = None
 
 a = Analysis(
