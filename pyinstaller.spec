@@ -26,7 +26,8 @@ a = Analysis(
         *copy_metadata('readchar'),
 
         # static assets for web servers
-        (shiny, 'shiny'),
+        ('venv/lib/python3.12/site-packages/shiny/www', 'shiny/www'),
+        ('venv/lib/python3.12/site-packages/htmltools/deps', 'htmltools/deps'),
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates', 'app/web_templates')
     ],
@@ -35,13 +36,36 @@ a = Analysis(
         'numpy',
         'numpy.core.multiarray',
         'shiny',
+        'shiny.ui',
+        'shiny.server',
+        'htmltools',
         'starlette',
-        'uvicorn'
+        'uvicorn',
+        'uvicorn.logging',
+        'uvicorn.loops',
+        'uvicorn.loops.auto',
+        'uvicorn.protocols',
+        'uvicorn.protocols.http',
+        'uvicorn.protocols.http.auto',
+        'uvicorn.protocols.websockets',
+        'uvicorn.protocols.websockets.auto',
+        'uvicorn.lifespan',
+        'uvicorn.lifespan.on',
+        'asyncio',
+        'websockets',
+        'websockets.legacy',
+        'websockets.legacy.server',
+        'polars',
+        'plotly',
+        'linkify_it',
+        'markdown_it',
+        'mdit_py_plugins',
+        'mdurl',
+        'uc_micro',
     ],  # Include any imports that PyInstaller might miss
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
-    collect_all=['shiny', 'starlette']
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
