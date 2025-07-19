@@ -36,7 +36,7 @@ a = Analysis(
 
         # static assets for web servers
         (os.path.join(site_packages_path, 'shiny/www'), 'shiny/www'),
-        (os.path.join(site_packages_path, 'shinywidgets/static'), 'shinywidgets/static')
+        (os.path.join(site_packages_path, 'shinywidgets/static'), 'shinywidgets/static'),
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates', 'app/web_templates')
     ],
