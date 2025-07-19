@@ -30,12 +30,15 @@ a = Analysis(
     hiddenimports=[
         'readchar',
         'numpy',
-        'numpy.core.multiarray'
+        'numpy.core.multiarray',
+        'shiny',
+        'starlette',
+        'uvicorn'
     ],  # Include any imports that PyInstaller might miss
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
-    collect_all=['shiny']
+    collect_all=['shiny', 'starlette']
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
