@@ -17,6 +17,9 @@ for site_path in site.getsitepackages():
     site_packages_path = site_path
     break
 
+if site_packages_path is None:
+  raise RuntimeError("The site-packages directory could not be found. Please setup the python envrionment correctly and try again...")
+
 a = Analysis(
     ['mangotango.py'],  # Entry point
     pathex=['.'],    # Ensure all paths are correctly included
@@ -33,6 +36,7 @@ a = Analysis(
 
         # static assets for web servers
         (os.path.join(site_packages_path, 'shiny/www'), 'shiny/www'),
+        (os.path.join(site_packages_path, 'shinywidgets/static'), 'shinywidgets/static')
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates', 'app/web_templates')
     ],
