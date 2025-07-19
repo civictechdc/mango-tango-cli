@@ -34,7 +34,8 @@ a = Analysis(
     ],  # Include any imports that PyInstaller might miss
     hookspath=[],
     runtime_hooks=[],
-    excludes=[]
+    excludes=[],
+    collect_all=['shiny']
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
