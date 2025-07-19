@@ -9,8 +9,13 @@ import os
 import site
 
 
-site_packages_path = site.getsitepackages()[0]
+site_packages_path = None
 block_cipher = None
+
+for site_path in site.getsitepackages():
+  if 'site-packages' in site_path:
+    site_packages_path = site_path
+    break
 
 a = Analysis(
     ['mangotango.py'],  # Entry point
