@@ -7,6 +7,8 @@ from PyInstaller.building.build_main import Analysis
 import sys
 import os
 
+
+shiny = os.path.abspath("./venv/Lib/site-packages/shiny")
 block_cipher = None
 
 a = Analysis(
@@ -24,6 +26,7 @@ a = Analysis(
         *copy_metadata('readchar'),
 
         # static assets for web servers
+        (shiny, 'shiny'),
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates', 'app/web_templates')
     ],
