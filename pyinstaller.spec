@@ -28,7 +28,6 @@ a = Analysis(
 
         # static assets for web servers
         (os.path.join(site_packages_path, 'shiny/www'), 'shiny/www'),
-        (os.path.join(site_packages_path, 'htmltools/deps'), 'htmltools/deps'),
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates', 'app/web_templates')
     ],
