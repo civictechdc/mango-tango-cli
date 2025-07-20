@@ -1,3 +1,4 @@
+from asyncio import exceptions as asyncio_exceptions
 from os import path
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -98,6 +99,9 @@ class AnalysisWebServerContext(BaseModel):
             uvi_server = Server(config)
 
             uvi_server.run()
+
+        except asyncio_exceptions.CancelledError:
+            pass
 
         except Exception as err:
             print(err)
