@@ -6,7 +6,7 @@ from a2wsgi import WSGIMiddleware
 from dash import Dash
 from flask import Flask, render_template
 from pydantic import BaseModel
-from shiny import App, ui
+from shiny import App
 from starlette.applications import Starlette
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
@@ -77,7 +77,6 @@ class AnalysisWebServerContext(BaseModel):
             layout_manager.add(result.shiny.panel)
 
         async def relay(_):
-            print(web_presenters[0])
             return RedirectResponse("/shiny" if web_presenters[0].shiny else "/dash")
 
         shiny_app = App(
