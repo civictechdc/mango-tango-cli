@@ -1,4 +1,3 @@
-from asyncio import exceptions as asyncio_exceptions
 from os import path
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -78,6 +77,7 @@ class AnalysisWebServerContext(BaseModel):
             layout_manager.add(result.shiny.panel)
 
         async def relay(_):
+            print(web_presenters[0])
             return RedirectResponse("/shiny" if web_presenters[0].shiny else "/dash")
 
         shiny_app = App(
@@ -100,7 +100,7 @@ class AnalysisWebServerContext(BaseModel):
 
             uvi_server.run()
 
-        except asyncio_exceptions.CancelledError:
+        except KeyboardInterrupt:
             pass
 
         except Exception as err:
