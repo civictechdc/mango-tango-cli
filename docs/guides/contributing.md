@@ -1,17 +1,18 @@
+Before following this workflow please refer to our [**Getting Started**](./get-started.md) page for instructions on installing dependencies and setting up your development environment.
+
 # Contributor Workflow
 
 ## Overview
+
 All changes should be made in a feature branch, merged into `develop`, and later merged into `main` for a new release.
 
-## Seting up your development environment
-
-Coming soon!
-
 ## Contributing new changes
+
 1. **Create a Feature Branch**
    - Branch from `develop` using `feature/<name>` or `bugfix/<name>`.
    - Example:
-     ```bash
+
+     ```shell
      git checkout develop
      git pull origin develop
      git checkout -b feature/new-feature
@@ -20,7 +21,8 @@ Coming soon!
 2. **Make Changes & Push**
    - Commit changes with clear messages.
    - Push the branch.
-     ```bash
+
+     ```shell
      git add .
      git commit -m "Description of changes"
      git push origin feature/new-feature
@@ -38,6 +40,7 @@ Coming soon!
    - When develop is clean and ready for a new major release, we will merge `develop` into `main`.
 
 ## Workflow Diagram
+
 ```mermaid
 graph TD;
     A[Feature Branch] -->|Commit & Push| B[Pull Request];

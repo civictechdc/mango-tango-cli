@@ -1,104 +1,150 @@
-# Getting Started
+# Mango Tango CLI
 
-## Requirements
-- Python (3.12)
-- Node.JS (20.0.0 or above)
-- Git (latest version)
+## Repository Overview
 
-## Setting up
-If you haven't installed git, node.js, and python yet refer to the following links to start installing said packages:
-- [https://codefinity.com/blog/A-step-by-step-guide-to-Git-installation](https://codefinity.com/blog/A-step-by-step-guide-to-Git-installation)
-- [https://nodejs.org/en/download](https://nodejs.org/en/download)
-- [https://realpython.com/installing-python/](https://realpython.com/installing-python/)
+**Mango Tango CLI** is a Python terminal-based tool for social media data
+analysis and visualization. It provides a modular, extensible architecture
+that separates core application logic from analysis modules, ensuring
+consistent UX while allowing easy contribution of new analyzers.
+The following documentation in this section is meant to provide a
+general overview of how the codebase for the project is structured,
+and to provide some context on patterns used throughout the project.
 
-If you're not sure which packages you already have installed on your system, the following commands can be used to figure what packages you already installed:
+### Purpose & Domain
 
-#### Linux & Mac OS
-```shell
-which <program_name_here>
-```
+- **Social Media Analytics**: Hashtag analysis, n-gram analysis, temporal
+  patterns, user coordination
+- **Modular Architecture**: Clear separation between data import/export,
+  analysis, and presentation
+- **Interactive Workflows**: Terminal-based UI with web dashboard capabilities
+- **Extensible Design**: Plugin-like analyzer system for easy expansion
 
-#### Windows
-```shell
-where.exe python
-```
+### Tech Stack
 
-## Setting Up Environment
-Next step is to create the virtual environment at `venv` using the following command
+- **Core**: Python 3.12, Inquirer (CLI), TinyDB (metadata), Starlette & Uvicorn (web-server)
+- **Data**: Polars/Pandas, PyArrow, Parquet files
+- **Web**: Dash, Shiny for Python, Plotly, React
+- **Dev Tools**: Black, isort, pytest, PyInstaller
 
-```shell
-python -m venv venv
-```
+## Semantic Code Structure
 
-Once the virtual environment with `venv` is created the next can be used to active the environment
+### Entry Points
 
-- Activate the virtual environment after creating the `venv` directory:
-  - Bash (Linux / Mac OS): `source ./venv/bin/activate`
-  - PS1 (Windows): `./env/bin/Activate.ps1`
+- `mangotango.py` - Main application bootstrap
+- `python -m mangotango` - Standard execution command
 
+### Core Architecture (MVC-like)
 
-- Run the bootstrap script for your shell environment:
-  - Bash (Linux / Mac OS): `./bootstrap.sh`
-  - PS1 (Windows): `./bootstrap.ps1`
+- **Application Layer** (`app/`): Workspace logic, analysis orchestration
+- **View Layer** (`components/`): Terminal UI components using inquirer
+- **Model Layer** (`storage/`): Data persistence, project/analysis models
 
-This will install the required dependencies for project development.
+### Domain Separation
 
-## Starting Services
+1. **Core Domain**: Application, Terminal Components, Storage IO
+2. **Edge Domain**: Data import/export (`importing/`), preprocessing
+3. **Content Domain**: Analyzers (`analyzers/`), web presenters
 
-### Starting CLI App
-```shell
-python -m mangotango
-```
+### Key Data Flow
 
-### Starting the Development Server for The Dashboards
-```shell
-cd ./app/web_templates
-npm run dev
-```
+1. Import (CSV/Excel) → Parquet → Semantic preprocessing
+2. Primary Analysis → Secondary Analysis → Web Presentation
+3. Export → User-selected formats (XLSX, CSV, etc.)
 
-It should be noted that running the development server is only required if you're working on the dashboard while debug mode is enabled for the CLI app web server. Setting the environment variable `FLASK_DEBUG` to `1` in your shell environment is enough to put the server into debug mode. For example:
+## Key Concepts
 
-#### Linux & Mac OS
-```shell
-export FLASK_DEBUG=1
-```
+### Analyzer System
 
-#### Windows
-```shell
-$env:FLASK_DEBUG = "1"
-```
+- **Primary Analyzers**: Core data processing (hashtags, ngrams, temporal)
+- **Secondary Analyzers**: User-friendly output transformation
+- **Web Presenters**: Interactive dashboards using Dash/Shiny/React
+  (Also used for providing data to backend APIs)
+- **Interface Pattern**: Declarative input/output schema definitions
 
-## Version Management
-If you already have Python and Node.JS installed but are on different versions from the versions outlined in the [requirements](#requirements) above you can switch to the correct versions for both languages for the project using version managers. The version manager for python is [pyenv](https://github.com/pyenv/pyenv). Where the version manager that is recommended for Node is [nvm](https://github.com/nvm-sh/nvm). Guides for installing both version managers are linked down below if you need references to go off of
+### Context Pattern
 
-- [https://www.freecodecamp.org/news/node-version-manager-nvm-install-guide/](https://www.freecodecamp.org/news/node-version-manager-nvm-install-guide/)
-- [https://github.com/pyenv/pyenv?tab=readme-ov-file#installation](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation)
-- [https://github.com/pyenv-win/pyenv-win?tab=readme-ov-file#installation](https://github.com/pyenv-win/pyenv-win?tab=readme-ov-file#installation)(If you're on windows and want to install pyenv)
+Dependency injection through context objects:
 
-Once you have both version managers installed the following commands can be used to switch versions
+- `AppContext`: Application-wide dependencies
+- `ViewContext`: UI state and terminal context
+- `AnalysisContext`: Analysis execution environment
+- Analyzer contexts: File paths, preprocessing, app hooks
 
-### pyenv
-```shell
-pyenv install 3.12
-pyenv local 3.12
-```
+### Data Semantics
 
-### nvm
-```shell
-nvm install v21.0.0
-nvm use v21.0.0
-```
+- Column semantic types guide user in analysis selection
+- Preprocessing maps user data to expected analyzer inputs
+- Type-safe data models using Pydantic
 
-## Common Dependency Issues
-One common issue when installing the dependencies for python is the installation failing due to compatibility issues with the python package `pyarrow`. The compatibility issues are due to a version mismatch between pyarrow any python itself. To resolve this issue, you MUST be on version 3.12 for python. Refer to [commands above](#pyenv) to switch to the correct version.
+## Development Patterns
 
-Similarly, the installation for node dependencies has been known to fail for some developers due to a version mismatch caused by the underlying dependencies for the package `@glideapps/glide-data-grid`. However, getting around this issue is more straightforward with node packages. Running the installation command for node with the flag `--legacy-peer-deps` is enough for the installation to work if you run into this issue. The commands needed to run the installation manually are as such.
+### Code Organization
 
-```shell
-cd ./app/web_templates
-npm install --legacy-peer-deps
-```
+- Domain-driven module structure
+- Interface-first analyzer design  
+- Context-based dependency injection
+- Test co-location with implementation
 
+### Key Conventions
 
-# Next Steps
-Once you have everything installed and running without any problems, the next step is to check out the [Contributor Workflow](./contributing.md)
+- Black + isort formatting (enforced by pre-commit)
+- Type hints throughout (modern Python syntax)
+- Parquet for data persistence
+- Pydantic models for validation
+
+## Getting Started
+
+### For Development
+
+1. **Setup**: See [Setup Guide](./setup.md)
+2. **Contribution Workflow**: See [The Contribution Workflow Guide](./contributing.md)
+3. **Development Guide**: See [The Development Guide](./dev-guide.md)
+
+### For AI Assistants
+
+- **Claude Code users**: See [CLAUDE.md](../../CLAUDE.md) (includes Serena integration)
+- **Cursor users**: See [.cursorrules](../../.cursorrules)
+- **Deep semantic analysis**: Explore [.serena/memories/](https://github.com/civictechdc/mango-tango-cli/tree/develop/.serena/memories)
+
+### Quick References
+
+- **Commands**: [.serena/memories/suggested_commands.md](../../.serena/memories/suggested_commands.md)
+- **Style Guide**: [.serena/memories/code_style_conventions.md](../../.serena/memories/code_style_conventions.md)
+- **Task Checklist**: [.serena/memories/task_completion_checklist.md](../../.serena/memories/task_completion_checklist.md)
+
+## External Dependencies
+
+### Data Processing
+
+- `polars` - Primary data processing library
+- `pandas` - Secondary support for Plotly integration
+- `pyarrow` - Parquet file format support
+
+### Web Framework
+
+- `dash` - Interactive web dashboards
+- `shiny` - Python Shiny for modern web UIs
+- `plotly` - Visualization library
+- React - Stylized Interactive Dashboards for the end-user
+- Starlette - Web Framework for providing the dashboards and handling backend logic
+- Uvicorn - ASGI web-server that handles running the Starlette backend
+
+### CLI & Storage
+
+- `inquirer` - Interactive terminal prompts
+- `tinydb` - Lightweight JSON database
+- `platformdirs` - Cross-platform data directories
+
+### Development
+
+- `black` - Code formatter
+- `isort` - Import organizer
+- `pytest` - Testing framework
+- `pyinstaller` - Executable building
+
+## Project Status
+
+- **License**: PolyForm Noncommercial License 1.0.0
+- **Author**: CIB Mango Tree / Civic Tech DC
+- **Branch Strategy**: feature branches → develop → main
+- **CI/CD**: GitHub Actions for testing, formatting, builds
