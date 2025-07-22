@@ -5,7 +5,7 @@ import pyarrow.parquet as pq
 from analyzer_interface.context import SecondaryAnalyzerContext
 from terminal_tools import ProgressReporter
 
-from ..ngrams.interface import (
+from ..ngrams_base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
     COL_MESSAGE_NGRAM_COUNT,

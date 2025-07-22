@@ -35,7 +35,7 @@ def main(context: PrimaryAnalyzerContext):
             & (pl.col(COL_AUTHOR_ID) != "")
         )
 
-    with ProgressReporter("Generating n-grams") as progress:
+    with ProgressReporter("Detecting n-grams") as progress:
 
         def get_ngram_rows(ngrams_by_id: dict[str, int]):
             nonlocal progress
@@ -63,7 +63,8 @@ def main(context: PrimaryAnalyzerContext):
         (
             pl.DataFrame(df_ngram_instances)
             .group_by(COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID)
-            .agg(pl.count().alias(COL_MESSAGE_NGRAM_COUNT))
+            .agg(pl.len().alias(COL_MESSAGE_NGRAM_COUNT))
+            .sort(by=[COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
             .write_parquet(context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path)
         )
 

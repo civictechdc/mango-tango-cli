@@ -106,6 +106,11 @@ class ExcelTestData(FileTestData):
         return pl.read_excel(self.filepath)
 
 
+class ParquetTestData(FileTestData):
+    def _load_as_polars(self) -> pl.DataFrame:
+        return pl.read_parquet(self.filepath)
+
+
 class PolarsTestData(TestData):
     def __init__(self, df: pl.DataFrame):
         self.df = df
