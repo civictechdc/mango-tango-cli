@@ -6,7 +6,7 @@ from a2wsgi import WSGIMiddleware
 from dash import Dash
 from flask import Flask, render_template
 from pydantic import BaseModel
-from shiny import App, ui
+from shiny import App
 from starlette.applications import Starlette
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
@@ -98,6 +98,9 @@ class AnalysisWebServerContext(BaseModel):
             uvi_server = Server(config)
 
             uvi_server.run()
+
+        except KeyboardInterrupt:
+            pass
 
         except Exception as err:
             print(err)

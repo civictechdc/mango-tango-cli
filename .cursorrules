@@ -1,0 +1,189 @@
+# Mango Tango CLI - Cursor Rules
+
+## Project Context
+
+Mango Tango CLI is a Python terminal-based tool for social media data analysis with a modular analyzer system. See @.ai-context/README.md for comprehensive overview.
+
+**Architecture**: Three-domain system (Core/Edge/Content) with context-based dependency injection
+**Tech Stack**: Python 3.12, Polars, Dash/Shiny, TinyDB, Parquet files
+**Analysis Pipeline**: Data Import → Primary Analysis → Secondary Analysis → Web Presentation → Export
+
+## Key Documentation References
+
+- **Complete Context**: @.ai-context/README.md
+- **Architecture Deep Dive**: @.ai-context/architecture-overview.md
+- **Symbol Navigation**: @.ai-context/symbol-reference.md
+- **Development Setup**: @.ai-context/setup-guide.md
+- **Development Guide**: @docs/dev-guide.md
+
+## Core Development Rules
+
+### Code Style (Enforced by CI)
+
+- **Black** formatting required before all commits
+- **isort** import organization with black profile
+- **Type hints** using modern Python syntax (`list[str]` not `List[str]`)
+- **Pydantic models** for all data validation
+
+### Architecture Patterns
+
+- **Context Pattern**: Use dependency injection through context objects
+- **Interface-First**: Define analyzer interfaces before implementation
+- **Domain Separation**: Maintain clear boundaries between core/edge/content
+- **Parquet-Centric**: All analysis data flows through Parquet files
+
+### Analyzer Development
+
+- **Primary Analyzers**: Core data processing, output normalized results
+- **Secondary Analyzers**: Transform primary outputs to user-friendly formats
+- **Web Presenters**: Create interactive dashboards using Dash/Shiny
+- **Registration**: Add all new analyzers to `analyzers/__init__.py` suite
+
+### Testing Requirements
+
+- **Co-located Tests**: Place test files alongside implementation
+- **Test Data**: Include sample data in `test_data/` directories
+- **Pytest Framework**: Use pytest for all testing
+- **Integration Tests**: Test full analyzer workflows with real data
+
+## Symbol-Level Understanding
+
+### Key Entry Points
+
+- `mangotango.py` - Application bootstrap and initialization
+- `app/app.py:App` - Main application controller
+- `components/main_menu.py:main_menu()` - Terminal UI entry point
+- `analyzers/__init__.py:suite` - Analyzer registry
+
+### Core Classes
+
+- `App` (`app/app.py`:10) - Application orchestration
+- `Storage` (`storage/__init__.py`:60) - Data persistence and workspace management
+- `ViewContext` (`components/context.py`) - UI state management
+- `AnalysisContext` (`app/analysis_context.py`) - Analysis execution environment
+
+### Analyzer System
+
+- `AnalyzerInterface` (analyzer_interface/) - Base interface definitions
+- Primary analyzers in `analyzers/*/main.py:main()` functions
+- Secondary analyzers process primary outputs
+- Web presenters in `analyzers/*/factory.py:factory()` functions
+
+## Development Workflow
+
+### Branch Strategy
+
+- **Always branch from develop** (not main)
+- **Feature branches**: `feature/name`
+- **Bug fixes**: `bugfix/name`
+- **Pull requests target develop**
+
+### Pre-Commit Checklist
+
+```bash
+# Required before all commits
+isort .
+black .
+pytest  # Ensure tests pass
+```
+
+### Environment Setup
+
+```bash
+# Create and activate virtual environment
+python -m venv venv
+./bootstrap.sh  # macOS/Linux
+./bootstrap.ps1 # Windows
+
+# Run application
+python -m mangotango
+```
+
+## Common Commands
+
+### Development
+
+- `python -m mangotango` - Start application
+- `python -m mangotango --noop` - Test mode
+- `isort . && black .` - Format code
+- `pytest` - Run tests
+- `pytest analyzers/[name]/` - Test specific analyzer
+
+### Data Flow
+
+- **Import**: CSV/Excel → Parquet via importers
+- **Preprocess**: Apply column semantic mappings
+- **Analyze**: Primary → Secondary → Web presentation
+- **Export**: Results → XLSX/CSV/Parquet formats
+
+## File Organization
+
+### Core Modules
+
+- `app/` - Application layer (MVC controller)
+- `components/` - Terminal UI components (MVC view)
+- `storage/` - Data persistence (MVC model)
+- `analyzers/` - Analysis modules (content domain)
+- `importing/` - Data import modules (edge domain)
+
+### Configuration Files
+
+- `requirements.txt` - Production dependencies
+- `requirements-dev.txt` - Development dependencies
+- `pyproject.toml` - Tool configuration (isort, pytest)
+- `.github/workflows/` - CI/CD configuration
+
+## AI Assistant Compatibility Notes
+
+**For Claude Code users**: This project includes Serena MCP integration. Always start sessions with "Read the initial instructions" and see @CLAUDE.md for full guidance.
+
+**Context loading**: Reference @.ai-context/ files for efficient context without reading entire codebase.
+
+**Symbol navigation**: Use semantic analysis tools when available, or reference @.ai-context/symbol-reference.md for precise code locations.
+
+## External Dependencies
+
+### Data Processing
+
+- `polars==1.9.0` - Primary data processing (preferred over pandas)
+- `pydantic==2.9.1` - Data validation and type safety
+- `pyarrow==17.0.0` - Parquet file format support
+
+### Web Framework
+
+- `dash==2.18.1` - Interactive web dashboards
+- `shiny==1.4.0` - Modern web UI framework
+- `plotly==5.24.1` - Data visualization
+
+### CLI & Storage
+
+- `inquirer==3.4.0` - Interactive terminal prompts
+- `tinydb==4.8.0` - Lightweight JSON database
+- `platformdirs==4.3.6` - Cross-platform data directories
+
+## Quality Standards
+
+### Code Quality
+
+- Type hints required for all new functions
+- Docstrings for public APIs following Google style
+- Error handling with appropriate exception types
+- Logging using standard Python logging module
+
+### Performance
+
+- Use Polars for data processing (more efficient than pandas)
+- Parquet files for all data persistence (columnar efficiency)
+- Lazy evaluation where possible
+- Memory-conscious handling of large datasets
+
+### Security
+
+- No hardcoded secrets or API keys
+- Validate all user inputs using Pydantic
+- Secure file handling for user-provided data
+- Follow principle of least privilege for file operations
+
+## License Compliance
+
+**PolyForm Noncommercial License 1.0.0** - Non-commercial use only. Commercial licensing available from CIB Mango Tree.
