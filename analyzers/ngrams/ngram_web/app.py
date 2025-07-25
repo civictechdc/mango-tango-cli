@@ -276,7 +276,8 @@ def server(input, output, sessions):
             return "Showing summary data. Select a data point by clicking on the scatter plot above to show n-gram specific data."
         else:
             total_reps = len(filtered)
-            return f"Ngram: {filtered['N-gram content'][0]}, Nr. total repetitions: {total_reps}"
+            ngram_string = filtered["N-gram content"][0]
+            return f"Ngram: {ngram_string}, Nr. total repetitions: {total_reps}"
 
     @render.data_frame
     def data_viewer():
