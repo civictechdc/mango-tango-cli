@@ -1,11 +1,13 @@
-import numpy as np
 import plotly.graph_objects as go
 import polars as pl
 
-FS = 14
+FS = 16
+MANGO_DARK_GREEN = "#609949"
+MANGO_DARK_ORANGE = "#f3921e"
+LIGHT_BLUE = "#acd7e5"
 
 
-def plot_gini_plotly(df: pl.DataFrame, x_selected, smooth: bool = False):
+def plot_gini_plotly(df: pl.DataFrame, smooth: bool = False):
     """Create a plotly line plot with white theme"""
 
     y = df.select(pl.col("gini")).to_numpy().flatten()
@@ -20,6 +22,7 @@ def plot_gini_plotly(df: pl.DataFrame, x_selected, smooth: bool = False):
             y=y,
             mode="lines",
             name="Gini coefficient",
+            hovertemplate="<b>Gini:</b> %{y:.3f}<extra></extra>",
             line=dict(color="black", width=1.5),
         )
     )
@@ -33,20 +36,18 @@ def plot_gini_plotly(df: pl.DataFrame, x_selected, smooth: bool = False):
                 y=y2,
                 mode="lines",
                 name="Smoothed",
+                hovertemplate="<b>Gini (Smoothed):</b> %{y:.3f}<extra></extra>",
                 line=dict(color="orange", width=2),
-                opacity=0.8,
             )
         )
-
-    # Add vertical line for selected date (x_selected is now the datetime value directly)
-    fig.add_vline(x=x_selected, line_dash="dash", line_color="red", line_width=2)
 
     # Update layout with white theme
     fig.update_layout(
         template="plotly_white",
         title="Concentration of hashtags over time",
-        xaxis_title="Time",
-        yaxis_title="Gini coefficient",
+        xaxis_title="Time window (start date)",
+        yaxis_title="Hashtag Concentration<br>(Gini coefficient)",
+        hovermode="x unified",
         showlegend=False,
         height=300,
         margin=dict(l=50, r=50, t=50, b=50),
@@ -90,7 +91,7 @@ def plot_bar_plotly(data_frame, selected_date=None, show_title=True):
             x=percentages,
             y=hashtags,
             orientation="h",
-            marker_color="#609949",
+            marker_color=MANGO_DARK_GREEN,
             hovertemplate="<b>%{y}</b><br>%{x:.1f}% of all hashtags<extra></extra>",
             width=0.8,  # Fixed bar width
             text=hashtags,  # Add text labels on bars
@@ -118,10 +119,10 @@ def plot_bar_plotly(data_frame, selected_date=None, show_title=True):
     fig.update_layout(
         template="plotly_white",
         title=title,
-        xaxis_title="% all hashtags in the selected time period",
+        xaxis_title="% all hashtags in the selected time window",
         yaxis_title="",
         height=dynamic_height,
-        margin=dict(l=0, r=100, t=10, b=50),
+        margin=dict(l=0, r=50, t=10, b=50),
         showlegend=False,
     )
 
@@ -131,6 +132,29 @@ def plot_bar_plotly(data_frame, selected_date=None, show_title=True):
     )  # Extra space for text, x-axis on top
     fig.update_yaxes(
         categoryorder="array", categoryarray=hashtags, showticklabels=False
+    )
+
+    return fig
+
+
+def _plot_hashtags_placeholder_fig():
+    """Create a an empty placeholder figure for hashtags barplot"""
+    fig = go.Figure()
+
+    fig.add_annotation(
+        x=0.5,
+        y=0.5,
+        text="Select a time window on line plot above<br>hashtags in that time window",
+        showarrow=False,
+        font=dict(size=16),
+        xref="paper",
+        yref="paper",
+    )
+    fig.update_layout(
+        template="plotly_white",
+        xaxis=dict(range=[0, 1]),
+        yaxis=dict(range=[0, 1]),
+        height=400,
     )
 
     return fig
@@ -171,7 +195,7 @@ def plot_users_plotly(users_data):
             x=counts,
             y=users,
             orientation="h",
-            marker_color="#609949",
+            marker_color=MANGO_DARK_GREEN,
             hovertemplate="<b>%{y}</b><br>%{x} posts<extra></extra>",
             width=0.8,  # Fixed bar width
             text=users,  # Add text labels on bars
@@ -200,5 +224,27 @@ def plot_users_plotly(users_data):
         range=[0, max(counts) * 1.5], side="top"
     )  # Extra space for text, x-axis on top
     fig.update_yaxes(categoryorder="array", categoryarray=users, showticklabels=False)
+
+    return fig
+
+
+def _plot_users_placeholder_fig():
+    fig = go.Figure()
+
+    fig.add_annotation(
+        x=0.5,
+        y=0.5,
+        text="Select a time window and a hashtag<br>to see user distribution",
+        showarrow=False,
+        font=dict(size=16),
+        xref="paper",
+        yref="paper",
+    )
+    fig.update_layout(
+        template="plotly_white",
+        xaxis=dict(range=[0, 1]),
+        yaxis=dict(range=[0, 1]),
+        height=400,
+    )
 
     return fig

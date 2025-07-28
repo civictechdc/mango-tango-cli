@@ -1,13 +1,22 @@
 from functools import lru_cache
 
-import numpy as np
+import plotly.graph_objects as go
 import polars as pl
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
 from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
 from .analysis import secondary_analyzer
-from .plots import plot_bar_plotly, plot_gini_plotly, plot_users_plotly
+from .plots import (
+    MANGO_DARK_GREEN,
+    _plot_hashtags_placeholder_fig,
+    _plot_users_placeholder_fig,
+    plot_bar_plotly,
+    plot_gini_plotly,
+    plot_users_plotly,
+)
+
+LOGO_URL = "https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG"
 
 # https://icons.getbootstrap.com/icons/question-circle-fill/
 question_circle_fill = ui.HTML(
@@ -36,9 +45,6 @@ def get_raw_data_subset(time_start, time_end, user_id, hashtag):
     )
 
 
-# Global variables for CLI integration
-
-
 def select_users(secondary_output, selected_hashtag):
     users_df = (
         secondary_output.filter(pl.col("hashtags") == selected_hashtag)["users_all"]
@@ -58,27 +64,20 @@ page_dependencies = ui.tags.head(
 )
 
 # main panel showing the line plot
-analysis_panel = ui.accordion(
-    ui.accordion_panel(
-        "",
-        [
-            ui.card(
-                ui.card_header(
-                    "Full time scale analysis ",
-                    ui.tooltip(
-                        ui.tags.span(
-                            question_circle_fill,
-                            style="cursor: help; font-size: 14px;",
-                        ),
-                        "This analysis shows the gini coefficient over the entire dataset. Select specific timepoints below to explore narrow time windows.",
-                        placement="top",
-                    ),
-                ),
-                ui.input_checkbox("smooth_checkbox", "Show smoothed line", value=False),
-                output_widget("line_plot", height="300px"),
-            )
-        ],
-    )
+analysis_panel = ui.card(
+    ui.card_header(
+        "Full time window analysis ",
+        ui.tooltip(
+            ui.tags.span(
+                question_circle_fill,
+                style="cursor: help; font-size: 14px;",
+            ),
+            "This analysis shows the gini coefficient over the entire dataset. Select specific timepoints below to explore narrow time windows.",
+            placement="top",
+        ),
+    ),
+    ui.input_checkbox("smooth_checkbox", "Show smoothed line", value=False),
+    output_widget("line_plot", height="300px"),
 )
 
 # panel to show hashtag distributions
@@ -90,18 +89,12 @@ hashtag_plot_panel = ui.card(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Select a date to display the hashtags that users posted most frequently in the time period starting with that date.",
+            "Displayed are the hashtags that users posted most frequently in the time window starting with selected date.",
             placement="top",
         ),
     ),
-    ui.input_selectize(
-        id="date_picker",
-        label="Show hashtags for time period starting on:",
-        choices=[],  # Will be populated by reactive effect
-        selected=None,
-        width="100%",
-    ),
-    output_widget("bar_plot", height="1500px"),
+    ui.output_text(id="hashtag_card_info"),
+    output_widget("hashtag_bar_plot", height="1500px"),
     max_height="500px",
     full_screen=True,
 )
@@ -109,23 +102,23 @@ hashtag_plot_panel = ui.card(
 # panel to show hashtag count per user distribution
 users_plot_panel = ui.card(
     ui.card_header(
-        "Hashtag usage by users ",
+        "Hashtag usage by accounts ",
         ui.tooltip(
             ui.tags.span(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Select a user account to show the number of times it used a specific hashtag.",
+            "Select a hashtag to show the number of times it was used by specific accounts.",
             placement="top",
         ),
     ),
     ui.input_selectize(
         id="hashtag_picker",
-        label="Show users for hashtag:",
+        label="Show accounts that used hashtag:",
         choices=[],
         width="100%",
     ),
-    output_widget("user_plot", height="800px"),
+    output_widget("user_bar_plot", height="800px"),
     max_height="500px",
     full_screen=True,
 )
@@ -138,13 +131,13 @@ tweet_explorer = ui.card(
                 question_circle_fill,
                 style="cursor: help; font-size: 14px;",
             ),
-            "Inspect the posts containing the hashtag for the specific user in the selected time period.",
+            "Inspect the posts containing the hashtag for the specific user in the selected time window.",
             placement="top",
         ),
     ),
     ui.input_selectize(
         id="user_picker",
-        label="Show tweets for user:",
+        label="Show posts for account:",
         choices=[],
         width="100%",
     ),
@@ -173,6 +166,20 @@ def server(input, output, session):
             return df["timewindow_start"][1] - df["timewindow_start"][0]
         return None
 
+    def _get_timewindow_info_text():
+        """Format selected timewindow into a short info text for feedback"""
+        click_data = clicked_data.get()
+
+        if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
+            timewindow = get_selected_datetime()
+            time_step = get_time_step()
+            timewindow_end = timewindow + time_step
+            format_code = "%B %d, %Y"
+            dates_formatted = f"{timewindow.strftime(format_code)} - {timewindow_end.strftime(format_code)}"
+            return "Time window: " + dates_formatted
+        else:
+            return "Time window not available (select first)"
+
     @reactive.effect
     def populate_date_choices():
         """Populate date picker choices when data is loaded"""
@@ -191,24 +198,36 @@ def server(input, output, session):
         df = get_df()
         # Find the datetime that matches the formatted string
         for dt in df["timewindow_start"].to_list():
-            if dt.strftime("%B %d, %Y") == selected_formatted:
+            if dt.strftime("%Y-%m-%d %H:%M") == selected_formatted:
                 return dt
         return df["timewindow_start"].to_list()[0]  # fallback
 
+    # this will store line plot values when clicked
+    clicked_data = reactive.value(None)
+
     def get_selected_datetime():
-        return get_selected_datetime_cached(input.date_picker())
-
-    @reactive.calc
-    def selected_date():
-        df = get_df()
-        x_selected = df.with_columns(
-            sel=pl.col("timewindow_start") == input.date_picker()
-        ).select(pl.col("sel"))
-
-        return np.where(x_selected)[0].item()
+        """Get date value from when a line plot is clicked on"""
+        click_data = clicked_data.get()
+        if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
+            # Convert the clicked datetime to the format expected by get_selected_datetime_cached
+            clicked_datetime = click_data.xs[0]
+            if hasattr(clicked_datetime, "strftime"):
+                formatted_datetime = clicked_datetime.strftime("%Y-%m-%d %H:%M")
+                return get_selected_datetime_cached(formatted_datetime)
+            else:
+                # If it's already a string, use it directly
+                return get_selected_datetime_cached(clicked_datetime)
+        else:
+            # Return the first datetime as default
+            return get_df()["timewindow_start"][0]
 
     @reactive.calc
     def secondary_analysis():
+        # Only run analysis if user has clicked on line plot
+        click_data = clicked_data()
+        if not (click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0):
+            return None
+
         timewindow = get_selected_datetime()
         df = get_df()
         df_out2 = secondary_analyzer(df, timewindow)
@@ -216,7 +235,12 @@ def server(input, output, session):
 
     @reactive.effect
     def update_hashtag_choices():
-        hashtags = secondary_analysis()["hashtags"].to_list()
+        analysis_result = secondary_analysis()
+        if analysis_result is None:
+            hashtags = []
+        else:
+            hashtags = analysis_result["hashtags"].to_list()
+
         ui.update_selectize(
             "hashtag_picker",
             choices=hashtags,
@@ -226,11 +250,16 @@ def server(input, output, session):
 
     @reactive.effect
     def update_user_choices():
-        df_users = select_users(
-            secondary_analysis(), selected_hashtag=input.hashtag_picker()
-        ).sort("count", descending=True)
+        analysis_result = secondary_analysis()
+        selected_hashtag = input.hashtag_picker()
 
-        users = df_users["users_all"].to_list()
+        if analysis_result is None or not selected_hashtag:
+            users = []
+        else:
+            df_users = select_users(
+                analysis_result, selected_hashtag=selected_hashtag
+            ).sort("count", descending=True)
+            users = df_users["users_all"].to_list()
 
         ui.update_selectize(
             "user_picker",
@@ -239,60 +268,84 @@ def server(input, output, session):
             session=session,
         )
 
-    @render_widget
-    def line_plot():
-        selected_date = get_selected_datetime()
-        smooth_enabled = input.smooth_checkbox()
-        df = get_df()
-        return plot_gini_plotly(df=df, x_selected=selected_date, smooth=smooth_enabled)
+    # whenever line plot is clicked, update `click_reactive`
+    def on_point_click(trace, points, state):
+        clicked_data.set(points)
 
-    @render_widget
-    def bar_plot():
-        selected_date = get_selected_datetime()
-        return plot_bar_plotly(
-            data_frame=secondary_analysis(),
-            selected_date=selected_date,
-            show_title=False,
+        # Get the parent figure widget from the trace
+        fig_widget = trace.parent
+
+        # Remove existing red marker traces
+        traces_to_remove = []
+        for i, existing_trace in enumerate(fig_widget.data):
+            if (
+                hasattr(existing_trace, "marker")
+                and hasattr(existing_trace.marker, "color")
+                and existing_trace.marker.color == MANGO_DARK_GREEN
+            ):
+                traces_to_remove.append(i)
+
+        # Remove old red markers in reverse order
+        for i in reversed(traces_to_remove):
+            fig_widget.data = fig_widget.data[:i] + fig_widget.data[i + 1 :]
+
+        # Add new red marker at clicked point
+        fig_widget.add_scatter(
+            x=[points.xs[0]],
+            y=[points.ys[0]],
+            mode="markers",
+            marker=dict(size=8, color=MANGO_DARK_GREEN),
+            hoverinfo="skip",  # Disable hover for this marker
+            showlegend=False,
         )
 
     @render_widget
-    def user_plot():
+    def line_plot():
+        smooth_enabled = input.smooth_checkbox()
+
+        df = get_df()
+
+        fig = plot_gini_plotly(df=df, smooth=smooth_enabled)
+
+        fig_widget = go.FigureWidget(fig.data, fig.layout)
+        fig_widget.data[0].on_click(on_point_click)
+
+        return fig_widget
+
+    @render_widget
+    def hashtag_bar_plot():
+        analysis_result = secondary_analysis()
+
+        if analysis_result is not None:
+            selected_date = get_selected_datetime()
+            return plot_bar_plotly(
+                data_frame=analysis_result,
+                selected_date=selected_date,
+                show_title=False,
+            )
+        else:
+            # Return placeholder plot if no data clicked
+            return _plot_hashtags_placeholder_fig()
+
+    @render.text
+    def hashtag_card_info():
+        return _get_timewindow_info_text()
+
+    @render_widget
+    def user_bar_plot():
+        analysis_result = secondary_analysis()
         selected_hashtag = input.hashtag_picker()
-        if selected_hashtag:
-            users_data = select_users(secondary_analysis(), selected_hashtag)
+
+        if analysis_result is not None and selected_hashtag:
+            users_data = select_users(analysis_result, selected_hashtag)
             return plot_users_plotly(users_data)
         else:
             # Return empty plot if no hashtag selected
-            import plotly.graph_objects as go
-
-            fig = go.Figure()
-            fig.add_annotation(
-                x=0.5,
-                y=0.5,
-                text="Select a hashtag to see user distribution",
-                showarrow=False,
-                font=dict(size=16),
-                xref="paper",
-                yref="paper",
-            )
-            fig.update_layout(
-                template="plotly_white",
-                xaxis=dict(range=[0, 1]),
-                yaxis=dict(range=[0, 1]),
-                height=400,
-            )
-            return fig
+            return _plot_users_placeholder_fig()
 
     @render.text
     def tweets_title():
-        timewindow = get_selected_datetime()
-        time_step = get_time_step()
-        if time_step:
-            timewindow_end = timewindow + time_step
-            format_code = "%B %d, %Y"
-            dates_formatted = f"{timewindow.strftime(format_code)} - {timewindow_end.strftime(format_code)}"
-            return "Showing posts in time window: " + dates_formatted
-        return "Time window information not available"
+        return _get_timewindow_info_text()
 
     @render.data_frame
     def tweets():
@@ -319,4 +372,4 @@ def server(input, output, session):
 
         df_posts = df_posts.drop(pl.col(COL_AUTHOR_ID))
 
-        return render.DataGrid(df_posts, width="100%", filters=True)
+        return render.DataGrid(df_posts, width="100%")

@@ -3,6 +3,7 @@ from itertools import accumulate
 import polars as pl
 
 from analyzer_interface.context import PrimaryAnalyzerContext
+from terminal_tools import ProgressReporter
 
 from .interface import (
     COL_AUTHOR_ID,
@@ -54,14 +55,17 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
         r"(#\S+)"
     )  # fetch all hashtags based on `#` symbol
 
-    # if hashtag symbol is detected, extract with regex
-    if data_frame.select(has_hashtag_symbols).item():
-        df_input = data_frame.with_columns(extract_hashtags).filter(
-            pl.col(COL_POST) != []
-        )
+    with ProgressReporter("Gathering hashtags..."):
+        # if hashtag symbol is detected, extract with regex
+        if data_frame.select(has_hashtag_symbols).item():
+            df_input = data_frame.with_columns(extract_hashtags).filter(
+                pl.col(COL_POST) != []
+            )
 
-    else:  # otherwise, we assume str: "['hashtag1', 'hashtag2', ...]"
-        raise ValueError(f"The data in {COL_POST} column appear to have no hashtags.")
+        else:  # otherwise, we assume str: "['hashtag1', 'hashtag2', ...]"
+            raise ValueError(
+                f"The data in {COL_POST} column appear to have no hashtags."
+            )
 
     # select columns and sort by time in ascending order
     # (expected by .group_by_dynamic below)
@@ -69,27 +73,28 @@ def hashtag_analysis(data_frame: pl.DataFrame, every="1h") -> pl.DataFrame:
         pl.col(COL_TIME)
     )
 
-    # compute gini per timewindow
-    df_out = (
-        df_input.explode(pl.col(COL_POST))
-        .group_by_dynamic(
-            pl.col(COL_TIME), every=every, period=every, start_by="datapoint"
+    with ProgressReporter("Counting hashtags..."):
+        # compute gini per timewindow
+        df_out = (
+            df_input.explode(pl.col(COL_POST))
+            .group_by_dynamic(
+                pl.col(COL_TIME), every=every, period=every, start_by="datapoint"
+            )
+            .agg(
+                pl.col(COL_AUTHOR_ID).alias(OUTPUT_COL_USERS),
+                pl.col(COL_POST).alias(OUTPUT_COL_HASHTAGS),
+                pl.col(COL_POST).count().alias(OUTPUT_COL_COUNT),
+                pl.col(COL_POST)
+                .map_batches(gini, returns_scalar=True, return_dtype=pl.Float64)
+                .alias(OUTPUT_COL_GINI),
+            )
+            .with_columns(
+                pl.col(OUTPUT_COL_GINI)
+                .rolling_mean(window_size=SMOOTH_WINDOW_SIZE, center=True)
+                .alias(OUTPUT_COL_GINI + "_smooth")
+            )
+            .rename({COL_TIME: OUTPUT_COL_TIMESPAN})
         )
-        .agg(
-            pl.col(COL_AUTHOR_ID).alias(OUTPUT_COL_USERS),
-            pl.col(COL_POST).alias(OUTPUT_COL_HASHTAGS),
-            pl.col(COL_POST).count().alias(OUTPUT_COL_COUNT),
-            pl.col(COL_POST)
-            .map_batches(gini, returns_scalar=True, return_dtype=pl.Float64)
-            .alias(OUTPUT_COL_GINI),
-        )
-        .with_columns(
-            pl.col(OUTPUT_COL_GINI)
-            .rolling_mean(window_size=SMOOTH_WINDOW_SIZE, center=True)
-            .alias(OUTPUT_COL_GINI + "_smooth")
-        )
-        .rename({COL_TIME: OUTPUT_COL_TIMESPAN})
-    )
 
     # convert datetime back to string
     df_out = df_out.with_columns(
