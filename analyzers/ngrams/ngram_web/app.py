@@ -42,7 +42,7 @@ def plot_scatter(data):
     jitter_factor = 0.05
     data = data.with_columns(
         (
-            pl.col("total_reps")
+            pl.col(COL_NGRAM_TOTAL_REPS)
             * (1 + np.random.uniform(-jitter_factor, jitter_factor, len(data)))
         ).alias("total_reps_jittered")
     )
@@ -55,7 +55,7 @@ def plot_scatter(data):
         y="total_reps_jittered",
         log_y=True,
         log_x=True,
-        custom_data=["words", "ngram_id", "total_reps"],
+        custom_data=[COL_NGRAM_WORDS, COL_NGRAM_ID, COL_NGRAM_TOTAL_REPS],
         color="n",
         category_orders={"n": n_gram_categories},
     )
@@ -169,22 +169,30 @@ def server(input, output, sessions):
     def get_top_n_data():
         global data_stats
 
-        data_top_n = data_stats.select(
-            [
-                COL_NGRAM_WORDS,
-                COL_NGRAM_TOTAL_REPS,
-                COL_NGRAM_DISTINCT_POSTER_COUNT,
-                COL_NGRAM_LENGTH,
-            ]
-        ).rename(
-            {
-                COL_NGRAM_WORDS: "N-gram content",
-                COL_NGRAM_TOTAL_REPS: "Nr. total repetitions",
-                COL_NGRAM_DISTINCT_POSTER_COUNT: "Nr. unique posters",
-                COL_NGRAM_LENGTH: "N-gram length",
-            }
+        data_top_n = (
+            data_stats.select(
+                [
+                    COL_NGRAM_WORDS,
+                    COL_NGRAM_TOTAL_REPS,
+                    COL_NGRAM_DISTINCT_POSTER_COUNT,
+                    COL_NGRAM_LENGTH,
+                ]
+            )
+            .sort(
+                pl.col(COL_NGRAM_TOTAL_REPS),
+                pl.col(COL_NGRAM_DISTINCT_POSTER_COUNT),
+                descending=[True, True],
+            )
+            .rename(
+                {
+                    COL_NGRAM_WORDS: "N-gram content",
+                    COL_NGRAM_TOTAL_REPS: "Nr. total repetitions",
+                    COL_NGRAM_DISTINCT_POSTER_COUNT: "Nr. unique posters",
+                    COL_NGRAM_LENGTH: "N-gram length",
+                }
+            )
+            .head(100)
         )
-
         return data_top_n
 
     click_data = reactive.value(None)
@@ -273,7 +281,7 @@ def server(input, output, sessions):
         filtered = get_filtered_data()
 
         if filtered.is_empty():
-            return "Showing summary data. Select a data point by clicking on the scatter plot above to show n-gram specific data."
+            return "Showing summary (top 100 n-grams). Select a data point by clicking on the scatter plot above to show data for selected n-gram."
         else:
             total_reps = len(filtered)
             ngram_string = filtered["N-gram content"][0]
