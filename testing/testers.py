@@ -41,11 +41,26 @@ def test_primary_analyzer(
         input_path = os.path.join(actual_input_dir, "input.parquet")
         input.convert_to_parquet(input_path)
 
+        # Create input_columns mapping from interface and test data semantics
+        from testing.context import TestInputColumnProvider
+
+        input_columns = {}
+        for column_spec in interface.input.columns:
+            analyzer_column_name = column_spec.name
+            # For testing, we assume the user column name matches the analyzer column name
+            user_column_name = analyzer_column_name
+            semantic = input.semantics.get(analyzer_column_name)
+            if semantic:
+                input_columns[analyzer_column_name] = TestInputColumnProvider(
+                    user_column_name=user_column_name, semantic=semantic
+                )
+
         context = TestPrimaryAnalyzerContext(
             temp_dir=temp_dir,
             input_parquet_path=input_path,
             param_values=params,
             output_parquet_root_path=actual_output_dir,
+            input_columns=input_columns,
         )
         main(context)
 

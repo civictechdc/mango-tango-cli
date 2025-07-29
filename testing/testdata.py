@@ -21,7 +21,11 @@ class TestData(ABC, BaseModel):
             # Attempt to convert to parquet lazily if possible.
             lf = self._scan_as_polars()
             return self._transform(lf).sink_parquet(target_path)
-        except (NotImplementedError, pl.exceptions.InvalidOperationError):
+        except (
+            NotImplementedError,
+            pl.exceptions.InvalidOperationError,
+            pl.exceptions.PanicException,
+        ):
             # If the lazy conversion is not possible, load the data in full
             # # and convert it to parquet.
             df = self.load()
