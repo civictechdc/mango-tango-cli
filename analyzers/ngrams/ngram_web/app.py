@@ -36,14 +36,14 @@ def plot_scatter(data):
 
     # Add jitter to x-axis to separate overlapping points
     # Since we're using log scale, we need to be careful with the jitter amount
-    np.random.seed(42)  # For reproducible jitter
+    rng = np.random.default_rng(seed=42)  # For reproducible jitter
 
     # Create jitter as a small multiplier (5% of the log value)
     jitter_factor = 0.05
     data = data.with_columns(
         (
             pl.col(COL_NGRAM_TOTAL_REPS)
-            * (1 + np.random.uniform(-jitter_factor, jitter_factor, len(data)))
+            * (1 + rng.uniform(-jitter_factor, jitter_factor, len(data)))
         ).alias("total_reps_jittered")
     )
 
