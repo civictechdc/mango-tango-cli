@@ -9,4 +9,5 @@ example_web = WebPresenterDeclaration(
     # You must pass __name__ here. It's to make Dash happy.
     # See: http://dash.plotly.com/urls
     name=__name__,
+    shiny=False,
 )
