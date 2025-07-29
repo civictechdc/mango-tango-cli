@@ -3,7 +3,6 @@ from analyzer_interface import (
     AnalyzerInterface,
     AnalyzerOutput,
     AnalyzerParam,
-    BooleanParam,
     InputColumn,
     IntegerParam,
     OutputColumn,
@@ -19,7 +18,7 @@ COL_NGRAM_WORDS = "words"
 COL_NGRAM_LENGTH = "n"
 COL_MESSAGE_TIMESTAMP = "timestamp"
 
-PARAM_NON_SPACED_TEXT = "non_spaced_text"
+
 PARAM_MIN_N = "min_n"
 PARAM_MAX_N = "max_n"
 
@@ -29,13 +28,17 @@ OUTPUT_MESSAGE = "message_authors"
 
 interface = AnalyzerInterface(
     id="ngrams",
-    version="0.2.0",
+    version="0.3.0",
     name="N-gram Analysis",
     short_description="Extracts configurable n-grams from text data",
     long_description="""
 The n-gram analysis extracts n-grams (sequences of n words) from the text data
 in the input and counts the occurrences of each n-gram in each message, linking
 the message author to the ngram frequency.
+
+The analyzer automatically detects the language type and applies appropriate
+tokenization: space-separated for Western languages (English, Spanish, French, etc.)
+and character-level for non-spaced languages (Chinese, Japanese, Thai, etc.).
 
 You can configure the minimum and maximum n-gram lengths to focus on specific
 word sequence patterns. The result can be used to see if certain word sequences
@@ -132,20 +135,6 @@ Higher values capture more specific patterns but may be less frequent.
             """,
             type=IntegerParam(min=1, max=15),
             default=5,
-        ),
-        AnalyzerParam(
-            id=PARAM_NON_SPACED_TEXT,
-            human_readable_name="Non-spaced Text Processing",
-            description="""
-Enable this for languages without spaces between words (e.g., Chinese, Japanese, Thai).
-When enabled, the advanced tokenization engine will properly handle character-based
-tokenization while preserving social media entities and mixed scripts.
-
-For most Western languages (English, Spanish, French, etc.), leave this disabled.
-For East Asian languages and other non-spaced scripts, enable this option.
-            """,
-            type=BooleanParam(),
-            default=False,
         ),
     ],
     outputs=[

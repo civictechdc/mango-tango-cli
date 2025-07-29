@@ -15,7 +15,6 @@ from .ngrams_base.interface import (
     OUTPUT_NGRAM_DEFS,
     PARAM_MAX_N,
     PARAM_MIN_N,
-    PARAM_NON_SPACED_TEXT,
     interface,
 )
 from .ngrams_base.main import _generate_ngrams_simple, _generate_ngrams_vectorized, main
@@ -245,35 +244,6 @@ def test_ngram_analyzer_configurable_parameters():
             },
             params=params,
         )
-
-
-def test_ngram_analyzer_non_spaced_text():
-    """Test the analyzer with non-spaced text parameter enabled."""
-    test_primary_analyzer(
-        interface=interface,
-        main=main,
-        input=CsvTestData(
-            filepath=str(Path(test_data_dir, TEST_CSV_FILENAME)),
-            semantics={
-                COL_AUTHOR_ID: identifier,
-                COL_MESSAGE_ID: identifier,
-                COL_MESSAGE_TEXT: text_catch_all,
-                COL_MESSAGE_TIMESTAMP: datetime_string,
-            },
-        ),
-        outputs={
-            OUTPUT_MESSAGE_NGRAMS: ParquetTestData(
-                filepath=str(Path(test_data_dir, OUTPUT_MESSAGE_NGRAMS + ".parquet"))
-            ),
-            OUTPUT_NGRAM_DEFS: ParquetTestData(
-                filepath=str(Path(test_data_dir, OUTPUT_NGRAM_DEFS + ".parquet"))
-            ),
-            OUTPUT_MESSAGE: ParquetTestData(
-                filepath=str(Path(test_data_dir, OUTPUT_MESSAGE + ".parquet"))
-            ),
-        },
-        params={PARAM_NON_SPACED_TEXT: True},
-    )
 
 
 def test_ngram_generation_edge_cases():

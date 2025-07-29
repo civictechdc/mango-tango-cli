@@ -24,7 +24,6 @@ from .interface import (
     OUTPUT_NGRAM_DEFS,
     PARAM_MAX_N,
     PARAM_MIN_N,
-    PARAM_NON_SPACED_TEXT,
 )
 
 
@@ -226,12 +225,10 @@ def main(context: PrimaryAnalyzerContext):
     # Get parameters from context
     min_n = context.params.get(PARAM_MIN_N, 3)
     max_n = context.params.get(PARAM_MAX_N, 5)
-    non_spaced_text = context.params.get(PARAM_NON_SPACED_TEXT, False)
 
     # Validate parameters
     assert isinstance(min_n, int) and min_n >= 1, "min_n must be a positive integer"
     assert isinstance(max_n, int) and max_n >= min_n, "max_n must be >= min_n"
-    assert isinstance(non_spaced_text, bool), "non_spaced_text must be a boolean"
 
     # Get the raw column names from the project's column mappings
     required_raw_columns = [
