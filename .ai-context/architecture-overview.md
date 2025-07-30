@@ -116,6 +116,39 @@ class AnalysisWebServerContext:
     server_config: dict
 ```
 
+### Progress Reporting Architecture
+
+The application uses a hierarchical progress reporting system built on the Rich library for terminal display:
+
+```python
+# Hierarchical Progress Manager
+class RichProgressManager:
+    # Main step management
+    def add_step(step_id: str, title: str, total: int = None)
+    def start_step(step_id: str)
+    def update_step(step_id: str, progress: int)
+    def complete_step(step_id: str)
+    
+    # Sub-step management for detailed progress tracking
+    def add_substep(parent_step_id: str, substep_id: str, description: str, total: int = None)
+    def start_substep(parent_step_id: str, substep_id: str)
+    def update_substep(parent_step_id: str, substep_id: str, progress: int)
+    def complete_substep(parent_step_id: str, substep_id: str)
+```
+
+**Enhanced N-gram Analysis Progress Flow**:
+- Steps 1-8: Data processing with traditional progress reporting
+- Steps 9-11: Final write operations with hierarchical sub-step progress
+  - Each write operation broken into 4 sub-steps (prepare, transform, sort, write)
+  - Eliminates silent processing periods during final 20-30% of analysis time
+  - Memory-aware progress calculation based on dataset size
+
+**Integration Points**:
+- `AnalysisContext.progress_callback` provides progress manager to analyzers
+- Enhanced write functions use sub-step progress for granular feedback
+- Rich terminal display with hierarchical progress visualization
+- Thread-safe progress updates with display locks
+
 ## Core Domain Patterns
 
 ### Analyzer Interface System

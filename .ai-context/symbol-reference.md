@@ -124,19 +124,24 @@ Base interface for data importers
 **Primary Analyzers** (core data processing):
 
 - `hashtags` - `analyzers/hashtags/main.py:main()` - Hashtag extraction and analysis
-- `ngrams` - `analyzers/ngrams/main.py:main()` - N-gram generation and tokenization
+- `ngrams_base` - `analyzers/ngrams/ngrams_base/main.py:main()` - N-gram generation with enhanced progress reporting
+  - Enhanced write functions: `_enhanced_write_message_ngrams()`, `_enhanced_write_ngram_definitions()`, `_enhanced_write_message_metadata()`
+  - Streaming optimization: `_stream_unique_batch_accumulator()`, `_stream_unique_to_temp_file()`
+  - Vectorized n-gram generation: `_generate_ngrams_vectorized()`, `_generate_ngrams_simple()`
 - `temporal` - `analyzers/temporal/main.py:main()` - Time-based aggregation
 - `time_coordination` - `analyzers/time_coordination/main.py:main()` - User coordination analysis
 
 **Secondary Analyzers** (result transformation):
 
-- `ngram_stats` - `analyzers/ngram_stats/main.py:main()` - N-gram statistics calculation
+- `ngram_stats` - `analyzers/ngrams/ngram_stats/main.py:main()` - N-gram statistics calculation
+  - Chunked processing: `_process_ngram_chunk()`, `_create_sample_full_report_row()`
 - `hashtags_web/analysis.py:secondary_analyzer()` - Hashtag summary statistics
 
 **Web Presenters** (interactive dashboards):
 
 - `hashtags_web` - `analyzers/hashtags_web/factory.py:factory()` - Hashtag dashboard
-- `ngram_web` - `analyzers/ngram_web/factory.py:factory()` - N-gram exploration dashboard
+- `ngram_web` - `analyzers/ngrams/ngram_web/factory.py:factory()` - N-gram exploration dashboard
+  - Word matching: `create_word_matcher()`
 - `temporal_barplot` - `analyzers/temporal_barplot/factory.py:factory()` - Temporal visualization
 
 #### Analyzer Registration
@@ -180,6 +185,35 @@ Base interface for data importers
 - Dashboard factory pattern for creating web applications
 - Background server process management
 
+### Terminal Tools (`terminal_tools/`)
+
+#### Enhanced Progress Reporting System
+
+- `RichProgressManager` - `terminal_tools/progress.py` - Hierarchical progress manager with Rich integration
+  - **Main step management**:
+    - `add_step(step_id, title, total=None)` - Add progress steps
+    - `start_step(step_id)`, `update_step(step_id, progress)`, `complete_step(step_id)` - Step lifecycle
+    - `fail_step(step_id, error_msg=None)` - Error handling
+  - **Hierarchical sub-step management**:
+    - `add_substep(parent_step_id, substep_id, description, total=None)` - Add sub-steps
+    - `start_substep(parent_step_id, substep_id)` - Start/activate sub-steps  
+    - `update_substep(parent_step_id, substep_id, progress)` - Update sub-step progress
+    - `complete_substep(parent_step_id, substep_id)` - Mark sub-steps complete
+    - `fail_substep(parent_step_id, substep_id, error_msg=None)` - Sub-step error handling
+  - **Internal methods**:
+    - `_update_parent_progress(parent_step_id)` - Calculate parent progress from sub-steps
+    - `_update_display()` - Rich terminal display with hierarchical visualization
+
+- `ProgressReporter` - `terminal_tools/progress.py` - Basic multiprocess progress reporting
+- `AdvancedProgressReporter` - `terminal_tools/progress.py` - tqdm-based progress with ETA calculation
+- `ChecklistProgressManager` - Backward compatibility alias for `RichProgressManager`
+
+#### Other Terminal Utilities
+
+- `file_selector()` - `terminal_tools/prompts.py` - Interactive file selection
+- `clear_terminal()` - `terminal_tools/utils.py` - Terminal screen clearing
+- `enable_windows_ansi_support()` - `terminal_tools/utils.py` - Windows terminal color support
+
 ## Common Utilities
 
 ### Data Processing (`app/utils.py`)
@@ -200,15 +234,47 @@ Base interface for data importers
 
 ### Test Utilities (`testing/`)
 
-- Primary analyzer testing framework
-- Secondary analyzer testing framework
-- Test data management utilities
+#### Test Data Management
+
+- `TestData` - `testing/testdata.py` - Base class for test data handling
+- `FileTestData` - File-based test data with path management
+- `CsvTestData` - CSV file testing with configurable parsing (`CsvConfig`)
+- `JsonTestData` - JSON file testing support
+- `ExcelTestData` - Excel file testing with sheet selection
+- `ParquetTestData` - Parquet file testing for analyzer outputs
+- `PolarsTestData` - In-memory Polars DataFrame testing
+
+#### Test Context Framework
+
+- `TestPrimaryAnalyzerContext` - `testing/context.py` - Mock context for primary analyzer testing
+- `TestSecondaryAnalyzerContext` - Mock context for secondary analyzer testing
+- `TestInputColumnProvider` - Column mapping testing support
+- `TestTableReader` - Mock data reader for testing
+- `TestOutputWriter` - Mock output writer for testing
+- `TestOutputReaderGroupContext` - Multi-output testing context
+
+#### Test Execution Framework
+
+- `test_primary_analyzer()` - `testing/testers.py` - Standardized primary analyzer testing
+- `test_secondary_analyzer()` - Standardized secondary analyzer testing
+- `compare_dfs()` - `testing/comparers.py` - DataFrame comparison utilities
+
+#### Progress Reporting Tests
+
+- `TestRichProgressManager` - `terminal_tools/test_progress.py` - Basic progress manager tests
+- `TestRichProgressManagerHierarchical` - Comprehensive hierarchical progress testing
+  - 18 test methods covering substep functionality, validation, error handling, performance
+- `TestProgressReporter` - Basic progress reporter tests
+- `TestAdvancedProgressReporter` - Advanced progress reporter with tqdm integration
 
 ### Example Tests
 
+- `analyzers/ngrams/test_ngrams_base.py` - Comprehensive n-gram analyzer tests with multiple configurations
+- `analyzers/ngrams/test_ngram_stats.py` - N-gram statistics analyzer tests
 - `analyzers/hashtags/test_hashtags_analyzer.py` - Hashtag analyzer tests
 - `analyzers/example/test_example_base.py` - Example analyzer tests
-- Test data directories co-located with analyzers
+- `app/test_utils.py` - Utility function tests
+- Test data directories co-located with analyzers (`test_data/` subdirectories)
 
 ## Development Patterns
 
