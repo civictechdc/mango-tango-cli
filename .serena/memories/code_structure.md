@@ -15,6 +15,8 @@
 - `analysis_output_context.py` - Context for handling analysis outputs
 - `analysis_webserver_context.py` - Context for web server operations
 - `settings_context.py` - SettingsContext for configuration management
+- `utils.py` - Utility functions including `parquet_row_count()` and enhanced tokenization
+- `test_utils.py` - Tests for utility functions
 
 ### Components (`components/`)
 
@@ -38,23 +40,81 @@ Terminal UI components using inquirer for interactive flows:
 - `__init__.py` - Storage class, models (ProjectModel, AnalysisModel, etc.)
 - `file_selector.py` - File selection state management
 
+### Terminal Tools (`terminal_tools/`)
+
+Enhanced terminal utilities and progress reporting:
+
+- `progress.py` - **Hierarchical progress reporting system**
+  - `RichProgressManager` - Main progress manager with sub-step support
+  - `ProgressReporter` - Basic multiprocess progress reporting
+  - `AdvancedProgressReporter` - tqdm-based progress with ETA
+- `prompts.py` - Interactive terminal prompts and file selection
+- `utils.py` - Terminal utilities (clear, ANSI support, etc.)
+- `test_progress.py` - Comprehensive tests for progress reporting (68 tests)
+
 ### Analyzers (`analyzers/`)
 
-Modular analysis system:
+**Reorganized modular analysis system:**
 
+#### Core Analyzers
 - `__init__.py` - Main analyzer suite registration
 - `example/` - Example analyzer implementation
 - `hashtags/` - Hashtag analysis (primary analyzer)
 - `hashtags_web/` - Hashtag web dashboard (web presenter)
-- `ngrams/` - N-gram analysis (primary analyzer)
-- `ngram_stats/` - N-gram statistics (secondary analyzer)
-- `ngram_web/` - N-gram web dashboard (web presenter)
 - `temporal/` - Temporal analysis (primary analyzer)
 - `temporal_barplot/` - Temporal visualization (web presenter)
 - `time_coordination/` - Time coordination analysis
+
+#### N-gram Analysis Hierarchy
+- `ngrams/` - **Hierarchically organized n-gram analysis system**
+  - `ngrams_base/` - **Primary analyzer with enhanced progress reporting**
+    - `main.py` - Enhanced with streaming optimization and hierarchical progress
+    - `interface.py` - Input/output schema definitions
+  - `ngram_stats/` - **Secondary analyzer**
+    - `main.py` - Statistics calculation with chunked processing
+    - `interface.py` - Statistics interface definition
+  - `ngram_web/` - **Web presenter**
+    - `factory.py` - Dashboard creation with word matching
+    - `interface.py` - Web interface definition
+  - `test_data/` - **Test files co-located with analyzers**
+  - `test_ngrams_base.py` - **Comprehensive primary analyzer tests**
+  - `test_ngram_stats.py` - **Secondary analyzer tests**
+
+### Testing Framework (`testing/`)
+
+**Comprehensive testing infrastructure:**
+
+- `testdata.py` - **Test data management classes**
+  - `TestData`, `FileTestData`, `CsvTestData`, `JsonTestData`
+  - `ExcelTestData`, `ParquetTestData`, `PolarsTestData`
+- `context.py` - **Mock context framework**
+  - `TestPrimaryAnalyzerContext`, `TestSecondaryAnalyzerContext`
+  - `TestInputColumnProvider`, `TestTableReader`, `TestOutputWriter`
+- `testers.py` - **Standardized test execution**
+  - `test_primary_analyzer()`, `test_secondary_analyzer()`
+- `comparers.py` - **DataFrame comparison utilities**
+  - `compare_dfs()` for precise test validation
 
 ### Importing (`importing/`)
 
 - `importer.py` - Base Importer and ImporterSession classes
 - `csv.py` - CSV import implementation
 - `excel.py` - Excel import implementation
+
+## Key Architectural Patterns
+
+### Domain Separation
+- **Core**: App, Components, Storage, Terminal Tools
+- **Edge**: Importers, Testing framework
+- **Content**: Analyzers (primary, secondary, web presenters)
+
+### Hierarchical Organization
+- **N-gram analyzers** organized into logical hierarchy
+- **Testing framework** provides comprehensive mock contexts
+- **Progress reporting** supports nested sub-steps
+
+### Enhanced Features
+- **Streaming optimization** for large dataset processing
+- **Hierarchical progress reporting** eliminates silent processing periods
+- **Comprehensive testing** with standardized frameworks
+- **Memory-efficient operations** with chunked processing
