@@ -762,21 +762,33 @@ class RichProgressManager:
         if not self._started:
             return
 
-        # Final display update to show final state
-        if self.live:
-            self._update_display()
-            self.live.stop()
-            self.live = None
+        try:
+            # Final display update to show final state
+            if self.live:
+                self._update_display()
+                self.live.stop()
+                self.live = None
 
-        # Add a final newline for separation
-        self.console.print()
-        self._started = False
+            # Add a final newline for separation
+            self.console.print()
+        except Exception:
+            # If display cleanup fails, at least try to clean up state
+            try:
+                if self.live:
+                    self.live.stop()
+                    self.live = None
+            except Exception:
+                pass
+        finally:
+            self._started = False
 
     def _update_display(self):
         """Update the Rich display with current step states, substeps, and active progress."""
-        with self._display_lock:
-            if not self._started or not self.live:
-                return
+        # Add timeout protection to prevent infinite loops during interrupts
+        try:
+            with self._display_lock:
+                if not self._started or not self.live:
+                    return
 
             from rich.console import Group
             from rich.panel import Panel
@@ -928,11 +940,22 @@ class RichProgressManager:
                             progress_bar_added = True
                             break
 
-            # Update the display group and live display
-            from rich.console import Group
+                # Update the display group and live display
+                from rich.console import Group
 
-            self.display_group = Group(*content_parts)
-            self.live.update(self.display_group)
+                self.display_group = Group(*content_parts)
+                self.live.update(self.display_group)
+        except Exception as e:
+            # During keyboard interrupts, display updates can fail
+            # Don't let display errors crash the application
+            if not isinstance(e, KeyboardInterrupt):
+                try:
+                    self.console.print(
+                        f"[yellow]Warning: Display update failed: {e}[/yellow]",
+                        file=sys.stderr,
+                    )
+                except Exception:
+                    pass
 
     def __enter__(self):
         """Context manager entry - starts the checklist display."""
@@ -941,7 +964,25 @@ class RichProgressManager:
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Context manager exit - finishes the checklist display."""
-        self.finish()
+        # Handle KeyboardInterrupt specially to ensure clean terminal state
+        if exc_type is KeyboardInterrupt:
+            # Stop Rich display immediately and cleanly
+            try:
+                if self.live and self._started:
+                    self.live.stop()
+                    self.live = None
+                # Clear the terminal to prevent repeated output
+                self.console.clear()
+                self._started = False
+            except Exception:
+                # If cleanup fails, at least try to restore terminal
+                try:
+                    self.console.clear()
+                except Exception:
+                    pass
+        else:
+            # Normal cleanup for other exceptions or successful completion
+            self.finish()
 
 
 # Create an alias for backward compatibility
