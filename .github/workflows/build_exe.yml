@@ -115,7 +115,7 @@ jobs:
 
       - name: Build the executable
         env:
-          APPLE_APP_CERT_ID: ${{secrets.APPLE_APP_CERT_ID}}
+          APPLE_APP_CERT_ID: "${{ inputs.is_release && secrets.APPLE_APP_CERT_ID || '' }}"
         run: pyinstaller pyinstaller.spec
 
       - name: Rename the executable to include platform suffix
