@@ -6,17 +6,24 @@ repo_url: https://github.com/civictechdc/mango-tango-cli
 copyright: Copyright &copy; 2025 CIB Mango Tree
 nav:
   - "Home":
-    - "Overview": "index.md"
-    - "License": "license.md"
+      - "Overview": "index.md"
+      - "License": "license.md"
   - "Guides":
-    - "CLI design philosophy": "guides/dev-guide.md"
-    - "Development guide": "guides/contributing.md"
+      - "Getting Started":
+          - "Overview": "guides/get-started/overview.md"
+          - "Installation": "guides/get-started/installation.md"
+      - "CLI design philosophy": "guides/architecture.md"
+      - "Domains":
+          - "Core Domain": "guides/domains/core-domain.md"
+          - "Edge Domain": "guides/domains/edge-domain.md"
+          - "Content Domain": "guides/domains/content-domain.md"
+      - "Contributing to The Project": "guides/contributing.md"
   - "Reference (CLI)":
-      - "Analyzer interface": "reference/analyzer_interface.md"
+      - "Analyzer Interface": "reference/analyzer_interface.md"
       - "Components": "reference/components.md"
       - "App": "reference/app.md"
       - "Preprocessing": "reference/preprocessing.md"
-      - "Terminal tools": "reference/terminal_tools.md"
+      - "Terminal Tools": "reference/terminal_tools.md"
       - "Importing": "reference/importing.md"
       - "Meta": "reference/meta.md"
       - "Testing": "reference/testing.md"
@@ -54,5 +61,6 @@ plugins:
 markdown_extensions:
   - toc:
       baselevel: 2
-  
+
   - pymdownx.snippets
+
