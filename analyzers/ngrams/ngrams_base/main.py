@@ -212,6 +212,7 @@ def _stream_unique_batch_accumulator(
 def _safe_streaming_write(lazy_frame, output_path, operation_name, progress_manager):
     """
     Attempt streaming write with fallback to collect() if streaming fails.
+    This is the legacy single-step write function for backward compatibility.
 
     Args:
         lazy_frame: polars LazyFrame to write
@@ -241,6 +242,214 @@ def _safe_streaming_write(lazy_frame, output_path, operation_name, progress_mana
                 f"Both streaming and fallback failed: {str(fallback_error)}",
             )
             raise fallback_error
+
+
+def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
+    """
+    Enhanced message n-grams write operation with sub-step progress reporting.
+
+    Breaks down the write operation into observable sub-steps:
+    1. Grouping n-grams by message
+    2. Aggregating n-gram counts
+    3. Sorting grouped data
+    4. Writing to parquet file
+
+    Args:
+        ldf_with_ids: LazyFrame with n-gram IDs assigned
+        output_path: Path to write the parquet file
+        progress_manager: Progress manager for status updates
+    """
+    step_id = "write_message_ngrams"
+
+    # Add sub-steps for this write operation
+    progress_manager.add_substep(step_id, "group", "Grouping n-grams by message")
+    progress_manager.add_substep(step_id, "aggregate", "Aggregating n-gram counts")
+    progress_manager.add_substep(step_id, "sort", "Sorting grouped data")
+    progress_manager.add_substep(step_id, "write", "Writing to parquet file")
+
+    try:
+        # Sub-step 1: Grouping n-grams by message
+        progress_manager.start_substep(step_id, "group")
+
+        # Apply group_by operation
+        grouped_ldf = ldf_with_ids.group_by([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
+        progress_manager.complete_substep(step_id, "group")
+
+        # Sub-step 2: Aggregating n-gram counts
+        progress_manager.start_substep(step_id, "aggregate")
+
+        # Apply aggregation
+        aggregated_ldf = grouped_ldf.agg([pl.len().alias(COL_MESSAGE_NGRAM_COUNT)])
+        progress_manager.complete_substep(step_id, "aggregate")
+
+        # Sub-step 3: Sorting grouped data
+        progress_manager.start_substep(step_id, "sort")
+
+        # Apply sorting
+        sorted_ldf = aggregated_ldf.sort([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
+        progress_manager.complete_substep(step_id, "sort")
+
+        # Sub-step 4: Writing to parquet file
+        progress_manager.start_substep(step_id, "write")
+
+        # Attempt streaming write with fallback
+        try:
+            sorted_ldf.sink_parquet(output_path, maintain_order=True)
+        except Exception as streaming_error:
+            # Fallback to collect + write
+            sorted_ldf.collect().write_parquet(output_path)
+
+        progress_manager.complete_substep(step_id, "write")
+        progress_manager.complete_step(step_id)
+
+    except Exception as e:
+        progress_manager.fail_step(step_id, f"Failed writing message n-grams: {str(e)}")
+        raise
+
+
+def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manager):
+    """
+    Enhanced n-gram definitions write operation with sub-step progress reporting.
+
+    Breaks down the write operation into observable sub-steps:
+    1. Preparing n-gram metadata
+    2. Calculating n-gram lengths
+    3. Sorting definitions
+    4. Writing definitions to parquet
+
+    Args:
+        unique_ngrams: DataFrame with unique n-grams
+        output_path: Path to write the parquet file
+        progress_manager: Progress manager for status updates
+    """
+    step_id = "write_ngram_defs"
+
+    # Add sub-steps for this write operation
+    progress_manager.add_substep(step_id, "metadata", "Preparing n-gram metadata")
+    progress_manager.add_substep(step_id, "lengths", "Calculating n-gram lengths")
+    progress_manager.add_substep(step_id, "sort", "Sorting definitions")
+    progress_manager.add_substep(step_id, "write", "Writing definitions to parquet")
+
+    try:
+        # Sub-step 1: Preparing n-gram metadata
+        progress_manager.start_substep(step_id, "metadata")
+
+        # Start with the base LazyFrame and select core columns
+        base_ldf = unique_ngrams.lazy().select(
+            [
+                COL_NGRAM_ID,
+                pl.col("ngram_text").alias(COL_NGRAM_WORDS),
+            ]
+        )
+        progress_manager.complete_substep(step_id, "metadata")
+
+        # Sub-step 2: Calculating n-gram lengths
+        progress_manager.start_substep(step_id, "lengths")
+
+        # Add n-gram length calculation
+        length_ldf = base_ldf.with_columns(
+            [pl.col(COL_NGRAM_WORDS).str.split(" ").list.len().alias(COL_NGRAM_LENGTH)]
+        )
+        progress_manager.complete_substep(step_id, "lengths")
+
+        # Sub-step 3: Sorting definitions
+        progress_manager.start_substep(step_id, "sort")
+
+        # Sort by ngram_id for consistent ordering
+        sorted_ldf = length_ldf.sort(COL_NGRAM_ID)
+        progress_manager.complete_substep(step_id, "sort")
+
+        # Sub-step 4: Writing definitions to parquet
+        progress_manager.start_substep(step_id, "write")
+
+        # Attempt streaming write with fallback
+        try:
+            sorted_ldf.sink_parquet(output_path, maintain_order=True)
+        except Exception as streaming_error:
+            # Fallback to collect + write
+            sorted_ldf.collect().write_parquet(output_path)
+
+        progress_manager.complete_substep(step_id, "write")
+        progress_manager.complete_step(step_id)
+
+    except Exception as e:
+        progress_manager.fail_step(
+            step_id, f"Failed writing n-gram definitions: {str(e)}"
+        )
+        raise
+
+
+def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manager):
+    """
+    Enhanced message metadata write operation with sub-step progress reporting.
+
+    Breaks down the write operation into observable sub-steps:
+    1. Selecting message columns
+    2. Deduplicating messages
+    3. Sorting by surrogate ID
+    4. Writing metadata to parquet
+
+    Args:
+        ldf_tokenized: LazyFrame with tokenized data
+        output_path: Path to write the parquet file
+        progress_manager: Progress manager for status updates
+    """
+    step_id = "write_message_metadata"
+
+    # Add sub-steps for this write operation
+    progress_manager.add_substep(step_id, "select", "Selecting message columns")
+    progress_manager.add_substep(step_id, "deduplicate", "Deduplicating messages")
+    progress_manager.add_substep(step_id, "sort", "Sorting by surrogate ID")
+    progress_manager.add_substep(step_id, "write", "Writing metadata to parquet")
+
+    try:
+        # Sub-step 1: Selecting message columns
+        progress_manager.start_substep(step_id, "select")
+
+        # Select the required columns
+        selected_ldf = ldf_tokenized.select(
+            [
+                COL_MESSAGE_SURROGATE_ID,
+                COL_MESSAGE_ID,
+                COL_MESSAGE_TEXT,
+                COL_AUTHOR_ID,
+                COL_MESSAGE_TIMESTAMP,
+            ]
+        )
+        progress_manager.complete_substep(step_id, "select")
+
+        # Sub-step 2: Deduplicating messages
+        progress_manager.start_substep(step_id, "deduplicate")
+
+        # Apply deduplication by surrogate ID
+        deduplicated_ldf = selected_ldf.unique(subset=[COL_MESSAGE_SURROGATE_ID])
+        progress_manager.complete_substep(step_id, "deduplicate")
+
+        # Sub-step 3: Sorting by surrogate ID
+        progress_manager.start_substep(step_id, "sort")
+
+        # Sort by surrogate ID for consistent ordering
+        sorted_ldf = deduplicated_ldf.sort(COL_MESSAGE_SURROGATE_ID)
+        progress_manager.complete_substep(step_id, "sort")
+
+        # Sub-step 4: Writing metadata to parquet
+        progress_manager.start_substep(step_id, "write")
+
+        # Attempt streaming write with fallback
+        try:
+            sorted_ldf.sink_parquet(output_path, maintain_order=True)
+        except Exception as streaming_error:
+            # Fallback to collect + write
+            sorted_ldf.collect().write_parquet(output_path)
+
+        progress_manager.complete_substep(step_id, "write")
+        progress_manager.complete_step(step_id)
+
+    except Exception as e:
+        progress_manager.fail_step(
+            step_id, f"Failed writing message metadata: {str(e)}"
+        )
+        raise
 
 
 def main(context: PrimaryAnalyzerContext):
@@ -608,81 +817,38 @@ def main(context: PrimaryAnalyzerContext):
             )
             raise
 
-        # Step 9: Generate output tables using streaming
-        progress_manager.start_step("write_message_ngrams")
-
+        # Step 9: Generate output tables using enhanced streaming with sub-step progress
         try:
-            # Output 1: message_ngrams (n-gram counts per message)
-            message_ngrams_ldf = (
-                ldf_with_ids.group_by([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
-                .agg([pl.len().alias(COL_MESSAGE_NGRAM_COUNT)])
-                .sort([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
-            )
-            _safe_streaming_write(
-                message_ngrams_ldf,
+            # Output 1: message_ngrams (n-gram counts per message) with enhanced progress
+            _enhanced_write_message_ngrams(
+                ldf_with_ids,
                 context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path,
-                "write_message_ngrams",
                 progress_manager,
             )
         except Exception as e:
-            progress_manager.fail_step(
-                "write_message_ngrams", f"Failed writing message n-grams: {str(e)}"
-            )
+            # Error handling is managed within the enhanced write function
             raise
 
-        progress_manager.start_step("write_ngram_defs")
-
         try:
-            # Output 2: ngrams (n-gram definitions)
-            ngram_defs_ldf = unique_ngrams.lazy().select(
-                [
-                    COL_NGRAM_ID,
-                    pl.col("ngram_text").alias(COL_NGRAM_WORDS),
-                    pl.col("ngram_text")
-                    .str.split(" ")
-                    .list.len()
-                    .alias(COL_NGRAM_LENGTH),
-                ]
-            )
-            _safe_streaming_write(
-                ngram_defs_ldf,
+            # Output 2: ngrams (n-gram definitions) with enhanced progress
+            _enhanced_write_ngram_definitions(
+                unique_ngrams,
                 context.output(OUTPUT_NGRAM_DEFS).parquet_path,
-                "write_ngram_defs",
                 progress_manager,
             )
         except Exception as e:
-            progress_manager.fail_step(
-                "write_ngram_defs", f"Failed writing n-gram definitions: {str(e)}"
-            )
+            # Error handling is managed within the enhanced write function
             raise
 
-        progress_manager.start_step("write_message_metadata")
-
         try:
-            # Output 3: message_authors (original message data)
-            message_metadata_ldf = (
-                ldf_tokenized.select(
-                    [
-                        COL_MESSAGE_SURROGATE_ID,
-                        COL_MESSAGE_ID,
-                        COL_MESSAGE_TEXT,
-                        COL_AUTHOR_ID,
-                        COL_MESSAGE_TIMESTAMP,
-                    ]
-                )
-                .unique(subset=[COL_MESSAGE_SURROGATE_ID])
-                .sort(COL_MESSAGE_SURROGATE_ID)
-            )
-            _safe_streaming_write(
-                message_metadata_ldf,
+            # Output 3: message_authors (original message data) with enhanced progress
+            _enhanced_write_message_metadata(
+                ldf_tokenized,
                 context.output(OUTPUT_MESSAGE).parquet_path,
-                "write_message_metadata",
                 progress_manager,
             )
         except Exception as e:
-            progress_manager.fail_step(
-                "write_message_metadata", f"Failed writing message metadata: {str(e)}"
-            )
+            # Error handling is managed within the enhanced write function
             raise
 
 

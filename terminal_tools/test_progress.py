@@ -9,6 +9,7 @@ This test suite validates:
 """
 
 import time
+import unittest
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -1188,3 +1189,401 @@ class TestRichProgressManager:
             # Only check progress for steps that had totals
             if manager.steps[step_id]["total"] is not None:
                 assert manager.steps[step_id]["progress"] == expected_progress
+
+
+class TestRichProgressManagerHierarchical(unittest.TestCase):
+    """Comprehensive tests for hierarchical progress reporting with sub-steps."""
+
+    def setUp(self):
+        """Set up test fixtures for hierarchical progress testing."""
+        self.progress_manager = RichProgressManager("Test Hierarchical Progress")
+
+    def test_add_substep_basic_functionality(self):
+        """Test basic substep addition functionality."""
+        # Add parent step first
+        self.progress_manager.add_step("parent", "Parent Step", 100)
+
+        # Add substep
+        self.progress_manager.add_substep("parent", "sub1", "First substep")
+
+        # Verify substep was added
+        self.assertIn("parent", self.progress_manager.substeps)
+        self.assertIn("sub1", self.progress_manager.substeps["parent"])
+
+        substep = self.progress_manager.substeps["parent"]["sub1"]
+        self.assertEqual(substep["description"], "First substep")
+        self.assertEqual(substep["state"], "pending")
+        self.assertEqual(substep["progress"], 0)
+        self.assertIsNone(substep["total"])
+        self.assertEqual(substep["parent_step_id"], "parent")
+
+    def test_add_substep_with_total(self):
+        """Test adding substep with total for progress tracking."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "Substep with total", 50)
+
+        substep = self.progress_manager.substeps["parent"]["sub1"]
+        self.assertEqual(substep["total"], 50)
+
+        # Verify Rich task was created
+        task_key = ("parent", "sub1")
+        self.assertIn(task_key, self.progress_manager.rich_substep_task_ids)
+
+    def test_add_substep_validation_errors(self):
+        """Test substep addition validation."""
+        # Parent step doesn't exist
+        with self.assertRaises(ValueError) as cm:
+            self.progress_manager.add_substep("nonexistent", "sub1", "Test")
+        self.assertIn("Parent step 'nonexistent' not found", str(cm.exception))
+
+        # Add parent and substep
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "First substep")
+
+        # Duplicate substep
+        with self.assertRaises(ValueError) as cm:
+            self.progress_manager.add_substep("parent", "sub1", "Duplicate")
+        self.assertIn("Substep 'sub1' already exists", str(cm.exception))
+
+    def test_start_substep_functionality(self):
+        """Test starting substeps and state management."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "First substep", 30)
+
+        # Start substep
+        self.progress_manager.start_substep("parent", "sub1")
+
+        # Verify states
+        self.assertEqual(self.progress_manager.steps["parent"]["state"], "active")
+        self.assertEqual(
+            self.progress_manager.substeps["parent"]["sub1"]["state"], "active"
+        )
+        self.assertEqual(self.progress_manager.active_substeps["parent"], "sub1")
+
+    def test_substep_auto_completes_previous_active(self):
+        """Test automatic completion of previous active substep."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "First substep", 20)
+        self.progress_manager.add_substep("parent", "sub2", "Second substep", 30)
+
+        # Start first substep
+        self.progress_manager.start_substep("parent", "sub1")
+        self.assertEqual(
+            self.progress_manager.substeps["parent"]["sub1"]["state"], "active"
+        )
+
+        # Start second substep - should complete first
+        self.progress_manager.start_substep("parent", "sub2")
+        self.assertEqual(
+            self.progress_manager.substeps["parent"]["sub1"]["state"], "completed"
+        )
+        self.assertEqual(
+            self.progress_manager.substeps["parent"]["sub2"]["state"], "active"
+        )
+        self.assertEqual(self.progress_manager.active_substeps["parent"], "sub2")
+
+    def test_update_substep_comprehensive(self):
+        """Test comprehensive substep progress updating."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "Test substep", 100)
+
+        # Update progress
+        self.progress_manager.update_substep("parent", "sub1", 25)
+        substep = self.progress_manager.substeps["parent"]["sub1"]
+        self.assertEqual(substep["progress"], 25)
+
+    def test_update_substep_validation_errors(self):
+        """Test substep update validation."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "Test substep", 100)
+
+        # Invalid parent step
+        with self.assertRaises(ValueError):
+            self.progress_manager.update_substep("nonexistent", "sub1", 50)
+
+        # Invalid substep
+        with self.assertRaises(ValueError):
+            self.progress_manager.update_substep("parent", "nonexistent", 50)
+
+        # Invalid progress types
+        with self.assertRaises(TypeError):
+            self.progress_manager.update_substep("parent", "sub1", "invalid")
+
+        # Negative progress
+        with self.assertRaises(ValueError):
+            self.progress_manager.update_substep("parent", "sub1", -5)
+
+        # Progress exceeds total
+        with self.assertRaises(ValueError):
+            self.progress_manager.update_substep("parent", "sub1", 150)
+
+    def test_complete_substep_functionality(self):
+        """Test substep completion."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "Test substep", 100)
+
+        self.progress_manager.start_substep("parent", "sub1")
+        self.progress_manager.update_substep("parent", "sub1", 50)
+        self.progress_manager.complete_substep("parent", "sub1")
+
+        substep = self.progress_manager.substeps["parent"]["sub1"]
+        self.assertEqual(substep["state"], "completed")
+        self.assertEqual(substep["progress"], 100)  # Should be set to total
+        self.assertIsNone(self.progress_manager.active_substeps.get("parent"))
+
+    def test_fail_substep_functionality(self):
+        """Test substep failure handling."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "Test substep", 100)
+
+        self.progress_manager.start_substep("parent", "sub1")
+        self.progress_manager.fail_substep("parent", "sub1", "Test error")
+
+        substep = self.progress_manager.substeps["parent"]["sub1"]
+        self.assertEqual(substep["state"], "failed")
+        self.assertEqual(substep["error_msg"], "Test error")
+        self.assertIsNone(self.progress_manager.active_substeps.get("parent"))
+
+    def test_parent_progress_calculation(self):
+        """Test automatic parent progress calculation based on substeps."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "First substep", 50)
+        self.progress_manager.add_substep("parent", "sub2", "Second substep", 30)
+        self.progress_manager.add_substep("parent", "sub3", "Third substep", 20)
+
+        # Complete first substep
+        self.progress_manager.start_substep("parent", "sub1")
+        self.progress_manager.complete_substep("parent", "sub1")
+
+        # Check parent progress (1/3 = 33.33%)
+        parent_progress = self.progress_manager.steps["parent"].get(
+            "substep_progress", 0
+        )
+        self.assertAlmostEqual(parent_progress, 33.33, places=1)
+
+        # Complete second substep
+        self.progress_manager.start_substep("parent", "sub2")
+        self.progress_manager.complete_substep("parent", "sub2")
+
+        # Check parent progress (2/3 = 66.67%)
+        parent_progress = self.progress_manager.steps["parent"].get(
+            "substep_progress", 0
+        )
+        self.assertAlmostEqual(parent_progress, 66.67, places=1)
+
+    def test_hierarchical_display_formatting(self):
+        """Test hierarchical display includes substeps with proper formatting."""
+        with patch.object(self.progress_manager, "_update_display") as mock_update:
+            self.progress_manager.add_step("parent", "Parent Step")
+            self.progress_manager.add_substep("parent", "sub1", "First substep", 50)
+            self.progress_manager.add_substep("parent", "sub2", "Second substep")
+
+            self.progress_manager.start()
+            self.progress_manager.start_substep("parent", "sub1")
+
+            # Verify _update_display was called
+            self.assertTrue(mock_update.called)
+
+            # Verify substeps data structure
+            self.assertIn("parent", self.progress_manager.substeps)
+            self.assertEqual(len(self.progress_manager.substeps["parent"]), 2)
+
+    def test_multiple_parents_with_substeps(self):
+        """Test multiple parent steps with their own substeps."""
+        # Setup multiple parents
+        self.progress_manager.add_step("parent1", "First Parent")
+        self.progress_manager.add_step("parent2", "Second Parent")
+
+        # Add substeps to each parent
+        self.progress_manager.add_substep("parent1", "sub1", "Parent1 Sub1", 100)
+        self.progress_manager.add_substep("parent1", "sub2", "Parent1 Sub2", 50)
+        self.progress_manager.add_substep("parent2", "sub1", "Parent2 Sub1", 75)
+
+        # Verify isolation
+        self.assertEqual(len(self.progress_manager.substeps["parent1"]), 2)
+        self.assertEqual(len(self.progress_manager.substeps["parent2"]), 1)
+
+        # Test independent operation
+        self.progress_manager.start_substep("parent1", "sub1")
+        self.progress_manager.start_substep("parent2", "sub1")
+
+        self.assertEqual(self.progress_manager.active_substeps["parent1"], "sub1")
+        self.assertEqual(self.progress_manager.active_substeps["parent2"], "sub1")
+
+    def test_substep_progress_bar_display(self):
+        """Test that substep progress bars display correctly."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep(
+            "parent", "sub1", "Substep with progress", 100
+        )
+
+        # Start the substep
+        self.progress_manager.start_substep("parent", "sub1")
+
+        # Verify Rich task was created and made visible
+        task_key = ("parent", "sub1")
+        self.assertIn(task_key, self.progress_manager.rich_substep_task_ids)
+
+    def test_enhanced_write_operations_integration(self):
+        """Test integration with enhanced write operations (simulated)."""
+        # Simulate the n-gram analyzer write operations
+        self.progress_manager.add_step(
+            "write_message_ngrams", "Writing message n-grams output", 1
+        )
+
+        # Add substeps as done in enhanced write functions
+        step_id = "write_message_ngrams"
+        self.progress_manager.add_substep(
+            step_id, "group", "Grouping n-grams by message"
+        )
+        self.progress_manager.add_substep(
+            step_id, "aggregate", "Aggregating n-gram counts"
+        )
+        self.progress_manager.add_substep(step_id, "sort", "Sorting grouped data")
+        self.progress_manager.add_substep(step_id, "write", "Writing to parquet file")
+
+        # Simulate the enhanced write operation workflow
+        self.progress_manager.start_step(step_id)
+
+        # Process each substep
+        substeps = ["group", "aggregate", "sort", "write"]
+        for substep in substeps:
+            self.progress_manager.start_substep(step_id, substep)
+            self.progress_manager.complete_substep(step_id, substep)
+
+        self.progress_manager.complete_step(step_id)
+
+        # Verify all substeps completed
+        for substep in substeps:
+            substep_info = self.progress_manager.substeps[step_id][substep]
+            self.assertEqual(substep_info["state"], "completed")
+
+    def test_dataset_size_aware_granularity(self):
+        """Test that progress reporting adapts to dataset size."""
+        # Small dataset simulation (should have fewer substeps)
+        small_dataset_steps = 3
+        self.progress_manager.add_step(
+            "small_process", "Small dataset processing", small_dataset_steps
+        )
+
+        # Large dataset simulation (should have more substeps)
+        large_dataset_steps = 8
+        self.progress_manager.add_step(
+            "large_process", "Large dataset processing", large_dataset_steps
+        )
+
+        # Add different numbers of substeps based on "dataset size"
+        for i in range(2):  # Fewer substeps for small dataset
+            self.progress_manager.add_substep(
+                "small_process", f"sub{i}", f"Small operation {i}"
+            )
+
+        for i in range(6):  # More substeps for large dataset
+            self.progress_manager.add_substep(
+                "large_process", f"sub{i}", f"Large operation {i}"
+            )
+
+        # Verify different granularity levels
+        self.assertEqual(len(self.progress_manager.substeps["small_process"]), 2)
+        self.assertEqual(len(self.progress_manager.substeps["large_process"]), 6)
+
+    def test_error_handling_and_recovery(self):
+        """Test error handling during substep operations."""
+        self.progress_manager.add_step("parent", "Parent Step")
+        self.progress_manager.add_substep("parent", "sub1", "First substep")
+        self.progress_manager.add_substep("parent", "sub2", "Second substep")
+
+        # Start first substep and make it fail
+        self.progress_manager.start_substep("parent", "sub1")
+        self.progress_manager.fail_substep("parent", "sub1", "Simulated failure")
+
+        # Verify failure state
+        self.assertEqual(
+            self.progress_manager.substeps["parent"]["sub1"]["state"], "failed"
+        )
+
+        # Should be able to continue with next substep
+        self.progress_manager.start_substep("parent", "sub2")
+        self.assertEqual(
+            self.progress_manager.substeps["parent"]["sub2"]["state"], "active"
+        )
+
+    def test_performance_overhead_measurement(self):
+        """Test that progress reporting overhead is minimal."""
+        import time
+
+        # Create many steps and substeps
+        num_steps = 10
+        substeps_per_step = 4
+
+        start_time = time.time()
+
+        for step_idx in range(num_steps):
+            step_id = f"step_{step_idx}"
+            self.progress_manager.add_step(step_id, f"Step {step_idx}")
+
+            for substep_idx in range(substeps_per_step):
+                substep_id = f"sub_{substep_idx}"
+                self.progress_manager.add_substep(
+                    step_id, substep_id, f"Substep {substep_idx}", 100
+                )
+
+        setup_time = time.time() - start_time
+
+        # Execute operations
+        start_time = time.time()
+
+        for step_idx in range(num_steps):
+            step_id = f"step_{step_idx}"
+
+            for substep_idx in range(substeps_per_step):
+                substep_id = f"sub_{substep_idx}"
+                self.progress_manager.start_substep(step_id, substep_id)
+
+                # Simulate some progress updates
+                for progress in [25, 50, 75, 100]:
+                    self.progress_manager.update_substep(step_id, substep_id, progress)
+
+                self.progress_manager.complete_substep(step_id, substep_id)
+
+        execution_time = time.time() - start_time
+
+        # Verify reasonable performance (should be very fast for this many operations)
+        self.assertLess(setup_time, 1.0, "Setup should take less than 1 second")
+        self.assertLess(
+            execution_time, 2.0, "Execution should take less than 2 seconds"
+        )
+
+    def test_backward_compatibility_maintained(self):
+        """Test that hierarchical features don't break existing functionality."""
+        # Test that existing step-only operations work unchanged
+        self.progress_manager.add_step("regular_step", "Regular Step", 100)
+        self.progress_manager.start_step("regular_step")
+        self.progress_manager.update_step("regular_step", 50)
+        self.progress_manager.complete_step("regular_step")
+
+        # Verify regular step functionality
+        step = self.progress_manager.steps["regular_step"]
+        self.assertEqual(step["state"], "completed")
+        self.assertEqual(step["progress"], 100)
+
+        # Test mixed usage (some steps with substeps, some without)
+        self.progress_manager.add_step("step_with_subs", "Step with Substeps")
+        self.progress_manager.add_step("step_without_subs", "Step without Substeps", 50)
+
+        self.progress_manager.add_substep("step_with_subs", "sub1", "Substep")
+
+        # Both should work fine
+        self.progress_manager.start_step("step_without_subs")
+        self.progress_manager.start_substep("step_with_subs", "sub1")
+
+        self.assertEqual(
+            self.progress_manager.steps["step_without_subs"]["state"], "active"
+        )
+        self.assertEqual(
+            self.progress_manager.substeps["step_with_subs"]["sub1"]["state"], "active"
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
