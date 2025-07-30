@@ -1,4 +1,4 @@
-Before following this workflow please refer to our [**Getting Started**](./get-started.md) page for instructions on installing dependencies and setting up your development environment.
+Before following this workflow please refer to our [**Getting Started**](overview.md) page for instructions on installing dependencies and setting up your development environment.
 
 # Contributor Workflow
 
@@ -47,3 +47,7 @@ graph TD;
     B -->|Review & Merge| C[Develop Branch];
     C -->|Release| D[Main Branch];
 ```
+
+# Next Steps
+
+Once you finish reading this it's recommended to check out the [architecture](./architecture.md) section.
