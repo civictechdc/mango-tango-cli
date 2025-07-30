@@ -209,6 +209,40 @@ def _stream_unique_batch_accumulator(
                 pass
 
 
+def _safe_streaming_write(lazy_frame, output_path, operation_name, progress_manager):
+    """
+    Attempt streaming write with fallback to collect() if streaming fails.
+
+    Args:
+        lazy_frame: polars LazyFrame to write
+        output_path: Path to write the parquet file
+        operation_name: Name of the operation for progress reporting
+        progress_manager: Progress manager for status updates
+
+    Raises:
+        Exception: If both streaming and fallback methods fail
+    """
+    try:
+        # Primary: Use streaming sink_parquet
+        lazy_frame.sink_parquet(output_path, maintain_order=True)
+        progress_manager.complete_step(operation_name)
+    except Exception as streaming_error:
+        progress_manager.update_step(
+            operation_name,
+            f"Streaming failed, falling back to collect(): {str(streaming_error)}",
+        )
+        try:
+            # Fallback: Traditional collect + write
+            lazy_frame.collect().write_parquet(output_path)
+            progress_manager.complete_step(operation_name)
+        except Exception as fallback_error:
+            progress_manager.fail_step(
+                operation_name,
+                f"Both streaming and fallback failed: {str(fallback_error)}",
+            )
+            raise fallback_error
+
+
 def main(context: PrimaryAnalyzerContext):
     """
     Streaming N-gram analyzer using polars lazy evaluation for memory efficiency.
@@ -579,14 +613,17 @@ def main(context: PrimaryAnalyzerContext):
 
         try:
             # Output 1: message_ngrams (n-gram counts per message)
-            (
+            message_ngrams_ldf = (
                 ldf_with_ids.group_by([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
                 .agg([pl.len().alias(COL_MESSAGE_NGRAM_COUNT)])
                 .sort([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
-                .collect()
-                .write_parquet(context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path)
             )
-            progress_manager.complete_step("write_message_ngrams")
+            _safe_streaming_write(
+                message_ngrams_ldf,
+                context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path,
+                "write_message_ngrams",
+                progress_manager,
+            )
         except Exception as e:
             progress_manager.fail_step(
                 "write_message_ngrams", f"Failed writing message n-grams: {str(e)}"
@@ -597,22 +634,22 @@ def main(context: PrimaryAnalyzerContext):
 
         try:
             # Output 2: ngrams (n-gram definitions)
-            (
-                unique_ngrams.lazy()
-                .select(
-                    [
-                        COL_NGRAM_ID,
-                        pl.col("ngram_text").alias(COL_NGRAM_WORDS),
-                        pl.col("ngram_text")
-                        .str.split(" ")
-                        .list.len()
-                        .alias(COL_NGRAM_LENGTH),
-                    ]
-                )
-                .collect()
-                .write_parquet(context.output(OUTPUT_NGRAM_DEFS).parquet_path)
+            ngram_defs_ldf = unique_ngrams.lazy().select(
+                [
+                    COL_NGRAM_ID,
+                    pl.col("ngram_text").alias(COL_NGRAM_WORDS),
+                    pl.col("ngram_text")
+                    .str.split(" ")
+                    .list.len()
+                    .alias(COL_NGRAM_LENGTH),
+                ]
             )
-            progress_manager.complete_step("write_ngram_defs")
+            _safe_streaming_write(
+                ngram_defs_ldf,
+                context.output(OUTPUT_NGRAM_DEFS).parquet_path,
+                "write_ngram_defs",
+                progress_manager,
+            )
         except Exception as e:
             progress_manager.fail_step(
                 "write_ngram_defs", f"Failed writing n-gram definitions: {str(e)}"
@@ -623,7 +660,7 @@ def main(context: PrimaryAnalyzerContext):
 
         try:
             # Output 3: message_authors (original message data)
-            (
+            message_metadata_ldf = (
                 ldf_tokenized.select(
                     [
                         COL_MESSAGE_SURROGATE_ID,
@@ -635,10 +672,13 @@ def main(context: PrimaryAnalyzerContext):
                 )
                 .unique(subset=[COL_MESSAGE_SURROGATE_ID])
                 .sort(COL_MESSAGE_SURROGATE_ID)
-                .collect()
-                .write_parquet(context.output(OUTPUT_MESSAGE).parquet_path)
             )
-            progress_manager.complete_step("write_message_metadata")
+            _safe_streaming_write(
+                message_metadata_ldf,
+                context.output(OUTPUT_MESSAGE).parquet_path,
+                "write_message_metadata",
+                progress_manager,
+            )
         except Exception as e:
             progress_manager.fail_step(
                 "write_message_metadata", f"Failed writing message metadata: {str(e)}"
