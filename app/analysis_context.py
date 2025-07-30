@@ -1,7 +1,7 @@
 import os
 from functools import cached_property
 from tempfile import TemporaryDirectory
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 

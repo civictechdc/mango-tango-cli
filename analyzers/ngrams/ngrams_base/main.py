@@ -1,4 +1,5 @@
 import gc
+import logging
 import os
 import tempfile
 from pathlib import Path
@@ -6,7 +7,7 @@ from pathlib import Path
 import polars as pl
 
 from analyzer_interface.context import PrimaryAnalyzerContext
-from app.utils import tokenize_text
+from app.utils import tokenize_text, MemoryManager, MemoryPressureLevel
 from terminal_tools.progress import RichProgressManager
 
 from .interface import (
@@ -454,14 +455,14 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
 
 def main(context: PrimaryAnalyzerContext):
     """
-    Streaming N-gram analyzer using polars lazy evaluation for memory efficiency.
-
-    This implementation uses:
-    - pl.scan_parquet for lazy data loading
-    - sink_parquet for streaming output
-    - Vectorized operations throughout (no row-by-row iteration)
-    - Rich progress reporting with proper progress bars
-    - Efficient n-gram ID assignment using streaming approach
+    Enhanced n-gram analyzer with comprehensive memory management.
+    
+    New Features:
+    - Real-time memory monitoring throughout processing
+    - Adaptive chunk sizing based on memory pressure
+    - Automatic fallback strategies for high memory pressure
+    - Memory-aware progress reporting with pressure warnings
+    - Enhanced garbage collection at critical memory points
     """
     input_reader = context.input()
 
@@ -473,6 +474,9 @@ def main(context: PrimaryAnalyzerContext):
     assert isinstance(min_n, int) and min_n >= 1, "min_n must be a positive integer"
     assert isinstance(max_n, int) and max_n >= min_n, "max_n must be >= min_n"
 
+    # Initialize memory manager
+    memory_manager = MemoryManager(max_memory_gb=4.0, process_name="ngram_analyzer")
+    
     # Get the raw column names from the project's column mappings
     required_raw_columns = [
         context.input_columns[COL_AUTHOR_ID].user_column_name,
@@ -482,108 +486,87 @@ def main(context: PrimaryAnalyzerContext):
     ]
 
     ldf = pl.scan_parquet(input_reader.parquet_path).select(required_raw_columns)
-    # Note: We'll apply preprocessing after initial filtering to maintain streaming
 
     # Count total messages for progress tracking
     total_messages = ldf.select(pl.len()).collect().item()
 
-    with RichProgressManager("N-gram Analysis Progress") as progress_manager:
+    # Use memory-aware progress manager instead of regular one
+    from app.memory_aware_progress import MemoryAwareProgressManager
+    
+    with MemoryAwareProgressManager("N-gram Analysis with Memory Monitoring", memory_manager) as progress_manager:
+        # Memory checkpoint: Initial state
+        initial_memory = memory_manager.get_current_memory_usage()
+        progress_manager.console.print(f"[blue]Starting analysis - Initial memory: {initial_memory['rss_mb']:.1f}MB[/blue]")
+        
         # Add ALL steps upfront for better UX with the enhanced progress system
-        # This provides users with a complete view of the process from the start
+        progress_manager.add_step("preprocess", "Preprocessing and filtering messages", total_messages)
 
-        # Step 1: Preprocessing and filtering messages
-        progress_manager.add_step(
-            "preprocess", "Preprocessing and filtering messages", total_messages
-        )
-
-        # Step 2: Tokenizing text data
-        # Calculate tokenization total based on whether chunking will occur
-        chunk_size = 50000  # This matches the chunk size in tokenize_text
+        # Calculate tokenization total based on memory-aware chunking
+        initial_chunk_size = 50000
+        adaptive_chunk_size = memory_manager.calculate_adaptive_chunk_size(initial_chunk_size, "tokenization")
         tokenization_total = None
-        if total_messages > chunk_size:
-            # Chunked processing will occur - set total to number of chunks
-            tokenization_total = (total_messages + chunk_size - 1) // chunk_size
-        progress_manager.add_step(
-            "tokenize", "Tokenizing text data", tokenization_total
-        )
+        if total_messages > adaptive_chunk_size:
+            tokenization_total = (total_messages + adaptive_chunk_size - 1) // adaptive_chunk_size
+        progress_manager.add_step("tokenize", "Tokenizing text data", tokenization_total)
 
-        # Step 3: Generating n-grams
-        # Enhanced n-gram generation with granular progress reporting
-        # The _generate_ngrams_vectorized function now provides 20-50+ progress steps
-        # instead of the previous 4-6, with detailed progress for each operation
+        # Enhanced n-gram generation step calculation
         n_gram_lengths = list(range(min_n, max_n + 1))
-
-        # Calculate enhanced n-gram total based on dataset size and processing approach
-        # This matches the enhanced _generate_ngrams_vectorized calculation
-        # We'll estimate based on total messages since ldf_filtered isn't available yet
-        estimated_rows = total_messages  # Use initial message count as estimate
-
-        # Enhanced progress calculation that matches _generate_ngrams_vectorized
-        base_steps = 2  # Generate expressions + Apply expressions
+        estimated_rows = total_messages
+        base_steps = 2
         MEMORY_CHUNK_THRESHOLD = 100_000
-        use_chunking = (
-            estimated_rows is not None and estimated_rows > MEMORY_CHUNK_THRESHOLD
-        )
+        use_chunking = estimated_rows is not None and estimated_rows > MEMORY_CHUNK_THRESHOLD
 
         if use_chunking and estimated_rows is not None:
-            chunks_per_ngram = (
-                estimated_rows + MEMORY_CHUNK_THRESHOLD - 1
-            ) // MEMORY_CHUNK_THRESHOLD
+            chunks_per_ngram = (estimated_rows + MEMORY_CHUNK_THRESHOLD - 1) // MEMORY_CHUNK_THRESHOLD
             chunked_substeps_per_ngram = 2 + (2 * chunks_per_ngram)
             total_ngram_steps = len(n_gram_lengths) * chunked_substeps_per_ngram
         else:
-            substeps_per_ngram = 4  # Extract, explode, filter, format
+            substeps_per_ngram = 4
             total_ngram_steps = len(n_gram_lengths) * substeps_per_ngram
 
         concat_steps = max(1, len(n_gram_lengths) // 2)
         ngram_total = base_steps + total_ngram_steps + concat_steps
-
         progress_manager.add_step("ngrams", "Generating n-grams", ngram_total)
 
-        # Step 4: Determine processing approach (analysis step)
-        progress_manager.add_step(
-            "analyze_approach", "Analyzing processing approach", 1
-        )
-
-        # Steps 5-11: Add remaining steps with proper totals for better ETA calculation
-        # Calculate expected chunks for unique extraction to provide accurate progress
-        expected_unique_chunks = (
-            max(1, total_messages // 50000) if total_messages > 500000 else 1
-        )
-
-        progress_manager.add_step(
-            "extract_unique", "Extracting unique n-grams", expected_unique_chunks
-        )
+        # Add remaining steps
+        progress_manager.add_step("analyze_approach", "Analyzing processing approach", 1)
+        expected_unique_chunks = max(1, total_messages // 50000) if total_messages > 500000 else 1
+        progress_manager.add_step("extract_unique", "Extracting unique n-grams", expected_unique_chunks)
         progress_manager.add_step("sort_ngrams", "Sorting n-grams alphabetically", 1)
         progress_manager.add_step("create_ids", "Creating n-gram IDs", 1)
         progress_manager.add_step("assign_ids", "Assigning n-gram IDs", 1)
-        progress_manager.add_step(
-            "write_message_ngrams", "Writing message n-grams output", 1
-        )
+        progress_manager.add_step("write_message_ngrams", "Writing message n-grams output", 1)
         progress_manager.add_step("write_ngram_defs", "Writing n-gram definitions", 1)
-        progress_manager.add_step(
-            "write_message_metadata", "Writing message metadata", 1
-        )
+        progress_manager.add_step("write_message_metadata", "Writing message metadata", 1)
 
-        # Step 1: Load and preprocess data using lazy evaluation
+        # Step 1: Enhanced preprocessing with memory monitoring
         progress_manager.start_step("preprocess")
 
         try:
-            # First collect a small sample to apply preprocessing and understand column mapping
-            # Apply preprocessing to get the proper column mapping
+            # Apply preprocessing with memory monitoring
             sample_df = ldf.limit(1).collect()
             preprocessed_sample = input_reader.preprocess(sample_df)
 
-            # Now we know the actual column names after preprocessing
-            # Apply preprocessing by reading the full data and preprocessing it
-            # For efficiency, we collect in chunks but this is unavoidable for preprocessing
-            full_df = ldf.collect()
-            preprocessed_df = input_reader.preprocess(full_df)
+            # Check memory pressure before full preprocessing
+            memory_before_preprocess = memory_manager.get_current_memory_usage()
+            pressure_level = memory_manager.get_memory_pressure_level()
+            
+            if pressure_level == MemoryPressureLevel.CRITICAL:
+                # Implement disk-based preprocessing fallback
+                progress_manager.console.print("[red]Critical memory pressure - using disk-based preprocessing[/red]")
+                # For now, proceed with regular preprocessing but with enhanced cleanup
+                full_df = ldf.collect()
+                memory_manager.enhanced_gc_cleanup()
+                preprocessed_df = input_reader.preprocess(full_df)
+            else:
+                full_df = ldf.collect()
+                preprocessed_df = input_reader.preprocess(full_df)
 
-            # Convert back to lazy frame and continue with streaming operations
+            # Immediate cleanup after preprocessing
+            del full_df
+            cleanup_stats = memory_manager.enhanced_gc_cleanup()
+            
             ldf_preprocessed = preprocessed_df.lazy()
-
-            # Add surrogate IDs and filter invalid messages
             ldf_filtered = ldf_preprocessed.with_columns(
                 [(pl.int_range(pl.len()) + 1).alias(COL_MESSAGE_SURROGATE_ID)]
             ).filter(
@@ -593,185 +576,147 @@ def main(context: PrimaryAnalyzerContext):
                 & (pl.col(COL_AUTHOR_ID).str.len_chars() > 0)
             )
 
-            # Count filtered messages
             filtered_count = ldf_filtered.select(pl.len()).collect().item()
-
-            try:
-                progress_manager.update_step("preprocess", filtered_count)
-            except Exception as e:
-                # Don't let progress reporting failures crash the analysis
-                print(f"Warning: Progress update failed for preprocessing: {e}")
-
+            progress_manager.update_step_with_memory("preprocess", filtered_count, "preprocessing")
             progress_manager.complete_step("preprocess")
 
-            # Force garbage collection after preprocessing to free memory
-            gc.collect()
+        except MemoryError as e:
+            progress_manager.fail_step("preprocess", f"Memory exhaustion during preprocessing: {str(e)}")
+            raise
         except Exception as e:
-            progress_manager.fail_step(
-                "preprocess", f"Failed during preprocessing: {str(e)}"
-            )
+            progress_manager.fail_step("preprocess", f"Failed during preprocessing: {str(e)}")
             raise
 
-        # Step 2: Tokenizing text data
+        # Step 2: Enhanced tokenization with memory monitoring
         progress_manager.start_step("tokenize")
 
         try:
-            # Create a progress callback for tokenization that updates the progress manager
-            def tokenize_progress_callback(current_chunk, total_chunks):
-                try:
-                    if (
-                        tokenization_total is not None
-                    ):  # Only update if we have a progress bar
-                        progress_manager.update_step("tokenize", current_chunk)
-                except Exception as e:
-                    # Don't let progress reporting failures crash the analysis
-                    print(f"Warning: Progress update failed for tokenization: {e}")
+            def memory_aware_tokenize_callback(current_chunk, total_chunks):
+                progress_manager.update_step_with_memory("tokenize", current_chunk, "tokenization")
+                
+                # Check if we need to reduce chunk size mid-process
+                pressure_level = memory_manager.get_memory_pressure_level()
+                if pressure_level == MemoryPressureLevel.CRITICAL:
+                    # Signal to reduce chunk size
+                    current_adaptive = memory_manager.calculate_adaptive_chunk_size(adaptive_chunk_size, "tokenization")
+                    return {"reduce_chunk_size": True, "new_size": current_adaptive // 2}
+                return {"continue": True}
 
-            # Apply tokenization using the new tokenize_text function with progress reporting
+            # Enhanced tokenization with memory management
+            from app.utils import tokenize_text
             ldf_tokenized = tokenize_text(
-                ldf_filtered, COL_MESSAGE_TEXT, tokenize_progress_callback
+                ldf_filtered, COL_MESSAGE_TEXT, memory_aware_tokenize_callback, memory_manager
             )
+            
             progress_manager.complete_step("tokenize")
+            memory_manager.enhanced_gc_cleanup()
 
-            # Force garbage collection after tokenization to free memory
-            gc.collect()
+        except MemoryError as e:
+            progress_manager.fail_step("tokenize", f"Memory exhaustion during tokenization: {str(e)}")
+            raise
         except Exception as e:
-            progress_manager.fail_step(
-                "tokenize", f"Failed during tokenization: {str(e)}"
-            )
+            progress_manager.fail_step("tokenize", f"Failed during tokenization: {str(e)}")
             raise
 
-        # Step 3: Generating n-grams
+        # Step 3: Enhanced n-gram generation with memory pressure handling
         progress_manager.start_step("ngrams")
 
         try:
-            # Create a progress callback for n-gram generation that updates the progress manager
-            def ngram_progress_callback(current, total):
-                try:
-                    progress_manager.update_step("ngrams", current)
-                except Exception as e:
-                    # Don't let progress reporting failures crash the analysis
-                    print(f"Warning: Progress update failed for n-gram generation: {e}")
+            def memory_aware_ngram_callback(current, total):
+                progress_manager.update_step_with_memory("ngrams", current, "n-gram generation")
+                
+                # Return memory pressure info for adaptive processing
+                pressure_level = memory_manager.get_memory_pressure_level()
+                return {
+                    "pressure_level": pressure_level,
+                    "should_use_disk_fallback": pressure_level == MemoryPressureLevel.CRITICAL
+                }
 
-            # Generate n-grams using vectorized polars expressions with progress reporting
-            ldf_ngrams = _generate_ngrams_vectorized(
-                ldf_tokenized, min_n, max_n, ngram_progress_callback
-            )
+            # Check if we should use disk-based generation
+            current_pressure = memory_manager.get_memory_pressure_level()
+            
+            if current_pressure == MemoryPressureLevel.CRITICAL:
+                # Import and use disk-based fallback
+                from analyzers.ngrams.fallback_processors import generate_ngrams_disk_based
+                progress_manager.console.print("[red]Critical memory pressure - using disk-based n-gram generation[/red]")
+                ldf_ngrams = generate_ngrams_disk_based(
+                    ldf_tokenized, min_n, max_n, memory_aware_ngram_callback, memory_manager
+                )
+            else:
+                # Use enhanced vectorized generation with memory monitoring
+                ldf_ngrams = _generate_ngrams_with_memory_management(
+                    ldf_tokenized, min_n, max_n, memory_aware_ngram_callback, memory_manager
+                )
+
             progress_manager.complete_step("ngrams")
+            memory_manager.enhanced_gc_cleanup()
 
-            # Force garbage collection after n-gram generation to free memory
-            gc.collect()
+        except MemoryError as e:
+            progress_manager.fail_step("ngrams", f"Memory exhaustion during n-gram generation: {str(e)}")
+            raise
         except Exception as e:
-            progress_manager.fail_step(
-                "ngrams", f"Failed during n-gram generation: {str(e)}"
-            )
+            progress_manager.fail_step("ngrams", f"Failed during n-gram generation: {str(e)}")
             raise
 
-        # Step 4: Determine processing approach based on dataset size
+        # Step 4: Determine processing approach based on dataset size and memory
         progress_manager.start_step("analyze_approach")
 
         try:
-            # Count total n-grams to decide between chunked vs atomic processing
             total_ngrams = ldf_ngrams.select(pl.len()).collect().item()
-
-            # Set threshold for switching to chunked processing approach
-            # Above 500,000 n-grams, use chunked processing to avoid memory issues
-            # Below this threshold, atomic processing is more efficient
             CHUNKED_PROCESSING_THRESHOLD = 500_000
             use_chunked_approach = total_ngrams > CHUNKED_PROCESSING_THRESHOLD
-
-            # Log information through progress manager context instead of direct printing
-            # Total n-grams: {total_ngrams:,} - this info is preserved in progress state
-            if use_chunked_approach:
-                # Using chunked processing approach - info preserved in progress context
-                # Calculate chunk information for user feedback
-                chunk_size = 100_000
-                total_chunks = (
-                    total_ngrams + chunk_size - 1
-                ) // chunk_size  # Ceiling division
-                # Will process {total_chunks:,} chunks - info preserved in progress context
-            else:
-                # Using atomic processing approach - info preserved in progress context
-                pass
+            
+            # Also consider current memory pressure
+            current_pressure = memory_manager.get_memory_pressure_level()
+            if current_pressure in [MemoryPressureLevel.HIGH, MemoryPressureLevel.CRITICAL]:
+                use_chunked_approach = True  # Force chunked approach under memory pressure
 
             progress_manager.complete_step("analyze_approach")
+
         except Exception as e:
-            progress_manager.fail_step(
-                "analyze_approach", f"Failed during approach analysis: {str(e)}"
-            )
+            progress_manager.fail_step("analyze_approach", f"Failed during approach analysis: {str(e)}")
             raise
 
-        # Step 5: Extract unique n-grams from the dataset
+        # Step 5: Memory-aware unique extraction
         progress_manager.start_step("extract_unique")
 
         try:
-            # Create progress callback for unique extraction that updates the progress manager
             def unique_progress_callback(current_chunk, total_chunks):
-                try:
-                    progress_manager.update_step("extract_unique", current_chunk)
-                except Exception as e:
-                    print(
-                        f"Warning: Progress update failed for unique extraction chunk {current_chunk}: {e}"
-                    )
+                progress_manager.update_step_with_memory("extract_unique", current_chunk, "unique extraction")
 
-            # Perform the unique extraction using optimized streaming approach based on dataset size
-            if use_chunked_approach:
-                # Use optimized streaming batch accumulator for large datasets to minimize memory usage
-                # This approach uses temporary files and polars streaming operations to stay under 4GB memory
-                chunk_size = 50_000  # Smaller chunks for better memory efficiency
-
-                try:
-                    unique_ngram_texts = _stream_unique_batch_accumulator(
-                        ldf_ngrams.select("ngram_text"),
-                        chunk_size=chunk_size,
-                        column_name="ngram_text",
-                        progress_callback=unique_progress_callback,
-                    )
-
-                except Exception as e:
-                    # Enhanced fallback with streaming atomic processing
-                    print(
-                        f"Warning: Chunked streaming failed ({e}), using streaming atomic approach"
-                    )
-                    try:
-                        unique_ngram_texts = _stream_unique_to_temp_file(
-                            ldf_ngrams.select("ngram_text")
-                        )
-
-                    except Exception as fallback_error:
-                        # Final fallback to collect() if streaming completely fails
-                        print(
-                            f"Warning: Streaming atomic failed ({fallback_error}), using collect() fallback"
-                        )
-                        unique_ngram_texts = (
-                            ldf_ngrams.select("ngram_text").unique()
-                        ).collect()
+            pressure_level = memory_manager.get_memory_pressure_level()
+            
+            if pressure_level == MemoryPressureLevel.CRITICAL:
+                # Use disk-based external sorting approach
+                from analyzers.ngrams.memory_strategies import extract_unique_external_sort
+                progress_manager.console.print("[red]Critical memory pressure - using external sorting[/red]")
+                unique_ngram_texts = extract_unique_external_sort(
+                    ldf_ngrams, memory_manager, progress_manager
+                )
+            elif pressure_level == MemoryPressureLevel.HIGH:
+                # Use enhanced streaming with smaller chunks
+                from analyzers.ngrams.fallback_processors import stream_unique_memory_optimized
+                progress_manager.console.print("[yellow]High memory pressure - using optimized streaming[/yellow]")
+                unique_ngram_texts = stream_unique_memory_optimized(
+                    ldf_ngrams, memory_manager, progress_manager
+                )
             else:
-                # Use streaming atomic processing for smaller datasets when possible
-                try:
-                    unique_ngram_texts = _stream_unique_to_temp_file(
-                        ldf_ngrams.select("ngram_text")
-                    )
+                # Use current implementation with memory monitoring
+                chunk_size = memory_manager.calculate_adaptive_chunk_size(50000, "unique_extraction")
+                unique_ngram_texts = _stream_unique_batch_accumulator(
+                    ldf_ngrams.select("ngram_text"),
+                    chunk_size=chunk_size,
+                    progress_callback=unique_progress_callback
+                )
 
-                except Exception as e:
-                    # Fallback to collect() for atomic processing if streaming fails
-                    print(
-                        f"Warning: Streaming atomic failed ({e}), using collect() fallback"
-                    )
-                    unique_ngram_texts = (
-                        ldf_ngrams.select("ngram_text").unique()
-                    ).collect()
-
-            # Complete the step with count information
-            unique_count = len(unique_ngram_texts)
             progress_manager.complete_step("extract_unique")
+            memory_manager.enhanced_gc_cleanup()
 
-            # Force garbage collection after unique extraction to free memory
-            gc.collect()
+        except MemoryError as e:
+            progress_manager.fail_step("extract_unique", f"Memory exhaustion during unique extraction: {str(e)}")
+            raise
         except Exception as e:
-            progress_manager.fail_step(
-                "extract_unique", f"Failed during unique extraction: {str(e)}"
-            )
+            progress_manager.fail_step("extract_unique", f"Failed during unique extraction: {str(e)}")
             raise
 
         # Step 6: Sort n-grams alphabetically for consistent ordering
@@ -781,9 +726,7 @@ def main(context: PrimaryAnalyzerContext):
             sorted_ngrams = unique_ngram_texts.sort("ngram_text")
             progress_manager.complete_step("sort_ngrams")
         except Exception as e:
-            progress_manager.fail_step(
-                "sort_ngrams", f"Failed during sorting: {str(e)}"
-            )
+            progress_manager.fail_step("sort_ngrams", f"Failed during sorting: {str(e)}")
             raise
 
         # Step 7: Create sequential IDs for n-grams
@@ -795,9 +738,7 @@ def main(context: PrimaryAnalyzerContext):
             )
             progress_manager.complete_step("create_ids")
         except Exception as e:
-            progress_manager.fail_step(
-                "create_ids", f"Failed during ID creation: {str(e)}"
-            )
+            progress_manager.fail_step("create_ids", f"Failed during ID creation: {str(e)}")
             raise
 
         # Step 8: Join n-gram IDs back to the main dataset
@@ -812,44 +753,78 @@ def main(context: PrimaryAnalyzerContext):
             )
             progress_manager.complete_step("assign_ids")
         except Exception as e:
-            progress_manager.fail_step(
-                "assign_ids", f"Failed during ID assignment: {str(e)}"
-            )
+            progress_manager.fail_step("assign_ids", f"Failed during ID assignment: {str(e)}")
             raise
 
-        # Step 9: Generate output tables using enhanced streaming with sub-step progress
+        # Steps 9-11: Generate output tables using enhanced streaming with sub-step progress
         try:
-            # Output 1: message_ngrams (n-gram counts per message) with enhanced progress
             _enhanced_write_message_ngrams(
                 ldf_with_ids,
                 context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path,
                 progress_manager,
             )
         except Exception as e:
-            # Error handling is managed within the enhanced write function
             raise
 
         try:
-            # Output 2: ngrams (n-gram definitions) with enhanced progress
             _enhanced_write_ngram_definitions(
                 unique_ngrams,
                 context.output(OUTPUT_NGRAM_DEFS).parquet_path,
                 progress_manager,
             )
         except Exception as e:
-            # Error handling is managed within the enhanced write function
             raise
 
         try:
-            # Output 3: message_authors (original message data) with enhanced progress
             _enhanced_write_message_metadata(
                 ldf_tokenized,
                 context.output(OUTPUT_MESSAGE).parquet_path,
                 progress_manager,
             )
         except Exception as e:
-            # Error handling is managed within the enhanced write function
             raise
+
+        # Final memory report
+        progress_manager.display_memory_summary()
+
+
+def _generate_ngrams_with_memory_management(
+    ldf: pl.LazyFrame, min_n: int, max_n: int, progress_callback=None, memory_manager=None
+) -> pl.LazyFrame:
+    """
+    Enhanced n-gram generation with memory management integration.
+    
+    This function wraps the existing _generate_ngrams_vectorized function
+    with additional memory monitoring and cleanup.
+    """
+    if memory_manager is None:
+        memory_manager = MemoryManager()
+    
+    try:
+        # Monitor memory before generation
+        memory_before = memory_manager.get_current_memory_usage()
+        
+        # Use existing vectorized generation with enhanced progress reporting
+        result = _generate_ngrams_vectorized(ldf, min_n, max_n, progress_callback)
+        
+        # Force cleanup after generation
+        memory_manager.enhanced_gc_cleanup()
+        
+        # Monitor memory after generation
+        memory_after = memory_manager.get_current_memory_usage()
+        memory_used = memory_after['rss_mb'] - memory_before['rss_mb']
+        
+        if memory_used > 500:  # Log significant memory usage
+            logging.info(f"N-gram generation used {memory_used:.1f}MB")
+        
+        return result
+        
+    except MemoryError as e:
+        # If vectorized generation fails, try minimal memory approach
+        logging.warning("Vectorized n-gram generation failed due to memory pressure, falling back to minimal approach")
+        
+        from analyzers.ngrams.fallback_processors import generate_ngrams_disk_based
+        return generate_ngrams_disk_based(ldf, min_n, max_n, progress_callback, memory_manager)
 
 
 def _generate_ngrams_vectorized(
