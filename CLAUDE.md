@@ -116,6 +116,17 @@ find_symbol("AppContext", include_body=True)
 4. ✅ Use semantic tools for code exploration
 5. ✅ Maintain context throughout development
 
+### Code Development Standards
+
+**Logging Integration:**
+```python
+from app.logger import get_logger
+logger = get_logger(__name__)
+logger.info("Operation started", extra={"context": "value"})
+```
+
+Use structured logging throughout development for debugging and monitoring. See @docs/dev-guide.md#logging for complete usage patterns.
+
 ### Task-Specific Patterns
 
 **New Analyzer Development**:
