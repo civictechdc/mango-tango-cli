@@ -96,9 +96,9 @@ Dependency injection through context objects:
 
 ### For Development
 
-1. **Setup**: See [Setup Guide](./setup.md)
-2. **Contribution Workflow**: See [The Contribution Workflow Guide](./contributing.md)
-3. **Development Guide**: See [The Development Guide](./dev-guide.md)
+1. **Setup**: See [Setup Guide](installation.md)
+2. **Contribution Workflow**: See [The Contribution Workflow Guide](contributing.md)
+3. **Development Guide**: See [The Development Guide](architecture.md)
 
 ### For AI Assistants
 
@@ -125,9 +125,9 @@ Dependency injection through context objects:
 - `dash` - Interactive web dashboards
 - `shiny` - Python Shiny for modern web UIs
 - `plotly` - Visualization library
-- React - Stylized Interactive Dashboards for the end-user
-- Starlette - Web Framework for providing the dashboards and handling backend logic
-- Uvicorn - ASGI web-server that handles running the Starlette backend
+- `React` - Stylized Interactive Dashboards for the end-user
+- `Starlette` - Web Framework for providing the dashboards and handling backend logic
+- `Uvicorn` - ASGI web-server that handles running the Starlette backend
 
 ### CLI & Storage
 

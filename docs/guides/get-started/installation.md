@@ -417,4 +417,4 @@ pytest analyzers/hashtags/ -v
 ## Next Steps
 
 Once you have everything installed and running without any problems,
-the next step is to check out the [Contributor Workflow](./contributing.md)
+the next step is to check out the [Contributor Workflow](contributing.md)
