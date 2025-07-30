@@ -12,13 +12,9 @@
         <meta name="author" content="CIB Mango Tree">
       
       
-        <link rel="canonical" href="https://cibmangotree.org/guides/dev-guide/">
+        <link rel="canonical" href="https://cibmangotree.org/guides/architecture/">
       
       
-        <link rel="prev" href="../../license/">
-      
-      
-        <link rel="next" href="../contributing/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +22,7 @@
     
     
       
-        <title>CLI design philosophy - CIB Mango Tree</title>
+        <title>Architecture - CIB Mango Tree</title>
       
     
     
@@ -70,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cib-development-guide" class="md-skip">
+        <a href="#application-design-overview" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +99,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CLI design philosophy
+              Architecture
             
           </span>
         </div>
@@ -166,13 +162,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../dev-guide.md" class="md-tabs__link">
           
   
   
@@ -348,31 +342,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -385,7 +374,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Guides
@@ -396,30 +385,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    CLI design philosophy
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../dev-guide.md" class="md-nav__link">
         
   
   
@@ -430,231 +399,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#cib-development-guide" class="md-nav__link">
-    <span class="md-ellipsis">
-      CIB 🥭 Development Guide
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CIB 🥭 Development Guide">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#application-design-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application Design Overview
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#architecture-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Architecture Overview
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#core-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      Core Domain
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Core Domain">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#application" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#terminal-components" class="md-nav__link">
-    <span class="md-ellipsis">
-      Terminal Components
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#storage-io" class="md-nav__link">
-    <span class="md-ellipsis">
-      Storage IO
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#edge-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      Edge Domain
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Edge Domain">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#importers" class="md-nav__link">
-    <span class="md-ellipsis">
-      Importers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#semantic-preprocessor" class="md-nav__link">
-    <span class="md-ellipsis">
-      Semantic Preprocessor
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#content-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      Content Domain
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Content Domain">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#implementing-analyzers" class="md-nav__link">
-    <span class="md-ellipsis">
-      Implementing Analyzers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributing-a-new-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributing a New Analysis
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing" class="md-nav__link">
-    <span class="md-ellipsis">
-      Testing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributor-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributor Workflow
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Contributor Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Overview">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Steps
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#workflow-diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      Workflow Diagram
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#questions-comments-and-feedback" class="md-nav__link">
-    <span class="md-ellipsis">
-      Questions, Comments, and Feedback
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -949,16 +693,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cib-development-guide" class="md-nav__link">
-    <span class="md-ellipsis">
-      CIB 🥭 Development Guide
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CIB 🥭 Development Guide">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#application-design-overview" class="md-nav__link">
     <span class="md-ellipsis">
       Application Design Overview
@@ -966,8 +700,8 @@
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#architecture-overview" class="md-nav__link">
     <span class="md-ellipsis">
       Architecture Overview
@@ -975,173 +709,8 @@
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#core-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      Core Domain
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Core Domain">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#application" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#terminal-components" class="md-nav__link">
-    <span class="md-ellipsis">
-      Terminal Components
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#storage-io" class="md-nav__link">
-    <span class="md-ellipsis">
-      Storage IO
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#edge-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      Edge Domain
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Edge Domain">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#importers" class="md-nav__link">
-    <span class="md-ellipsis">
-      Importers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#semantic-preprocessor" class="md-nav__link">
-    <span class="md-ellipsis">
-      Semantic Preprocessor
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#content-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      Content Domain
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Content Domain">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#implementing-analyzers" class="md-nav__link">
-    <span class="md-ellipsis">
-      Implementing Analyzers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributing-a-new-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributing a New Analysis
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing" class="md-nav__link">
-    <span class="md-ellipsis">
-      Testing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributor-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributor Workflow
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Contributor Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Overview">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Steps
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#workflow-diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      Workflow Diagram
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#questions-comments-and-feedback" class="md-nav__link">
     <span class="md-ellipsis">
       Questions, Comments, and Feedback
@@ -1149,9 +718,13 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
   
 </li>
       
@@ -1174,22 +747,19 @@
   
 
 
-  <h1>CLI design philosophy</h1>
+  <h1>Architecture</h1>
 
-<h2 id="cib-development-guide">CIB 🥭 Development Guide</h2>
 <p>Before contributing please refer to our <a href="#contributor-workflow"><strong>Contributor Workflow</strong></a></p>
 <h3 id="application-design-overview">Application Design Overview</h3>
 <p>The CIB 🥭 application is a terminal-based tool for performing data analysis and visualization. It is designed to be modular and extensible, allowing developers to contribute new analysis modules and visualization components while providing a consistent user experience around data import, preprocessing, and output generation.</p>
 <p>This design is motivated by a common pain point when moving from a data analysis script for private use to a tool that can be shared with others: A script for private consumption carries assumptions about the desired input and output data format and structure that are convenient to its author. When such a script is made available to others, debates on these aspects often arise. For a suite of analyses that this project aims to offer, if left decentralized, this debate can lead to inconsistent UX offerings across analyses, code duplication, and even bugs.</p>
 <p>The architecture of the CIB 🥭 application is designed to address this problem by providing a clear separation between the core application logic and the analysis modules, such that the analysis module does not need to be concerned with the input and output data format and structure; such responsibilities are handled by the core application, where we aim to provide a rich, consistent, and intuitive user experience.</p>
 <h3 id="architecture-overview">Architecture Overview</h3>
-<p>The application has three "domains":</p>
-<ul>
-<li>The <a href="#core-domain"><strong>Core</strong></a> domain is responsible for workspace management, user flow, and integration of analysis runs and data import/export in a generic sense. It has three parts that correspond loosely to the MVC paradigm.</li>
-<li>The <a href="#application"><strong>Application</strong></a> defines the workspace logic and exposes generic capabilities for importing and exporting data as well as analyses and dashboards. This is the "controller" part.</li>
-<li>The <a href="#terminal-components"><strong>Terminal Components</strong></a> render the terminal interface and handle user input. This is the "view" part.</li>
-<li>The <a href="#storage-io"><strong>Storage IO</strong></a> persists the workspace data and is responsible for reading and writing data. This is the "model" part.</li>
-</ul>
+<p>The application has three "domains":
+- The <a href="#core-domain"><strong>Core</strong></a> domain is responsible for workspace management, user flow, and integration of analysis runs and data import/export in a generic sense. It has three parts that correspond loosely to the MVC paradigm.
+  - The <a href="#application"><strong>Application</strong></a> defines the workspace logic and exposes generic capabilities for importing and exporting data as well as analyses and dashboards. This is the "controller" part.
+  - The <a href="#terminal-components"><strong>Terminal Components</strong></a> render the terminal interface and handle user input. This is the "view" part.
+  - The <a href="#storage-io"><strong>Storage IO</strong></a> persists the workspace data and is responsible for reading and writing data. This is the "model" part.</p>
 <p>The core application provides the context necessary for the other domains to function in a way that allows them to be agnostic about the specifics of the workspace and user flow.</p>
 <ul>
 <li>The <a href="#edge-domain"><strong>Edge</strong></a> domain is responsible for data import and export while being agnostic about the specific analysis being run. Currently, this consists of the <strong>Importers</strong> and the <strong>Semantic Preprocessor</strong>.</li>
@@ -1218,113 +788,18 @@
 
     application --&gt; content
 </code></pre>
-<h3 id="core-domain">Core Domain</h3>
-<h4 id="application">Application</h4>
-<p>The Application <a href="../app/__init__.py">lives here</a>. It is responsible for defining and executing all capabilities of the application's workspace. Any extension or modification of the application's workspace capabilities should be done here.</p>
-<p>The application code should be free of specific storage implementation and be agnostic about the specifics of the terminal interface and the available analyzers.</p>
-<h4 id="terminal-components">Terminal Components</h4>
-<p>The Terminal Components <a href="../components/__init__.py">live here</a>. Their main responsibility is user flow, rendering the terminal interface, and handling user input.</p>
-<p>The user flow understandably depends on the set of capabilities offered by the <a href="#application">Application</a>, so an adjustment there may require an adjustment here.</p>
-<h4 id="storage-io">Storage IO</h4>
-<p>The Storage IO <a href="../storage/__init__.py">lives here</a>. It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.</p>
-<h3 id="edge-domain">Edge Domain</h3>
-<p>The Edge domain governs data import and export.</p>
-<h4 id="importers">Importers</h4>
-<p>The Importers <a href="../importing/__init__.py">live here</a>. Each importer offers a new way to import data into the workspace. The importers should be agnostic about the available analyzers. However, the Importers currently provide a terminal user flow so that their options can be customized by the user—a necessity since each importer may expose different sets of options and may have different UX approaches for their configuration.</p>
-<p>The importers eventually write data to a parquet file, whose path is provisioned by the application.</p>
-<h4 id="semantic-preprocessor">Semantic Preprocessor</h4>
-<p>The Semantic Preprocessor <a href="../preprocessing/series_semantic.py">lives here</a>. It defines all the column data semantics—a kind of type system that is used to guide the user in selecting the right columns for the right analysis. It is agnostic about the specific analyzers but does depend on them in a generic way—the available semantics exist to support the needs of analyzers and will be extended as necessary.</p>
-<h3 id="content-domain">Content Domain</h3>
-<p>The Content domain is where the analysis and visualization happen.</p>
-<p>An analysis is added to the application by defining a <strong>Primary Analyzer</strong>, which comes with an interface declaration and an implementation. The interface declaration defines the input data structure and the output tables, which the application depends on for user guidance. The implementation is made workspace-agnostic by means of the "context" object.</p>
-<p>The goal of the Primary Analyzer is to produce a set of output tables that can be used by other analyzers, including <strong>Secondary Analyzers</strong> and <strong>Web Presenters</strong>. Primary Analyzer outputs are ideally normalized, non-duplicated, and non-redundant. As such, they are not always suitable for direct user consumption. It is the job of the Secondary Analyzers to produce user-friendly outputs and the job of Web Presenters to produce interactive visualizations.</p>
-<p>Both Secondary Analyzers and Web Presenters are also defined using interface objects. Secondary Analyzers will depend on the output of Primary Analyzers, and Web Presenters will depend on the output of both Primary and Secondary Analyzers.</p>
-<h4 id="implementing-analyzers">Implementing Analyzers</h4>
-<p>The Primary Analyzer, the Secondary Analyzer, and the Web Presenter are all defined as functions that take a "context" object as their only argument. These context objects are provided by the application. The context object is there to support a contract that is expected between each module and the application.</p>
-<ul>
-<li>
-<p>The Primary Analyzer context provides the path to the input file and a method to apply the user's preprocessing, which must be called on the input data so that the analyzer receives the columns it expects. It also provides the output path for the analyzer to write its results, which must match the interface declaration. The files are parquet files, and the implementation can use whichever library it prefers to read and write these files.</p>
-</li>
-<li>
-<p>The Secondary Analyzer context provides the path to the output file of the Primary Analyzer and the path to the output file that the Secondary Analyzer should write to. The Secondary Analyzer should read the output of the Primary Analyzer and write its output in a way that is suitable for user consumption.</p>
-</li>
-<li>
-<p>The Web Presenter context provides the path to the output file of the Primary Analyzer and the paths to the output files of the Secondary Analyzers. It also provides the <a href="https://pypi.org/project/dash/">Dash</a> application object, which the Web Presenter should use to define its visualizations.</p>
-</li>
-</ul>
-<h4 id="contributing-a-new-analysis">Contributing a New Analysis</h4>
-<p>To contribute a new analysis, you should:</p>
-<ul>
-<li>Think about what you need from the user as input and what you want to show the user as output.</li>
-<li>Define a new Primary Analyzer interface and implementation. To start, you might want to output the exportable tables directly. However, as soon as you want to offer a dashboard or more elaborate sets of exportable outputs, you should consider outputting a more normalized set of tables in the Primary Analyzer and then define a Secondary Analyzer to produce the user-friendly outputs.</li>
-</ul>
-<blockquote>
-<p>💚 Using the Primary Analyzer in this way means that other contributors can build on your work. It is a great way to get started if you want to focus on the data science but let others handle data presentation.</p>
-</blockquote>
-<ul>
-<li>When defining a Secondary Analyzer, be sure to import and provide the Primary Analyzer interface as the "base" interface.</li>
-<li>When defining a Web Presenter, be sure to specify the "base" Primary Analyzer <strong>and</strong> all Secondary Analyzers that your dashboard needs.</li>
-<li>Mark any output not intended for user consumption as "internal" in the interface.</li>
-<li>Add all the defined modules to the <a href="../analyzers/__init__.py">suite</a>.</li>
-</ul>
-<p>If you're new to the project, check out
-<a href="../analyzers/example/README.md">this directory</a> for a
-workable example.</p>
-<h3 id="testing">Testing</h3>
-<p>The <code>testing</code> module provides testers for the primary and
-secondary analyzer modules. See the <a href="../analyzers/example/README.md">example</a> for further references.</p>
-<h3 id="contributor-workflow">Contributor Workflow</h3>
-<h4 id="overview">Overview</h4>
-<p>All changes should be made in a feature branch, merged into <code>develop</code>, and later merged into <code>main</code> for a new release.</p>
-<h5 id="steps">Steps</h5>
-<ol>
-<li><strong>Create a Feature Branch</strong></li>
-<li>Branch from <code>develop</code> using <code>feature/&lt;name&gt;</code> or <code>bugfix/&lt;name&gt;</code>.</li>
-<li>
-<p>Example:</p>
-<p><code>bash
- git checkout develop
- git pull origin develop
- git checkout -b feature/new-feature</code></p>
-</li>
-<li>
-<p><strong>Make Changes &amp; Push</strong></p>
-</li>
-<li>Commit changes with clear messages.</li>
-<li>
-<p>Push the branch.</p>
-<p><code>bash
- git add .
- git commit -m "Description of changes"
- git push origin feature/new-feature</code></p>
-</li>
-<li>
-<p><strong>Create a Pull Request</strong></p>
-</li>
-<li>Open a PR to merge into <code>develop</code>.</li>
-<li>
-<p>Address any review feedback.</p>
-</li>
-<li>
-<p><strong>Merge &amp; Clean Up</strong></p>
-</li>
-<li>After approval, merge into <code>develop</code>.</li>
-<li>
-<p>Delete the feature branch.</p>
-</li>
-<li>
-<p><strong>Release</strong></p>
-</li>
-<li>When develop is clean and ready for a new major release, we will merge <code>develop</code> into <code>main</code>.</li>
-</ol>
-<h4 id="workflow-diagram">Workflow Diagram</h4>
-<pre><code class="language-mermaid">graph TD;
-    A[Feature Branch] --&gt;|Commit &amp; Push| B[Pull Request];
-    B --&gt;|Review &amp; Merge| C[Develop Branch];
-    C --&gt;|Release| D[Main Branch];
-</code></pre>
-<h3 id="questions-comments-and-feedback">Questions, Comments, and Feedback</h3>
+<h2 id="questions-comments-and-feedback">Questions, Comments, and Feedback</h2>
 <p>Talk to us on the <a href="https://civictechdc.slack.com">Civic Tech DC Slack workspace</a>!</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>It would be recommended to review the sections for each domain, and the section for implementing analyzers. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="../domains/core-domain/">Core Domain</a></li>
+<li><a href="../domains/edge-domain/">Edge Domain</a></li>
+<li><a href="../domains/content-domain/">Content Domain</a></li>
+<li><a href="../analyzers/">Implementing Analyzers</a></li>
+<li><a href="./dashboards/shiny.md">Shiny Dashboards</a></li>
+<li><a href="./dashboards/react.md">React Dashboards</a></li>
+</ul>
 
 
 
