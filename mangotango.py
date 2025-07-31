@@ -8,6 +8,7 @@ from analyzers import suite
 from app import App, AppContext
 from app.logger import setup_logging
 from components import ViewContext, main_menu, splash
+from meta import get_version
 from storage import Storage
 from terminal_tools import enable_windows_ansi_support
 from terminal_tools.inception import TerminalContext
@@ -43,7 +44,8 @@ if __name__ == "__main__":
     # Set up logging
     log_level = getattr(logging, args.log_level)
     log_file_path = Path(storage.user_data_dir) / "logs" / "mangotango.log"
-    setup_logging(log_file_path, log_level)
+    app_version = get_version() or "development"
+    setup_logging(log_file_path, log_level, app_version)
 
     # Get logger for main module
     logger = logging.getLogger(__name__)
