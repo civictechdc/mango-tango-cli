@@ -90,11 +90,15 @@ def generate_ngrams_disk_based(
                 .with_columns([pl.lit("").alias("ngram_text")])
             )
 
-        # Stream all temp files together
+        # Stream all temp files together and collect immediately
+        # to avoid file cleanup race condition
         chunk_lazyframes = [pl.scan_parquet(f) for f in temp_files]
         result_ldf = pl.concat(chunk_lazyframes)
-
-        return result_ldf
+        
+        # Collect the result before cleanup to avoid file access issues
+        result_df = result_ldf.collect()
+        
+        return result_df.lazy()  # Return as LazyFrame for consistency
 
     finally:
         # Always cleanup temporary files

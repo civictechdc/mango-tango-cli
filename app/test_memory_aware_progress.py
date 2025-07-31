@@ -163,7 +163,9 @@ class TestMemoryAwareProgressManager:
 
             # Should have called print with a Panel
             mock_console.print.assert_called()
-            call_args = mock_console.print.call_args[0]
+            call_args = mock_console.print.call_args
+            assert call_args is not None, "mock_console.print was not called with arguments"
+            call_args = call_args[0]
             panel = call_args[0]
 
             # Panel should have appropriate border style and content
@@ -175,6 +177,8 @@ class TestMemoryAwareProgressManager:
 
             # Reset mock for next test
             mock_console.reset_mock()
+            # Reset the throttling timestamp to allow second warning
+            progress_manager.last_memory_warning = None
 
             # Test CRITICAL pressure warning
             progress_manager._display_memory_warning(
@@ -183,7 +187,9 @@ class TestMemoryAwareProgressManager:
                 "unique extraction",
             )
 
-            call_args = mock_console.print.call_args[0]
+            call_args = mock_console.print.call_args
+            assert call_args is not None, "mock_console.print was not called with arguments"
+            call_args = call_args[0]
             panel = call_args[0]
 
             assert panel.border_style == "red"
@@ -206,7 +212,9 @@ class TestMemoryAwareProgressManager:
 
             # Should display summary panel
             mock_console.print.assert_called()
-            call_args = mock_console.print.call_args[0]
+            call_args = mock_console.print.call_args
+            assert call_args is not None, "mock_console.print was not called with arguments"
+            call_args = call_args[0]
             panel = call_args[0]
 
             assert panel.border_style == "green"
@@ -284,7 +292,10 @@ class TestMemoryAwareProgressManagerIntegration:
             },  # After cleanup
         ]
 
-        memory_manager.get_current_memory_usage.side_effect = memory_states
+        # Add one more state for the final summary call
+        memory_manager.get_current_memory_usage.side_effect = memory_states + [
+            {"rss_mb": 2800.0, "process_memory_percent": 70.0, "pressure_level": "medium"}  # Final state for summary
+        ]
         memory_manager.should_trigger_gc.side_effect = [
             False,
             False,
@@ -315,7 +326,8 @@ class TestMemoryAwareProgressManagerIntegration:
             progress_manager.display_memory_summary()
 
         # Verify all memory monitoring calls were made
-        assert memory_manager.get_current_memory_usage.call_count == len(steps)
+        # 5 calls for steps + 1 call for final summary = 6 total calls
+        assert memory_manager.get_current_memory_usage.call_count == len(steps) + 1
         assert memory_manager.should_trigger_gc.call_count == len(steps)
         assert memory_manager.enhanced_gc_cleanup.call_count == 1  # Only when triggered
         assert memory_manager.get_memory_trend.call_count == 1  # In summary
