@@ -5,7 +5,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from analyzer_interface.context import SecondaryAnalyzerContext
+from app.logger import get_logger
 from terminal_tools.progress import RichProgressManager
+
+# Initialize module-level logger
+logger = get_logger(__name__)
 
 from ..ngrams_base.interface import (
     COL_AUTHOR_ID,
@@ -37,6 +41,19 @@ def main(context: SecondaryAnalyzerContext):
     Uses lazy evaluation with pl.scan_parquet, chunked processing to avoid cardinality explosion,
     and RichProgressManager for detailed progress feedback.
     """
+    logger.info(
+        "Starting n-gram statistics analysis",
+        extra={
+            "input_message_ngrams": str(
+                context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
+            ),
+            "input_ngram_defs": str(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path),
+            "input_messages": str(context.base.table(OUTPUT_MESSAGE).parquet_path),
+            "output_stats": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+            "output_full": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+            "analyzer_version": "streaming_memory_managed",
+        },
+    )
     # 1. Load inputs as LazyFrames for memory efficiency
     ldf_message_ngrams = pl.scan_parquet(
         context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
@@ -71,8 +88,16 @@ def main(context: SecondaryAnalyzerContext):
                 ngram_count + estimated_chunk_size - 1
             ) // estimated_chunk_size
 
-            # Data structure info preserved in progress context instead of direct printing
-            # Estimated full report processing info preserved in progress context
+            logger.info(
+                "Data structure analysis completed",
+                extra={
+                    "ngram_count": ngram_count,
+                    "message_ngram_count": message_ngram_count,
+                    "message_count": message_count,
+                    "estimated_chunk_size": estimated_chunk_size,
+                    "estimated_full_report_chunks": estimated_full_report_chunks,
+                },
+            )
 
             # Now add the full report step with calculated total
             progress_manager.add_step(
@@ -81,6 +106,11 @@ def main(context: SecondaryAnalyzerContext):
 
             progress_manager.complete_step("analyze_structure")
         except Exception as e:
+            logger.error(
+                "Structure analysis failed",
+                extra={"error": str(e), "error_type": type(e).__name__},
+                exc_info=True,
+            )
             progress_manager.fail_step(
                 "analyze_structure", f"Failed during structure analysis: {str(e)}"
             )
@@ -143,8 +173,20 @@ def main(context: SecondaryAnalyzerContext):
 
             # Collect and write the summary table
             df_ngram_summary = ldf_ngram_summary.collect(engine="streaming")
+            logger.info(
+                "Statistics computation completed",
+                extra={
+                    "summary_record_count": df_ngram_summary.height,
+                    "processing_engine": "streaming",
+                },
+            )
             progress_manager.complete_step("compute_stats")
         except Exception as e:
+            logger.error(
+                "Statistics computation failed",
+                extra={"error": str(e), "error_type": type(e).__name__},
+                exc_info=True,
+            )
             progress_manager.fail_step(
                 "compute_stats", f"Failed during statistics computation: {str(e)}"
             )
@@ -157,8 +199,24 @@ def main(context: SecondaryAnalyzerContext):
             df_ngram_summary.write_parquet(
                 context.output(OUTPUT_NGRAM_STATS).parquet_path
             )
+            logger.info(
+                "Summary output written successfully",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+                    "record_count": df_ngram_summary.height,
+                },
+            )
             progress_manager.complete_step("write_summary")
         except Exception as e:
+            logger.error(
+                "Summary output write failed",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+                exc_info=True,
+            )
             progress_manager.fail_step(
                 "write_summary", f"Failed writing summary output: {str(e)}"
             )
@@ -184,7 +242,15 @@ def main(context: SecondaryAnalyzerContext):
                 total_ngrams_to_process + chunk_size - 1
             ) // chunk_size
 
-            # Processing full report info preserved in progress context
+            logger.info(
+                "Starting full report generation",
+                extra={
+                    "total_ngrams_to_process": total_ngrams_to_process,
+                    "chunk_size": chunk_size,
+                    "actual_total_chunks": actual_total_chunks,
+                    "processing_mode": "chunked_streaming",
+                },
+            )
 
             # Initialize output file with schema
             first_chunk = True
@@ -241,22 +307,62 @@ def main(context: SecondaryAnalyzerContext):
                         progress_manager.update_step("write_full_report", current_chunk)
                     except Exception as e:
                         # Don't let progress reporting failures crash the analysis
-                        print(
-                            f"Warning: Progress update failed for full report chunk {current_chunk}: {e}"
+                        logger.warning(
+                            "Progress update failed for full report chunk",
+                            extra={
+                                "current_chunk": current_chunk,
+                                "error": str(e),
+                                "error_type": type(e).__name__,
+                            },
                         )
 
             except Exception as e:
+                logger.error(
+                    "Full report chunk processing failed",
+                    extra={
+                        "processed_count": processed_count,
+                        "total_ngrams_to_process": total_ngrams_to_process,
+                        "error": str(e),
+                        "error_type": type(e).__name__,
+                    },
+                    exc_info=True,
+                )
                 progress_manager.fail_step(
                     "write_full_report", f"Failed during chunk processing: {str(e)}"
                 )
                 raise
 
+            logger.info(
+                "Full report generation completed successfully",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+                    "processed_count": processed_count,
+                    "total_chunks": actual_total_chunks,
+                },
+            )
             progress_manager.complete_step("write_full_report")
         except Exception as e:
+            logger.error(
+                "Full report generation failed",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+                exc_info=True,
+            )
             progress_manager.fail_step(
                 "write_full_report", f"Failed during full report generation: {str(e)}"
             )
             raise
+
+    logger.info(
+        "N-gram statistics analysis completed successfully",
+        extra={
+            "output_stats_path": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+            "output_full_path": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+        },
+    )
 
 
 def _create_sample_full_report_row(

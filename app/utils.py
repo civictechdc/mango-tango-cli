@@ -4,14 +4,24 @@ from typing import Callable, Union
 import polars as pl
 import pyarrow.parquet as pq
 
+from app.logger import get_logger
+
+# Initialize module-level logger
+logger = get_logger(__name__)
+
 # Try to import regex module for Unicode property support, fallback to standard re
 try:
     import regex
 
     UNICODE_SUPPORT = True
+    logger.debug("Unicode regex support available", extra={"regex_module": "regex"})
 except ImportError:
     regex = re
     UNICODE_SUPPORT = False
+    logger.debug(
+        "Using standard re module, Unicode regex not available",
+        extra={"regex_module": "re"},
+    )
 
 
 def parquet_row_count(filename: str) -> int:
@@ -19,95 +29,102 @@ def parquet_row_count(filename: str) -> int:
     with pq.ParquetFile(filename) as pf:
         return pf.metadata.num_rows
 
+
 # Memory Management Infrastructure
 
-import psutil
 import gc
 import logging
 import time
-from typing import Dict, Optional, Callable
 from enum import Enum
+from typing import Callable, Dict, Optional
+
+import psutil
 
 
 class MemoryPressureLevel(Enum):
-    LOW = "low"           # < 60% of limit
-    MEDIUM = "medium"     # 60-75% of limit  
-    HIGH = "high"         # 75-85% of limit
-    CRITICAL = "critical" # > 85% of limit
+    LOW = "low"  # < 60% of limit
+    MEDIUM = "medium"  # 60-75% of limit
+    HIGH = "high"  # 75-85% of limit
+    CRITICAL = "critical"  # > 85% of limit
 
 
 class MemoryManager:
     """
     Real-time memory monitoring and adaptive processing control.
-    
+
     Provides memory usage tracking, adaptive chunk sizing, early warning system,
     and automatic garbage collection triggering for memory pressure scenarios.
     """
-    
-    def __init__(self, max_memory_gb: float = 4.0, process_name: str = "ngram_analyzer"):
+
+    def __init__(
+        self, max_memory_gb: float = 4.0, process_name: str = "ngram_analyzer"
+    ):
         self.max_memory_bytes = max_memory_gb * 1024**3
         self.process_name = process_name
         self.process = psutil.Process()
-        
+
         # Memory pressure thresholds
         self.thresholds = {
             MemoryPressureLevel.MEDIUM: 0.60,
-            MemoryPressureLevel.HIGH: 0.75, 
-            MemoryPressureLevel.CRITICAL: 0.85
+            MemoryPressureLevel.HIGH: 0.75,
+            MemoryPressureLevel.CRITICAL: 0.85,
         }
-        
+
         # Adaptive chunk size factors
         self.chunk_size_factors = {
             MemoryPressureLevel.LOW: 1.0,
             MemoryPressureLevel.MEDIUM: 0.7,
             MemoryPressureLevel.HIGH: 0.4,
-            MemoryPressureLevel.CRITICAL: 0.2
+            MemoryPressureLevel.CRITICAL: 0.2,
         }
-        
+
         # Memory usage history for trend analysis
         self.memory_history = []
         self.max_history_size = 100
-        
-        self.logger = logging.getLogger(f"{process_name}_memory")
-    
+
+        # Use structured logger instead of basic logging
+        self.logger = get_logger(f"{__name__}.{process_name}_memory")
+
     def get_current_memory_usage(self) -> Dict:
         """Get comprehensive current memory statistics."""
         memory_info = self.process.memory_info()
         system_memory = psutil.virtual_memory()
-        
+
         current_rss = memory_info.rss
         current_vms = memory_info.vms
-        
+
         usage_stats = {
-            'rss_bytes': current_rss,
-            'vms_bytes': current_vms,
-            'rss_mb': current_rss / 1024**2,
-            'vms_mb': current_vms / 1024**2,
-            'rss_gb': current_rss / 1024**3,
-            'system_available_gb': system_memory.available / 1024**3,
-            'system_used_percent': system_memory.percent,
-            'process_memory_percent': (current_rss / self.max_memory_bytes) * 100,
-            'pressure_level': self.get_memory_pressure_level().value
+            "rss_bytes": current_rss,
+            "vms_bytes": current_vms,
+            "rss_mb": current_rss / 1024**2,
+            "vms_mb": current_vms / 1024**2,
+            "rss_gb": current_rss / 1024**3,
+            "system_available_gb": system_memory.available / 1024**3,
+            "system_used_percent": system_memory.percent,
+            "process_memory_percent": (current_rss / self.max_memory_bytes) * 100,
+            "pressure_level": self.get_memory_pressure_level().value,
         }
-        
+
         # Add to history for trend analysis
-        self.memory_history.append({
-            'timestamp': time.time(),
-            'rss_bytes': current_rss,
-            'pressure_level': usage_stats['pressure_level']
-        })
-        
+        self.memory_history.append(
+            {
+                "timestamp": time.time(),
+                "rss_bytes": current_rss,
+                "pressure_level": usage_stats["pressure_level"],
+            }
+        )
+
         # Maintain history size
         if len(self.memory_history) > self.max_history_size:
             self.memory_history.pop(0)
-            
+
         return usage_stats
-    
+
     def get_memory_pressure_level(self) -> MemoryPressureLevel:
         """Determine current memory pressure level."""
         current_usage = self.process.memory_info().rss
         usage_ratio = current_usage / self.max_memory_bytes
-        
+
         if usage_ratio >= self.thresholds[MemoryPressureLevel.CRITICAL]:
             return MemoryPressureLevel.CRITICAL
         elif usage_ratio >= self.thresholds[MemoryPressureLevel.HIGH]:
@@ -116,67 +133,82 @@ class MemoryManager:
             return MemoryPressureLevel.MEDIUM
         else:
             return MemoryPressureLevel.LOW
-    
-    def calculate_adaptive_chunk_size(self, base_chunk_size: int, operation_type: str) -> int:
+
+    def calculate_adaptive_chunk_size(
+        self, base_chunk_size: int, operation_type: str
+    ) -> int:
         """Calculate optimal chunk size based on current memory pressure."""
         pressure_level = self.get_memory_pressure_level()
         adjustment_factor = self.chunk_size_factors[pressure_level]
-        
+
         # Operation-specific base adjustments
         operation_factors = {
             "tokenization": 1.0,
             "ngram_generation": 0.6,  # More memory intensive
             "unique_extraction": 1.2,
-            "join_operations": 0.8
+            "join_operations": 0.8,
         }
-        
+
         operation_factor = operation_factors.get(operation_type, 1.0)
         adjusted_size = int(base_chunk_size * adjustment_factor * operation_factor)
-        
+
         # Ensure minimum viable chunk size
         min_chunk_size = max(1000, base_chunk_size // 10)
         return max(adjusted_size, min_chunk_size)
-    
+
     def should_trigger_gc(self, force_threshold: float = 0.7) -> bool:
         """Determine if garbage collection should be triggered."""
         current_usage = self.process.memory_info().rss
         usage_ratio = current_usage / self.max_memory_bytes
-        
+
         return usage_ratio >= force_threshold
-    
+
     def enhanced_gc_cleanup(self) -> Dict:
         """Perform comprehensive garbage collection with metrics."""
         memory_before = self.get_current_memory_usage()
-        
+
         # Multiple GC passes for thorough cleanup
         for i in range(3):
             collected = gc.collect()
             if collected == 0:
                 break
-        
+
         memory_after = self.get_current_memory_usage()
-        
+
         cleanup_stats = {
-            'memory_freed_mb': (memory_before['rss_mb'] - memory_after['rss_mb']),
-            'memory_before_mb': memory_before['rss_mb'],
-            'memory_after_mb': memory_after['rss_mb'],
-            'pressure_before': memory_before['pressure_level'],
-            'pressure_after': memory_after['pressure_level']
+            "memory_freed_mb": (memory_before["rss_mb"] - memory_after["rss_mb"]),
+            "memory_before_mb": memory_before["rss_mb"],
+            "memory_after_mb": memory_after["rss_mb"],
+            "pressure_before": memory_before["pressure_level"],
+            "pressure_after": memory_after["pressure_level"],
         }
-        
-        self.logger.info(f"GC cleanup freed {cleanup_stats['memory_freed_mb']:.1f}MB")
+
+        self.logger.debug(
+            "Memory cleanup completed",
+            extra={
+                "memory_freed_mb": cleanup_stats["memory_freed_mb"],
+                "memory_before_mb": cleanup_stats["memory_before_mb"],
+                "memory_after_mb": cleanup_stats["memory_after_mb"],
+                "pressure_before": cleanup_stats["pressure_before"],
+                "pressure_after": cleanup_stats["pressure_after"],
+            },
+        )
         return cleanup_stats
-    
+
     def get_memory_trend(self) -> str:
         """Analyze recent memory usage trend."""
         if len(self.memory_history) < 5:
             return "insufficient_data"
-            
-        recent_usage = [entry['rss_bytes'] for entry in self.memory_history[-5:]]
-        
-        if all(recent_usage[i] <= recent_usage[i+1] for i in range(len(recent_usage)-1)):
+
+        recent_usage = [entry["rss_bytes"] for entry in self.memory_history[-5:]]
+
+        if all(
+            recent_usage[i] <= recent_usage[i + 1] for i in range(len(recent_usage) - 1)
+        ):
             return "increasing"
-        elif all(recent_usage[i] >= recent_usage[i+1] for i in range(len(recent_usage)-1)):
+        elif all(
+            recent_usage[i] >= recent_usage[i + 1] for i in range(len(recent_usage) - 1)
+        ):
             return "decreasing"
         else:
             return "stable"
@@ -303,6 +335,16 @@ def tokenize_text(
     if memory_manager is None:
         memory_manager = MemoryManager(max_memory_gb=4.0, process_name="tokenizer")
 
+    # Log tokenization start
+    logger.info(
+        "Starting text tokenization",
+        extra={
+            "text_column": text_column,
+            "has_progress_callback": progress_callback is not None,
+            "memory_manager_provided": memory_manager is not None,
+        },
+    )
+
     # Check if column exists by trying to reference it
     try:
         # This will validate that the column exists when the lazy frame is executed
@@ -425,7 +467,9 @@ def tokenize_text(
                 try:
                     # Tertiary method: Use sample-based estimation for problematic cases
                     # This is a fallback for very problematic data sources
-                    initial_chunk_size = memory_manager.calculate_adaptive_chunk_size(50000, "tokenization")
+                    initial_chunk_size = memory_manager.calculate_adaptive_chunk_size(
+                        50000, "tokenization"
+                    )
                     sample_size = min(1000, initial_chunk_size // 10)
                     sample_df = ldf.limit(sample_size).collect()
                     if len(sample_df) == 0:
@@ -442,25 +486,65 @@ def tokenize_text(
 
     total_rows = _get_dataset_size()
 
+    logger.debug(
+        "Dataset size determined",
+        extra={
+            "total_rows": total_rows,
+            "size_determination_method": (
+                "count_aggregation" if total_rows is not None else "unknown"
+            ),
+        },
+    )
+
     # Handle empty dataset efficiently
     if total_rows == 0:
+        logger.info(
+            "Empty dataset detected, returning empty tokens", extra={"total_rows": 0}
+        )
         return ldf.with_columns([pl.lit([]).alias("tokens")])
 
     # Calculate initial adaptive chunk size based on memory pressure
     initial_chunk_size = 50000
-    adaptive_chunk_size = memory_manager.calculate_adaptive_chunk_size(initial_chunk_size, "tokenization")
+    adaptive_chunk_size = memory_manager.calculate_adaptive_chunk_size(
+        initial_chunk_size, "tokenization"
+    )
+
+    logger.debug(
+        "Adaptive chunk size calculated",
+        extra={
+            "initial_chunk_size": initial_chunk_size,
+            "adaptive_chunk_size": adaptive_chunk_size,
+            "memory_pressure": memory_manager.get_memory_pressure_level().value,
+        },
+    )
 
     # If dataset is small, check if we should process without chunking
     if total_rows is not None and total_rows <= adaptive_chunk_size:
         # Small dataset - process normally with memory monitoring
+        logger.info(
+            "Processing small dataset without chunking",
+            extra={
+                "total_rows": total_rows,
+                "adaptive_chunk_size": adaptive_chunk_size,
+                "processing_mode": "single_chunk",
+            },
+        )
+
         memory_before = memory_manager.get_current_memory_usage()
         result = _tokenize_chunk(ldf)
         memory_after = memory_manager.get_current_memory_usage()
 
         # Log memory usage for small datasets
-        memory_used = memory_after['rss_mb'] - memory_before['rss_mb']
-        if memory_used > 100:  # Log if significant memory usage
-            logging.info(f"Tokenization used {memory_used:.1f}MB for {total_rows} rows")
+        memory_used = memory_after["rss_mb"] - memory_before["rss_mb"]
+        logger.debug(
+            "Small dataset tokenization completed",
+            extra={
+                "total_rows": total_rows,
+                "memory_used_mb": memory_used,
+                "memory_before_mb": memory_before["rss_mb"],
+                "memory_after_mb": memory_after["rss_mb"],
+            },
+        )
 
         return result
 
@@ -468,6 +552,15 @@ def tokenize_text(
     try:
         if total_rows is not None:
             # Known size approach - adaptive chunking with memory monitoring
+            logger.info(
+                "Starting chunked tokenization for large dataset",
+                extra={
+                    "total_rows": total_rows,
+                    "initial_chunk_size": adaptive_chunk_size,
+                    "processing_mode": "known_size_chunking",
+                },
+            )
+
             chunk_lazyframes = []
             current_chunk_size = adaptive_chunk_size
             processed_rows = 0
@@ -478,10 +571,30 @@ def tokenize_text(
 
                 if pressure_level == MemoryPressureLevel.CRITICAL:
                     # Reduce chunk size dramatically for critical pressure
+                    old_chunk_size = current_chunk_size
                     current_chunk_size = max(1000, current_chunk_size // 4)
+                    logger.warning(
+                        "Critical memory pressure - reducing chunk size dramatically",
+                        extra={
+                            "pressure_level": "CRITICAL",
+                            "old_chunk_size": old_chunk_size,
+                            "new_chunk_size": current_chunk_size,
+                            "processed_rows": processed_rows,
+                        },
+                    )
                 elif pressure_level == MemoryPressureLevel.HIGH:
                     # Reduce chunk size moderately for high pressure
+                    old_chunk_size = current_chunk_size
                     current_chunk_size = max(5000, current_chunk_size // 2)
+                    logger.warning(
+                        "High memory pressure - reducing chunk size",
+                        extra={
+                            "pressure_level": "HIGH",
+                            "old_chunk_size": old_chunk_size,
+                            "new_chunk_size": current_chunk_size,
+                            "processed_rows": processed_rows,
+                        },
+                    )
 
                 # Calculate actual chunk size for this iteration
                 remaining_rows = total_rows - processed_rows
@@ -499,39 +612,95 @@ def tokenize_text(
                     # Report progress with memory stats if callback provided
                     if progress_callback:
                         chunk_num = len(chunk_lazyframes)
-                        estimated_total_chunks = (total_rows + current_chunk_size - 1) // current_chunk_size
+                        estimated_total_chunks = (
+                            total_rows + current_chunk_size - 1
+                        ) // current_chunk_size
 
-                        callback_result = progress_callback(chunk_num, estimated_total_chunks)
+                        callback_result = progress_callback(
+                            chunk_num, estimated_total_chunks
+                        )
 
                         # Handle callback suggestions for chunk size adjustment
-                        if isinstance(callback_result, dict) and callback_result.get("reduce_chunk_size"):
-                            suggested_size = callback_result.get("new_size", current_chunk_size // 2)
+                        if isinstance(callback_result, dict) and callback_result.get(
+                            "reduce_chunk_size"
+                        ):
+                            suggested_size = callback_result.get(
+                                "new_size", current_chunk_size // 2
+                            )
                             current_chunk_size = max(1000, suggested_size)
 
                     # Force garbage collection after each chunk in high memory pressure
-                    if pressure_level in [MemoryPressureLevel.HIGH, MemoryPressureLevel.CRITICAL]:
+                    if pressure_level in [
+                        MemoryPressureLevel.HIGH,
+                        MemoryPressureLevel.CRITICAL,
+                    ]:
                         cleanup_stats = memory_manager.enhanced_gc_cleanup()
-                        if cleanup_stats['memory_freed_mb'] > 20:
-                            logging.info(f"Freed {cleanup_stats['memory_freed_mb']:.1f}MB after tokenization chunk")
+                        if cleanup_stats["memory_freed_mb"] > 20:
+                            logger.debug(
+                                "Significant memory freed after tokenization chunk",
+                                extra={
+                                    "memory_freed_mb": cleanup_stats["memory_freed_mb"],
+                                    "pressure_level": pressure_level.value,
+                                    "chunk_number": len(chunk_lazyframes),
+                                },
+                            )
 
                 except MemoryError as e:
                     # Emergency fallback - reduce chunk size dramatically and retry
                     if current_chunk_size > 1000:
+                        old_chunk_size = current_chunk_size
                         current_chunk_size = max(500, current_chunk_size // 8)
-                        logging.warning(f"Memory error in tokenization - reducing chunk size to {current_chunk_size}")
+                        logger.error(
+                            "Memory error in tokenization - emergency chunk size reduction",
+                            extra={
+                                "old_chunk_size": old_chunk_size,
+                                "new_chunk_size": current_chunk_size,
+                                "processed_rows": processed_rows,
+                                "error": str(e),
+                            },
+                        )
                         continue
                     else:
                         # Even minimum chunk size failed - this is a critical error
-                        raise MemoryError(f"Cannot process even minimal chunks during tokenization: {e}") from e
+                        logger.critical(
+                            "Cannot process even minimal chunks during tokenization",
+                            extra={
+                                "chunk_size": current_chunk_size,
+                                "processed_rows": processed_rows,
+                                "error": str(e),
+                            },
+                        )
+                        raise MemoryError(
+                            f"Cannot process even minimal chunks during tokenization: {e}"
+                        ) from e
 
             # Return concatenated results
             if not chunk_lazyframes:
+                logger.warning(
+                    "No chunks processed successfully in known-size tokenization"
+                )
                 return ldf.with_columns([pl.lit([]).alias("tokens")])
 
+            logger.info(
+                "Chunked tokenization completed successfully",
+                extra={
+                    "total_chunks_processed": len(chunk_lazyframes),
+                    "total_rows_processed": processed_rows,
+                    "final_chunk_size": current_chunk_size,
+                },
+            )
             return pl.concat(chunk_lazyframes)
 
         else:
             # Unknown size - streaming approach with memory-aware chunk sizing
+            logger.info(
+                "Starting streaming tokenization for unknown-size dataset",
+                extra={
+                    "initial_chunk_size": adaptive_chunk_size,
+                    "processing_mode": "streaming_unknown_size",
+                },
+            )
+
             chunk_lazyframes = []
             chunk_idx = 0
             estimated_chunks = 10  # Start with conservative estimate
@@ -587,25 +756,58 @@ def tokenize_text(
                         callback_result = progress_callback(chunk_idx, estimated_chunks)
 
                         # Handle callback suggestions for chunk size adjustment
-                        if isinstance(callback_result, dict) and callback_result.get("reduce_chunk_size"):
-                            suggested_size = callback_result.get("new_size", current_chunk_size // 2)
+                        if isinstance(callback_result, dict) and callback_result.get(
+                            "reduce_chunk_size"
+                        ):
+                            suggested_size = callback_result.get(
+                                "new_size", current_chunk_size // 2
+                            )
                             current_chunk_size = max(1000, suggested_size)
 
                     # Force garbage collection in high memory pressure
-                    if pressure_level in [MemoryPressureLevel.HIGH, MemoryPressureLevel.CRITICAL]:
+                    if pressure_level in [
+                        MemoryPressureLevel.HIGH,
+                        MemoryPressureLevel.CRITICAL,
+                    ]:
                         cleanup_stats = memory_manager.enhanced_gc_cleanup()
-                        if cleanup_stats['memory_freed_mb'] > 20:
-                            logging.info(f"Freed {cleanup_stats['memory_freed_mb']:.1f}MB after streaming tokenization chunk")
+                        if cleanup_stats["memory_freed_mb"] > 20:
+                            logger.debug(
+                                "Significant memory freed after streaming tokenization chunk",
+                                extra={
+                                    "memory_freed_mb": cleanup_stats["memory_freed_mb"],
+                                    "pressure_level": pressure_level.value,
+                                    "chunk_index": chunk_idx,
+                                },
+                            )
 
                 except MemoryError as e:
                     # Emergency fallback - reduce chunk size dramatically and retry
                     if current_chunk_size > 1000:
+                        old_chunk_size = current_chunk_size
                         current_chunk_size = max(500, current_chunk_size // 8)
-                        logging.warning(f"Memory error in streaming tokenization - reducing chunk size to {current_chunk_size}")
+                        logger.error(
+                            "Memory error in streaming tokenization - emergency chunk size reduction",
+                            extra={
+                                "old_chunk_size": old_chunk_size,
+                                "new_chunk_size": current_chunk_size,
+                                "chunk_index": chunk_idx,
+                                "error": str(e),
+                            },
+                        )
                         continue
                     else:
                         # Even minimum chunk size failed - critical error
-                        raise MemoryError(f"Cannot process even minimal chunks during streaming tokenization: {e}") from e
+                        logger.critical(
+                            "Cannot process even minimal chunks during streaming tokenization",
+                            extra={
+                                "chunk_size": current_chunk_size,
+                                "chunk_index": chunk_idx,
+                                "error": str(e),
+                            },
+                        )
+                        raise MemoryError(
+                            f"Cannot process even minimal chunks during streaming tokenization: {e}"
+                        ) from e
 
                 except Exception:
                     # If chunk processing fails, likely no more data
@@ -618,17 +820,51 @@ def tokenize_text(
                 progress_callback(final_chunks, final_chunks)  # Set to 100%
 
             if not chunk_lazyframes:
+                logger.warning(
+                    "No chunks processed successfully in streaming tokenization"
+                )
                 return ldf.with_columns([pl.lit([]).alias("tokens")])
 
+            logger.info(
+                "Streaming tokenization completed successfully",
+                extra={
+                    "total_chunks_processed": len(chunk_lazyframes),
+                    "final_chunk_size": current_chunk_size,
+                    "consecutive_empty_chunks": consecutive_empty_chunks,
+                },
+            )
             return pl.concat(chunk_lazyframes)
 
     except Exception as e:
         # If chunked processing fails completely, fall back to non-chunked processing
         # This maintains backward compatibility and ensures functionality
+        logger.warning(
+            "Chunked tokenization failed, attempting fallback to single-chunk processing",
+            extra={
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "fallback_mode": "single_chunk",
+            },
+        )
+
         try:
-            return _tokenize_chunk(ldf)
+            result = _tokenize_chunk(ldf)
+            logger.info(
+                "Fallback tokenization completed successfully",
+                extra={"fallback_mode": "single_chunk"},
+            )
+            return result
         except Exception as fallback_error:
             # If even fallback fails, provide informative error
+            logger.critical(
+                "Tokenization failed in both chunked and fallback modes",
+                extra={
+                    "chunked_error": str(e),
+                    "chunked_error_type": type(e).__name__,
+                    "fallback_error": str(fallback_error),
+                    "fallback_error_type": type(fallback_error).__name__,
+                },
+            )
             raise RuntimeError(
                 f"Tokenization failed in both chunked and fallback modes. "
                 f"Chunked error: {str(e)}. Fallback error: {str(fallback_error)}"
