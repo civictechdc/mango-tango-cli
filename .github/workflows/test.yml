@@ -26,5 +26,6 @@ jobs:
         run: pytest
   test_build:
       uses: ./.github/workflows/build_exe.yml
+      secrets: inherit
       with:
         is_release: false
