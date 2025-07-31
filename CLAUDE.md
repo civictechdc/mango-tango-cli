@@ -127,6 +127,24 @@ logger.info("Operation started", extra={"context": "value"})
 
 Use structured logging throughout development for debugging and monitoring. See @docs/dev-guide.md#logging for complete usage patterns.
 
+**Progress Reporting Integration:**
+```python
+from terminal_tools.progress import RichProgressManager
+
+def main(context):
+    with RichProgressManager("Analysis Progress") as progress:
+        progress.add_step("step_1", "Processing data", total=data_size)
+        progress.start_step("step_1")
+        # Use hierarchical sub-steps for complex operations
+        progress.add_substep("step_1", "prepare", "Preparing", total=100)
+        progress.start_substep("step_1", "prepare")
+        # ... processing with progress updates
+        progress.complete_substep("step_1", "prepare")
+        progress.complete_step("step_1")
+```
+
+Use hierarchical progress reporting for long-running analyzers. See @docs/dev-guide.md#progress-reporting-system and read_memory("progress_reporting_architecture") for comprehensive guidance.
+
 ### Task-Specific Patterns
 
 **New Analyzer Development**:
@@ -169,9 +187,10 @@ Use structured logging throughout development for debugging and monitoring. See 
 
 ```markdown
 # Load relevant memory for current task
-read_memory("analyzer_architecture")  # For analyzer work
-read_memory("suggested_commands")     # For development setup
-read_memory("task_completion_checklist") # Before committing
+read_memory("analyzer_architecture")        # For analyzer work
+read_memory("progress_reporting_architecture") # For progress reporting integration
+read_memory("suggested_commands")            # For development setup
+read_memory("task_completion_checklist")    # Before committing
 ```
 
 ## Context Management
@@ -188,8 +207,9 @@ read_memory("task_completion_checklist") # Before committing
 @.ai-context/setup-guide.md          # For environment issues
 
 # Deep domain knowledge
-@.serena/memories/analyzer_architecture.md # For analyzer work
-@.serena/memories/code_style_conventions.md # For style questions
+@.serena/memories/analyzer_architecture.md        # For analyzer work
+@.serena/memories/progress_reporting_architecture.md # For progress reporting
+@.serena/memories/code_style_conventions.md       # For style questions
 ```
 
 ### Symbol Navigation Examples

@@ -264,6 +264,221 @@ def test_my_function_logs_correctly(caplog):
     assert "Expected log message" in caplog.text
 ```
 
+## Progress Reporting System
+
+The application uses a sophisticated hierarchical progress reporting system built on the Rich library that provides real-time feedback during long-running analysis operations. This system is designed to eliminate silent processing periods and give users detailed visibility into analysis progress.
+
+### Progress System Components
+
+The progress reporting system consists of three main components:
+
+- **RichProgressManager**: The primary progress manager with hierarchical step and sub-step support
+- **ProgressReporter**: Basic multiprocess-compatible progress reporting
+- **AdvancedProgressReporter**: tqdm-based progress reporting with ETA calculation
+
+### RichProgressManager
+
+The `RichProgressManager` is the recommended progress reporting solution for analyzers. It provides:
+
+- **Hierarchical progress tracking**: Main steps with detailed sub-steps
+- **Rich terminal integration**: Beautiful progress bars and status indicators  
+- **Thread-safe operations**: Safe for concurrent progress updates
+- **Context manager support**: Clean setup and teardown
+- **Memory-aware calculations**: Progress estimates based on dataset characteristics
+
+#### Basic Progress Reporting
+
+```python
+from terminal_tools.progress import RichProgressManager
+
+def my_analyzer_function(context):
+    # Create progress manager with overall title
+    with RichProgressManager("N-gram Analysis Progress") as progress:
+        # Add main steps
+        progress.add_step("preprocess", "Preprocessing and filtering messages", total=1000)
+        progress.add_step("tokenize", "Tokenizing text data", total=500) 
+        progress.add_step("generate", "Generating n-grams", total=200)
+        
+        # Execute first step
+        progress.start_step("preprocess")
+        for i in range(1000):
+            # Do processing work
+            process_item(i)
+            progress.update_step("preprocess", i + 1)
+        progress.complete_step("preprocess")
+        
+        # Continue with remaining steps...
+```
+
+#### Hierarchical Sub-Steps
+
+For complex operations that benefit from granular progress feedback:
+
+```python
+def enhanced_analyzer_with_substeps(context):
+    with RichProgressManager("Enhanced Analysis") as progress:
+        # Add main step
+        progress.add_step("write_outputs", "Writing analysis outputs")
+        
+        # Add sub-steps for detailed progress
+        progress.add_substep("write_outputs", "prepare", "Preparing data structures", total=100)
+        progress.add_substep("write_outputs", "transform", "Transforming data format", total=200)
+        progress.add_substep("write_outputs", "sort", "Sorting results", total=150)
+        progress.add_substep("write_outputs", "write", "Writing to file", total=300)
+        
+        progress.start_step("write_outputs")
+        
+        # Execute each sub-step
+        progress.start_substep("write_outputs", "prepare")
+        for i in range(100):
+            prepare_data_item(i)
+            progress.update_substep("write_outputs", "prepare", i + 1)
+        progress.complete_substep("write_outputs", "prepare")
+        
+        # Continue with other sub-steps...
+        progress.complete_step("write_outputs")
+```
+
+### Integration with Analysis Context
+
+Analyzers receive progress reporting capability through the analysis context:
+
+```python
+def main(context):
+    """Primary analyzer with progress reporting."""
+    from terminal_tools.progress import RichProgressManager
+    
+    # The context provides a progress callback for integration
+    with RichProgressManager("My Analysis") as progress:
+        # Register progress manager with context if needed
+        if hasattr(context, 'progress_callback'):
+            context.progress_callback = progress
+        
+        # Your analysis implementation with progress updates
+        progress.add_step("analysis", "Running analysis", total=dataset_size)
+        progress.start_step("analysis")
+        
+        for i, item in enumerate(dataset):
+            process_item(item)
+            progress.update_step("analysis", i + 1)
+            
+        progress.complete_step("analysis")
+```
+
+### Progress Reporting Best Practices
+
+#### 1. Use Descriptive Step Names
+
+```python
+# Good - descriptive and specific
+progress.add_step("tokenize_text", "Tokenizing social media text", total=messages_count)
+progress.add_step("extract_ngrams", "Extracting n-gram patterns", total=token_count)
+
+# Avoid - too generic
+progress.add_step("step1", "Processing", total=count)
+```
+
+#### 2. Provide Accurate Progress Totals
+
+```python
+# Calculate totals based on actual data size
+message_count = len(input_dataframe)
+progress.add_step("process_messages", "Processing messages", total=message_count)
+
+# For unknown totals, omit the total parameter
+progress.add_step("variable_work", "Processing variable amount of data")
+```
+
+#### 3. Use Hierarchical Steps for Complex Operations
+
+```python
+# For operations that have distinct phases, use sub-steps
+progress.add_step("data_output", "Writing analysis results")
+progress.add_substep("data_output", "ngram_messages", "Writing n-gram messages", total=ngram_count)
+progress.add_substep("data_output", "ngram_definitions", "Writing n-gram definitions", total=definition_count)
+progress.add_substep("data_output", "metadata", "Writing metadata", total=metadata_count)
+```
+
+#### 4. Handle Errors Gracefully
+
+```python
+try:
+    progress.start_step("risky_operation")
+    perform_risky_operation()
+    progress.complete_step("risky_operation")
+except Exception as e:
+    progress.fail_step("risky_operation", f"Failed: {str(e)}")
+    raise
+```
+
+### Enhanced N-gram Pattern
+
+The enhanced N-gram analyzer demonstrates the recommended pattern for complex analyzers:
+
+```python
+def main(context):
+    with RichProgressManager("N-gram Analysis Progress") as progress:
+        # Steps 1-8: Traditional progress reporting
+        progress.add_step("step_1", "Loading and preprocessing data", total=row_count)
+        # ... other steps ...
+        
+        # Steps 9-11: Hierarchical sub-step progress for final operations
+        progress.add_step("step_9", "Writing n-gram messages")
+        progress.add_substep("step_9", "prepare", "Preparing message data", total=prepare_total)
+        progress.add_substep("step_9", "transform", "Transforming format", total=transform_total)
+        progress.add_substep("step_9", "sort", "Sorting by frequency", total=sort_total)
+        progress.add_substep("step_9", "write", "Writing to parquet", total=write_total)
+        
+        # Execute with granular feedback
+        _enhanced_write_message_ngrams(context, progress)
+```
+
+### Testing Progress Reporting
+
+When writing tests for analyzers with progress reporting:
+
+```python
+def test_analyzer_with_progress():
+    """Test analyzer progress reporting functionality."""
+    from terminal_tools.progress import RichProgressManager
+    from unittest.mock import Mock
+    
+    # Create mock context
+    context = Mock()
+    context.input_path = test_input_path
+    context.output_path = test_output_path
+    
+    # Test that progress reporting doesn't interfere with analysis
+    result = my_analyzer_function(context)
+    
+    # Verify outputs were created correctly
+    assert result is not None
+    assert output_path.exists()
+```
+
+### Performance Considerations
+
+- **Progress update frequency**: Update progress in reasonable increments (every 100-1000 items) to avoid display overhead
+- **Memory usage**: The progress system is designed to be lightweight and memory-efficient
+- **Thread safety**: All progress operations are thread-safe with internal locking
+
+### Troubleshooting
+
+#### Common Issues
+
+1. **Progress bars not displaying**: Ensure you're using the context manager (`with` statement)
+2. **Progress exceeds total**: Verify your total calculations match actual data size
+3. **Sub-steps not showing**: Confirm parent step is active before starting sub-steps
+
+#### Debug Mode
+
+Enable verbose progress logging during development:
+
+```python
+import logging
+logging.getLogger('terminal_tools.progress').setLevel(logging.DEBUG)
+```
+
 ## Contributor Workflow
 
 ### Overview

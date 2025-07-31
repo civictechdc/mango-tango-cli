@@ -42,15 +42,16 @@ Terminal UI components using inquirer for interactive flows:
 
 ### Terminal Tools (`terminal_tools/`)
 
-Enhanced terminal utilities and progress reporting:
+Enhanced terminal utilities and **sophisticated progress reporting system**:
 
-- `progress.py` - **Hierarchical progress reporting system**
+- `progress.py` - **Hierarchical progress reporting system** 
+  - See `progress_reporting_architecture` memory for detailed documentation
   - `RichProgressManager` - Main progress manager with sub-step support
   - `ProgressReporter` - Basic multiprocess progress reporting
   - `AdvancedProgressReporter` - tqdm-based progress with ETA
 - `prompts.py` - Interactive terminal prompts and file selection
 - `utils.py` - Terminal utilities (clear, ANSI support, etc.)
-- `test_progress.py` - Comprehensive tests for progress reporting (68 tests)
+- `test_progress.py` - Comprehensive tests for progress reporting (68+ tests)
 
 ### Analyzers (`analyzers/`)
 
@@ -70,6 +71,7 @@ Enhanced terminal utilities and progress reporting:
   - `ngrams_base/` - **Primary analyzer with enhanced progress reporting**
     - `main.py` - Enhanced with streaming optimization and hierarchical progress
     - `interface.py` - Input/output schema definitions
+    - **Progress Integration**: Uses RichProgressManager with hierarchical sub-steps for write operations
   - `ngram_stats/` - **Secondary analyzer**
     - `main.py` - Statistics calculation with chunked processing
     - `interface.py` - Statistics interface definition
@@ -111,10 +113,16 @@ Enhanced terminal utilities and progress reporting:
 ### Hierarchical Organization
 - **N-gram analyzers** organized into logical hierarchy
 - **Testing framework** provides comprehensive mock contexts
-- **Progress reporting** supports nested sub-steps
+- **Progress reporting** supports nested sub-steps (see `progress_reporting_architecture` memory)
 
 ### Enhanced Features
 - **Streaming optimization** for large dataset processing
 - **Hierarchical progress reporting** eliminates silent processing periods
 - **Comprehensive testing** with standardized frameworks
 - **Memory-efficient operations** with chunked processing
+
+## Related Memories
+
+- `progress_reporting_architecture` - Detailed documentation of the hierarchical progress reporting system
+- `analyzer_architecture` - Deep dive into analyzer system design
+- `project_overview` - High-level project understanding
