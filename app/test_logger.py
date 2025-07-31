@@ -35,7 +35,7 @@ class TestSetupLogging:
         with tempfile.TemporaryDirectory() as temp_dir:
             log_file_path = Path(temp_dir) / "test.log"
 
-            setup_logging(log_file_path, logging.DEBUG)
+            setup_logging(log_file_path, logging.DEBUG, "test_version")
 
             root_logger = logging.getLogger()
             assert root_logger.level == logging.DEBUG
@@ -45,7 +45,7 @@ class TestSetupLogging:
         with tempfile.TemporaryDirectory() as temp_dir:
             log_file_path = Path(temp_dir) / "test.log"
 
-            setup_logging(log_file_path)
+            setup_logging(log_file_path, logging.INFO, "test_version")
 
             root_logger = logging.getLogger()
 
@@ -88,7 +88,7 @@ class TestSetupLogging:
             sys.stderr = captured_stderr
 
             try:
-                setup_logging(log_file_path, logging.DEBUG)
+                setup_logging(log_file_path, logging.DEBUG, "test_version")
                 logger = logging.getLogger("test")
 
                 # Log messages at different levels
@@ -117,11 +117,12 @@ class TestSetupLogging:
                 sys.stderr = original_stderr
 
     def test_file_handler_logs_info_and_above(self):
-        """Test that file handler logs INFO and above messages."""
+        """Test that file handler logs INFO and above messages when set to INFO level."""
         with tempfile.TemporaryDirectory() as temp_dir:
             log_file_path = Path(temp_dir) / "test.log"
 
-            setup_logging(log_file_path, logging.DEBUG)
+            # Set logging to INFO level (not DEBUG) to test INFO+ filtering
+            setup_logging(log_file_path, logging.INFO, "test_version")
 
             logger = logging.getLogger("test")
 
@@ -152,7 +153,7 @@ class TestSetupLogging:
         with tempfile.TemporaryDirectory() as temp_dir:
             log_file_path = Path(temp_dir) / "test.log"
 
-            setup_logging(log_file_path, logging.INFO)
+            setup_logging(log_file_path, logging.INFO, "test_version")
 
             logger = logging.getLogger("test")
             logger.info("Test JSON format")
@@ -170,10 +171,13 @@ class TestSetupLogging:
                         if line.strip():
                             try:
                                 log_entry = json.loads(line)
-                                assert "asctime" in log_entry
+                                assert "timestamp" in log_entry  # renamed from asctime
                                 assert "name" in log_entry
-                                assert "levelname" in log_entry
+                                assert "level" in log_entry  # renamed from levelname
                                 assert "message" in log_entry
+                                assert "process_id" in log_entry
+                                assert "thread_id" in log_entry
+                                assert "app_version" in log_entry
                             except json.JSONDecodeError:
                                 pytest.fail(f"Log line is not valid JSON: {line}")
 
@@ -212,7 +216,7 @@ class TestIntegration:
             log_file_path = Path(temp_dir) / "integration_test.log"
 
             # Setup logging
-            setup_logging(log_file_path, logging.INFO)
+            setup_logging(log_file_path, logging.INFO, "integration_test_version")
 
             # Get logger and log messages
             logger = get_logger("integration_test")
@@ -236,4 +240,97 @@ class TestIntegration:
                 if line.strip():
                     log_entry = json.loads(line)
                     assert log_entry["name"] == "integration_test"
-                    assert log_entry["levelname"] in ["INFO", "WARNING", "ERROR"]
+                    assert log_entry["level"] in [
+                        "INFO",
+                        "WARNING",
+                        "ERROR",
+                    ]  # renamed field
+                    assert log_entry["app_version"] == "integration_test_version"
+
+
+class TestContextEnrichment:
+    """Test cases for context enrichment features."""
+
+    def test_context_filter_adds_metadata(self):
+        """Test that context filter adds process_id, thread_id, and app_version."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file_path = Path(temp_dir) / "test.log"
+
+            setup_logging(log_file_path, logging.INFO, "context_test_version")
+            logger = get_logger("context_test")
+            logger.info("Test context enrichment")
+
+            # Force flush
+            for handler in logging.getLogger().handlers:
+                handler.flush()
+
+            # Read and verify log contains enriched context
+            if log_file_path.exists():
+                log_content = log_file_path.read_text().strip()
+                if log_content:
+                    log_entry = json.loads(log_content)
+                    assert "process_id" in log_entry
+                    assert "thread_id" in log_entry
+                    assert log_entry["app_version"] == "context_test_version"
+                    assert isinstance(log_entry["process_id"], int)
+                    assert isinstance(log_entry["thread_id"], int)
+
+    def test_third_party_logger_levels(self):
+        """Test that third-party loggers are set to WARNING level."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file_path = Path(temp_dir) / "test.log"
+
+            setup_logging(log_file_path, logging.DEBUG, "hierarchy_test")
+
+            # Test third-party loggers
+            urllib3_logger = logging.getLogger("urllib3")
+            requests_logger = logging.getLogger("requests")
+            dash_logger = logging.getLogger("dash")
+
+            # They should be set to WARNING level
+            assert urllib3_logger.level == logging.WARNING
+            assert requests_logger.level == logging.WARNING
+            assert dash_logger.level == logging.WARNING
+
+            # Application loggers should inherit root level (DEBUG)
+            app_logger = logging.getLogger("app")
+            assert app_logger.level == logging.DEBUG
+
+    def test_cli_level_controls_file_handler(self):
+        """Test that CLI log level properly controls file handler level."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file_path = Path(temp_dir) / "test.log"
+
+            # Set up with DEBUG level
+            setup_logging(log_file_path, logging.DEBUG, "cli_test")
+
+            root_logger = logging.getLogger()
+            file_handler = None
+
+            # Find the file handler
+            for handler in root_logger.handlers:
+                if hasattr(handler, "baseFilename"):
+                    file_handler = handler
+                    break
+
+            assert file_handler is not None
+            # File handler level should match the CLI level
+            assert file_handler.level == logging.DEBUG
+
+    def test_global_exception_handler_setup(self):
+        """Test that global exception handler is installed."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file_path = Path(temp_dir) / "test.log"
+
+            # Store original exception handler
+            original_excepthook = sys.excepthook
+
+            try:
+                setup_logging(log_file_path, logging.INFO, "exception_test")
+
+                # Exception handler should be modified
+                assert sys.excepthook != original_excepthook
+
+            finally:
+                # Restore original handler
+                sys.excepthook = original_excepthook
