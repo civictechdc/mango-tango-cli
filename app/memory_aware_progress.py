@@ -38,22 +38,117 @@ class MemoryAwareProgressManager(RichProgressManager):
         # Get current memory stats
         memory_stats = self.memory_manager.get_current_memory_usage()
 
-        # Update the progress step
-        self.update_step(step_id, current)
+        # Log memory-aware progress update for debugging
+        from app.logger import get_logger
+
+        logger = get_logger(__name__)
+        logger.debug(
+            "Memory-aware progress update",
+            extra={
+                "step_id": step_id,
+                "current": current,
+                "memory_context": memory_context,
+                "memory_mb": memory_stats.get("rss_mb", "unknown"),
+                "pressure_level": memory_stats.get("pressure_level", "unknown"),
+            },
+        )
+
+        # Update the progress step with enhanced error handling
+        try:
+            self.update_step(step_id, current)
+        except Exception as progress_error:
+            # Critical: progress updates must not fail
+            logger.error(
+                "Critical failure in progress step update",
+                extra={
+                    "step_id": step_id,
+                    "current": current,
+                    "memory_context": memory_context,
+                    "error": str(progress_error),
+                    "error_type": type(progress_error).__name__,
+                },
+                exc_info=True,
+            )
+            # Try to continue with a simpler progress update
+            try:
+                # Fallback: try to update without memory context
+                super().update_step(step_id, current)
+                logger.info(
+                    "Progress update recovered using fallback method",
+                    extra={"step_id": step_id, "current": current},
+                )
+            except Exception as fallback_error:
+                logger.critical(
+                    "Complete failure in progress reporting - both primary and fallback methods failed",
+                    extra={
+                        "step_id": step_id,
+                        "current": current,
+                        "primary_error": str(progress_error),
+                        "fallback_error": str(fallback_error),
+                    },
+                )
+                # At this point, continue execution but progress display may be broken
 
         # Check for memory pressure and warn if necessary
-        pressure_level = MemoryPressureLevel(memory_stats["pressure_level"])
+        try:
+            # Fix: Properly convert string to enum
+            pressure_level_str = memory_stats["pressure_level"]
+            pressure_level = next(
+                (
+                    level
+                    for level in MemoryPressureLevel
+                    if level.value == pressure_level_str
+                ),
+                MemoryPressureLevel.LOW,  # Default fallback
+            )
 
-        if pressure_level in [MemoryPressureLevel.HIGH, MemoryPressureLevel.CRITICAL]:
-            self._display_memory_warning(pressure_level, memory_stats, memory_context)
+            if pressure_level in [
+                MemoryPressureLevel.HIGH,
+                MemoryPressureLevel.CRITICAL,
+            ]:
+                self._display_memory_warning(
+                    pressure_level, memory_stats, memory_context
+                )
+
+        except Exception as e:
+            # Log error but don't let it crash progress reporting
+            from app.logger import get_logger
+
+            logger = get_logger(__name__)
+            logger.warning(
+                "Failed to process memory pressure level in progress reporting",
+                extra={
+                    "step_id": step_id,
+                    "pressure_level_str": memory_stats.get("pressure_level", "unknown"),
+                    "memory_context": memory_context,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+            # Continue with progress reporting even if memory monitoring fails
 
         # Trigger GC if needed
-        if self.memory_manager.should_trigger_gc():
-            cleanup_stats = self.memory_manager.enhanced_gc_cleanup()
-            if cleanup_stats["memory_freed_mb"] > 50:  # Significant cleanup
-                self.console.print(
-                    f"[green]Freed {cleanup_stats['memory_freed_mb']:.1f}MB memory[/green]"
-                )
+        try:
+            if self.memory_manager.should_trigger_gc():
+                cleanup_stats = self.memory_manager.enhanced_gc_cleanup()
+                if cleanup_stats["memory_freed_mb"] > 50:  # Significant cleanup
+                    self.console.print(
+                        f"[green]Freed {cleanup_stats['memory_freed_mb']:.1f}MB memory[/green]"
+                    )
+        except Exception as e:
+            # Don't let GC failures crash progress reporting
+            from app.logger import get_logger
+
+            logger = get_logger(__name__)
+            logger.warning(
+                "Failed to trigger garbage collection in progress reporting",
+                extra={
+                    "step_id": step_id,
+                    "memory_context": memory_context,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
 
     def _display_memory_warning(
         self, pressure_level: MemoryPressureLevel, memory_stats: Dict, context: str

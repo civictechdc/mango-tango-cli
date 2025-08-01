@@ -94,88 +94,6 @@ class ProgressReporter:
         self.last_output_length = len(output)
 
 
-class AdvancedProgressReporter:
-    """Advanced progress reporter using tqdm for rich progress displays.
-
-    Provides detailed progress tracking with ETA calculation, processing speed,
-    and visual progress bars. Can be used as a context manager.
-    """
-
-    def __init__(self, title: str, total: int):
-        """Initialize the progress reporter.
-
-        Args:
-            title: The title/description for the progress bar
-            total: The total number of items to process
-        """
-        self.title = title
-        self.total = total
-        self._pbar = None
-
-    def start(self) -> None:
-        """Start the progress bar display."""
-        import tqdm
-
-        self._pbar = tqdm.tqdm(
-            total=self.total,
-            desc=self.title,
-            unit="items",
-            unit_scale=True,
-            dynamic_ncols=True,
-            bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]",
-        )
-
-    def update(self, n: int = 1) -> None:
-        """Update progress by n items.
-
-        Args:
-            n: Number of items processed (default: 1)
-        """
-        if self._pbar is not None:
-            self._pbar.update(n)
-
-    def set_progress(self, processed: int) -> None:
-        """Set the absolute progress to a specific number of processed items.
-
-        Args:
-            processed: Total number of items processed so far
-        """
-        if self._pbar is not None:
-            # Calculate the difference from current position
-            current = getattr(self._pbar, "n", 0)
-            diff = processed - current
-            if diff > 0:
-                self._pbar.update(diff)
-            elif diff < 0:
-                # If we need to go backwards, reset and update to new position
-                self._pbar.reset()
-                self._pbar.update(processed)
-
-    def finish(self, done_text: str = "Done!") -> None:
-        """Finish the progress bar and display completion message.
-
-        Args:
-            done_text: Text to display when finished (default: "Done!")
-        """
-        if self._pbar is not None:
-            # Ensure progress bar is at 100%
-            if self._pbar.n < self._pbar.total:
-                self._pbar.update(self._pbar.total - self._pbar.n)
-
-            self._pbar.set_description(done_text)
-            self._pbar.close()
-            self._pbar = None
-
-    def __enter__(self):
-        """Context manager entry - starts the progress bar."""
-        self.start()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Context manager exit - finishes the progress bar."""
-        self.finish()
-
-
 class RichProgressManager:
     """Rich-based multi-step progress manager with visual indicators and progress bars.
 
@@ -210,23 +128,16 @@ class RichProgressManager:
         Args:
             title: The overall title for the progress checklist
         """
-        import threading
-
         from rich.console import Console
-        from rich.live import Live
-        from rich.panel import Panel
         from rich.progress import (
             BarColumn,
             MofNCompleteColumn,
             Progress,
             SpinnerColumn,
-            TaskID,
             TaskProgressColumn,
             TextColumn,
             TimeRemainingColumn,
         )
-        from rich.table import Table
-        from rich.text import Text
 
         self.title = title
         self.steps = {}  # step_id -> step_info dict
@@ -235,13 +146,12 @@ class RichProgressManager:
         self.active_step = None
         self.active_substeps = {}  # step_id -> active_substep_id mapping
         self._started = False
-        self._display_lock = threading.Lock()  # Synchronize terminal display operations
 
-        # Rich components
+        # Rich components - use a single console and progress instance
         self.console = Console()
         self.live = None
 
-        # Create custom progress with appropriate columns
+        # Create custom progress with appropriate columns for hierarchical display
         self.progress = Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -253,9 +163,8 @@ class RichProgressManager:
             expand=True,
         )
 
-        # Rich task management - use Rich's native task IDs instead of custom mapping
+        # Rich task management - use Rich's native task IDs
         self.rich_task_ids = {}  # step_id -> Rich TaskID mapping
-        # Also track Rich task IDs for substeps
         self.rich_substep_task_ids = {}  # (step_id, substep_id) -> Rich TaskID mapping
 
         # State symbols
@@ -286,19 +195,15 @@ class RichProgressManager:
         }
         self.step_order.append(step_id)
 
-        # Create Rich progress task if total is specified, but keep it hidden initially
+        # Create Rich progress task if total is specified
         if total is not None:
             task_id = self.progress.add_task(
                 description=title,
                 total=total,
-                visible=False,  # Start hidden - will show when step becomes active
-                start=False,  # Don't start timer until step is active
+                visible=False,  # Will show when step becomes active
+                start=False,  # Timer starts when step is activated
             )
             self.rich_task_ids[step_id] = task_id
-
-        # Update display immediately if we're already started
-        if self._started and self.live:
-            self._update_display()
 
     def add_substep(
         self, parent_step_id: str, substep_id: str, description: str, total: int = None
@@ -333,19 +238,15 @@ class RichProgressManager:
             "parent_step_id": parent_step_id,
         }
 
-        # Create Rich progress task if total is specified, but keep it hidden initially
+        # Create Rich progress task if total is specified
         if total is not None:
             task_id = self.progress.add_task(
                 description=f"  └─ {description}",  # Indent substeps visually
                 total=total,
-                visible=False,  # Start hidden - will show when substep becomes active
-                start=False,  # Don't start timer until substep is active
+                visible=False,  # Will show when substep becomes active
+                start=False,  # Timer starts when substep is activated
             )
             self.rich_substep_task_ids[(parent_step_id, substep_id)] = task_id
-
-        # Update display immediately if we're already started
-        if self._started and self.live:
-            self._update_display()
 
     def start_substep(self, parent_step_id: str, substep_id: str):
         """Start/activate a specific substep.
@@ -404,9 +305,8 @@ class RichProgressManager:
             self.progress.update(task_id, visible=True)
             self.progress.start_task(task_id)
 
-        # Update display immediately
-        if self._started and self.live:
-            self._update_display()
+        # Update display to show substep activation
+        self._update_display()
 
     def update_substep(self, parent_step_id: str, substep_id: str, progress: int):
         """Update the progress of a specific substep.
@@ -469,15 +369,8 @@ class RichProgressManager:
         # Update parent step progress based on substep completion
         self._update_parent_progress(parent_step_id)
 
-        # Update display if started (with error handling)
-        if self._started and self.live:
-            try:
-                self._update_display()
-            except Exception as e:
-                self.console.print(
-                    f"[yellow]Warning: Failed to update progress display: {e}[/yellow]",
-                    file=sys.stderr,
-                )
+        # Update display to show substep progress
+        self._update_display()
 
     def complete_substep(self, parent_step_id: str, substep_id: str):
         """Mark a substep as completed.
@@ -522,9 +415,8 @@ class RichProgressManager:
         # Update parent step progress
         self._update_parent_progress(parent_step_id)
 
-        # Update display immediately
-        if self._started and self.live:
-            self._update_display()
+        # Update display to show substep completion
+        self._update_display()
 
     def fail_substep(self, parent_step_id: str, substep_id: str, error_msg: str = None):
         """Mark a substep as failed.
@@ -563,9 +455,8 @@ class RichProgressManager:
         ):
             self.active_substeps[parent_step_id] = None
 
-        # Update display immediately
-        if self._started and self.live:
-            self._update_display()
+        # Update display to show substep failure
+        self._update_display()
 
     def _update_parent_progress(self, parent_step_id: str):
         """Update parent step progress based on substep completion."""
@@ -610,11 +501,10 @@ class RichProgressManager:
             self.progress.update(task_id, visible=True)
             self.progress.start_task(task_id)
 
-        # Update display immediately
-        if self._started and self.live:
-            self._update_display()
+        # Update display to show new state
+        self._update_display()
 
-    def update_step(self, step_id: str, progress: int):
+    def update_step(self, step_id: str, progress: float):
         """Update the progress of a specific step.
 
         Args:
@@ -640,8 +530,8 @@ class RichProgressManager:
                 f"Progress must be a number, got {type(progress).__name__}: {progress!r}"
             )
 
-        # Convert to int if it was a float
-        progress = int(progress)
+        # Keep as float for precise progress tracking
+        progress = float(progress)
 
         # Validate progress bounds
         if progress < 0:
@@ -662,16 +552,8 @@ class RichProgressManager:
             task_id = self.rich_task_ids[step_id]
             self.progress.update(task_id, completed=progress)
 
-        # Update display if started (with error handling)
-        if self._started and self.live:
-            try:
-                self._update_display()
-            except Exception as e:
-                self.console.print(
-                    f"[yellow]Warning: Failed to update progress display: {e}[/yellow]",
-                    file=sys.stderr,
-                )
-                # Continue execution - display issues shouldn't crash progress tracking
+        # Update display to show progress changes
+        self._update_display()
 
     def complete_step(self, step_id: str):
         """Mark a step as completed.
@@ -700,9 +582,8 @@ class RichProgressManager:
         if step_id == self.active_step:
             self.active_step = None
 
-        # Update display immediately
-        if self._started and self.live:
-            self._update_display()
+        # Update display to show completion
+        self._update_display()
 
     def fail_step(self, step_id: str, error_msg: str = None):
         """Mark a step as failed.
@@ -728,241 +609,181 @@ class RichProgressManager:
         if step_id == self.active_step:
             self.active_step = None
 
-        # Update display immediately
-        if self._started and self.live:
-            self._update_display()
+        # Update display to show failure
+        self._update_display()
 
     def start(self):
         """Start the checklist display."""
         if self._started:
             return
 
-        from rich.console import Group
         from rich.live import Live
 
         self._started = True
 
-        # Create the display content group
-        self.display_group = Group()
-
-        # Initialize Rich Live display with the group
+        # Initialize Live display with dynamic content
         self.live = Live(
-            self.display_group,
+            self._create_display_group(),
             console=self.console,
-            refresh_per_second=4,
+            refresh_per_second=40,
             auto_refresh=True,
         )
         self.live.start()
 
-        # Initial display update
-        self._update_display()
+    def _update_display(self):
+        """Update the live display with current progress."""
+        if self._started and self.live:
+            self.live.update(self._create_display_group())
 
     def finish(self):
         """Finish the checklist display and cleanup."""
         if not self._started:
             return
 
-        try:
-            # Final display update to show final state
-            if self.live:
-                self._update_display()
-                self.live.stop()
-                self.live = None
+        self._started = False
+        # Final display update to show final state
+        if self.live:
+            self.live.stop()
+            self.live = None
 
-            # Add a final newline for separation
-            self.console.print()
-        except Exception:
-            # If display cleanup fails, at least try to clean up state
-            try:
-                if self.live:
-                    self.live.stop()
-                    self.live = None
-            except Exception:
-                pass
-        finally:
-            self._started = False
+    def _create_display_group(self):
+        """Create the Rich renderable group for the hierarchical progress display."""
+        from rich.console import Group
+        from rich.table import Table
+        from rich.text import Text
 
-    def _update_display(self):
-        """Update the Rich display with current step states, substeps, and active progress."""
-        # Add timeout protection to prevent infinite loops during interrupts
-        try:
-            with self._display_lock:
-                if not self._started or not self.live:
-                    return
+        # Create a table for step overview
+        steps_table = Table(
+            show_header=False, show_edge=False, pad_edge=False, box=None
+        )
+        steps_table.add_column("Status", style="bold", width=3, justify="center")
+        steps_table.add_column("Step", ratio=1)
 
-            from rich.console import Group
-            from rich.panel import Panel
-            from rich.table import Table
-            from rich.text import Text
+        # Add each step to the table
+        for step_id in self.step_order:
+            step_info = self.steps[step_id]
+            symbol = self.SYMBOLS[step_info["state"]]
+            title = step_info["title"]
 
-            # Create the main table for all steps and substeps
-            steps_table = Table(
-                show_header=False, show_edge=False, pad_edge=False, box=None
-            )
-            steps_table.add_column("Status", style="bold", width=3, justify="center")
-            steps_table.add_column("Step", ratio=1)
+            # Create step text with progress if available
+            if step_info["total"] is not None and step_info["state"] in [
+                "active",
+                "completed",
+            ]:
+                percentage = (
+                    (step_info["progress"] / step_info["total"]) * 100
+                    if step_info["total"] > 0
+                    else 0
+                )
+                step_text = f"{title} ({step_info['progress']}/{step_info['total']} - {percentage:.0f}%)"
+            else:
+                step_text = title
 
-            # Add each step and its substeps to the table
-            for step_id in self.step_order:
-                step_info = self.steps[step_id]
-                symbol = self.SYMBOLS[step_info["state"]]
-                title = step_info["title"]
+            # Add substep progress if available
+            if step_id in self.substeps and self.substeps[step_id]:
+                substeps = self.substeps[step_id]
+                completed_substeps = sum(
+                    1 for s in substeps.values() if s["state"] == "completed"
+                )
+                total_substeps = len(substeps)
+                if step_info["state"] == "active" and total_substeps > 0:
+                    substep_percent = (completed_substeps / total_substeps) * 100
+                    step_text += f" [{substep_percent:.0f}% substeps]"
 
-                # Create the step text with potential progress info
-                if step_info["total"] is not None and step_info["state"] in [
-                    "active",
-                    "completed",
-                ]:
-                    percentage = (
-                        (step_info["progress"] / step_info["total"]) * 100
-                        if step_info["total"] > 0
-                        else 0
-                    )
-                    step_text = f"{title} ({step_info['progress']}/{step_info['total']} - {percentage:.0f}%)"
-                else:
-                    step_text = title
+            # Add error message for failed steps
+            if step_info["state"] == "failed" and step_info["error_msg"]:
+                step_text += f" - [red]{step_info['error_msg']}[/red]"
 
-                # Add substep progress information if available
-                if step_id in self.substeps and self.substeps[step_id]:
-                    substeps = self.substeps[step_id]
-                    completed_substeps = sum(
-                        1 for s in substeps.values() if s["state"] == "completed"
-                    )
-                    total_substeps = len(substeps)
+            # Style based on state
+            if step_info["state"] == "completed":
+                step_text = f"[green]{step_text}[/green]"
+            elif step_info["state"] == "failed":
+                step_text = f"[red]{step_text}[/red]"
+            elif step_info["state"] == "active":
+                step_text = f"[yellow]{step_text}[/yellow]"
+            else:  # pending
+                step_text = f"[dim white]{step_text}[/dim white]"
 
-                    if step_info["state"] == "active" and total_substeps > 0:
-                        substep_percent = (completed_substeps / total_substeps) * 100
-                        step_text += f" [{substep_percent:.0f}% substeps]"
+            steps_table.add_row(symbol, step_text)
 
-                # Add error message for failed steps
-                if step_info["state"] == "failed" and step_info["error_msg"]:
-                    step_text += f" - [red]{step_info['error_msg']}[/red]"
+            # Add substeps
+            if step_id in self.substeps:
+                for _substep_id, substep_info in self.substeps[step_id].items():
+                    substep_description = substep_info["description"]
 
-                # Style based on state - colors help distinguish states
-                if step_info["state"] == "completed":
-                    step_text = f"[green]{step_text}[/green]"
-                elif step_info["state"] == "failed":
-                    step_text = f"[red]{step_text}[/red]"
-                elif step_info["state"] == "active":
-                    step_text = f"[yellow]{step_text}[/yellow]"
-                else:  # pending
-                    step_text = f"[dim white]{step_text}[/dim white]"
+                    # Create substep text with progress
+                    if substep_info["total"] is not None and substep_info["state"] in [
+                        "active",
+                        "completed",
+                    ]:
+                        substep_percentage = (
+                            (substep_info["progress"] / substep_info["total"]) * 100
+                            if substep_info["total"] > 0
+                            else 0
+                        )
+                        substep_text = f"  └─ {substep_description} ({substep_info['progress']}/{substep_info['total']} - {substep_percentage:.0f}%)"
+                    else:
+                        substep_text = f"  └─ {substep_description}"
 
-                steps_table.add_row(symbol, step_text)
+                    # Add error message for failed substeps
+                    if substep_info["state"] == "failed" and substep_info["error_msg"]:
+                        substep_text += f" - [red]{substep_info['error_msg']}[/red]"
 
-                # Add substeps if they exist
-                if step_id in self.substeps:
-                    substeps = self.substeps[step_id]
-                    for substep_id, substep_info in substeps.items():
-                        substep_symbol = self.SYMBOLS[substep_info["state"]]
-                        substep_description = substep_info["description"]
+                    # Style substeps
+                    if substep_info["state"] == "completed":
+                        substep_text = f"[green]{substep_text}[/green]"
+                    elif substep_info["state"] == "failed":
+                        substep_text = f"[red]{substep_text}[/red]"
+                    elif substep_info["state"] == "active":
+                        substep_text = f"[yellow]{substep_text}[/yellow]"
+                    else:  # pending
+                        substep_text = f"[dim white]{substep_text}[/dim white]"
 
-                        # Create substep text with progress if available
-                        if substep_info["total"] is not None and substep_info[
-                            "state"
-                        ] in [
-                            "active",
-                            "completed",
-                        ]:
-                            substep_percentage = (
-                                (substep_info["progress"] / substep_info["total"]) * 100
-                                if substep_info["total"] > 0
-                                else 0
-                            )
-                            substep_text = f"  └─ {substep_description} ({substep_info['progress']}/{substep_info['total']} - {substep_percentage:.0f}%)"
-                        else:
-                            substep_text = f"  └─ {substep_description}"
+                    steps_table.add_row("", substep_text)
 
-                        # Add error message for failed substeps
-                        if (
-                            substep_info["state"] == "failed"
-                            and substep_info["error_msg"]
-                        ):
-                            substep_text += f" - [red]{substep_info['error_msg']}[/red]"
+        # Create the display group
+        content_parts = []
 
-                        # Style substeps based on state
-                        if substep_info["state"] == "completed":
-                            substep_text = f"[green]{substep_text}[/green]"
-                        elif substep_info["state"] == "failed":
-                            substep_text = f"[red]{substep_text}[/red]"
-                        elif substep_info["state"] == "active":
-                            substep_text = f"[yellow]{substep_text}[/yellow]"
-                        else:  # pending
-                            substep_text = f"[dim white]{substep_text}[/dim white]"
+        # Add title
+        title_text = Text(self.title, style="bold blue")
+        content_parts.append(title_text)
+        content_parts.append("")  # Empty line
+        content_parts.append(steps_table)
 
-                        steps_table.add_row(
-                            "", substep_text
-                        )  # Empty symbol for substeps
+        # Add progress bar for active tasks
+        has_active_progress = (
+            self.active_step
+            and self.active_step in self.rich_task_ids
+            and self.steps[self.active_step]["state"] == "active"
+        )
 
-            # Build the content parts
-            content_parts = []
+        # Check for active substep progress
+        if not has_active_progress:
+            for parent_step_id, active_substep_id in self.active_substeps.items():
+                if (
+                    active_substep_id
+                    and parent_step_id in self.substeps
+                    and active_substep_id in self.substeps[parent_step_id]
+                    and self.substeps[parent_step_id][active_substep_id]["state"]
+                    == "active"
+                    and (parent_step_id, active_substep_id)
+                    in self.rich_substep_task_ids
+                ):
+                    has_active_progress = True
+                    break
 
-            # Add title
-            title_text = Text(self.title, style="bold blue")
-            content_parts.append(title_text)
+        if has_active_progress:
             content_parts.append("")  # Empty line
-            content_parts.append(steps_table)
+            content_parts.append(self.progress)
 
-            # Add active progress bar - check both step and substep progress bars
-            progress_bar_added = False
-
-            # Check for active step with total (original logic)
-            if (
-                self.active_step
-                and self.active_step in self.rich_task_ids
-                and self.steps[self.active_step]["state"] == "active"
-            ):
-                step_info = self.steps[self.active_step]
-                if step_info["total"] is not None:
-                    content_parts.append("")  # Empty line
-                    content_parts.append(self.progress)
-                    progress_bar_added = True
-
-            # Check for active substep with total (new logic)
-            if not progress_bar_added:
-                for parent_step_id, active_substep_id in self.active_substeps.items():
-                    if (
-                        active_substep_id
-                        and parent_step_id in self.substeps
-                        and active_substep_id in self.substeps[parent_step_id]
-                    ):
-
-                        substep_info = self.substeps[parent_step_id][active_substep_id]
-                        if (
-                            substep_info["state"] == "active"
-                            and substep_info["total"] is not None
-                            and (parent_step_id, active_substep_id)
-                            in self.rich_substep_task_ids
-                        ):
-
-                            content_parts.append("")  # Empty line
-                            content_parts.append(self.progress)
-                            progress_bar_added = True
-                            break
-
-                # Update the display group and live display
-                from rich.console import Group
-
-                self.display_group = Group(*content_parts)
-                self.live.update(self.display_group)
-        except Exception as e:
-            # During keyboard interrupts, display updates can fail
-            # Don't let display errors crash the application
-            if not isinstance(e, KeyboardInterrupt):
-                try:
-                    self.console.print(
-                        f"[yellow]Warning: Display update failed: {e}[/yellow]",
-                        file=sys.stderr,
-                    )
-                except Exception:
-                    pass
+        return Group(*content_parts)
 
     def __enter__(self):
         """Context manager entry - starts the checklist display."""
         self.start()
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, _exc_value, _traceback):
         """Context manager exit - finishes the checklist display."""
         # Handle KeyboardInterrupt specially to ensure clean terminal state
         if exc_type is KeyboardInterrupt:

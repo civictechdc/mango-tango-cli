@@ -24,10 +24,11 @@ class ExternalSortUniqueExtractor:
     available memory while maintaining reasonable performance.
     """
 
-    def __init__(self, memory_manager: MemoryManager, temp_dir: Optional[str] = None):
+    def __init__(self, memory_manager: MemoryManager, temp_dir: Optional[str] = None, progress_manager=None):
         self.memory_manager = memory_manager
         self.temp_dir = temp_dir or tempfile.gettempdir()
         self.temp_files = []
+        self.progress_manager = progress_manager
         self.logger = get_logger(f"{__name__}.ExternalSortUniqueExtractor")
 
     def extract_unique(
@@ -72,6 +73,16 @@ class ExternalSortUniqueExtractor:
             },
         )
 
+        # Add sub-substep for chunk creation progress tracking
+        if self.progress_manager:
+            try:
+                self.progress_manager.add_substep(
+                    "extract_unique", "create_chunks", f"Creating {total_chunks} sorted chunks", total=total_chunks
+                )
+                self.progress_manager.start_substep("extract_unique", "create_chunks")
+            except Exception as e:
+                self.logger.warning("Failed to set up chunk creation progress", extra={"error": str(e)})
+
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
 
@@ -86,6 +97,12 @@ class ExternalSortUniqueExtractor:
                 )
 
                 if len(chunk_df) == 0:
+                    # Update progress even for empty chunks
+                    if self.progress_manager:
+                        try:
+                            self.progress_manager.update_substep("extract_unique", "create_chunks", chunk_idx + 1)
+                        except Exception as e:
+                            self.logger.warning("Progress update failed for empty chunk", extra={"error": str(e)})
                     continue
 
                 # Write sorted chunk to temporary file
@@ -95,6 +112,13 @@ class ExternalSortUniqueExtractor:
                 chunk_df.write_parquet(chunk_file, compression="snappy")
                 chunk_files.append(chunk_file)
                 self.temp_files.append(chunk_file)
+
+                # Update progress after successful chunk creation
+                if self.progress_manager:
+                    try:
+                        self.progress_manager.update_substep("extract_unique", "create_chunks", chunk_idx + 1)
+                    except Exception as e:
+                        self.logger.warning("Progress update failed for chunk creation", extra={"error": str(e)})
 
                 # Force cleanup after each chunk
                 del chunk_df
@@ -111,7 +135,20 @@ class ExternalSortUniqueExtractor:
                         "error_type": type(e).__name__,
                     },
                 )
+                # Update progress even for failed chunks to show we attempted them
+                if self.progress_manager:
+                    try:
+                        self.progress_manager.update_substep("extract_unique", "create_chunks", chunk_idx + 1)
+                    except Exception as e:
+                        self.logger.warning("Progress update failed for failed chunk", extra={"error": str(e)})
                 continue
+
+        # Complete chunk creation substep
+        if self.progress_manager:
+            try:
+                self.progress_manager.complete_substep("extract_unique", "create_chunks")
+            except Exception as e:
+                self.logger.warning("Failed to complete chunk creation progress", extra={"error": str(e)})
 
         return chunk_files
 
@@ -133,9 +170,20 @@ class ExternalSortUniqueExtractor:
             },
         )
 
+        # Add sub-substep for merge progress tracking
+        if self.progress_manager:
+            try:
+                self.progress_manager.add_substep(
+                    "extract_unique", "merge_chunks", f"Merging {len(chunk_files)} sorted chunks", total=len(chunk_files)
+                )
+                self.progress_manager.start_substep("extract_unique", "merge_chunks")
+            except Exception as e:
+                self.logger.warning("Failed to set up merge progress", extra={"error": str(e)})
+
         # Use k-way merge with priority queue for efficiency
         heap = []
         chunk_iterators = []
+        active_chunks = 0
 
         # Open all chunk files and initialize heap
         for i, chunk_file in enumerate(chunk_files):
@@ -148,6 +196,7 @@ class ExternalSortUniqueExtractor:
                         first_value = next(chunk_iter)
                         heapq.heappush(heap, (first_value, i, chunk_iter))
                         chunk_iterators.append(chunk_iter)
+                        active_chunks += 1
                     except StopIteration:
                         continue
 
@@ -166,6 +215,8 @@ class ExternalSortUniqueExtractor:
         # Perform k-way merge
         result_values = []
         last_value = None
+        processed_items = 0
+        update_interval = max(1, active_chunks // 20)  # Update progress ~20 times during merge
 
         while heap:
             current_value, chunk_idx, chunk_iter = heapq.heappop(heap)
@@ -175,12 +226,38 @@ class ExternalSortUniqueExtractor:
                 result_values.append(current_value)
                 last_value = current_value
 
+            # Update progress periodically during merge operation
+            processed_items += 1
+            if processed_items % update_interval == 0 and self.progress_manager:
+                try:
+                    # Progress is based on the conceptual progress through the merge
+                    # We use processed_items as a proxy, but cap it at the total chunks
+                    progress_value = min(processed_items // update_interval, len(chunk_files))
+                    self.progress_manager.update_substep("extract_unique", "merge_chunks", progress_value)
+                except Exception as e:
+                    self.logger.warning("Progress update failed during merge", extra={"error": str(e)})
+
             # Get next value from this chunk
             try:
                 next_value = next(chunk_iter)
                 heapq.heappush(heap, (next_value, chunk_idx, chunk_iter))
             except StopIteration:
+                # This chunk is exhausted - update progress to show one chunk completed
+                active_chunks -= 1
+                if self.progress_manager:
+                    try:
+                        completed_chunks = len(chunk_files) - active_chunks
+                        self.progress_manager.update_substep("extract_unique", "merge_chunks", completed_chunks)
+                    except Exception as e:
+                        self.logger.warning("Progress update failed for completed chunk", extra={"error": str(e)})
                 continue
+
+        # Complete merge substep
+        if self.progress_manager:
+            try:
+                self.progress_manager.complete_substep("extract_unique", "merge_chunks")
+            except Exception as e:
+                self.logger.warning("Failed to complete merge progress", extra={"error": str(e)})
 
         return pl.DataFrame({column_name: result_values})
 
@@ -211,12 +288,21 @@ def extract_unique_external_sort(
     Convenience function to perform external sort unique extraction.
 
     This is the primary interface for using external sorting when
-    memory pressure becomes critical.
+    memory pressure becomes critical. Integrates with hierarchical progress structure.
     """
-    extractor = ExternalSortUniqueExtractor(memory_manager)
+    extractor = ExternalSortUniqueExtractor(memory_manager, progress_manager=progress_manager)
 
     try:
         return extractor.extract_unique(ldf_data, column_name)
     except Exception as e:
-        progress_manager.fail_step("extract_unique", f"External sort failed: {str(e)}")
+        # Use hierarchical progress structure - external sort happens within extract_unique substep
+        if progress_manager:
+            try:
+                progress_manager.fail_substep(
+                    "process_ngrams", "extract_unique", f"External sort failed: {str(e)}"
+                )
+            except Exception as progress_error:
+                # Log but don't let progress failure mask the original error
+                logger = get_logger(f"{__name__}.extract_unique_external_sort")
+                logger.warning("Failed to update progress on error", extra={"error": str(progress_error)})
         raise

@@ -18,7 +18,7 @@ from analyzers.ngrams.memory_strategies import (
     ExternalSortUniqueExtractor,
     extract_unique_external_sort,
 )
-from app.utils import MemoryManager
+from app.utils import MemoryManager, MemoryPressureLevel
 
 
 class TestExternalSortUniqueExtractor:
@@ -222,15 +222,15 @@ class TestFallbackProcessors:
 
         # Check some expected n-grams
         ngrams = result_df["ngram_text"].to_list()
-        
+
         # The test data should generate these 2-grams and 3-grams:
         expected_2grams = ["hello world", "world test", "test case", "case example"]
         expected_3grams = ["hello world test", "world test case", "test case example"]
-        
+
         # Check that we have both 2-grams and 3-grams
         has_2grams = any(ngram in ngrams for ngram in expected_2grams)
         has_3grams = any(ngram in ngrams for ngram in expected_3grams)
-        
+
         if not has_2grams:
             # If 2-grams are missing, that means the function has a bug - let's check for 3-grams instead
             assert "hello world test" in ngrams
@@ -266,8 +266,9 @@ class TestFallbackProcessors:
             test_data.lazy(),
             min_n=2,
             max_n=2,
-            progress_callback=mock_progress,
+            estimated_rows=4,  # Add the missing parameter
             memory_manager=memory_manager,
+            progress_manager=None,  # Updated to use progress_manager instead of callback
         )
 
         result_df = result.collect()
@@ -397,7 +398,11 @@ class TestMemoryStrategiesIntegration:
 
         # Generate n-grams using disk-based approach
         disk_result = generate_ngrams_disk_based(
-            test_data.lazy(), min_n=2, max_n=2, memory_manager=memory_manager
+            test_data.lazy(),
+            min_n=2,
+            max_n=2,
+            estimated_rows=5,
+            memory_manager=memory_manager,
         )
         disk_ngrams = set(disk_result.collect()["ngram_text"].to_list())
 
@@ -422,6 +427,8 @@ class TestMemoryStrategiesIntegration:
             1  # Very small chunks
         )
         memory_manager.enhanced_gc_cleanup.return_value = {"memory_freed_mb": 15}
+        # Mock memory pressure to be HIGH so cleanup is called
+        memory_manager.get_memory_pressure_level.return_value = MemoryPressureLevel.HIGH
 
         # Create test data that will require multiple chunks
         test_data = pl.DataFrame(
@@ -433,7 +440,11 @@ class TestMemoryStrategiesIntegration:
 
         # Test disk-based generation
         generate_ngrams_disk_based(
-            test_data.lazy(), min_n=2, max_n=2, memory_manager=memory_manager
+            test_data.lazy(),
+            min_n=2,
+            max_n=2,
+            estimated_rows=10,
+            memory_manager=memory_manager,
         )
 
         # Should have called cleanup multiple times (once per chunk)

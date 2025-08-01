@@ -164,7 +164,9 @@ class TestMemoryAwareProgressManager:
             # Should have called print with a Panel
             mock_console.print.assert_called()
             call_args = mock_console.print.call_args
-            assert call_args is not None, "mock_console.print was not called with arguments"
+            assert (
+                call_args is not None
+            ), "mock_console.print was not called with arguments"
             call_args = call_args[0]
             panel = call_args[0]
 
@@ -188,7 +190,9 @@ class TestMemoryAwareProgressManager:
             )
 
             call_args = mock_console.print.call_args
-            assert call_args is not None, "mock_console.print was not called with arguments"
+            assert (
+                call_args is not None
+            ), "mock_console.print was not called with arguments"
             call_args = call_args[0]
             panel = call_args[0]
 
@@ -213,7 +217,9 @@ class TestMemoryAwareProgressManager:
             # Should display summary panel
             mock_console.print.assert_called()
             call_args = mock_console.print.call_args
-            assert call_args is not None, "mock_console.print was not called with arguments"
+            assert (
+                call_args is not None
+            ), "mock_console.print was not called with arguments"
             call_args = call_args[0]
             panel = call_args[0]
 
@@ -294,7 +300,11 @@ class TestMemoryAwareProgressManagerIntegration:
 
         # Add one more state for the final summary call
         memory_manager.get_current_memory_usage.side_effect = memory_states + [
-            {"rss_mb": 2800.0, "process_memory_percent": 70.0, "pressure_level": "medium"}  # Final state for summary
+            {
+                "rss_mb": 2800.0,
+                "process_memory_percent": 70.0,
+                "pressure_level": "medium",
+            }  # Final state for summary
         ]
         memory_manager.should_trigger_gc.side_effect = [
             False,

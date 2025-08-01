@@ -116,13 +116,21 @@ def main(context: SecondaryAnalyzerContext):
             )
             raise
 
-        # Step 2: Calculate initial statistics using streaming-friendly aggregations
+        # Step 2: Calculate initial statistics using streaming-friendly aggregations with hierarchical progress
         progress_manager.start_step("compute_stats")
+        
+        # Add hierarchical sub-steps for detailed progress feedback during complex operations
+        progress_manager.add_substep("compute_stats", "calculate_reps", "Calculating total repetitions per n-gram")
+        progress_manager.add_substep("compute_stats", "count_posters", "Counting distinct posters per n-gram")
+        progress_manager.add_substep("compute_stats", "join_definitions", "Joining with n-gram definitions")
+        progress_manager.add_substep("compute_stats", "sort_results", "Sorting final results")
 
         try:
-            # Calculate total repetitions and distinct poster counts per n-gram
-            # Using lazy evaluation to avoid loading entire datasets into memory
-            ldf_ngram_stats = (
+            # Sub-step 1: Calculate total repetitions and basic aggregations per n-gram
+            progress_manager.start_substep("compute_stats", "calculate_reps")
+            logger.info("Starting repetition count calculation")
+            
+            ldf_basic_stats = (
                 ldf_message_ngrams.group_by(COL_NGRAM_ID)
                 .agg(
                     [
@@ -135,34 +143,61 @@ def main(context: SecondaryAnalyzerContext):
                     ]
                 )
                 .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
-                # Join with messages to get distinct poster count efficiently
-                .join(
-                    ldf_message_ngrams.join(
-                        ldf_messages.select([COL_MESSAGE_SURROGATE_ID, COL_AUTHOR_ID]),
-                        on=COL_MESSAGE_SURROGATE_ID,
-                    )
-                    .group_by(COL_NGRAM_ID)
-                    .agg(
-                        pl.col(COL_AUTHOR_ID)
-                        .n_unique()
-                        .alias(COL_NGRAM_DISTINCT_POSTER_COUNT)
-                    ),
-                    on=COL_NGRAM_ID,
-                    how="inner",
+            )
+            
+            logger.info("Repetition count calculation completed")
+            progress_manager.complete_substep("compute_stats", "calculate_reps")
+            
+            # Sub-step 2: Count distinct posters per n-gram through message joins
+            progress_manager.start_substep("compute_stats", "count_posters")
+            logger.info("Starting distinct poster count calculation")
+            
+            # Create the poster count aggregation with optimized joins
+            ldf_poster_counts = (
+                ldf_message_ngrams.join(
+                    ldf_messages.select([COL_MESSAGE_SURROGATE_ID, COL_AUTHOR_ID]),
+                    on=COL_MESSAGE_SURROGATE_ID,
                 )
-                .select(
-                    [
-                        COL_NGRAM_ID,
-                        COL_NGRAM_TOTAL_REPS,
-                        COL_NGRAM_DISTINCT_POSTER_COUNT,
-                    ]
+                .group_by(COL_NGRAM_ID)
+                .agg(
+                    pl.col(COL_AUTHOR_ID)
+                    .n_unique()
+                    .alias(COL_NGRAM_DISTINCT_POSTER_COUNT)
                 )
             )
+            
+            # Join basic stats with poster counts
+            ldf_ngram_stats = ldf_basic_stats.join(
+                ldf_poster_counts,
+                on=COL_NGRAM_ID,
+                how="inner",
+            ).select(
+                [
+                    COL_NGRAM_ID,
+                    COL_NGRAM_TOTAL_REPS,
+                    COL_NGRAM_DISTINCT_POSTER_COUNT,
+                ]
+            )
+            
+            logger.info("Distinct poster count calculation completed")
+            progress_manager.complete_substep("compute_stats", "count_posters")
 
-            # Create the summary table by joining with n-gram definitions
+            # Sub-step 3: Join with n-gram definitions to create summary table
+            progress_manager.start_substep("compute_stats", "join_definitions")
+            logger.info("Starting join with n-gram definitions")
+            
             ldf_ngram_summary = ldf_ngrams.join(
                 ldf_ngram_stats, on=COL_NGRAM_ID, how="inner"
-            ).sort(
+            )
+            
+            logger.info("Join with n-gram definitions completed")
+            progress_manager.complete_substep("compute_stats", "join_definitions")
+
+            # Sub-step 4: Sort results for final output
+            progress_manager.start_substep("compute_stats", "sort_results")
+            logger.info("Starting final result sorting")
+            
+            ldf_ngram_summary = ldf_ngram_summary.sort(
                 [
                     COL_NGRAM_LENGTH,
                     COL_NGRAM_TOTAL_REPS,
@@ -171,8 +206,18 @@ def main(context: SecondaryAnalyzerContext):
                 descending=True,
             )
 
-            # Collect and write the summary table
+            # Collect the final result using streaming engine
             df_ngram_summary = ldf_ngram_summary.collect(engine="streaming")
+            
+            logger.info(
+                "Final result sorting and collection completed",
+                extra={
+                    "summary_record_count": df_ngram_summary.height,
+                    "processing_engine": "streaming",
+                },
+            )
+            progress_manager.complete_substep("compute_stats", "sort_results")
+            
             logger.info(
                 "Statistics computation completed",
                 extra={
@@ -187,8 +232,31 @@ def main(context: SecondaryAnalyzerContext):
                 extra={"error": str(e), "error_type": type(e).__name__},
                 exc_info=True,
             )
+            # Determine which substep failed and provide specific error context
+            error_context = f"Failed during statistics computation: {str(e)}"
+            try:
+                # Try to identify which substep was active when the error occurred
+                substep_context = {
+                    "calculate_reps": "repetition calculation",
+                    "count_posters": "poster counting", 
+                    "join_definitions": "definition joining",
+                    "sort_results": "result sorting"
+                }
+                
+                # Log the specific phase that failed for better debugging
+                logger.error(
+                    "Detailed error context for statistics computation",
+                    extra={
+                        "possible_failure_points": list(substep_context.keys()),
+                        "error_location": "compute_stats_step"
+                    }
+                )
+            except Exception:
+                # Don't let error reporting failures crash the main error handling
+                pass
+                
             progress_manager.fail_step(
-                "compute_stats", f"Failed during statistics computation: {str(e)}"
+                "compute_stats", error_context
             )
             raise
 
@@ -265,7 +333,10 @@ def main(context: SecondaryAnalyzerContext):
 
                     # Process this chunk of n-grams
                     chunk_output = _process_ngram_chunk(
-                        chunk_ngram_summary, ldf_message_ngrams, ldf_messages
+                        chunk_ngram_summary,
+                        ldf_message_ngrams,
+                        ldf_messages,
+                        progress_manager,
                     )
 
                     # Write chunk output efficiently
@@ -393,8 +464,10 @@ def _create_sample_full_report_row(
     return sample_output.head(0)  # Return empty DataFrame with correct schema
 
 
-def _process_ngram_chunk(chunk_ngram_summary, ldf_message_ngrams, ldf_messages):
-    """Process a chunk of n-grams to generate full report data."""
+def _process_ngram_chunk(
+    chunk_ngram_summary, ldf_message_ngrams, ldf_messages, progress_manager=None
+):
+    """Process a chunk of n-grams to generate full report data with optional progress reporting."""
     # Get n-gram IDs for this chunk
     ngram_ids = chunk_ngram_summary.get_column(COL_NGRAM_ID).to_list()
 

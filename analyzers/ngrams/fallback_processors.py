@@ -8,13 +8,14 @@ becomes critical, trading some performance for guaranteed memory bounds.
 import gc
 import os
 import tempfile
-from typing import Callable, Optional
+from typing import Optional
 
 import polars as pl
 
 from analyzers.ngrams.ngrams_base.interface import COL_MESSAGE_SURROGATE_ID
 from app.logger import get_logger
-from app.utils import MemoryManager
+from app.memory_aware_progress import MemoryAwareProgressManager
+from app.utils import MemoryManager, MemoryPressureLevel
 
 # Initialize module-level logger
 logger = get_logger(__name__)
@@ -24,24 +25,40 @@ def generate_ngrams_disk_based(
     ldf: pl.LazyFrame,
     min_n: int,
     max_n: int,
-    progress_callback: Optional[Callable[[int, int], None]] = None,
+    estimated_rows: int,
     memory_manager: Optional[MemoryManager] = None,
+    progress_manager: Optional[MemoryAwareProgressManager] = None,
 ) -> pl.LazyFrame:
     """
     Generate n-grams using disk-based approach for critical memory pressure.
 
     This approach processes data in very small chunks and uses temporary files
     to store intermediate results, allowing processing of arbitrarily large datasets.
+
+    Args:
+        ldf: LazyFrame with tokenized data
+        min_n: Minimum n-gram length
+        max_n: Maximum n-gram length
+        estimated_rows: Pre-calculated row count to avoid memory-intensive counting
+        memory_manager: Optional memory manager for optimization
+        progress_manager: Optional progress manager for detailed chunk progress reporting
     """
 
     if memory_manager is None:
         memory_manager = MemoryManager()
 
     # Use extremely small chunks for critical memory conditions
-    chunk_size = memory_manager.calculate_adaptive_chunk_size(5000, "ngram_generation")
+    chunk_size = memory_manager.calculate_adaptive_chunk_size(25000, "ngram_generation")
 
-    total_rows = ldf.select(pl.len()).collect().item()
+    total_rows = estimated_rows
     total_chunks = (total_rows + chunk_size - 1) // chunk_size
+
+    # Integrate with existing ngrams step as a sub-step instead of creating new step
+    if progress_manager:
+        progress_manager.add_substep(
+            "ngrams", "disk_generation", "Processing data chunks", total_chunks
+        )
+        progress_manager.start_substep("ngrams", "disk_generation")
 
     logger.info(
         "Starting disk-based n-gram generation",
@@ -57,6 +74,7 @@ def generate_ngrams_disk_based(
     # Create temporary directory for intermediate results
     temp_dir = tempfile.mkdtemp(prefix="ngram_disk_")
     temp_files = []
+    import time
 
     try:
         # Process each chunk and write results to disk
@@ -67,20 +85,66 @@ def generate_ngrams_disk_based(
             chunk_ldf = ldf.slice(chunk_start, chunk_size)
 
             # Generate n-grams for this chunk using memory-efficient method
+            ngram_start = time.time()
             chunk_ngrams = _generate_ngrams_minimal_memory(chunk_ldf, min_n, max_n)
+            ngram_end = time.time()
+            logger.debug(
+                "N-gram generation finished on chunk",
+                extra={"elapsed_time": f"{ngram_end - ngram_start:.2f} seconds"},
+            )
 
             # Write chunk results to temporary file
             temp_file = os.path.join(temp_dir, f"ngrams_chunk_{chunk_idx}.parquet")
-            chunk_ngrams.collect().write_parquet(temp_file, compression="snappy")
+            write_start = time.time()
+            # chunk_ngrams.collect().write_parquet(temp_file, compression="snappy")
+            chunk_ngrams.sink_parquet(temp_file)
+            write_end = time.time()
+            elapsed_time = f"{write_end - write_start:.2f} seconds"
+            logger.debug("N-gram chunk written", extra={"elapsed_time": elapsed_time})
+
             temp_files.append(temp_file)
 
             # Immediate cleanup
             del chunk_ngrams
-            memory_manager.enhanced_gc_cleanup()
 
-            # Report progress
-            if progress_callback:
-                progress_callback(chunk_idx + 1, total_chunks)
+            # Only perform expensive cleanup if memory pressure is high
+            if memory_manager.get_memory_pressure_level() in [
+                MemoryPressureLevel.HIGH,
+                MemoryPressureLevel.CRITICAL,
+            ]:
+                memory_manager.enhanced_gc_cleanup()
+            else:
+                gc.collect()  # Lightweight cleanup
+
+            # Update progress with current chunk
+            if progress_manager:
+                try:
+                    progress_manager.update_substep(
+                        "ngrams", "disk_generation", chunk_idx + 1
+                    )
+                    completion_percentage = round(
+                        ((chunk_idx + 1) / total_chunks) * 100, 2
+                    )
+
+                    logger.info(
+                        "N-gram generation chunk progress",
+                        extra={
+                            "chunk_index": chunk_idx + 1,
+                            "total_chunks": total_chunks,
+                            "completion_percentage": completion_percentage,
+                            "processing_mode": "disk_based",
+                        },
+                    )
+                except Exception as e:
+                    logger.warning(
+                        "Progress update failed during disk-based processing - continuing",
+                        extra={
+                            "chunk_index": chunk_idx + 1,
+                            "total_chunks": total_chunks,
+                            "error": str(e),
+                            "error_type": type(e).__name__,
+                        },
+                    )
 
         # Combine all temporary files using streaming
         if not temp_files:
@@ -94,12 +158,23 @@ def generate_ngrams_disk_based(
         # to avoid file cleanup race condition
         chunk_lazyframes = [pl.scan_parquet(f) for f in temp_files]
         result_ldf = pl.concat(chunk_lazyframes)
-        
+
         # Collect the result before cleanup to avoid file access issues
         result_df = result_ldf.collect()
-        
+
+        # Complete progress sub-step on success
+        if progress_manager:
+            progress_manager.complete_substep("ngrams", "disk_generation")
+
         return result_df.lazy()  # Return as LazyFrame for consistency
 
+    except Exception as e:
+        # Fail progress sub-step on error
+        if progress_manager:
+            progress_manager.fail_substep(
+                "ngrams", "disk_generation", f"Disk-based generation failed: {str(e)}"
+            )
+        raise
     finally:
         # Always cleanup temporary files
         for temp_file in temp_files:
@@ -176,13 +251,14 @@ def _generate_ngrams_minimal_memory(
 def stream_unique_memory_optimized(
     ldf_data: pl.LazyFrame,
     memory_manager: MemoryManager,
-    progress_manager,
+    progress_manager: Optional[MemoryAwareProgressManager],
     column_name: str = "ngram_text",
 ) -> pl.DataFrame:
     """
     Enhanced streaming unique extraction with smaller chunks for high memory pressure.
 
     This is an intermediate fallback between normal processing and external sorting.
+    Integrates with the hierarchical progress structure by using the existing extract_unique sub-step.
     """
 
     # Use smaller chunks than normal streaming
@@ -199,7 +275,8 @@ def stream_unique_memory_optimized(
         },
     )
 
-    # Get total count for chunking
+    # Get total count for chunking - use estimated count if available in memory manager context
+    # For now, we still need to get the count, but this should be optimized in future versions
     total_count = ldf_data.select(pl.len()).collect().item()
     total_chunks = (total_count + chunk_size - 1) // chunk_size
 
@@ -211,9 +288,12 @@ def stream_unique_memory_optimized(
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
 
-            # Update progress before processing chunk
+            # Update progress before processing chunk - integrate with hierarchical structure
             try:
-                progress_manager.update_step("extract_unique", chunk_idx)
+                # Use the hierarchical substep update for extract_unique
+                progress_manager.update_substep(
+                    "process_ngrams", "extract_unique", chunk_idx
+                )
             except Exception as e:
                 logger.warning(
                     "Progress update failed for streaming chunk",
@@ -240,8 +320,14 @@ def stream_unique_memory_optimized(
                     .sink_csv(temp_path, include_header=False)
                 )
 
-                # Force cleanup after each chunk
-                memory_manager.enhanced_gc_cleanup()
+                # Only perform expensive cleanup if memory pressure is high
+                if memory_manager.get_memory_pressure_level() in [
+                    MemoryPressureLevel.HIGH,
+                    MemoryPressureLevel.CRITICAL,
+                ]:
+                    memory_manager.enhanced_gc_cleanup()
+                else:
+                    gc.collect()  # Lightweight cleanup
 
             except Exception as e:
                 logger.warning(

@@ -1,10 +1,14 @@
 import re
-from typing import Callable, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import polars as pl
 import pyarrow.parquet as pq
 
 from app.logger import get_logger
+
+if TYPE_CHECKING:
+    from app.memory_aware_progress import MemoryAwareProgressManager
+
 
 # Initialize module-level logger
 logger = get_logger(__name__)
@@ -36,7 +40,7 @@ import gc
 import logging
 import time
 from enum import Enum
-from typing import Callable, Dict, Optional
+from typing import Dict, Optional
 
 import psutil
 
@@ -291,7 +295,7 @@ def is_space_separated(text: Union[str, pl.Expr]) -> Union[bool, pl.Expr]:
 def tokenize_text(
     ldf: pl.LazyFrame,
     text_column: str,
-    progress_callback: Callable[[int, int], None] = None,
+    progress_manager: Optional["MemoryAwareProgressManager"] = None,
     memory_manager: Optional[MemoryManager] = None,
 ) -> pl.LazyFrame:
     """
@@ -307,8 +311,7 @@ def tokenize_text(
     Args:
         ldf: Input LazyFrame containing text data
         text_column: Name of the column containing text to tokenize
-        progress_callback: Optional callback function for progress reporting.
-                         Called with (current_chunk, total_chunks) between chunks.
+        progress_manager: Optional progress manager for detailed tokenization progress reporting
         memory_manager: Optional MemoryManager for adaptive processing
 
     Returns:
@@ -326,10 +329,7 @@ def tokenize_text(
     if not isinstance(text_column, str):
         raise TypeError(f"text_column must be a string, got {type(text_column)}")
 
-    if progress_callback is not None and not callable(progress_callback):
-        raise TypeError(
-            f"progress_callback must be callable, got {type(progress_callback)}"
-        )
+    # No validation needed for progress_manager - it's expected to be a progress manager instance or None
 
     # Create memory manager if not provided
     if memory_manager is None:
@@ -340,7 +340,7 @@ def tokenize_text(
         "Starting text tokenization",
         extra={
             "text_column": text_column,
-            "has_progress_callback": progress_callback is not None,
+            "has_progress_manager": progress_manager is not None,
             "memory_manager_provided": memory_manager is not None,
         },
     )
@@ -565,6 +565,19 @@ def tokenize_text(
             current_chunk_size = adaptive_chunk_size
             processed_rows = 0
 
+            # Set up progress manager with estimated total chunks
+            if progress_manager:
+                estimated_total_chunks = (
+                    total_rows + adaptive_chunk_size - 1
+                ) // adaptive_chunk_size
+                progress_manager.add_substep(
+                    "tokenize",
+                    "tokenize_chunks",
+                    "Processing tokenization chunks",
+                    estimated_total_chunks,
+                )
+                progress_manager.start_substep("tokenize", "tokenize_chunks")
+
             while processed_rows < total_rows:
                 # Check memory pressure and adjust chunk size if needed
                 pressure_level = memory_manager.get_memory_pressure_level()
@@ -609,25 +622,22 @@ def tokenize_text(
 
                     processed_rows += actual_chunk_size
 
-                    # Report progress with memory stats if callback provided
-                    if progress_callback:
+                    # Report progress with current chunk number
+                    if progress_manager:
                         chunk_num = len(chunk_lazyframes)
-                        estimated_total_chunks = (
-                            total_rows + current_chunk_size - 1
-                        ) // current_chunk_size
-
-                        callback_result = progress_callback(
-                            chunk_num, estimated_total_chunks
-                        )
-
-                        # Handle callback suggestions for chunk size adjustment
-                        if isinstance(callback_result, dict) and callback_result.get(
-                            "reduce_chunk_size"
-                        ):
-                            suggested_size = callback_result.get(
-                                "new_size", current_chunk_size // 2
+                        try:
+                            progress_manager.update_substep(
+                                "tokenize", "tokenize_chunks", chunk_num
                             )
-                            current_chunk_size = max(1000, suggested_size)
+                        except Exception as e:
+                            logger.warning(
+                                "Progress update failed during tokenization",
+                                extra={
+                                    "chunk_num": chunk_num,
+                                    "processed_rows": processed_rows,
+                                    "error": str(e),
+                                },
+                            )
 
                     # Force garbage collection after each chunk in high memory pressure
                     if pressure_level in [
@@ -679,6 +689,9 @@ def tokenize_text(
                 logger.warning(
                     "No chunks processed successfully in known-size tokenization"
                 )
+                # Complete progress step even if no chunks processed
+                if progress_manager:
+                    progress_manager.complete_substep("tokenize", "tokenize_chunks")
                 return ldf.with_columns([pl.lit([]).alias("tokens")])
 
             logger.info(
@@ -689,6 +702,11 @@ def tokenize_text(
                     "final_chunk_size": current_chunk_size,
                 },
             )
+
+            # Complete progress step on success
+            if progress_manager:
+                progress_manager.complete_substep("tokenize", "tokenize_chunks")
+
             return pl.concat(chunk_lazyframes)
 
         else:
@@ -707,6 +725,16 @@ def tokenize_text(
             consecutive_empty_chunks = 0
             max_empty_chunks = 3  # Stop after this many consecutive empty chunks
             current_chunk_size = adaptive_chunk_size
+
+            # Set up progress manager for streaming with initial estimate
+            if progress_manager:
+                progress_manager.add_substep(
+                    "tokenize",
+                    "stream_tokenize",
+                    "Streaming tokenization chunks",
+                    estimated_chunks,
+                )
+                progress_manager.start_substep("tokenize", "stream_tokenize")
 
             while consecutive_empty_chunks < max_empty_chunks:
                 # Check memory pressure and adjust chunk size
@@ -750,19 +778,35 @@ def tokenize_text(
                     chunk_idx += 1
                     if chunk_idx > estimated_chunks:
                         estimated_chunks = chunk_idx + 10  # Increase estimate
+                        # Update progress step total with new estimate
+                        if progress_manager:
+                            try:
+                                # Note: RichProgressManager might not support updating totals,
+                                # but we can try or just update current progress
+                                progress_manager.update_substep(
+                                    "tokenize", "stream_tokenize", chunk_idx
+                                )
+                            except Exception as e:
+                                logger.debug(
+                                    "Progress total update failed",
+                                    extra={"error": str(e)},
+                                )
 
-                    # Report progress if callback provided
-                    if progress_callback:
-                        callback_result = progress_callback(chunk_idx, estimated_chunks)
-
-                        # Handle callback suggestions for chunk size adjustment
-                        if isinstance(callback_result, dict) and callback_result.get(
-                            "reduce_chunk_size"
-                        ):
-                            suggested_size = callback_result.get(
-                                "new_size", current_chunk_size // 2
+                    # Report progress with current chunk
+                    if progress_manager:
+                        try:
+                            progress_manager.update_substep(
+                                "tokenize", "stream_tokenize", chunk_idx
                             )
-                            current_chunk_size = max(1000, suggested_size)
+                        except Exception as e:
+                            logger.warning(
+                                "Progress update failed during streaming tokenization",
+                                extra={
+                                    "chunk_idx": chunk_idx,
+                                    "estimated_chunks": estimated_chunks,
+                                    "error": str(e),
+                                },
+                            )
 
                     # Force garbage collection in high memory pressure
                     if pressure_level in [
@@ -814,15 +858,15 @@ def tokenize_text(
                     consecutive_empty_chunks += 1
                     chunk_idx += 1
 
-            # Final progress update
-            if progress_callback and chunk_idx > 0:
-                final_chunks = len(chunk_lazyframes)
-                progress_callback(final_chunks, final_chunks)  # Set to 100%
+            # Complete progress step for streaming
+            if progress_manager:
+                progress_manager.complete_substep("tokenize", "stream_tokenize")
 
             if not chunk_lazyframes:
                 logger.warning(
                     "No chunks processed successfully in streaming tokenization"
                 )
+                # Progress was already completed above
                 return ldf.with_columns([pl.lit([]).alias("tokens")])
 
             logger.info(

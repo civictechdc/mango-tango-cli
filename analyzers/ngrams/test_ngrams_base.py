@@ -137,6 +137,7 @@ def test_ngrams():
             test_df,
             min_n=test_params["min_gram_len"],
             max_n=test_params["max_ngram_len"],
+            estimated_rows=1,  # Single test row
         ).collect()
 
         # Check the number of n-grams generated
@@ -162,7 +163,9 @@ def test_serialize_ngram():
     ).lazy()
 
     # Generate n-grams with min=5, max=8
-    ngrams_result = _generate_ngrams_vectorized(test_df, min_n=5, max_n=8).collect()
+    ngrams_result = _generate_ngrams_vectorized(
+        test_df, min_n=5, max_n=8, estimated_rows=1
+    ).collect()
 
     # Get the first n-gram (should be the 5-gram starting with "mango")
     first_ngram = ngrams_result["ngram_text"][0]
@@ -255,7 +258,9 @@ def test_ngram_generation_edge_cases():
     # Test with empty data
     empty_df = pl.DataFrame({"message_surrogate_id": [], "tokens": []}).lazy()
 
-    empty_result = _generate_ngrams_vectorized(empty_df, min_n=1, max_n=3).collect()
+    empty_result = _generate_ngrams_vectorized(
+        empty_df, min_n=1, max_n=3, estimated_rows=0
+    ).collect()
 
     assert len(empty_result) == 0, "Empty input should produce empty output"
 
@@ -265,7 +270,7 @@ def test_ngram_generation_edge_cases():
     ).lazy()
 
     single_result = _generate_ngrams_vectorized(
-        single_token_df, min_n=2, max_n=3
+        single_token_df, min_n=2, max_n=3, estimated_rows=1
     ).collect()
 
     assert (
@@ -278,7 +283,7 @@ def test_ngram_generation_edge_cases():
     ).lazy()
 
     exact_result = _generate_ngrams_vectorized(
-        exact_tokens_df, min_n=2, max_n=3
+        exact_tokens_df, min_n=2, max_n=3, estimated_rows=1
     ).collect()
 
     assert (

@@ -3,11 +3,13 @@ import logging
 import os
 import tempfile
 from pathlib import Path
+from typing import Optional
 
 import polars as pl
 
 from analyzer_interface.context import PrimaryAnalyzerContext
 from app.logger import get_logger
+from app.memory_aware_progress import MemoryAwareProgressManager
 from app.utils import MemoryManager, MemoryPressureLevel, tokenize_text
 from terminal_tools.progress import RichProgressManager
 
@@ -81,19 +83,23 @@ def _stream_unique_batch_accumulator(
     ldf_data: pl.LazyFrame,
     chunk_size: int = 50_000,
     column_name: str = "ngram_text",
-    progress_callback=None,
+    progress_manager=None,
 ) -> pl.DataFrame:
     """
     Memory-efficient streaming unique extraction using batch accumulation with temporary files.
 
     This function processes large datasets in chunks, streaming each chunk's unique values
     to disk and accumulating results using polars operations instead of Python loops.
+    
+    Enhanced with chunked progress tracking that provides real-time feedback during 
+    chunk processing, integrating with the hierarchical progress reporting system.
 
     Args:
         ldf_data: LazyFrame containing the data to process
         chunk_size: Size of each processing chunk (default: 50,000)
         column_name: Name of the column to extract unique values from
-        progress_callback: Optional callback for progress updates (chunk_num, total_chunks)
+        progress_manager: Optional progress manager for detailed batch progress reporting.
+                         Adds 'stream_batches' substep to 'process_ngrams' with chunk-level updates.
 
     Returns:
         DataFrame containing all unique values across chunks
@@ -105,6 +111,14 @@ def _stream_unique_batch_accumulator(
     total_count = ldf_data.select(pl.len()).collect().item()
     total_chunks = (total_count + chunk_size - 1) // chunk_size
 
+    # Set up hierarchical progress tracking for batch processing
+    if progress_manager:
+        # Add substep for batch processing within the current context
+        progress_manager.add_substep(
+            "process_ngrams", "stream_batches", "Processing data batches", total_chunks
+        )
+        progress_manager.start_substep("process_ngrams", "stream_batches")
+
     # Use temporary files for intermediate storage of unique values
     temp_files = []
 
@@ -112,20 +126,6 @@ def _stream_unique_batch_accumulator(
         # Process each chunk and stream unique values to separate temp files
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
-
-            # Update progress before processing chunk
-            if progress_callback:
-                try:
-                    progress_callback(chunk_idx, total_chunks)
-                except Exception as e:
-                    logger.warning(
-                        "Progress callback failed during chunk processing",
-                        extra={
-                            "chunk_index": chunk_idx + 1,
-                            "total_chunks": total_chunks,
-                            "error": str(e),
-                        },
-                    )
 
             # Create temporary file for this chunk's unique values
             with tempfile.NamedTemporaryFile(
@@ -142,6 +142,22 @@ def _stream_unique_batch_accumulator(
                     .unique()
                     .sink_csv(temp_path, include_header=False)
                 )
+
+                # Update progress after successful chunk processing
+                if progress_manager:
+                    try:
+                        progress_manager.update_substep("process_ngrams", "stream_batches", chunk_idx + 1)
+                    except Exception as progress_error:
+                        logger.warning(
+                            "Progress update failed during batch processing",
+                            extra={
+                                "chunk_index": chunk_idx + 1,
+                                "total_chunks": total_chunks,
+                                "error": str(progress_error),
+                                "error_type": type(progress_error).__name__,
+                            },
+                        )
+
             except Exception as e:
                 logger.warning(
                     "Failed to process chunk during unique extraction",
@@ -160,18 +176,12 @@ def _stream_unique_batch_accumulator(
                     pass
                 continue
 
-        # Final progress update
-        if progress_callback:
-            try:
-                progress_callback(total_chunks, total_chunks)
-            except Exception as e:
-                logger.warning(
-                    "Final progress callback failed",
-                    extra={"error": str(e), "total_chunks": total_chunks},
-                )
+        # Processing complete - progress will be completed after successful result
 
         if not temp_files:
-            # If no chunks were processed successfully, return empty DataFrame
+            # If no chunks were processed successfully, complete progress and return empty DataFrame
+            if progress_manager:
+                progress_manager.complete_substep("process_ngrams", "stream_batches")
             return pl.DataFrame({column_name: []})
 
         # Combine all temporary files using polars streaming operations
@@ -196,6 +206,9 @@ def _stream_unique_batch_accumulator(
                 continue
 
         if not chunk_lazy_frames:
+            # Complete progress and return empty DataFrame if no valid chunks
+            if progress_manager:
+                progress_manager.complete_substep("process_ngrams", "stream_batches")
             return pl.DataFrame({column_name: []})
 
         # Concatenate all chunks and extract final unique values using streaming
@@ -218,6 +231,10 @@ def _stream_unique_batch_accumulator(
                 final_temp_file, has_header=False, new_columns=[column_name]
             )
 
+            # Complete progress step on success
+            if progress_manager:
+                progress_manager.complete_substep("process_ngrams", "stream_batches")
+
             return result
 
         finally:
@@ -228,6 +245,13 @@ def _stream_unique_batch_accumulator(
                 except OSError:
                     pass
 
+    except Exception as e:
+        # Fail progress step on error
+        if progress_manager:
+            progress_manager.fail_substep(
+                "process_ngrams", "stream_batches", f"Streaming unique extraction failed: {str(e)}"
+            )
+        raise
     finally:
         # Always clean up all temporary files
         for temp_path in temp_files:
@@ -327,44 +351,55 @@ def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
     try:
         # Sub-step 1: Grouping n-grams by message
         progress_manager.start_substep(step_id, "group")
-
-        # Apply group_by operation
-        grouped_ldf = ldf_with_ids.group_by([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
-        progress_manager.complete_substep(step_id, "group")
+        try:
+            # Apply group_by operation
+            grouped_ldf = ldf_with_ids.group_by([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
+            progress_manager.complete_substep(step_id, "group")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "group", f"Grouping failed: {str(e)}")
+            raise
 
         # Sub-step 2: Aggregating n-gram counts
         progress_manager.start_substep(step_id, "aggregate")
-
-        # Apply aggregation
-        aggregated_ldf = grouped_ldf.agg([pl.len().alias(COL_MESSAGE_NGRAM_COUNT)])
-        progress_manager.complete_substep(step_id, "aggregate")
+        try:
+            # Apply aggregation
+            aggregated_ldf = grouped_ldf.agg([pl.len().alias(COL_MESSAGE_NGRAM_COUNT)])
+            progress_manager.complete_substep(step_id, "aggregate")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "aggregate", f"Aggregation failed: {str(e)}")
+            raise
 
         # Sub-step 3: Sorting grouped data
         progress_manager.start_substep(step_id, "sort")
-
-        # Apply sorting
-        sorted_ldf = aggregated_ldf.sort([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
-        progress_manager.complete_substep(step_id, "sort")
+        try:
+            # Apply sorting
+            sorted_ldf = aggregated_ldf.sort([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
+            progress_manager.complete_substep(step_id, "sort")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "sort", f"Sorting failed: {str(e)}")
+            raise
 
         # Sub-step 4: Writing to parquet file
         progress_manager.start_substep(step_id, "write")
-
-        # Attempt streaming write with fallback
         try:
-            sorted_ldf.sink_parquet(output_path, maintain_order=True)
-        except Exception as streaming_error:
-            logger.warning(
-                "Streaming write failed for message n-grams, using fallback",
-                extra={
-                    "output_path": str(output_path),
-                    "error": str(streaming_error),
-                    "error_type": type(streaming_error).__name__,
-                },
-            )
-            # Fallback to collect + write
-            sorted_ldf.collect().write_parquet(output_path)
-
-        progress_manager.complete_substep(step_id, "write")
+            # Attempt streaming write with fallback
+            try:
+                sorted_ldf.sink_parquet(output_path, maintain_order=True)
+            except Exception as streaming_error:
+                logger.warning(
+                    "Streaming write failed for message n-grams, using fallback",
+                    extra={
+                        "output_path": str(output_path),
+                        "error": str(streaming_error),
+                        "error_type": type(streaming_error).__name__,
+                    },
+                )
+                # Fallback to collect + write
+                sorted_ldf.collect().write_parquet(output_path)
+            progress_manager.complete_substep(step_id, "write")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "write", f"Write operation failed: {str(e)}")
+            raise
         progress_manager.complete_step(step_id)
 
         logger.debug(
@@ -424,51 +459,62 @@ def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manag
     try:
         # Sub-step 1: Preparing n-gram metadata
         progress_manager.start_substep(step_id, "metadata")
-
-        # Start with the base LazyFrame and select core columns
-        base_ldf = unique_ngrams.lazy().select(
-            [
-                COL_NGRAM_ID,
-                pl.col("ngram_text").alias(COL_NGRAM_WORDS),
-            ]
-        )
-        progress_manager.complete_substep(step_id, "metadata")
+        try:
+            # Start with the base LazyFrame and select core columns
+            base_ldf = unique_ngrams.lazy().select(
+                [
+                    COL_NGRAM_ID,
+                    pl.col("ngram_text").alias(COL_NGRAM_WORDS),
+                ]
+            )
+            progress_manager.complete_substep(step_id, "metadata")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "metadata", f"Metadata preparation failed: {str(e)}")
+            raise
 
         # Sub-step 2: Calculating n-gram lengths
         progress_manager.start_substep(step_id, "lengths")
-
-        # Add n-gram length calculation
-        length_ldf = base_ldf.with_columns(
-            [pl.col(COL_NGRAM_WORDS).str.split(" ").list.len().alias(COL_NGRAM_LENGTH)]
-        )
-        progress_manager.complete_substep(step_id, "lengths")
+        try:
+            # Add n-gram length calculation
+            length_ldf = base_ldf.with_columns(
+                [pl.col(COL_NGRAM_WORDS).str.split(" ").list.len().alias(COL_NGRAM_LENGTH)]
+            )
+            progress_manager.complete_substep(step_id, "lengths")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "lengths", f"Length calculation failed: {str(e)}")
+            raise
 
         # Sub-step 3: Sorting definitions
         progress_manager.start_substep(step_id, "sort")
-
-        # Sort by ngram_id for consistent ordering
-        sorted_ldf = length_ldf.sort(COL_NGRAM_ID)
-        progress_manager.complete_substep(step_id, "sort")
+        try:
+            # Sort by ngram_id for consistent ordering
+            sorted_ldf = length_ldf.sort(COL_NGRAM_ID)
+            progress_manager.complete_substep(step_id, "sort")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "sort", f"Sorting failed: {str(e)}")
+            raise
 
         # Sub-step 4: Writing definitions to parquet
         progress_manager.start_substep(step_id, "write")
-
-        # Attempt streaming write with fallback
         try:
-            sorted_ldf.sink_parquet(output_path, maintain_order=True)
-        except Exception as streaming_error:
-            logger.warning(
-                "Streaming write failed for n-gram definitions, using fallback",
-                extra={
-                    "output_path": str(output_path),
-                    "error": str(streaming_error),
-                    "error_type": type(streaming_error).__name__,
-                },
-            )
-            # Fallback to collect + write
-            sorted_ldf.collect().write_parquet(output_path)
-
-        progress_manager.complete_substep(step_id, "write")
+            # Attempt streaming write with fallback
+            try:
+                sorted_ldf.sink_parquet(output_path, maintain_order=True)
+            except Exception as streaming_error:
+                logger.warning(
+                    "Streaming write failed for n-gram definitions, using fallback",
+                    extra={
+                        "output_path": str(output_path),
+                        "error": str(streaming_error),
+                        "error_type": type(streaming_error).__name__,
+                    },
+                )
+                # Fallback to collect + write
+                sorted_ldf.collect().write_parquet(output_path)
+            progress_manager.complete_substep(step_id, "write")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "write", f"Write operation failed: {str(e)}")
+            raise
         progress_manager.complete_step(step_id)
 
         logger.debug(
@@ -527,52 +573,63 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
     try:
         # Sub-step 1: Selecting message columns
         progress_manager.start_substep(step_id, "select")
-
-        # Select the required columns
-        selected_ldf = ldf_tokenized.select(
-            [
-                COL_MESSAGE_SURROGATE_ID,
-                COL_MESSAGE_ID,
-                COL_MESSAGE_TEXT,
-                COL_AUTHOR_ID,
-                COL_MESSAGE_TIMESTAMP,
-            ]
-        )
-        progress_manager.complete_substep(step_id, "select")
+        try:
+            # Select the required columns
+            selected_ldf = ldf_tokenized.select(
+                [
+                    COL_MESSAGE_SURROGATE_ID,
+                    COL_MESSAGE_ID,
+                    COL_MESSAGE_TEXT,
+                    COL_AUTHOR_ID,
+                    COL_MESSAGE_TIMESTAMP,
+                ]
+            )
+            progress_manager.complete_substep(step_id, "select")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "select", f"Column selection failed: {str(e)}")
+            raise
 
         # Sub-step 2: Deduplicating messages
         progress_manager.start_substep(step_id, "deduplicate")
-
-        # Apply deduplication by surrogate ID
-        deduplicated_ldf = selected_ldf.unique(subset=[COL_MESSAGE_SURROGATE_ID])
-        progress_manager.complete_substep(step_id, "deduplicate")
+        try:
+            # Apply deduplication by surrogate ID
+            deduplicated_ldf = selected_ldf.unique(subset=[COL_MESSAGE_SURROGATE_ID])
+            progress_manager.complete_substep(step_id, "deduplicate")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "deduplicate", f"Deduplication failed: {str(e)}")
+            raise
 
         # Sub-step 3: Sorting by surrogate ID
         progress_manager.start_substep(step_id, "sort")
-
-        # Sort by surrogate ID for consistent ordering
-        sorted_ldf = deduplicated_ldf.sort(COL_MESSAGE_SURROGATE_ID)
-        progress_manager.complete_substep(step_id, "sort")
+        try:
+            # Sort by surrogate ID for consistent ordering
+            sorted_ldf = deduplicated_ldf.sort(COL_MESSAGE_SURROGATE_ID)
+            progress_manager.complete_substep(step_id, "sort")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "sort", f"Sorting failed: {str(e)}")
+            raise
 
         # Sub-step 4: Writing metadata to parquet
         progress_manager.start_substep(step_id, "write")
-
-        # Attempt streaming write with fallback
         try:
-            sorted_ldf.sink_parquet(output_path, maintain_order=True)
-        except Exception as streaming_error:
-            logger.warning(
-                "Streaming write failed for message metadata, using fallback",
-                extra={
-                    "output_path": str(output_path),
-                    "error": str(streaming_error),
-                    "error_type": type(streaming_error).__name__,
-                },
-            )
-            # Fallback to collect + write
-            sorted_ldf.collect().write_parquet(output_path)
-
-        progress_manager.complete_substep(step_id, "write")
+            # Attempt streaming write with fallback
+            try:
+                sorted_ldf.sink_parquet(output_path, maintain_order=True)
+            except Exception as streaming_error:
+                logger.warning(
+                    "Streaming write failed for message metadata, using fallback",
+                    extra={
+                        "output_path": str(output_path),
+                        "error": str(streaming_error),
+                        "error_type": type(streaming_error).__name__,
+                    },
+                )
+                # Fallback to collect + write
+                sorted_ldf.collect().write_parquet(output_path)
+            progress_manager.complete_substep(step_id, "write")
+        except Exception as e:
+            progress_manager.fail_substep(step_id, "write", f"Write operation failed: {str(e)}")
+            raise
         progress_manager.complete_step(step_id)
 
         logger.debug(
@@ -692,9 +749,32 @@ def main(context: PrimaryAnalyzerContext):
         n_gram_lengths = list(range(min_n, max_n + 1))
         estimated_rows = total_messages
         base_steps = 2
-        MEMORY_CHUNK_THRESHOLD = 100_000
+
+        # Dynamic chunk sizing based on dataset size
+        def calculate_optimal_chunk_size(dataset_size: int) -> int:
+            """Calculate optimal chunk size based on dataset size to balance memory and performance."""
+            if dataset_size <= 100_000:
+                return 100_000  # Original threshold for small datasets
+            elif dataset_size <= 1_000_000:
+                return 50_000  # Smaller chunks for medium datasets (1M rows)
+            elif dataset_size <= 2_000_000:
+                return 25_000  # Even smaller for larger datasets (2M rows)
+            else:
+                return 10_000  # Very small chunks for huge datasets (5M+ rows)
+
+        MEMORY_CHUNK_THRESHOLD = calculate_optimal_chunk_size(estimated_rows)
         use_chunking = (
             estimated_rows is not None and estimated_rows > MEMORY_CHUNK_THRESHOLD
+        )
+
+        # Log dynamic chunk sizing decision
+        logger.info(
+            "Dynamic chunk sizing calculated",
+            extra={
+                "dataset_size": estimated_rows,
+                "calculated_chunk_size": MEMORY_CHUNK_THRESHOLD,
+                "will_use_chunking": use_chunking,
+            },
         )
 
         if use_chunking and estimated_rows is not None:
@@ -709,21 +789,26 @@ def main(context: PrimaryAnalyzerContext):
 
         concat_steps = max(1, len(n_gram_lengths) // 2)
         ngram_total = base_steps + total_ngram_steps + concat_steps
-        progress_manager.add_step("ngrams", "Generating n-grams", ngram_total)
+        # Use percentage-based progress (0.0 to 100.0) for smooth n-gram progress display
+        progress_manager.add_step("ngrams", "Generating n-grams")
 
-        # Add remaining steps
-        progress_manager.add_step(
-            "analyze_approach", "Analyzing processing approach", 1
+        # Add n-gram processing step with hierarchical sub-steps
+        progress_manager.add_step("process_ngrams", "Processing n-grams for output")
+        progress_manager.add_substep(
+            "process_ngrams", "analyze_approach", "Analyzing processing approach"
         )
-        expected_unique_chunks = (
-            max(1, total_messages // 50000) if total_messages > 500000 else 1
+        progress_manager.add_substep(
+            "process_ngrams", "extract_unique", "Extracting unique n-grams"
         )
-        progress_manager.add_step(
-            "extract_unique", "Extracting unique n-grams", expected_unique_chunks
+        progress_manager.add_substep(
+            "process_ngrams", "sort_ngrams", "Sorting n-grams alphabetically"
         )
-        progress_manager.add_step("sort_ngrams", "Sorting n-grams alphabetically", 1)
-        progress_manager.add_step("create_ids", "Creating n-gram IDs", 1)
-        progress_manager.add_step("assign_ids", "Assigning n-gram IDs", 1)
+        progress_manager.add_substep(
+            "process_ngrams", "create_ids", "Creating n-gram IDs"
+        )
+        progress_manager.add_substep(
+            "process_ngrams", "assign_ids", "Assigning n-gram IDs"
+        )
         progress_manager.add_step(
             "write_message_ngrams", "Writing message n-grams output", 1
         )
@@ -733,6 +818,7 @@ def main(context: PrimaryAnalyzerContext):
         )
 
         # Step 1: Enhanced preprocessing with memory monitoring
+
         progress_manager.start_step("preprocess")
         logger.info(
             "Starting preprocessing step",
@@ -832,31 +918,7 @@ def main(context: PrimaryAnalyzerContext):
 
         try:
 
-            def memory_aware_tokenize_callback(current_chunk, total_chunks):
-                progress_manager.update_step_with_memory(
-                    "tokenize", current_chunk, "tokenization"
-                )
-
-                # Check if we need to reduce chunk size mid-process
-                pressure_level = memory_manager.get_memory_pressure_level()
-                if pressure_level == MemoryPressureLevel.CRITICAL:
-                    # Signal to reduce chunk size
-                    current_adaptive = memory_manager.calculate_adaptive_chunk_size(
-                        adaptive_chunk_size, "tokenization"
-                    )
-                    logger.debug(
-                        "Reducing chunk size due to memory pressure",
-                        extra={
-                            "original_chunk_size": adaptive_chunk_size,
-                            "new_chunk_size": current_adaptive // 2,
-                            "pressure_level": "CRITICAL",
-                        },
-                    )
-                    return {
-                        "reduce_chunk_size": True,
-                        "new_size": current_adaptive // 2,
-                    }
-                return {"continue": True}
+            # Direct progress manager usage - no callback needed
 
             # Enhanced tokenization with memory management
             from app.utils import tokenize_text
@@ -864,7 +926,7 @@ def main(context: PrimaryAnalyzerContext):
             ldf_tokenized = tokenize_text(
                 ldf_filtered,
                 COL_MESSAGE_TEXT,
-                memory_aware_tokenize_callback,
+                progress_manager,
                 memory_manager,
             )
 
@@ -903,39 +965,45 @@ def main(context: PrimaryAnalyzerContext):
         # Step 3: Enhanced n-gram generation with memory pressure handling
         progress_manager.start_step("ngrams")
         logger.info(
-            "Starting n-gram generation step",
+            "Starting n-gram generation step with percentage-based progress",
             extra={
                 "step": "ngrams",
                 "min_n": min_n,
                 "max_n": max_n,
                 "n_gram_lengths": list(range(min_n, max_n + 1)),
+                "progress_total": 100.0,
+                "progress_method": "percentage_based",
             },
         )
 
         try:
 
-            def memory_aware_ngram_callback(current, total):
-                progress_manager.update_step_with_memory(
-                    "ngrams", current, "n-gram generation"
-                )
-
-                # Return memory pressure info for adaptive processing
-                pressure_level = memory_manager.get_memory_pressure_level()
-                return {
-                    "pressure_level": pressure_level,
-                    "should_use_disk_fallback": pressure_level
-                    == MemoryPressureLevel.CRITICAL,
-                }
+            # Direct progress manager usage - no callback needed
 
             # Check if we should use disk-based generation
+            # First check dataset size threshold (early fallback)
+            DATASET_SIZE_FALLBACK_THRESHOLD = 500_000
+            should_use_disk_fallback = filtered_count > DATASET_SIZE_FALLBACK_THRESHOLD
+
+            # Also check current memory pressure
             current_pressure = memory_manager.get_memory_pressure_level()
 
-            if current_pressure == MemoryPressureLevel.CRITICAL:
+            if (
+                should_use_disk_fallback
+                or current_pressure == MemoryPressureLevel.CRITICAL
+            ):
                 # Import and use disk-based fallback
+                fallback_reason = (
+                    "dataset_size" if should_use_disk_fallback else "memory_pressure"
+                )
                 logger.warning(
-                    "Critical memory pressure detected, using disk-based n-gram generation",
+                    "Using disk-based n-gram generation",
                     extra={
-                        "pressure_level": "CRITICAL",
+                        "dataset_size": filtered_count,
+                        "size_threshold": DATASET_SIZE_FALLBACK_THRESHOLD,
+                        "dataset_exceeds_threshold": should_use_disk_fallback,
+                        "pressure_level": current_pressure.value,
+                        "fallback_reason": fallback_reason,
                         "fallback_mechanism": "disk_based_generation",
                         "min_n": min_n,
                         "max_n": max_n,
@@ -945,15 +1013,21 @@ def main(context: PrimaryAnalyzerContext):
                     generate_ngrams_disk_based,
                 )
 
-                progress_manager.console.print(
-                    "[red]Critical memory pressure - using disk-based n-gram generation[/red]"
-                )
+                if should_use_disk_fallback:
+                    progress_manager.console.print(
+                        f"[yellow]Large dataset ({filtered_count:,} rows) - using disk-based n-gram generation[/yellow]"
+                    )
+                else:
+                    progress_manager.console.print(
+                        "[red]Critical memory pressure - using disk-based n-gram generation[/red]"
+                    )
                 ldf_ngrams = generate_ngrams_disk_based(
                     ldf_tokenized,
                     min_n,
                     max_n,
-                    memory_aware_ngram_callback,
+                    filtered_count,  # Pass the known row count
                     memory_manager,
+                    progress_manager,
                 )
             else:
                 # Use enhanced vectorized generation with memory monitoring
@@ -961,8 +1035,9 @@ def main(context: PrimaryAnalyzerContext):
                     ldf_tokenized,
                     min_n,
                     max_n,
-                    memory_aware_ngram_callback,
+                    filtered_count,  # Pass the known row count to avoid memory-intensive recalculation
                     memory_manager,
+                    progress_manager,
                 )
 
             progress_manager.complete_step("ngrams")
@@ -1022,8 +1097,14 @@ def main(context: PrimaryAnalyzerContext):
             )
             raise
 
-        # Step 4: Determine processing approach based on dataset size and memory
-        progress_manager.start_step("analyze_approach")
+        # Step 4: Process n-grams for output (hierarchical step with 5 sub-steps)
+        progress_manager.start_step("process_ngrams")
+        logger.info(
+            "Starting n-gram processing phase", extra={"step": "process_ngrams"}
+        )
+
+        # Sub-step 1: Determine processing approach based on dataset size and memory
+        progress_manager.start_substep("process_ngrams", "analyze_approach")
         logger.info(
             "Starting approach analysis step", extra={"step": "analyze_approach"}
         )
@@ -1043,7 +1124,7 @@ def main(context: PrimaryAnalyzerContext):
                     True  # Force chunked approach under memory pressure
                 )
 
-            progress_manager.complete_step("analyze_approach")
+            progress_manager.complete_substep("process_ngrams", "analyze_approach")
 
             logger.info(
                 "Approach analysis step completed",
@@ -1067,13 +1148,15 @@ def main(context: PrimaryAnalyzerContext):
                     "error_type": type(e).__name__,
                 },
             )
-            progress_manager.fail_step(
-                "analyze_approach", f"Failed during approach analysis: {str(e)}"
+            progress_manager.fail_substep(
+                "process_ngrams",
+                "analyze_approach",
+                f"Failed during approach analysis: {str(e)}",
             )
             raise
 
-        # Step 5: Memory-aware unique extraction
-        progress_manager.start_step("extract_unique")
+        # Sub-step 2: Memory-aware unique extraction
+        progress_manager.start_substep("process_ngrams", "extract_unique")
         logger.info(
             "Starting unique extraction step",
             extra={
@@ -1085,10 +1168,7 @@ def main(context: PrimaryAnalyzerContext):
 
         try:
 
-            def unique_progress_callback(current_chunk, total_chunks):
-                progress_manager.update_step_with_memory(
-                    "extract_unique", current_chunk, "unique extraction"
-                )
+            # Direct progress manager usage - no callback needed
 
             pressure_level = memory_manager.get_memory_pressure_level()
 
@@ -1124,10 +1204,10 @@ def main(context: PrimaryAnalyzerContext):
                 unique_ngram_texts = _stream_unique_batch_accumulator(
                     ldf_ngrams.select("ngram_text"),
                     chunk_size=chunk_size,
-                    progress_callback=unique_progress_callback,
+                    progress_manager=progress_manager,
                 )
 
-            progress_manager.complete_step("extract_unique")
+            progress_manager.complete_substep("process_ngrams", "extract_unique")
             memory_manager.enhanced_gc_cleanup()
 
             # Log completion with unique n-gram count
@@ -1158,7 +1238,8 @@ def main(context: PrimaryAnalyzerContext):
                 extra={"step": "extract_unique", "memory_error": str(e)},
                 exc_info=True,
             )
-            progress_manager.fail_step(
+            progress_manager.fail_substep(
+                "process_ngrams",
                 "extract_unique",
                 f"Memory exhaustion during unique extraction: {str(e)}",
             )
@@ -1172,18 +1253,20 @@ def main(context: PrimaryAnalyzerContext):
                     "error_type": type(e).__name__,
                 },
             )
-            progress_manager.fail_step(
-                "extract_unique", f"Failed during unique extraction: {str(e)}"
+            progress_manager.fail_substep(
+                "process_ngrams",
+                "extract_unique",
+                f"Failed during unique extraction: {str(e)}",
             )
             raise
 
-        # Step 6: Sort n-grams alphabetically for consistent ordering
-        progress_manager.start_step("sort_ngrams")
+        # Sub-step 3: Sort n-grams alphabetically for consistent ordering
+        progress_manager.start_substep("process_ngrams", "sort_ngrams")
         logger.info("Starting n-gram sorting step", extra={"step": "sort_ngrams"})
 
         try:
             sorted_ngrams = unique_ngram_texts.sort("ngram_text")
-            progress_manager.complete_step("sort_ngrams")
+            progress_manager.complete_substep("process_ngrams", "sort_ngrams")
 
             logger.info("N-gram sorting step completed", extra={"step": "sort_ngrams"})
         except Exception as e:
@@ -1195,20 +1278,20 @@ def main(context: PrimaryAnalyzerContext):
                     "error_type": type(e).__name__,
                 },
             )
-            progress_manager.fail_step(
-                "sort_ngrams", f"Failed during sorting: {str(e)}"
+            progress_manager.fail_substep(
+                "process_ngrams", "sort_ngrams", f"Failed during sorting: {str(e)}"
             )
             raise
 
-        # Step 7: Create sequential IDs for n-grams
-        progress_manager.start_step("create_ids")
+        # Sub-step 4: Create sequential IDs for n-grams
+        progress_manager.start_substep("process_ngrams", "create_ids")
         logger.info("Starting ID creation step", extra={"step": "create_ids"})
 
         try:
             unique_ngrams = sorted_ngrams.with_columns(
                 [pl.int_range(pl.len()).alias(COL_NGRAM_ID)]
             )
-            progress_manager.complete_step("create_ids")
+            progress_manager.complete_substep("process_ngrams", "create_ids")
 
             logger.info("ID creation step completed", extra={"step": "create_ids"})
         except Exception as e:
@@ -1220,13 +1303,13 @@ def main(context: PrimaryAnalyzerContext):
                     "error_type": type(e).__name__,
                 },
             )
-            progress_manager.fail_step(
-                "create_ids", f"Failed during ID creation: {str(e)}"
+            progress_manager.fail_substep(
+                "process_ngrams", "create_ids", f"Failed during ID creation: {str(e)}"
             )
             raise
 
-        # Step 8: Join n-gram IDs back to the main dataset
-        progress_manager.start_step("assign_ids")
+        # Sub-step 5: Join n-gram IDs back to the main dataset
+        progress_manager.start_substep("process_ngrams", "assign_ids")
         logger.info("Starting ID assignment step", extra={"step": "assign_ids"})
 
         try:
@@ -1236,7 +1319,8 @@ def main(context: PrimaryAnalyzerContext):
                 right_on="ngram_text",
                 how="left",
             )
-            progress_manager.complete_step("assign_ids")
+            progress_manager.complete_substep("process_ngrams", "assign_ids")
+            progress_manager.complete_step("process_ngrams")
 
             logger.info("ID assignment step completed", extra={"step": "assign_ids"})
         except Exception as e:
@@ -1248,12 +1332,12 @@ def main(context: PrimaryAnalyzerContext):
                     "error_type": type(e).__name__,
                 },
             )
-            progress_manager.fail_step(
-                "assign_ids", f"Failed during ID assignment: {str(e)}"
+            progress_manager.fail_substep(
+                "process_ngrams", "assign_ids", f"Failed during ID assignment: {str(e)}"
             )
             raise
 
-        # Steps 9-11: Generate output tables using enhanced streaming with sub-step progress
+        # Steps 5-7: Generate output tables using enhanced streaming with sub-step progress
         logger.info(
             "Starting output generation steps",
             extra={
@@ -1357,8 +1441,9 @@ def _generate_ngrams_with_memory_management(
     ldf: pl.LazyFrame,
     min_n: int,
     max_n: int,
-    progress_callback=None,
+    estimated_rows: int,
     memory_manager=None,
+    progress_manager=None,
 ) -> pl.LazyFrame:
     """
     Enhanced n-gram generation with memory management integration.
@@ -1374,7 +1459,9 @@ def _generate_ngrams_with_memory_management(
         memory_before = memory_manager.get_current_memory_usage()
 
         # Use existing vectorized generation with enhanced progress reporting
-        result = _generate_ngrams_vectorized(ldf, min_n, max_n, progress_callback)
+        result = _generate_ngrams_vectorized(
+            ldf, min_n, max_n, estimated_rows, progress_manager
+        )
 
         # Force cleanup after generation
         memory_manager.enhanced_gc_cleanup()
@@ -1408,32 +1495,84 @@ def _generate_ngrams_with_memory_management(
         from analyzers.ngrams.fallback_processors import generate_ngrams_disk_based
 
         return generate_ngrams_disk_based(
-            ldf, min_n, max_n, progress_callback, memory_manager
+            ldf, min_n, max_n, estimated_rows, memory_manager, progress_manager
+        )
+
+
+def _create_dynamic_substeps(progress_manager, min_n: int, max_n: int):
+    """Create dynamic sub-steps based on n-gram configuration.
+
+    This function creates phase-based sub-steps that provide clear visibility
+    into the different processing stages of vectorized n-gram generation:
+
+    1. Expression setup phase
+    2. Individual n-gram length processing phases (one per n-gram length)
+    3. Result combination phase
+
+    Args:
+        progress_manager: The progress manager to add sub-steps to
+        min_n: Minimum n-gram length
+        max_n: Maximum n-gram length
+    """
+    if progress_manager is None:
+        return
+
+    try:
+        # Setup phase
+        progress_manager.add_substep(
+            "ngrams", "setup_expressions", "Creating and applying n-gram expressions"
+        )
+
+        # N-gram processing phases - one for each n-gram length
+        for n in range(min_n, max_n + 1):
+            substep_id = f"process_{n}grams"
+            description = f"Processing {n}-grams"
+            progress_manager.add_substep("ngrams", substep_id, description)
+
+        # Combination phase
+        progress_manager.add_substep(
+            "ngrams", "combine_results", "Combining n-gram results"
+        )
+    except Exception as e:
+        # Log error but don't break the analysis - fall back to original approach
+        logger.warning(
+            "Failed to create dynamic sub-steps for vectorized generation",
+            extra={
+                "min_n": min_n,
+                "max_n": max_n,
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
         )
 
 
 def _generate_ngrams_vectorized(
-    ldf: pl.LazyFrame, min_n: int, max_n: int, progress_callback=None
+    ldf: pl.LazyFrame,
+    min_n: int,
+    max_n: int,
+    estimated_rows: int,
+    progress_manager: Optional[MemoryAwareProgressManager] = None,
 ) -> pl.LazyFrame:
     """
-    Generate n-grams using vectorized polars expressions with enhanced progress reporting.
+    Generate n-grams using vectorized polars expressions with enhanced phase-based progress reporting.
 
     This function takes a LazyFrame with a 'tokens' column and generates
     all n-grams from min_n to max_n length, creating a row for each n-gram
     occurrence in each message.
 
-    Enhanced Progress Reporting:
-    - Provides 20-50+ progress steps instead of 4-6
-    - Reports progress during memory-intensive operations (explode, filter, concat)
-    - Shows progress for each chunk when processing large datasets
-    - Breaks down n-gram processing into granular sub-operations
+    Enhanced Phase-Based Progress Reporting:
+    - Expression setup phase: Creating and applying n-gram expressions
+    - Individual n-gram processing phases (one per n-gram length)
+    - Result combination phase: Combining all n-gram results
+    - Clear visibility into which operation and n-gram length is being processed
+    - Memory-aware progress updates during intensive operations
 
     Args:
         ldf: LazyFrame with 'tokens' column
         min_n: Minimum n-gram length
         max_n: Maximum n-gram length
-        progress_callback: Optional function to call for progress updates.
-                         Should accept (current, total) parameters.
+        estimated_rows: Estimated number of rows for memory management
+        progress_manager: Optional progress manager for detailed progress reporting.
     """
 
     def create_ngrams_expr(n: int) -> pl.Expr:
@@ -1484,258 +1623,252 @@ def _generate_ngrams_vectorized(
             .alias(f"ngrams_{n}")
         )
 
-    def safe_progress_update(current: int, total: int, operation: str = ""):
-        """Safely update progress with error handling to prevent crashes."""
-        if progress_callback is None:
-            return
-
-        try:
-            # Validate inputs
-            if not isinstance(current, int) or not isinstance(total, int):
-                return
-            if current < 0 or total <= 0 or current > total:
-                return
-
-            progress_callback(current, total)
-        except Exception as e:
-            # Follow the same pattern as the main() function - log warning but continue
-            logger.warning(
-                "Progress update failed during n-gram generation",
-                extra={
-                    "operation": operation,
-                    "current": current,
-                    "total": total,
-                    "error": str(e),
-                },
-            )
-
-    # Calculate total steps for enhanced progress reporting
+    # Calculate n-gram lengths for processing
     n_gram_lengths = list(range(min_n, max_n + 1))
 
-    # Estimate dataset size for chunking decision
-    estimated_rows = None
-    try:
-        estimated_rows = ldf.select(pl.len()).collect().item()
-    except Exception:
-        # If we can't get row count efficiently, proceed without chunking
-        pass
+    # Dynamic memory threshold for chunking based on dataset size
+    def calculate_optimal_chunk_size(dataset_size: int) -> int:
+        """Calculate optimal chunk size based on dataset size to balance memory and performance."""
+        if dataset_size <= 100_000:
+            return 100_000  # Original threshold for small datasets
+        elif dataset_size <= 1_000_000:
+            return 50_000  # Smaller chunks for medium datasets (1M rows)
+        elif dataset_size <= 2_000_000:
+            return 25_000  # Even smaller for larger datasets (2M rows)
+        else:
+            return 10_000  # Very small chunks for huge datasets (5M+ rows)
 
-    # Memory threshold for chunking (same as current implementation)
-    MEMORY_CHUNK_THRESHOLD = 100_000
+    MEMORY_CHUNK_THRESHOLD = (
+        calculate_optimal_chunk_size(estimated_rows) if estimated_rows else 100_000
+    )
     use_chunking = (
         estimated_rows is not None and estimated_rows > MEMORY_CHUNK_THRESHOLD
     )
 
-    # Enhanced progress calculation
-    base_steps = 2  # Generate expressions + Apply expressions
+    # Create dynamic sub-steps based on n-gram configuration
+    _create_dynamic_substeps(progress_manager, min_n, max_n)
 
-    if use_chunking and estimated_rows is not None:
-        # Calculate number of chunks per n-gram length
-        chunks_per_ngram = (
-            estimated_rows + MEMORY_CHUNK_THRESHOLD - 1
-        ) // MEMORY_CHUNK_THRESHOLD
-        # Each n-gram length has: 1 setup + (2 operations * chunks) + 1 completion = 2 + 2*chunks
-        chunked_substeps_per_ngram = 2 + (2 * chunks_per_ngram)
-        total_ngram_steps = len(n_gram_lengths) * chunked_substeps_per_ngram
-    else:
-        # Non-chunked: each n-gram length has 4 sub-operations
-        # 1. Extract n-grams, 2. Explode, 3. Filter, 4. Format columns
-        substeps_per_ngram = 4
-        total_ngram_steps = len(n_gram_lengths) * substeps_per_ngram
+    try:
+        # Phase 1: Expression Setup
+        if progress_manager is not None:
+            progress_manager.start_substep("ngrams", "setup_expressions")
 
-    # Final concat operation - more steps if combining many results
-    concat_steps = max(
-        1, len(n_gram_lengths) // 2
-    )  # Show progress for complex concat operations
+        try:
+            # Step 1: Generate expressions for all n-gram lengths
+            ngram_expressions = [create_ngrams_expr(n) for n in n_gram_lengths]
 
-    total_steps = base_steps + total_ngram_steps + concat_steps
-    current_step = 0
+            # Step 2: Apply all n-gram expressions to create separate columns
+            # This creates the n-gram lists but doesn't explode them yet
+            ldf_with_ngrams = ldf.with_columns(ngram_expressions)
 
-    # Report initial progress
-    safe_progress_update(current_step, total_steps, "initialization")
+            if progress_manager is not None:
+                progress_manager.complete_substep("ngrams", "setup_expressions")
 
-    # Step 1: Generate expressions for all n-gram lengths
-    ngram_expressions = [create_ngrams_expr(n) for n in n_gram_lengths]
-    current_step += 1
-    safe_progress_update(current_step, total_steps, "expression generation")
+        except Exception as e:
+            if progress_manager is not None:
+                progress_manager.fail_substep(
+                    "ngrams", "setup_expressions", f"Expression setup failed: {str(e)}"
+                )
+            raise
 
-    # Step 2: Apply all n-gram expressions to create separate columns
-    # This creates the n-gram lists but doesn't explode them yet
-    ldf_with_ngrams = ldf.with_columns(ngram_expressions)
-    current_step += 1
-    safe_progress_update(current_step, total_steps, "expression application")
+        # Phase 2: Process each n-gram length with dedicated sub-steps
+        all_ngram_results = []
 
-    # Step 3: Process each n-gram column with enhanced progress reporting
-    all_ngram_results = []
+        for n_idx, n in enumerate(n_gram_lengths):
+            substep_id = f"process_{n}grams"
+            ngram_col = f"ngrams_{n}"
 
-    for n_idx, n in enumerate(n_gram_lengths):
-        ngram_col = f"ngrams_{n}"
+            if progress_manager is not None:
+                progress_manager.start_substep("ngrams", substep_id)
 
-        # Progress update: Starting n-gram length processing
-        safe_progress_update(current_step, total_steps, f"starting n-gram length {n}")
+            try:
+                if use_chunking and estimated_rows is not None:
+                    # Enhanced chunked processing with detailed progress
+                    chunk_size = MEMORY_CHUNK_THRESHOLD // len(n_gram_lengths)
+                    chunk_results = []
+                    total_chunks = (estimated_rows + chunk_size - 1) // chunk_size
 
-        if use_chunking and estimated_rows is not None:
-            # Enhanced chunked processing with detailed progress
-            chunk_size = MEMORY_CHUNK_THRESHOLD // len(n_gram_lengths)
-            chunk_results = []
-            total_chunks = (estimated_rows + chunk_size - 1) // chunk_size
+                    for chunk_idx in range(total_chunks):
+                        chunk_start = chunk_idx * chunk_size
+                        chunk_end = min(chunk_start + chunk_size, estimated_rows)
 
-            # Progress update: Starting chunked processing for this n-gram length
-            current_step += 1
-            safe_progress_update(current_step, total_steps, f"n-gram {n} chunked setup")
+                        # Process chunk with detailed progress
+                        try:
+                            # Step 1: Extract and explode chunk
+                            chunk_ngrams = (
+                                ldf_with_ngrams.slice(
+                                    chunk_start, chunk_end - chunk_start
+                                )
+                                .select([COL_MESSAGE_SURROGATE_ID, pl.col(ngram_col)])
+                                .explode(ngram_col)
+                            )
 
-            for chunk_idx in range(total_chunks):
-                chunk_start = chunk_idx * chunk_size
-                chunk_end = min(chunk_start + chunk_size, estimated_rows)
+                            # Step 2: Filter and format chunk
+                            chunk_ngrams = (
+                                chunk_ngrams.filter(
+                                    pl.col(ngram_col).is_not_null()
+                                    & (pl.col(ngram_col).str.len_chars() > 0)
+                                )
+                                .select(
+                                    [
+                                        COL_MESSAGE_SURROGATE_ID,
+                                        pl.col(ngram_col).alias("ngram_text"),
+                                    ]
+                                )
+                                .collect()  # Collect chunk to manage memory
+                            )
 
-                # Process chunk with detailed progress
-                try:
-                    # Step 1: Extract and explode chunk
-                    chunk_ngrams = (
-                        ldf_with_ngrams.slice(chunk_start, chunk_end - chunk_start)
-                        .select([COL_MESSAGE_SURROGATE_ID, pl.col(ngram_col)])
-                        .explode(ngram_col)
-                    )
+                            chunk_results.append(chunk_ngrams)
 
-                    # Progress update after explode operation
-                    current_step += 1
-                    safe_progress_update(
-                        current_step,
-                        total_steps,
-                        f"n-gram {n} chunk {chunk_idx+1}/{total_chunks} exploded",
-                    )
+                            # Update substep progress for this chunk
+                            if progress_manager is not None:
+                                try:
+                                    # Calculate progress as: chunks completed / total chunks
+                                    progress_manager.update_substep("ngrams", substep_id, chunk_idx + 1, total_chunks)
+                                except Exception as progress_error:
+                                    # Don't let progress reporting failures crash the analysis
+                                    logger.warning(
+                                        "Progress update failed for n-gram chunk",
+                                        extra={
+                                            "chunk_index": chunk_idx + 1,
+                                            "total_chunks": total_chunks,
+                                            "ngram_length": n,
+                                            "error": str(progress_error),
+                                            "error_type": type(progress_error).__name__,
+                                        },
+                                    )
 
-                    # Step 2: Filter and format chunk
-                    chunk_ngrams = (
-                        chunk_ngrams.filter(
-                            pl.col(ngram_col).is_not_null()
-                            & (pl.col(ngram_col).str.len_chars() > 0)
+                            # Aggressive garbage collection after each chunk
+                            gc.collect()
+
+                        except Exception as e:
+                            logger.warning(
+                                "Error processing chunk during n-gram generation",
+                                extra={
+                                    "chunk_index": chunk_idx,
+                                    "ngram_length": n,
+                                    "total_chunks": total_chunks,
+                                    "error": str(e),
+                                    "error_type": type(e).__name__,
+                                },
+                            )
+                            continue
+
+                    # Combine chunks for this n-gram length
+                    if chunk_results:
+                        exploded_ngrams = pl.concat(chunk_results).lazy()
+                    else:
+                        # Empty result with correct schema
+                        exploded_ngrams = (
+                            ldf_with_ngrams.select(
+                                [COL_MESSAGE_SURROGATE_ID, pl.col(ngram_col)]
+                            )
+                            .limit(0)
+                            .select(
+                                [
+                                    COL_MESSAGE_SURROGATE_ID,
+                                    pl.col(ngram_col).alias("ngram_text"),
+                                ]
+                            )
                         )
-                        .select(
-                            [
-                                COL_MESSAGE_SURROGATE_ID,
-                                pl.col(ngram_col).alias("ngram_text"),
-                            ]
-                        )
-                        .collect()  # Collect chunk to manage memory
-                    )
 
-                    chunk_results.append(chunk_ngrams)
-
-                    # Progress update after filter and format
-                    current_step += 1
-                    safe_progress_update(
-                        current_step,
-                        total_steps,
-                        f"n-gram {n} chunk {chunk_idx+1}/{total_chunks} filtered",
-                    )
-
-                except Exception as e:
-                    logger.warning(
-                        "Error processing chunk during n-gram generation",
-                        extra={
-                            "chunk_index": chunk_idx,
-                            "ngram_length": n,
-                            "total_chunks": total_chunks,
-                            "error": str(e),
-                            "error_type": type(e).__name__,
-                        },
-                    )
-                    continue
-
-            # Combine chunks for this n-gram length
-            if chunk_results:
-                exploded_ngrams = pl.concat(chunk_results).lazy()
-            else:
-                # Empty result with correct schema
-                exploded_ngrams = (
-                    ldf_with_ngrams.select(
+                else:
+                    # Standard processing with enhanced progress reporting
+                    # Total of 4 sub-operations for non-chunked processing
+                    total_operations = 4
+                    
+                    # Sub-step 1: Extract n-grams for this length
+                    selected_ngrams = ldf_with_ngrams.select(
                         [COL_MESSAGE_SURROGATE_ID, pl.col(ngram_col)]
                     )
-                    .limit(0)
-                    .select(
+                    if progress_manager is not None:
+                        try:
+                            progress_manager.update_substep("ngrams", substep_id, 1, total_operations)
+                        except Exception:
+                            pass  # Ignore progress update failures
+
+                    # Sub-step 2: Explode n-gram lists (memory-intensive operation)
+                    exploded_ngrams = selected_ngrams.explode(ngram_col)
+                    if progress_manager is not None:
+                        try:
+                            progress_manager.update_substep("ngrams", substep_id, 2, total_operations)
+                        except Exception:
+                            pass  # Ignore progress update failures
+
+                    # Sub-step 3: Filter null/empty n-grams (memory-intensive operation)
+                    filtered_ngrams = exploded_ngrams.filter(
+                        pl.col(ngram_col).is_not_null()
+                        & (pl.col(ngram_col).str.len_chars() > 0)
+                    )
+                    if progress_manager is not None:
+                        try:
+                            progress_manager.update_substep("ngrams", substep_id, 3, total_operations)
+                        except Exception:
+                            pass  # Ignore progress update failures
+
+                    # Sub-step 4: Format columns
+                    exploded_ngrams = filtered_ngrams.select(
                         [
                             COL_MESSAGE_SURROGATE_ID,
                             pl.col(ngram_col).alias("ngram_text"),
                         ]
                     )
+                    if progress_manager is not None:
+                        try:
+                            progress_manager.update_substep("ngrams", substep_id, 4, total_operations)
+                        except Exception:
+                            pass  # Ignore progress update failures
+
+                all_ngram_results.append(exploded_ngrams)
+
+                # Complete this n-gram length processing
+                if progress_manager is not None:
+                    progress_manager.complete_substep("ngrams", substep_id)
+
+                # Aggressive garbage collection between n-gram lengths
+                gc.collect()
+
+            except Exception as e:
+                if progress_manager is not None:
+                    progress_manager.fail_substep(
+                        "ngrams", substep_id, f"Processing {n}-grams failed: {str(e)}"
+                    )
+                raise
+
+        # Phase 3: Combine all results
+        if progress_manager is not None:
+            progress_manager.start_substep("ngrams", "combine_results")
+
+        try:
+            if len(all_ngram_results) == 1:
+                result_ldf = all_ngram_results[0]
+            else:
+                # Combine all results using pl.concat
+                result_ldf = pl.concat(all_ngram_results)
+
+            if progress_manager is not None:
+                progress_manager.complete_substep("ngrams", "combine_results")
+
+        except Exception as e:
+            if progress_manager is not None:
+                progress_manager.fail_substep(
+                    "ngrams", "combine_results", f"Result combination failed: {str(e)}"
                 )
+            raise
 
-            # Progress update: Completed chunked processing for this n-gram length
-            current_step += 1
-            safe_progress_update(
-                current_step, total_steps, f"n-gram {n} chunks combined"
-            )
-
-        else:
-            # Standard processing with enhanced progress reporting
-            # Sub-step 1: Extract n-grams for this length
-            selected_ngrams = ldf_with_ngrams.select(
-                [COL_MESSAGE_SURROGATE_ID, pl.col(ngram_col)]
-            )
-            current_step += 1
-            safe_progress_update(current_step, total_steps, f"n-gram {n} extracted")
-
-            # Sub-step 2: Explode n-gram lists (memory-intensive operation)
-            exploded_ngrams = selected_ngrams.explode(ngram_col)
-            current_step += 1
-            safe_progress_update(current_step, total_steps, f"n-gram {n} exploded")
-
-            # Sub-step 3: Filter null/empty n-grams (memory-intensive operation)
-            filtered_ngrams = exploded_ngrams.filter(
-                pl.col(ngram_col).is_not_null()
-                & (pl.col(ngram_col).str.len_chars() > 0)
-            )
-            current_step += 1
-            safe_progress_update(current_step, total_steps, f"n-gram {n} filtered")
-
-            # Sub-step 4: Format columns
-            exploded_ngrams = filtered_ngrams.select(
-                [
-                    COL_MESSAGE_SURROGATE_ID,
-                    pl.col(ngram_col).alias("ngram_text"),
-                ]
-            )
-            current_step += 1
-            safe_progress_update(current_step, total_steps, f"n-gram {n} formatted")
-
-        all_ngram_results.append(exploded_ngrams)
-
-    # Step 4: Combine all results using pl.concat with enhanced progress
-    if len(all_ngram_results) == 1:
-        result_ldf = all_ngram_results[0]
-        current_step += concat_steps
-        safe_progress_update(
-            current_step, total_steps, "single result, no concat needed"
+    except Exception as e:
+        # Log the error for debugging
+        logger.error(
+            "Vectorized n-gram generation failed",
+            extra={
+                "min_n": min_n,
+                "max_n": max_n,
+                "estimated_rows": estimated_rows,
+                "error": str(e),
+                "error_type": type(e).__name__,
+            },
         )
-    else:
-        # For multiple results, show progress during concatenation
-        if concat_steps > 1:
-            # Progressive concatenation for better progress visibility
-            result_ldf = all_ngram_results[0]
-            for i, additional_result in enumerate(all_ngram_results[1:], 1):
-                result_ldf = pl.concat([result_ldf, additional_result])
-                current_step += 1
-                safe_progress_update(
-                    current_step,
-                    total_steps,
-                    f"concatenated {i+1}/{len(all_ngram_results)} results",
-                )
-
-            # Fill remaining concat steps if any
-            while current_step < total_steps:
-                current_step += 1
-                safe_progress_update(current_step, total_steps, "concat finalization")
-        else:
-            # Single concat operation
-            result_ldf = pl.concat(all_ngram_results)
-            current_step += 1
-            safe_progress_update(current_step, total_steps, "results concatenated")
-
-    # Ensure we end at exactly total_steps
-    if current_step < total_steps:
-        current_step = total_steps
-        safe_progress_update(current_step, total_steps, "n-gram generation completed")
+        raise
 
     return result_ldf
 
