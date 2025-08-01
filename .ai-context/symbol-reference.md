@@ -182,6 +182,28 @@ Base interface for data importers
 
 ## Common Utilities
 
+### Logging System (`app/logger.py`)
+
+Application-wide structured JSON logging with configurable levels and automatic rotation.
+
+**Core Functions:**
+- `setup_logging(log_file_path: Path, level: int = logging.INFO)` - Configure application logging
+- `get_logger(name: str) -> logging.Logger` - Get logger instance for module
+
+**Features:**
+- Dual handlers: console (ERROR+) and file (INFO+) 
+- JSON-formatted structured logs with timestamps and context
+- Automatic log rotation (10MB files, 5 backups)
+- CLI-configurable log levels via `--log-level` flag
+- Log location: `~/.local/share/MangoTango/logs/mangotango.log`
+
+**Usage Pattern:**
+```python
+from app.logger import get_logger
+logger = get_logger(__name__)
+logger.info("Message", extra={"context": "value"})
+```
+
 ### Data Processing (`app/utils.py`)
 
 - `parquet_row_count(path) -> int` - Efficient row counting for large files

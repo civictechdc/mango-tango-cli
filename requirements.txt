@@ -16,3 +16,4 @@ shinywidgets==0.6.2
 starlette==0.47.1
 uvicorn==0.34.3
 a2wsgi==1.10.10
+python-json-logger==2.0.7
