@@ -1,4 +1,4 @@
-from .progress import ProgressReporter
+from .progress import AdvancedProgressReporter, ProgressReporter
 from .utils import (
     clear_printed_lines,
     clear_terminal,

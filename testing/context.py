@@ -14,12 +14,25 @@ from analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
 from analyzer_interface.context import TableReader, TableWriter
+from preprocessing.series_semantic import SeriesSemantic
+
+
+class TestInputColumnProvider:
+    """Simple test version of InputColumnProvider."""
+
+    def __init__(self, user_column_name: str, semantic: SeriesSemantic):
+        self.user_column_name = user_column_name
+        self.semantic = semantic
 
 
 class TestPrimaryAnalyzerContext(BasePrimaryAnalyzerContext):
     input_parquet_path: str
     output_parquet_root_path: str
     param_values: dict[str, ParamValue]
+    input_columns: dict[str, TestInputColumnProvider]
+
+    class Config:
+        arbitrary_types_allowed = True
 
     def input(self) -> InputTableReader:
         return TestTableReader(parquet_path=self.input_parquet_path)
