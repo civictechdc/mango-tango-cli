@@ -12,9 +12,10 @@ nav:
       - "Getting Started":
           - "Overview": "guides/get-started/overview.md"
           - "Installation": "guides/get-started/installation.md"
-          - "Contributing to The Project": "guides/contributing.md"
-          - "Logging System": "guides/logging.md"
-          - "CLI design philosophy": "guides/architecture.md"
+          - "Contributing to The Project": "guides/get-started/contributing.md"
+          - "Logging System": "guides/get-started/logging.md"
+          - "Testing": "guides/get-started/testing.md"
+          - "CLI design philosophy": "guides/get-started/architecture.md"
       - "Implementing Analyzers": "guides/analyzers.md"
       - "Domains":
           - "Core Domain": "guides/domains/core-domain.md"
@@ -31,6 +32,7 @@ nav:
       - "Terminal Tools": "reference/terminal_tools.md"
       - "Importing": "reference/importing.md"
       - "Meta": "reference/meta.md"
+      - "Storage": "reference/storage.md"
       - "Testing": "reference/testing.md"
 
 theme:
@@ -62,6 +64,8 @@ plugins:
             parameter_headings: true
             show_symbol_type_heading: True
             show_symbol_type_toc: True
+  - search
+  - mermaid2
 
 markdown_extensions:
   - toc:
