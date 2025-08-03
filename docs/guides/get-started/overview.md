@@ -96,21 +96,21 @@ Dependency injection through context objects:
 
 ### For Development
 
-1. **Setup**: See [Setup Guide](installation.md)
-2. **Contribution Workflow**: See [The Contribution Workflow Guide](contributing.md)
-3. **Development Guide**: See [The Development Guide](architecture.md)
+1. **Setup**: See [Setup Guide](./installation.md)
+2. **Contribution Workflow**: See [The Contribution Workflow Guide](./contributing.md)
+3. **Development Guide**: See [The Development Guide](./architecture.md)
 
 ### For AI Assistants
 
-- **Claude Code users**: See [CLAUDE.md](../../CLAUDE.md) (includes Serena integration)
-- **Cursor users**: See [.cursorrules](../../.cursorrules)
+- **Claude Code users**: See [CLAUDE.md](./CLAUDE.md) (includes Serena integration)
+- **Cursor users**: See [.cursorrules](./.cursorrules)
 - **Deep semantic analysis**: Explore [.serena/memories/](https://github.com/civictechdc/mango-tango-cli/tree/develop/.serena/memories)
 
 ### Quick References
 
-- **Commands**: [.serena/memories/suggested_commands.md](../../.serena/memories/suggested_commands.md)
-- **Style Guide**: [.serena/memories/code_style_conventions.md](../../.serena/memories/code_style_conventions.md)
-- **Task Checklist**: [.serena/memories/task_completion_checklist.md](../../.serena/memories/task_completion_checklist.md)
+- **Commands**: [.serena/memories/suggested_commands.md](./.serena/memories/suggested_commands.md)
+- **Style Guide**: [.serena/memories/code_style_conventions.md](./.serena/memories/code_style_conventions.md)
+- **Task Checklist**: [.serena/memories/task_completion_checklist.md](./.serena/memories/task_completion_checklist.md)
 
 ## External Dependencies
 

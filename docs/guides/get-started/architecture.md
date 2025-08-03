@@ -1,4 +1,4 @@
-Before contributing please refer to our [**Contributor Workflow**](#contributor-workflow)
+Before contributing please refer to our [**Contributor Workflow**](./contributing.md)
 
 ## Application Design Overview
 The CIB 🥭 application is a terminal-based tool for performing data analysis and visualization. It is designed to be modular and extensible, allowing developers to contribute new analysis modules and visualization components while providing a consistent user experience around data import, preprocessing, and output generation.
@@ -10,18 +10,18 @@ The architecture of the CIB 🥭 application is designed to address this problem
 ## Architecture Overview
 
 The application has three "domains":
-- The [**Core**](#core-domain) domain is responsible for workspace management, user flow, and integration of analysis runs and data import/export in a generic sense. It has three parts that correspond loosely to the MVC paradigm.
-  - The [**Application**](#application) defines the workspace logic and exposes generic capabilities for importing and exporting data as well as analyses and dashboards. This is the "controller" part.
-  - The [**Terminal Components**](#terminal-components) render the terminal interface and handle user input. This is the "view" part.
-  - The [**Storage IO**](#storage-io) persists the workspace data and is responsible for reading and writing data. This is the "model" part.
+- The [**Core**](../domains/core-domain.md) domain is responsible for workspace management, user flow, and integration of analysis runs and data import/export in a generic sense. It has three parts that correspond loosely to the MVC paradigm.
+  - The **Application** defines the workspace logic and exposes generic capabilities for importing and exporting data as well as analyses and dashboards. This is the "controller" part.
+  - The **Terminal** Components render the terminal interface and handle user input. This is the "view" part.
+  - The **Storage IO** persists the workspace data and is responsible for reading and writing data. This is the "model" part.
 
   The core application provides the context necessary for the other domains to function in a way that allows them to be agnostic about the specifics of the workspace and user flow.
 
-- The [**Edge**](#edge-domain) domain is responsible for data import and export while being agnostic about the specific analysis being run. Currently, this consists of the **Importers** and the **Semantic Preprocessor**.
+- The [**Edge**](../domains/edge-domain.md) domain is responsible for data import and export while being agnostic about the specific analysis being run. Currently, this consists of the **Importers** and the **Semantic Preprocessor**.
 
   > Note that the Storage IO is currently responsible for data export, but we should consider moving this to the Edge domain to allow for more extensibility and looser coupling.
 
-- The [**Content**](#content-domain) domain is responsible for the actual data analysis and visualization and is agnostic about data import/export or workspace specifics. This consists of the **Analyzers** (both **Primary** and **Secondary**) as well as the **Web Presenters**.
+- The [**Content**](../domains/content-domain.md) domain is responsible for the actual data analysis and visualization and is agnostic about data import/export or workspace specifics. This consists of the **Analyzers** (both **Primary** and **Secondary**) as well as the **Web Presenters**.
 
 ```mermaid
 flowchart TD
@@ -51,11 +51,11 @@ Talk to us on the [Civic Tech DC Slack workspace](https://civictechdc.slack.com)
 
 It would be recommended to review the sections for each domain, and the section for implementing analyzers. Might also be a good idea to review the sections that discuss implementing  [Shiny](https://shiny.posit.co/py/), and [React](https://react.dev) dashboards.
 
-- [Core Domain](./domains/core-domain.md)
-- [Edge Domain](./domains/edge-domain.md)
-- [Content Domain](./domains/content-domain.md)
-- [Implementing Analyzers](./analyzers.md)
-- [Shiny Dashboards](./dashboards/shiny.md)
-- [React Dashboards](./dashboards/react.md)
+- [Core Domain](../domains/core-domain.md)
+- [Edge Domain](../domains/edge-domain.md)
+- [Content Domain](../domains/content-domain.md)
+- [Implementing Analyzers](../analyzers.md)
+- [Shiny Dashboards](../dashboards/shiny.md)
+- [React Dashboards](../dashboards/react.md)
 
 
