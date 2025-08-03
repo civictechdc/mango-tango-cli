@@ -15,6 +15,10 @@
         <link rel="canonical" href="https://cibmangotree.org/guides/analyzers/">
       
       
+        <link rel="prev" href="../logging/">
+      
+      
+        <link rel="next" href="../../reference/analyzer_interface/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +26,7 @@
     
     
       
-        <title>Analyzers - CIB Mango Tree</title>
+        <title>Implementing Analyzers - CIB Mango Tree</title>
       
     
     
@@ -99,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Analyzers
+              Implementing Analyzers
             
           </span>
         </div>
@@ -162,6 +166,8 @@
   
   
   
+    
+  
   
     
     
@@ -169,10 +175,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../get-started/overview/" class="md-tabs__link">
           
   
@@ -352,26 +360,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -384,7 +397,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Guides
@@ -404,17 +417,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
         
           
-          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
             
   
   
@@ -524,17 +540,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
             
   
   
@@ -649,6 +668,357 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Implementing Analyzers
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Implementing Analyzers
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#analyzers-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analyzers Guide
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Analyzers Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Architecture Overview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Primary Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Primary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#declaration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Declaration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Secondary Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secondary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-presenters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Web Presenters
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web Presenters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shiny-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shiny Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-factory-for-react-dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Factory for React Dashboards
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Factory for React Dashboards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-output-api-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Output API Factory
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Endpoints
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Primary Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Secondary Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Processing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Design
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-to-the-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding to the Suite
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1205,7 +1575,7 @@
   
 
 
-  <h1>Analyzers</h1>
+  <h1>Implementing Analyzers</h1>
 
 <h2 id="analyzers-guide">Analyzers Guide</h2>
 <p>Analyzers are the core data processing components of the platform. They follow a three-tier architecture that separates data processing, analysis, and presentation concerns.</p>

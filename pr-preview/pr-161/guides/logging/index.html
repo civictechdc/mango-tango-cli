@@ -12,13 +12,13 @@
         <meta name="author" content="CIB Mango Tree">
       
       
-        <link rel="canonical" href="https://cibmangotree.org/reference/preprocessing/">
+        <link rel="canonical" href="https://cibmangotree.org/guides/logging/">
       
       
-        <link rel="prev" href="../app/">
+        <link rel="prev" href="../contributing/">
       
       
-        <link rel="next" href="../terminal_tools/">
+        <link rel="next" href="../analyzers/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Preprocessing - CIB Mango Tree</title>
+        <title>Logging System - CIB Mango Tree</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#preprocessing" class="md-skip">
+        <a href="#logging" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Preprocessing
+              Logging System
             
           </span>
         </div>
@@ -166,6 +166,8 @@
   
   
   
+    
+  
   
     
     
@@ -173,11 +175,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../guides/get-started/overview/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../get-started/overview/" class="md-tabs__link">
           
   
   
@@ -196,13 +200,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../analyzer_interface/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../reference/analyzer_interface/" class="md-tabs__link">
           
   
   
@@ -358,26 +360,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -390,7 +397,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Guides
@@ -410,17 +417,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
         
           
-          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
             
   
   
@@ -447,7 +457,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/get-started/overview/" class="md-nav__link">
+      <a href="../get-started/overview/" class="md-nav__link">
         
   
   
@@ -470,7 +480,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/get-started/installation/" class="md-nav__link">
+      <a href="../get-started/installation/" class="md-nav__link">
         
   
   
@@ -501,7 +511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/architecture/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -530,17 +540,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
             
   
   
@@ -567,7 +580,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/domains/core-domain/" class="md-nav__link">
+      <a href="../domains/core-domain/" class="md-nav__link">
         
   
   
@@ -590,7 +603,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/domains/edge-domain/" class="md-nav__link">
+      <a href="../domains/edge-domain/" class="md-nav__link">
         
   
   
@@ -613,7 +626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/domains/content-domain/" class="md-nav__link">
+      <a href="../domains/content-domain/" class="md-nav__link">
         
   
   
@@ -644,182 +657,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/contributing/" class="md-nav__link">
+      <a href="../contributing/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     Contributing to The Project
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../guides/logging/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Logging System
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../guides/analyzers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Implementing Analyzers
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    Reference (CLI)
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            Reference (CLI)
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../analyzer_interface/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Analyzer Interface
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Components
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../app/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    App
     
   </span>
   
@@ -849,7 +692,7 @@
   
   
   <span class="md-ellipsis">
-    Preprocessing
+    Logging System
     
   </span>
   
@@ -862,7 +705,7 @@
   
   
   <span class="md-ellipsis">
-    Preprocessing
+    Logging System
     
   </span>
   
@@ -883,29 +726,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#preprocessing" class="md-nav__link">
+  <a href="#logging" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;preprocessing
+      Logging
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" preprocessing">
+    <nav class="md-nav" aria-label="Logging">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preprocessing.series_semantic" class="md-nav__link">
+  <a href="#logging-architecture" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;series_semantic
+      Logging Architecture
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" series_semantic">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-logger-in-your-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using the Logger in Your Code
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using the Logger in Your Code">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preprocessing.series_semantic.constant_series" class="md-nav__link">
+  <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;constant_series
+      Basic Usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-log-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example Log Output
     </span>
   </a>
   
@@ -916,8 +777,62 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#logging-in-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging in Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-with-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging with Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-file-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log File Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-with-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing with Logs
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
   
 </li>
       
@@ -937,7 +852,172 @@
   
   
     <li class="md-nav__item">
-      <a href="../terminal_tools/" class="md-nav__link">
+      <a href="../analyzers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Implementing Analyzers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference (CLI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference (CLI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/analyzer_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Analyzer Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Components
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    App
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/preprocessing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preprocessing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/terminal_tools/" class="md-nav__link">
         
   
   
@@ -960,7 +1040,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../importing/" class="md-nav__link">
+      <a href="../../reference/importing/" class="md-nav__link">
         
   
   
@@ -983,7 +1063,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../meta/" class="md-nav__link">
+      <a href="../../reference/meta/" class="md-nav__link">
         
   
   
@@ -1006,7 +1086,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../testing/" class="md-nav__link">
+      <a href="../../reference/testing/" class="md-nav__link">
         
   
   
@@ -1054,29 +1134,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#preprocessing" class="md-nav__link">
+  <a href="#logging" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;preprocessing
+      Logging
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" preprocessing">
+    <nav class="md-nav" aria-label="Logging">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preprocessing.series_semantic" class="md-nav__link">
+  <a href="#logging-architecture" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;series_semantic
+      Logging Architecture
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" series_semantic">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-logger-in-your-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using the Logger in Your Code
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using the Logger in Your Code">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preprocessing.series_semantic.constant_series" class="md-nav__link">
+  <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;constant_series
+      Basic Usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-log-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example Log Output
     </span>
   </a>
   
@@ -1087,8 +1185,62 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#logging-in-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging in Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logging Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-with-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging with Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-file-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log File Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-with-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing with Logs
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
   
 </li>
       
@@ -1111,110 +1263,134 @@
   
 
 
-  <h1>Preprocessing</h1>
-
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="preprocessing" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <code>preprocessing</code>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-module">
-
-
-
-<h3 id="preprocessing.series_semantic" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <code>series_semantic</code>
-
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.series_semantic.constant_series" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">constant_series</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Create a series with a constant value for each row of <code>series</code>.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">constant_series</span><span class="p">(</span><span class="n">series</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a series with a constant value for each row of `series`.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">constant</span><span class="p">]</span> <span class="o">*</span> <span class="n">series</span><span class="o">.</span><span class="n">len</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">Boolean</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-  </div>
-
-    </div>
-
-</div>
+  <h1>Logging System</h1>
+
+<h3 id="logging">Logging</h3>
+<p>The application uses a structured JSON logging system that provides consistent logging across all modules. The logging system automatically separates critical alerts from diagnostic information.</p>
+<h4 id="logging-architecture">Logging Architecture</h4>
+<ul>
+<li><strong>Console Output</strong>: Only <code>ERROR</code> and <code>CRITICAL</code> messages are displayed on stderr</li>
+<li><strong>File Output</strong>: All messages from <code>INFO</code> level and above are written to log files</li>
+<li><strong>Log Format</strong>: All logs are structured JSON for easy parsing and analysis</li>
+<li><strong>Log Rotation</strong>: Log files automatically rotate at 10MB with 5 backup files retained</li>
+<li><strong>Log Location</strong>: <code>~/.local/share/MangoTango/logs/mangotango.log</code> (varies by platform)</li>
+</ul>
+<h4 id="using-the-logger-in-your-code">Using the Logger in Your Code</h4>
+<h5 id="basic-usage">Basic Usage</h5>
+<pre><code class="language-python">from app.logger import get_logger
+
+# Get a logger for your module
+logger = get_logger(__name__)
+
+# Log at different levels
+logger.debug(&quot;Detailed debugging information&quot;)
+logger.info(&quot;General information about program execution&quot;)
+logger.warning(&quot;Something unexpected happened, but the program continues&quot;)
+logger.error(&quot;A serious problem occurred&quot;)
+logger.critical(&quot;A very serious error occurred, program may not be able to continue&quot;)
+</code></pre>
+<h5 id="example-log-output">Example Log Output</h5>
+<p><strong>Console (stderr) - Only errors:</strong></p>
+<pre><code class="language-json">{&quot;asctime&quot;: &quot;2025-07-30 16:42:33,914&quot;, &quot;name&quot;: &quot;analyzers.hashtags&quot;, &quot;levelname&quot;: &quot;ERROR&quot;, &quot;message&quot;: &quot;Failed to process hashtags&quot;, &quot;taskName&quot;: null}
+</code></pre>
+<p><strong>Log File - All info and above:</strong></p>
+<pre><code class="language-json">{&quot;asctime&quot;: &quot;2025-07-30 16:42:33,910&quot;, &quot;name&quot;: &quot;analyzers.hashtags&quot;, &quot;levelname&quot;: &quot;INFO&quot;, &quot;message&quot;: &quot;Starting hashtag analysis&quot;, &quot;taskName&quot;: null}
+{&quot;asctime&quot;: &quot;2025-07-30 16:42:33,914&quot;, &quot;name&quot;: &quot;analyzers.hashtags&quot;, &quot;levelname&quot;: &quot;ERROR&quot;, &quot;message&quot;: &quot;Failed to process hashtags&quot;, &quot;taskName&quot;: null}
+</code></pre>
+<h4 id="logging-in-analyzers">Logging in Analyzers</h4>
+<p>When developing analyzers, add logging to help with debugging and monitoring:</p>
+<pre><code class="language-python">from app.logger import get_logger
+
+def main(context):
+    logger = get_logger(__name__)
+
+    logger.info(&quot;Starting analysis&quot;, extra={
+        &quot;input_path&quot;: str(context.input_path),
+        &quot;output_path&quot;: str(context.output_path)
+    })
+
+    try:
+        # Your analysis code here
+        result = perform_analysis(context)
+
+        logger.info(&quot;Analysis completed successfully&quot;, extra={
+            &quot;records_processed&quot;: len(result),
+            &quot;execution_time&quot;: time.time() - start_time
+        })
+
+    except Exception as e:
+        logger.error(&quot;Analysis failed&quot;, extra={
+            &quot;error&quot;: str(e),
+            &quot;error_type&quot;: type(e).__name__
+        }, exc_info=True)
+        raise
+</code></pre>
+<h4 id="logging-best-practices">Logging Best Practices</h4>
+<ol>
+<li>
+<p><strong>Use Appropriate Log Levels</strong>:</p>
+<ul>
+<li><code>DEBUG</code>: Detailed diagnostic information, only useful when debugging</li>
+<li><code>INFO</code>: General information about program execution</li>
+<li><code>WARNING</code>: Something unexpected happened, but the program continues</li>
+<li><code>ERROR</code>: A serious problem occurred</li>
+<li><code>CRITICAL</code>: A very serious error occurred, program may not be able to continue</li>
+<li><strong>Include Context with <code>extra</code> Parameter</strong>:</li>
+</ul>
+<p><code>python
+logger.info("Processing file", extra={
+    "filename": filename,
+    "file_size": file_size,
+    "record_count": record_count
+})</code></p>
+</li>
+<li>
+<p><strong>Log Exceptions Properly</strong>:</p>
+<p><code>python
+try:
+    risky_operation()
+except Exception as e:
+    logger.error("Operation failed", exc_info=True)  # Includes stack trace</code></p>
+</li>
+<li>
+<p><strong>Avoid Logging Sensitive Information</strong>:</p>
+<ul>
+<li>Never log passwords, API keys, or personal data</li>
+<li>Be cautious with user-provided data</li>
+</ul>
+</li>
+</ol>
+<h4 id="debugging-with-logs">Debugging with Logs</h4>
+<p>Users can control log verbosity when running the application:</p>
+<pre><code class="language-shell"># Default INFO level
+python -m mangotango
+
+# Verbose DEBUG level for troubleshooting
+python -m mangotango --log-level DEBUG
+
+# Only show warnings and errors in log file
+python -m mangotango --log-level WARNING
+</code></pre>
+<h4 id="log-file-management">Log File Management</h4>
+<ul>
+<li>Log files are automatically rotated when they reach 10MB</li>
+<li>Up to 5 backup files are kept (<code>mangotango.log.1</code>, <code>mangotango.log.2</code>, etc.)</li>
+<li>Older backup files are automatically deleted</li>
+<li>Log directory is created automatically if it doesn't exist</li>
+</ul>
+<h4 id="testing-with-logs">Testing with Logs</h4>
+<p>When writing tests that involve logging:</p>
+<pre><code class="language-python">import logging
+from app.logger import get_logger
+
+def test_my_function_logs_correctly(caplog):
+    with caplog.at_level(logging.INFO):
+        my_function()
+
+    assert &quot;Expected log message&quot; in caplog.text
+</code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this it's recommended to check out the <a href="../architecture/">architecture</a> section.</p>
 
 
 
