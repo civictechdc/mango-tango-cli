@@ -35,11 +35,6 @@ jobs:
         with:
           # ✅ Explicitly checkout the PR branch
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Clean build directory
-        run: |
-          if [ -d "site" ]; then
-            rm -rf site/
-          fi
       - name: Fix site permissions
         if: github.event.action != 'closed'
         run: |
