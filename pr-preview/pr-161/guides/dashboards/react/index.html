@@ -1,1411 +1,1130 @@
 
-<!doctype html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-        <meta name="description" content="An interactive python terminal UI wrapper for Mango Tree analyzers.">
-      
-      
-        <meta name="author" content="CIB Mango Tree">
-      
-      
-        <link rel="canonical" href="https://cibmangotree.org/guides/dashboards/react/">
-      
-      
-      
-      
-      <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
-    
-    
-      
-        <title>React - CIB Mango Tree</title>
-      
-    
-    
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
-      
-      
+<!DOCTYPE html>
 
-
-    
-    
-      
-    
-    
-      
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
-      
-    
-    
-      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
-    
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-    
-      
-
-    
-    
-    
-  </head>
-  
-  
-    <body dir="ltr">
-  
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#react-dashboards-guide" class="md-skip">
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="An interactive python terminal UI wrapper for Mango Tree analyzers." name="description"/>
+<meta content="CIB Mango Tree" name="author"/>
+<link href="https://cibmangotree.org/guides/dashboards/react/" rel="canonical"/>
+<link href="../../domains/content-domain/" rel="prev"/>
+<link href="../shiny/" rel="next"/>
+<link href="../../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
+<title>React - CIB Mango Tree</title>
+<link href="../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../../assets/_mkdocstrings.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#react-dashboards-guide">
           Skip to content
         </a>
-      
-    </div>
-    <div data-md-component="announce">
-      
-    </div>
-    
-    
-      
-
+</div>
+<div data-md-component="announce">
+</div>
 <header class="md-header" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
-      
-  <img src="../../../img/favicon.ico" alt="logo">
-
-    </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-    </label>
-    <div class="md-header__title" data-md-component="header-title">
-      <div class="md-header__ellipsis">
-        <div class="md-header__topic">
-          <span class="md-ellipsis">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="CIB Mango Tree" class="md-header__button md-logo" data-md-component="logo" href="../../.." title="CIB Mango Tree">
+<img alt="logo" src="../../../img/favicon.ico"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
             CIB Mango Tree
           </span>
-        </div>
-        <div class="md-header__topic" data-md-component="header-topic">
-          <span class="md-ellipsis">
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
             
               React
             
           </span>
-        </div>
-      </div>
-    </div>
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
-    
-    
-    
-    
-      <div class="md-header__source">
-        <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
-  </div>
-  <div class="md-source__repository">
+</div>
+</div>
+</div>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4" fill="currentColor"></path></svg>
+</div>
+<div class="md-source__repository">
     GitHub
   </div>
 </a>
-      </div>
-    
-  </nav>
-  
+</div>
+</nav>
 </header>
-    
-    <div class="md-container" data-md-component="container">
-      
-      
-        
-          
-            
-<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
-  <div class="md-grid">
-    <ul class="md-tabs__list">
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../.." class="md-tabs__link">
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../..">
           
   
   
   Home
 
         </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../get-started/overview/" class="md-tabs__link">
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../../get-started/overview/">
           
   
   
   Guides
 
         </a>
-      </li>
-    
-  
-
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../../reference/analyzer_interface/" class="md-tabs__link">
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../reference/analyzer_interface/">
           
   
   
   Reference (CLI)
 
         </a>
-      </li>
-    
-  
-
-      
-    </ul>
-  </div>
+</li>
+</ul>
+</div>
 </nav>
-          
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-  
-
-
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
-      
-  <img src="../../../img/favicon.ico" alt="logo">
-
-    </a>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="CIB Mango Tree" class="md-nav__button md-logo" data-md-component="logo" href="../../.." title="CIB Mango Tree">
+<img alt="logo" src="../../../img/favicon.ico"/>
+</a>
     CIB Mango Tree
   </label>
-  
-    <div class="md-nav__source">
-      <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
-  </div>
-  <div class="md-source__repository">
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4" fill="currentColor"></path></svg>
+</div>
+<div class="md-source__repository">
     GitHub
   </div>
 </a>
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+<span class="md-ellipsis">
     Home
     
   </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_1">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
             Home
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../..">
+<span class="md-ellipsis">
     Overview
     
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../license/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../license/">
+<span class="md-ellipsis">
     License
     
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-ellipsis">
     Guides
     
   </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
             Guides
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+<span class="md-ellipsis">
     Getting Started
     
   </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_1">
-            <span class="md-nav__icon md-icon"></span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_1">
+<span class="md-nav__icon md-icon"></span>
             Getting Started
           </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/overview/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../get-started/overview/">
+<span class="md-ellipsis">
     Overview
     
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../get-started/installation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../get-started/installation/">
+<span class="md-ellipsis">
     Installation
     
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    CLI design philosophy
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Domains
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3">
-            <span class="md-nav__icon md-icon"></span>
-            Domains
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../domains/core-domain/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Core Domain
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../domains/edge-domain/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Edge Domain
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../domains/content-domain/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Content Domain
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../contributing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../get-started/contributing/">
+<span class="md-ellipsis">
     Contributing to The Project
     
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../logging/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../get-started/logging/">
+<span class="md-ellipsis">
     Logging System
     
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../analyzers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Implementing Analyzers
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Reference (CLI)
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            Reference (CLI)
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/analyzer_interface/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Analyzer Interface
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Components
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/app/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    App
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/preprocessing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Preprocessing
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/terminal_tools/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Terminal Tools
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/importing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Importing
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/meta/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Meta
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/testing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../get-started/testing/">
+<span class="md-ellipsis">
     Testing
     
   </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../get-started/architecture/">
+<span class="md-ellipsis">
+    CLI design philosophy
     
-  </ul>
+  </span>
+</a>
+</li>
+</ul>
 </nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../analyzers/">
+<span class="md-ellipsis">
+    Implementing Analyzers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+<span class="md-ellipsis">
+    Domains
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_3">
+<span class="md-nav__icon md-icon"></span>
+            Domains
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../domains/core-domain/">
+<span class="md-ellipsis">
+    Core Domain
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../domains/edge-domain/">
+<span class="md-ellipsis">
+    Edge Domain
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../domains/content-domain/">
+<span class="md-ellipsis">
+    Content Domain
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+<span class="md-ellipsis">
+    Dashboards
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_2_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_4">
+<span class="md-nav__icon md-icon"></span>
+            Dashboards
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    React
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    React
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#react-dashboards-guide" class="md-nav__link">
-    <span class="md-ellipsis">
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#react-dashboards-guide">
+<span class="md-ellipsis">
       React Dashboards Guide
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="React Dashboards Guide">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="React Dashboards Guide" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#overview">
+<span class="md-ellipsis">
       Overview
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#architecture">
+<span class="md-ellipsis">
       Architecture
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#setting-up-api-factory" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#setting-up-api-factory">
+<span class="md-ellipsis">
       Setting Up API Factory
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Setting Up API Factory">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-api-factory" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="Setting Up API Factory" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#basic-api-factory">
+<span class="md-ellipsis">
       Basic API Factory
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#multi-output-api-factory" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#multi-output-api-factory">
+<span class="md-ellipsis">
       Multi-Output API Factory
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#complex-filtering-and-search" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#complex-filtering-and-search">
+<span class="md-ellipsis">
       Complex Filtering and Search
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#api-endpoints" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#api-endpoints">
+<span class="md-ellipsis">
       API Endpoints
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="API Endpoints">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#standard-endpoints" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="API Endpoints" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#standard-endpoints">
+<span class="md-ellipsis">
       Standard Endpoints
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#download-endpoints" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#download-endpoints">
+<span class="md-ellipsis">
       Download Endpoints
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#react-component-architecture" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#react-component-architecture">
+<span class="md-ellipsis">
       React Component Architecture
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="React Component Architecture">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#core-component-structure" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="React Component Architecture" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#core-component-structure">
+<span class="md-ellipsis">
       Core Component Structure
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#data-fetching-hooks" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#data-fetching-hooks">
+<span class="md-ellipsis">
       Data Fetching Hooks
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#chart-components" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#chart-components">
+<span class="md-ellipsis">
       Chart Components
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#interactive-data-tables" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#interactive-data-tables">
+<span class="md-ellipsis">
       Interactive Data Tables
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#search-and-filtering-components" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#search-and-filtering-components">
+<span class="md-ellipsis">
       Search and Filtering Components
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#download-components" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#download-components">
+<span class="md-ellipsis">
       Download Components
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#state-management" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#state-management">
+<span class="md-ellipsis">
       State Management
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="State Management">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#local-component-state" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="State Management" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#local-component-state">
+<span class="md-ellipsis">
       Local Component State
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#global-state-with-zustand" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#global-state-with-zustand">
+<span class="md-ellipsis">
       Global State with Zustand
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#styling-and-theming" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling-and-theming">
+<span class="md-ellipsis">
       Styling and Theming
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Styling and Theming">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tailwind-css-classes" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="Styling and Theming" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tailwind-css-classes">
+<span class="md-ellipsis">
       Tailwind CSS Classes
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#dark-mode-support" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dark-mode-support">
+<span class="md-ellipsis">
       Dark Mode Support
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#responsive-design" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#responsive-design">
+<span class="md-ellipsis">
       Responsive Design
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#performance-optimization" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance-optimization">
+<span class="md-ellipsis">
       Performance Optimization
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Optimization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#memoization-and-optimization" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="Performance Optimization" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#memoization-and-optimization">
+<span class="md-ellipsis">
       Memoization and Optimization
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#virtual-scrolling" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#virtual-scrolling">
+<span class="md-ellipsis">
       Virtual Scrolling
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#code-splitting" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#code-splitting">
+<span class="md-ellipsis">
       Code Splitting
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-react-dashboards" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing-react-dashboards">
+<span class="md-ellipsis">
       Testing React Dashboards
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing React Dashboards">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#component-testing" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="Testing React Dashboards" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#component-testing">
+<span class="md-ellipsis">
       Component Testing
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#integration-testing" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#integration-testing">
+<span class="md-ellipsis">
       Integration Testing
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#e2e-testing-with-cypress" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#e2e-testing-with-cypress">
+<span class="md-ellipsis">
       E2E Testing with Cypress
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#deployment-and-build-process" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deployment-and-build-process">
+<span class="md-ellipsis">
       Deployment and Build Process
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Deployment and Build Process">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#production-build" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="Deployment and Build Process" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#production-build">
+<span class="md-ellipsis">
       Production Build
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#integration-with-backend" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#integration-with-backend">
+<span class="md-ellipsis">
       Integration with Backend
     </span>
-  </a>
-  
+</a>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#environment-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#environment-configuration">
+<span class="md-ellipsis">
       Environment Configuration
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#best-practices">
+<span class="md-ellipsis">
       Best Practices
     </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Best Practices">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#component-design" class="md-nav__link">
-    <span class="md-ellipsis">
+</a>
+<nav aria-label="Best Practices" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#component-design">
+<span class="md-ellipsis">
       Component Design
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#complete-example-ngram-analysis-dashboard" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#complete-example-ngram-analysis-dashboard">
+<span class="md-ellipsis">
       Complete Example: Ngram Analysis Dashboard
     </span>
-  </a>
-  
+</a>
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
       Next Steps
     </span>
-  </a>
-  
+</a>
 </li>
-      
-    </ul>
-  
+</ul>
 </nav>
-                  </div>
-                </div>
-              </div>
-            
-          
-          
-            <div class="md-content" data-md-component="content">
-              <article class="md-content__inner md-typeset">
-                
-                  
-
-
-  
-  
-
-
-  <h1>React</h1>
-
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../shiny/">
+<span class="md-ellipsis">
+    Shiny
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    Reference (CLI)
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            Reference (CLI)
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/analyzer_interface/">
+<span class="md-ellipsis">
+    Analyzer Interface
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/components/">
+<span class="md-ellipsis">
+    Components
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/app/">
+<span class="md-ellipsis">
+    App
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/preprocessing/">
+<span class="md-ellipsis">
+    Preprocessing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/terminal_tools/">
+<span class="md-ellipsis">
+    Terminal Tools
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/importing/">
+<span class="md-ellipsis">
+    Importing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/meta/">
+<span class="md-ellipsis">
+    Meta
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/storage/">
+<span class="md-ellipsis">
+    Storage
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../reference/testing/">
+<span class="md-ellipsis">
+    Testing
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#react-dashboards-guide">
+<span class="md-ellipsis">
+      React Dashboards Guide
+    </span>
+</a>
+<nav aria-label="React Dashboards Guide" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#overview">
+<span class="md-ellipsis">
+      Overview
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#architecture">
+<span class="md-ellipsis">
+      Architecture
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#setting-up-api-factory">
+<span class="md-ellipsis">
+      Setting Up API Factory
+    </span>
+</a>
+<nav aria-label="Setting Up API Factory" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#basic-api-factory">
+<span class="md-ellipsis">
+      Basic API Factory
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#multi-output-api-factory">
+<span class="md-ellipsis">
+      Multi-Output API Factory
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#complex-filtering-and-search">
+<span class="md-ellipsis">
+      Complex Filtering and Search
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#api-endpoints">
+<span class="md-ellipsis">
+      API Endpoints
+    </span>
+</a>
+<nav aria-label="API Endpoints" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#standard-endpoints">
+<span class="md-ellipsis">
+      Standard Endpoints
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#download-endpoints">
+<span class="md-ellipsis">
+      Download Endpoints
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#react-component-architecture">
+<span class="md-ellipsis">
+      React Component Architecture
+    </span>
+</a>
+<nav aria-label="React Component Architecture" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#core-component-structure">
+<span class="md-ellipsis">
+      Core Component Structure
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#data-fetching-hooks">
+<span class="md-ellipsis">
+      Data Fetching Hooks
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#chart-components">
+<span class="md-ellipsis">
+      Chart Components
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#interactive-data-tables">
+<span class="md-ellipsis">
+      Interactive Data Tables
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#search-and-filtering-components">
+<span class="md-ellipsis">
+      Search and Filtering Components
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#download-components">
+<span class="md-ellipsis">
+      Download Components
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#state-management">
+<span class="md-ellipsis">
+      State Management
+    </span>
+</a>
+<nav aria-label="State Management" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#local-component-state">
+<span class="md-ellipsis">
+      Local Component State
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#global-state-with-zustand">
+<span class="md-ellipsis">
+      Global State with Zustand
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#styling-and-theming">
+<span class="md-ellipsis">
+      Styling and Theming
+    </span>
+</a>
+<nav aria-label="Styling and Theming" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tailwind-css-classes">
+<span class="md-ellipsis">
+      Tailwind CSS Classes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dark-mode-support">
+<span class="md-ellipsis">
+      Dark Mode Support
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#responsive-design">
+<span class="md-ellipsis">
+      Responsive Design
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance-optimization">
+<span class="md-ellipsis">
+      Performance Optimization
+    </span>
+</a>
+<nav aria-label="Performance Optimization" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#memoization-and-optimization">
+<span class="md-ellipsis">
+      Memoization and Optimization
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#virtual-scrolling">
+<span class="md-ellipsis">
+      Virtual Scrolling
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#code-splitting">
+<span class="md-ellipsis">
+      Code Splitting
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing-react-dashboards">
+<span class="md-ellipsis">
+      Testing React Dashboards
+    </span>
+</a>
+<nav aria-label="Testing React Dashboards" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#component-testing">
+<span class="md-ellipsis">
+      Component Testing
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#integration-testing">
+<span class="md-ellipsis">
+      Integration Testing
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#e2e-testing-with-cypress">
+<span class="md-ellipsis">
+      E2E Testing with Cypress
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deployment-and-build-process">
+<span class="md-ellipsis">
+      Deployment and Build Process
+    </span>
+</a>
+<nav aria-label="Deployment and Build Process" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#production-build">
+<span class="md-ellipsis">
+      Production Build
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#integration-with-backend">
+<span class="md-ellipsis">
+      Integration with Backend
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#environment-configuration">
+<span class="md-ellipsis">
+      Environment Configuration
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#best-practices">
+<span class="md-ellipsis">
+      Best Practices
+    </span>
+</a>
+<nav aria-label="Best Practices" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#component-design">
+<span class="md-ellipsis">
+      Component Design
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#complete-example-ngram-analysis-dashboard">
+<span class="md-ellipsis">
+      Complete Example: Ngram Analysis Dashboard
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
+      Next Steps
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1>React</h1>
 <h2 id="react-dashboards-guide">React Dashboards Guide</h2>
 <p>Web presenters can create modern, client-side dashboards using React for rich interactivity and responsive user experiences. React dashboards consume data through REST APIs and provide smooth, app-like interfaces.</p>
 <h3 id="overview">Overview</h3>
@@ -1424,12 +1143,12 @@
 <li><strong>API Layer</strong>: Automatically generated endpoints that serve presenter data as JSON</li>
 <li><strong>React Frontend</strong>: TypeScript components that consume the API and render interactive UI</li>
 </ol>
-<pre><code class="language-mermaid">graph TB
+<div class="mermaid">graph TB
     A[Analyzer Data] --&gt; B[Web Presenter api_factory]
     B --&gt; C[REST API Endpoints]
     C --&gt; D[React Components]
     D --&gt; E[Interactive Dashboard]
-</code></pre>
+</div>
 <h3 id="setting-up-api-factory">Setting Up API Factory</h3>
 <p>The <code>api_factory</code> function transforms analyzer outputs into structured data for React consumption:</p>
 <h4 id="basic-api-factory">Basic API Factory</h4>
@@ -1438,7 +1157,7 @@ from analyzer_interface.context import WebPresenterContext, FactoryOutputContext
 from ..utils.pop import pop_unnecessary_fields
 
 def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
-    &quot;&quot;&quot;
+    """
     Transform analyzer data for React dashboard consumption.
 
     Args:
@@ -1447,40 +1166,40 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
 
     Returns:
         FactoryOutputContext with API-formatted data
-    &quot;&quot;&quot;
+    """
     # Extract API options
-    filter_value = options.get(&quot;filter_value&quot;, &quot;&quot;) if options else &quot;&quot;
-    matcher = options.get(&quot;matcher&quot;, &quot;&quot;) if options else &quot;&quot;
+    filter_value = options.get("filter_value", "") if options else ""
+    matcher = options.get("matcher", "") if options else ""
 
     # Load analyzer data
-    df = pl.read_parquet(context.base.table(&quot;main_output&quot;).parquet_path)
+    df = pl.read_parquet(context.base.table("main_output").parquet_path)
 
     # Apply filtering based on API parameters
     if filter_value:
-        df = df.filter(pl.col(&quot;category&quot;) == filter_value)
+        df = df.filter(pl.col("category") == filter_value)
 
     if matcher:
-        df = df.filter(pl.col(&quot;text_field&quot;).str.contains(matcher, literal=False))
+        df = df.filter(pl.col("text_field").str.contains(matcher, literal=False))
 
     # Build presenter model with metadata
     presenter_model = context.web_presenter.model_dump()
 
     # Add visualization configuration
     presenter_model.update({
-        &quot;figure_type&quot;: &quot;scatter&quot;,  # histogram, bar, scatter
-        &quot;axis&quot;: {
-            &quot;x&quot;: {&quot;label&quot;: &quot;User Count&quot;, &quot;value&quot;: &quot;user_count&quot;},
-            &quot;y&quot;: {&quot;label&quot;: &quot;Message Count&quot;, &quot;value&quot;: &quot;message_count&quot;}
+        "figure_type": "scatter",  # histogram, bar, scatter
+        "axis": {
+            "x": {"label": "User Count", "value": "user_count"},
+            "y": {"label": "Message Count", "value": "message_count"}
         },
-        &quot;explanation&quot;: {
-            &quot;main_view&quot;: &quot;This chart shows the relationship between users and messages...&quot;
+        "explanation": {
+            "main_view": "This chart shows the relationship between users and messages..."
         }
     })
 
     # Add data arrays for visualization
-    presenter_model[&quot;x&quot;] = df[&quot;x_column&quot;].to_list()
-    presenter_model[&quot;y&quot;] = df[&quot;y_column&quot;].to_list()
-    presenter_model[&quot;labels&quot;] = df[&quot;label_column&quot;].to_list()
+    presenter_model["x"] = df["x_column"].to_list()
+    presenter_model["y"] = df["y_column"].to_list()
+    presenter_model["labels"] = df["label_column"].to_list()
 
     # Remove internal fields not needed by frontend
     return FactoryOutputContext(
@@ -1491,103 +1210,103 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
 <p>For analyzers with multiple data views:</p>
 <pre><code class="language-python">def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
     # Determine which output to return
-    output_type = options.get(&quot;output&quot;, &quot;default&quot;) if options else &quot;default&quot;
+    output_type = options.get("output", "default") if options else "default"
 
     # Load different datasets
     df_summary = pl.read_parquet(
-        context.base.table(&quot;summary_stats&quot;).parquet_path
+        context.base.table("summary_stats").parquet_path
     )
     df_details = pl.read_parquet(
-        context.dependency(detail_analyzer).table(&quot;full_details&quot;).parquet_path
+        context.dependency(detail_analyzer).table("full_details").parquet_path
     )
 
     # Apply common filtering
-    filter_value = options.get(&quot;filter_value&quot;, &quot;&quot;) if options else &quot;&quot;
+    filter_value = options.get("filter_value", "") if options else ""
     if filter_value:
-        df_summary = df_summary.filter(pl.col(&quot;category&quot;) == filter_value)
-        df_details = df_details.filter(pl.col(&quot;category&quot;) == filter_value)
+        df_summary = df_summary.filter(pl.col("category") == filter_value)
+        df_details = df_details.filter(pl.col("category") == filter_value)
 
     # Create different presenter models for each output
     base_model = context.web_presenter.model_dump()
 
     summary_model = base_model.copy()
     summary_model.update({
-        &quot;figure_type&quot;: &quot;scatter&quot;,
-        &quot;axis&quot;: {
-            &quot;x&quot;: {&quot;label&quot;: &quot;Users&quot;, &quot;value&quot;: &quot;user_count&quot;},
-            &quot;y&quot;: {&quot;label&quot;: &quot;Messages&quot;, &quot;value&quot;: &quot;message_count&quot;}
+        "figure_type": "scatter",
+        "axis": {
+            "x": {"label": "Users", "value": "user_count"},
+            "y": {"label": "Messages", "value": "message_count"}
         },
-        &quot;x&quot;: df_summary[&quot;user_count&quot;].to_list(),
-        &quot;y&quot;: df_summary[&quot;message_count&quot;].to_list(),
-        &quot;labels&quot;: df_summary[&quot;category&quot;].to_list()
+        "x": df_summary["user_count"].to_list(),
+        "y": df_summary["message_count"].to_list(),
+        "labels": df_summary["category"].to_list()
     })
 
     details_model = base_model.copy()
     details_model.update({
-        &quot;figure_type&quot;: &quot;table&quot;,
-        &quot;columns&quot;: [&quot;user_id&quot;, &quot;message_text&quot;, &quot;timestamp&quot;, &quot;category&quot;],
-        &quot;data&quot;: df_details.to_dicts()
+        "figure_type": "table",
+        "columns": ["user_id", "message_text", "timestamp", "category"],
+        "data": df_details.to_dicts()
     })
 
     return FactoryOutputContext(
         api={
-            &quot;default_output&quot;: &quot;summary&quot;,
-            &quot;summary&quot;: pop_unnecessary_fields(summary_model),
-            &quot;details&quot;: pop_unnecessary_fields(details_model)
+            "default_output": "summary",
+            "summary": pop_unnecessary_fields(summary_model),
+            "details": pop_unnecessary_fields(details_model)
         }
     )
 </code></pre>
 <h4 id="complex-filtering-and-search">Complex Filtering and Search</h4>
 <pre><code class="language-python">def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
     # Load base data
-    df = pl.read_parquet(context.base.table(&quot;ngram_analysis&quot;).parquet_path)
+    df = pl.read_parquet(context.base.table("ngram_analysis").parquet_path)
 
     # Extract search/filter parameters
-    search_term = options.get(&quot;matcher&quot;, &quot;&quot;) if options else &quot;&quot;
-    date_range = options.get(&quot;date_range&quot;) if options else None
-    min_frequency = options.get(&quot;min_frequency&quot;, 0) if options else 0
+    search_term = options.get("matcher", "") if options else ""
+    date_range = options.get("date_range") if options else None
+    min_frequency = options.get("min_frequency", 0) if options else 0
 
     # Apply filters progressively
     if search_term:
         # Create word matcher for ngram search
-        search_filter = pl.col(&quot;ngram_text&quot;).str.contains(
+        search_filter = pl.col("ngram_text").str.contains(
             search_term.lower(), literal=False
         )
         df = df.filter(search_filter)
 
     if date_range:
-        start_date, end_date = date_range.split(&quot;,&quot;)
+        start_date, end_date = date_range.split(",")
         df = df.filter(
-            pl.col(&quot;timestamp&quot;).is_between(
+            pl.col("timestamp").is_between(
                 pl.datetime(start_date), 
                 pl.datetime(end_date)
             )
         )
 
     if min_frequency &gt; 0:
-        df = df.filter(pl.col(&quot;frequency&quot;) &gt;= min_frequency)
+        df = df.filter(pl.col("frequency") &gt;= min_frequency)
 
     # Sort and limit results for performance
-    df = df.sort(&quot;frequency&quot;, descending=True).head(1000)
+    df = df.sort("frequency", descending=True).head(1000)
 
     # Build API response
     presenter_model = context.web_presenter.model_dump()
     presenter_model.update({
-        &quot;figure_type&quot;: &quot;scatter&quot;,
-        &quot;axis&quot;: {
-            &quot;x&quot;: {&quot;label&quot;: &quot;User Repetition&quot;, &quot;value&quot;: &quot;user_repetition&quot;},
-            &quot;y&quot;: {&quot;label&quot;: &quot;Total Repetition&quot;, &quot;value&quot;: &quot;total_repetition&quot;}
+        "figure_type": "scatter",
+        "axis": {
+            "x": {"label": "User Repetition", "value": "user_repetition"},
+            "y": {"label": "Total Repetition", "value": "total_repetition"}
         },
-        &quot;explanation&quot;: {
-            &quot;total_repetition&quot;: &quot;N-grams to the right are repeated by more users...&quot;,
-            &quot;user_repetition&quot;: &quot;N-grams higher up show higher amplification...&quot;
+        "explanation": {
+            "total_repetition": "N-grams to the right are repeated by more users...",
+            "user_repetition": "N-grams higher up show higher amplification..."
         },
         # Data for visualization
-        &quot;x&quot;: df[&quot;user_count&quot;].to_list(),
-        &quot;y&quot;: df[&quot;total_count&quot;].to_list(),
-        &quot;ngrams&quot;: df[&quot;ngram_text&quot;].to_list(),
-        &quot;frequencies&quot;: df[&quot;frequency&quot;].to_list(),
-        &quot;rankings&quot;: list(range(1, len(df) + 1))
+        "x": df["user_count"].to_list(),
+        "y": df["total_count"].to_list(),
+        "ngrams": df["ngram_text"].to_list(),
+        "frequencies": df["frequency"].to_list(),
+        "rankings": list(range(1, len(df) + 1))
     })
 
     return FactoryOutputContext(
@@ -1649,9 +1368,9 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps&lt;N
     const handleTabChange = (tab: string) =&gt; setCurrentTab(tab);
 
     return (
-        &lt;div className=&quot;space-y-6&quot;&gt;
+        &lt;div className="space-y-6"&gt;
             {/* Controls */}
-            &lt;div className=&quot;flex justify-between items-center&quot;&gt;
+            &lt;div className="flex justify-between items-center"&gt;
                 &lt;SearchBar onSubmit={handleSearch} onClear={() =&gt; setSearchValue('')} /&gt;
                 &lt;DownloadButton presenterID={presenter.id} /&gt;
             &lt;/div&gt;
@@ -1659,11 +1378,11 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps&lt;N
             {/* Tabs for different views */}
             &lt;Tabs value={currentTab} onValueChange={handleTabChange}&gt;
                 &lt;TabsList&gt;
-                    &lt;TabsTrigger value=&quot;total_repetition&quot;&gt;Total Repetition&lt;/TabsTrigger&gt;
-                    &lt;TabsTrigger value=&quot;amplification_factor&quot;&gt;Amplification&lt;/TabsTrigger&gt;
+                    &lt;TabsTrigger value="total_repetition"&gt;Total Repetition&lt;/TabsTrigger&gt;
+                    &lt;TabsTrigger value="amplification_factor"&gt;Amplification&lt;/TabsTrigger&gt;
                 &lt;/TabsList&gt;
 
-                &lt;TabsContent value=&quot;total_repetition&quot;&gt;
+                &lt;TabsContent value="total_repetition"&gt;
                     &lt;ScatterPlot 
                         data={data} 
                         onItemClick={handleItemSelect}
@@ -1671,7 +1390,7 @@ export default function NgramScatterPlot({ presenter }: ChartContainerProps&lt;N
                     /&gt;
                 &lt;/TabsContent&gt;
 
-                &lt;TabsContent value=&quot;amplification_factor&quot;&gt;
+                &lt;TabsContent value="amplification_factor"&gt;
                     &lt;ScatterPlot 
                         data={data} 
                         onItemClick={handleItemSelect}
@@ -1815,9 +1534,9 @@ export default function ScatterPlot({
     ], [plotData, darkMode, viewport.viewState.zoom]);
 
     return (
-        &lt;div className=&quot;relative&quot;&gt;
+        &lt;div className="relative"&gt;
             {/* Zoom controls */}
-            &lt;div className=&quot;absolute top-4 right-4 z-10&quot;&gt;
+            &lt;div className="absolute top-4 right-4 z-10"&gt;
                 &lt;ToolBox 
                     features={['zoom', 'restore']}
                     zoomIncrement={viewport.hooks.increment}
@@ -1956,17 +1675,17 @@ export default function DataTable&lt;T extends BaseRow&gt;({
 
     return (
         &lt;DataEditor
-            width=&quot;100%&quot;
-            height=&quot;50rem&quot;
-            className=&quot;rounded-md border shadow-md&quot;
+            width="100%"
+            height="50rem"
+            className="rounded-md border shadow-md"
             columns={columns}
             rows={data.length}
             getCellContent={getCellContent}
             gridSelection={gridSelection}
             onGridSelectionChange={handleSelectionChange}
             theme={tableTheme}
-            rowSelect=&quot;single&quot;
-            rowMarkers=&quot;checkbox-visible&quot;
+            rowSelect="single"
+            rowMarkers="checkbox-visible"
         /&gt;
     );
 }
@@ -1992,7 +1711,7 @@ export default function SearchBar({
     searchList, 
     onSubmit, 
     onClear, 
-    placeholder = &quot;Search...&quot;,
+    placeholder = "Search...",
     maxSuggestions = 100
 }: SearchBarProps) {
     const [value, setValue] = useState('');
@@ -2038,25 +1757,25 @@ export default function SearchBar({
     }, [suggestions.length, value.length]);
 
     return (
-        &lt;form onSubmit={handleSubmit} className=&quot;relative&quot;&gt;
-            &lt;div className=&quot;flex items-center space-x-2&quot;&gt;
+        &lt;form onSubmit={handleSubmit} className="relative"&gt;
+            &lt;div className="flex items-center space-x-2"&gt;
                 &lt;Input
-                    type=&quot;text&quot;
+                    type="text"
                     value={value}
                     onChange={(e) =&gt; setValue(e.target.value)}
                     placeholder={placeholder}
-                    className=&quot;w-80&quot;
+                    className="w-80"
                     onFocus={() =&gt; suggestions.length &gt; 0 &amp;&amp; setShowSuggestions(true)}
                     onBlur={() =&gt; setTimeout(() =&gt; setShowSuggestions(false), 150)}
                 /&gt;
                 {value &amp;&amp; (
                     &lt;Button
-                        type=&quot;button&quot;
-                        variant=&quot;ghost&quot;
-                        size=&quot;icon&quot;
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={handleClear}
                     &gt;
-                        &lt;X className=&quot;h-4 w-4&quot; /&gt;
+                        &lt;X className="h-4 w-4" /&gt;
                     &lt;/Button&gt;
                 )}
             &lt;/div&gt;
@@ -2065,16 +1784,16 @@ export default function SearchBar({
             {showSuggestions &amp;&amp; (
                 &lt;div
                     ref={containerRef}
-                    className=&quot;absolute z-50 w-80 max-h-96 mt-1 bg-white border rounded-md shadow-lg overflow-auto dark:bg-zinc-950 dark:border-zinc-800&quot;
+                    className="absolute z-50 w-80 max-h-96 mt-1 bg-white border rounded-md shadow-lg overflow-auto dark:bg-zinc-950 dark:border-zinc-800"
                 &gt;
                     &lt;div
                         style={{ height: virtualizer.getTotalSize() }}
-                        className=&quot;relative&quot;
+                        className="relative"
                     &gt;
                         {virtualizer.getVirtualItems().map((item) =&gt; (
                             &lt;div
                                 key={item.key}
-                                className=&quot;absolute w-full px-3 py-2 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800&quot;
+                                className="absolute w-full px-3 py-2 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                 style={{
                                     height: item.size,
                                     transform: `translateY(${item.start}px)`
@@ -2109,7 +1828,7 @@ interface DownloadButtonProps {
 export function DownloadButton({ 
     presenterID, 
     queryParams, 
-    label = &quot;Export&quot; 
+    label = "Export" 
 }: DownloadButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -2122,22 +1841,22 @@ export function DownloadButton({
     return (
         &lt;DropdownMenu open={isOpen} onOpenChange={setIsOpen}&gt;
             &lt;DropdownMenuTrigger asChild&gt;
-                &lt;Button variant=&quot;outline&quot; size=&quot;sm&quot;&gt;
+                &lt;Button variant="outline" size="sm"&gt;
                     {label}
                     &lt;ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} /&gt;
                 &lt;/Button&gt;
             &lt;/DropdownMenuTrigger&gt;
 
-            &lt;DropdownMenuContent align=&quot;end&quot;&gt;
+            &lt;DropdownMenuContent align="end"&gt;
                 {downloadFormats.map(({ type, icon: Icon, label: formatLabel }) =&gt; (
                     &lt;DropdownMenuItem key={type} asChild&gt;
                         &lt;a
                             href={createDownloadLink(presenterID, type, queryParams)}
-                            target=&quot;_blank&quot;
-                            rel=&quot;noopener noreferrer&quot;
-                            className=&quot;flex items-center w-full&quot;
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center w-full"
                         &gt;
-                            &lt;Icon className=&quot;mr-2 h-4 w-4&quot; /&gt;
+                            &lt;Icon className="mr-2 h-4 w-4" /&gt;
                             {formatLabel}
                         &lt;/a&gt;
                     &lt;/DropdownMenuItem&gt;
@@ -2244,19 +1963,19 @@ function Dashboard() {
 <h4 id="tailwind-css-classes">Tailwind CSS Classes</h4>
 <p>The project uses Tailwind CSS for utility-first styling:</p>
 <pre><code class="language-typescript">// Layout utilities
-&lt;div className=&quot;grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6&quot;&gt;
-    &lt;div className=&quot;col-span-full lg:col-span-2&quot;&gt;
+&lt;div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"&gt;
+    &lt;div className="col-span-full lg:col-span-2"&gt;
         {/* Main content */}
     &lt;/div&gt;
-    &lt;div className=&quot;lg:col-span-1&quot;&gt;
+    &lt;div className="lg:col-span-1"&gt;
         {/* Sidebar */}
     &lt;/div&gt;
 &lt;/div&gt;
 
 // Component styling
-&lt;Card className=&quot;p-6 shadow-lg border-zinc-200 dark:border-zinc-800&quot;&gt;
-    &lt;CardHeader className=&quot;pb-4&quot;&gt;
-        &lt;CardTitle className=&quot;text-lg font-semibold text-zinc-900 dark:text-zinc-100&quot;&gt;
+&lt;Card className="p-6 shadow-lg border-zinc-200 dark:border-zinc-800"&gt;
+    &lt;CardHeader className="pb-4"&gt;
+        &lt;CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100"&gt;
             Chart Title
         &lt;/CardTitle&gt;
     &lt;/CardHeader&gt;
@@ -2267,27 +1986,27 @@ function Dashboard() {
 
 // Interactive states
 &lt;Button 
-    variant=&quot;outline&quot; 
-    className=&quot;hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors&quot;
+    variant="outline" 
+    className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
     disabled={isLoading}
 &gt;
-    {isLoading ? &lt;Spinner className=&quot;mr-2&quot; /&gt; : null}
+    {isLoading ? &lt;Spinner className="mr-2" /&gt; : null}
     Load Data
 &lt;/Button&gt;
 </code></pre>
 <h4 id="dark-mode-support">Dark Mode Support</h4>
 <p>Dark mode is handled through CSS custom properties and Tailwind's dark variant:</p>
 <pre><code class="language-typescript">// Theme provider context
-export function ThemeProvider({ children, defaultTheme = &quot;system&quot; }) {
+export function ThemeProvider({ children, defaultTheme = "system" }) {
     const [theme, setTheme] = useState&lt;Theme&gt;(defaultTheme);
 
     useEffect(() =&gt; {
         const root = window.document.documentElement;
-        root.classList.remove(&quot;light&quot;, &quot;dark&quot;);
+        root.classList.remove("light", "dark");
 
-        if (theme === &quot;system&quot;) {
-            const systemTheme = window.matchMedia(&quot;(prefers-color-scheme: dark)&quot;).matches 
-                ? &quot;dark&quot; : &quot;light&quot;;
+        if (theme === "system") {
+            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches 
+                ? "dark" : "light";
             root.classList.add(systemTheme);
         } else {
             root.classList.add(theme);
@@ -2318,16 +2037,16 @@ function Chart({ data }: ChartProps) {
 </code></pre>
 <h4 id="responsive-design">Responsive Design</h4>
 <p>Components adapt to different screen sizes:</p>
-<pre><code class="language-typescript">&lt;div className=&quot;space-y-6&quot;&gt;
+<pre><code class="language-typescript">&lt;div className="space-y-6"&gt;
     {/* Mobile-first responsive grid */}
-    &lt;div className=&quot;grid grid-cols-1 lg:grid-cols-4 gap-4&quot;&gt;
-        &lt;div className=&quot;lg:col-span-3&quot;&gt;
+    &lt;div className="grid grid-cols-1 lg:grid-cols-4 gap-4"&gt;
+        &lt;div className="lg:col-span-3"&gt;
             {/* Chart takes full width on mobile, 3/4 on desktop */}
             &lt;ScatterPlot data={data} /&gt;
         &lt;/div&gt;
-        &lt;div className=&quot;lg:col-span-1&quot;&gt;
+        &lt;div className="lg:col-span-1"&gt;
             {/* Controls stack below chart on mobile, sidebar on desktop */}
-            &lt;div className=&quot;space-y-4&quot;&gt;
+            &lt;div className="space-y-4"&gt;
                 &lt;SearchBar onSubmit={handleSearch} /&gt;
                 &lt;FilterControls /&gt;
             &lt;/div&gt;
@@ -2335,10 +2054,10 @@ function Chart({ data }: ChartProps) {
     &lt;/div&gt;
 
     {/* Table with horizontal scroll on mobile */}
-    &lt;div className=&quot;overflow-x-auto&quot;&gt;
+    &lt;div className="overflow-x-auto"&gt;
         &lt;DataTable 
             data={data}
-            className=&quot;min-w-[600px]&quot; 
+            className="min-w-[600px]" 
         /&gt;
     &lt;/div&gt;
 &lt;/div&gt;
@@ -2381,7 +2100,7 @@ function VirtualTable({ data }: { data: Array&lt;any&gt; }) {
     });
 
     return (
-        &lt;div ref={containerRef} className=&quot;h-96 overflow-auto&quot;&gt;
+        &lt;div ref={containerRef} className="h-96 overflow-auto"&gt;
             &lt;div style={{ height: virtualizer.getTotalSize() }}&gt;
                 {virtualizer.getVirtualItems().map((item) =&gt; (
                     &lt;div
@@ -2438,7 +2157,7 @@ describe('SearchBar', () =&gt; {
             &lt;SearchBar 
                 searchList={searchList}
                 onSubmit={mockSubmit}
-                placeholder=&quot;Search fruits...&quot;
+                placeholder="Search fruits..."
             /&gt;
         );
 
@@ -2502,7 +2221,7 @@ afterEach(() =&gt; server.resetHandlers());
 afterAll(() =&gt; server.close());
 
 test('loads and displays data', async () =&gt; {
-    render(&lt;Dashboard presenterId=&quot;test-presenter&quot; /&gt;);
+    render(&lt;Dashboard presenterId="test-presenter" /&gt;);
 
     // Initially shows loading
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
@@ -2524,7 +2243,7 @@ test('handles API errors gracefully', async () =&gt; {
         })
     );
 
-    render(&lt;Dashboard presenterId=&quot;test-presenter&quot; /&gt;);
+    render(&lt;Dashboard presenterId="test-presenter" /&gt;);
 
     await waitFor(() =&gt; {
         expect(screen.getByText(/error loading data/i)).toBeInTheDocument();
@@ -2545,41 +2264,41 @@ describe('Dashboard Interaction', () =&gt; {
 
     it('allows searching and filtering data', () =&gt; {
         // Search for specific terms
-        cy.get('[data-testid=&quot;search-input&quot;]').type('climate');
-        cy.get('[data-testid=&quot;search-submit&quot;]').click();
+        cy.get('[data-testid="search-input"]').type('climate');
+        cy.get('[data-testid="search-submit"]').click();
 
         // Verify results update
-        cy.get('[data-testid=&quot;chart-points&quot;]').should('have.length.lessThan', 100);
-        cy.get('[data-testid=&quot;data-table&quot;]').should('contain', 'climate');
+        cy.get('[data-testid="chart-points"]').should('have.length.lessThan', 100);
+        cy.get('[data-testid="data-table"]').should('contain', 'climate');
 
         // Clear search
-        cy.get('[data-testid=&quot;search-clear&quot;]').click();
-        cy.get('[data-testid=&quot;chart-points&quot;]').should('have.length.greaterThan', 100);
+        cy.get('[data-testid="search-clear"]').click();
+        cy.get('[data-testid="chart-points"]').should('have.length.greaterThan', 100);
     });
 
     it('supports chart interactions', () =&gt; {
         // Click on chart point
-        cy.get('[data-testid=&quot;chart-container&quot;]').click(300, 200);
+        cy.get('[data-testid="chart-container"]').click(300, 200);
 
         // Verify tooltip appears
-        cy.get('[data-testid=&quot;tooltip&quot;]').should('be.visible');
-        cy.get('[data-testid=&quot;tooltip&quot;]').should('contain', 'Ranking:');
+        cy.get('[data-testid="tooltip"]').should('be.visible');
+        cy.get('[data-testid="tooltip"]').should('contain', 'Ranking:');
 
         // Verify data table selection updates
-        cy.get('[data-testid=&quot;data-table&quot;] .selected-row').should('exist');
+        cy.get('[data-testid="data-table"] .selected-row').should('exist');
     });
 
     it('downloads data in different formats', () =&gt; {
         // Open download menu
-        cy.get('[data-testid=&quot;download-button&quot;]').click();
+        cy.get('[data-testid="download-button"]').click();
 
         // Download CSV
-        cy.get('[data-testid=&quot;download-csv&quot;]').click();
+        cy.get('[data-testid="download-csv"]').click();
         cy.readFile('cypress/downloads/data.csv').should('exist');
 
         // Download JSON
-        cy.get('[data-testid=&quot;download-button&quot;]').click();
-        cy.get('[data-testid=&quot;download-json&quot;]').click();
+        cy.get('[data-testid="download-button"]').click();
+        cy.get('[data-testid="download-json"]').click();
         cy.readFile('cypress/downloads/data.json').should('exist');
     });
 });
@@ -2601,15 +2320,15 @@ from pathlib import Path
 import json
 
 # Load build manifest
-manifest_path = Path(&quot;web_templates/build/manifest.json&quot;)
+manifest_path = Path("web_templates/build/manifest.json")
 with open(manifest_path) as f:
     manifest = json.load(f)
 
 # Serve React app
-@app.route(&quot;/&quot;)
+@app.route("/")
 def dashboard():
     return render_template(
-        &quot;index.html&quot;,
+        "index.html",
         js_files=get_js_files(manifest),
         css_files=get_css_files(manifest),
         project_name=config.PROJECT_NAME
@@ -2638,7 +2357,7 @@ const apiClient = axios.create({
 function ChartControls({ onFilterChange, onExport }: ChartControlsProps): ReactElement&lt;FC&gt; {
     // Only handle UI controls, delegate data management
     return (
-        &lt;div className=&quot;flex gap-4&quot;&gt;
+        &lt;div className="flex gap-4"&gt;
             &lt;SearchBar onSubmit={(term) =&gt; onFilterChange({ search: term })} /&gt;
             &lt;ExportButton onExport={onExport} /&gt;
         &lt;/div&gt;
@@ -2648,9 +2367,9 @@ function ChartControls({ onFilterChange, onExport }: ChartControlsProps): ReactE
 // 2. Use composition over inheritance
 function Dashboard({ children }: PropsWithChildren): ReactElement&lt;FC&gt; {
     return (
-        &lt;div className=&quot;dashboard-layout&quot;&gt;
+        &lt;div className="dashboard-layout"&gt;
             &lt;Sidebar /&gt;
-            &lt;main className=&quot;main-content&quot;&gt;
+            &lt;main className="main-content"&gt;
                 {children}
             &lt;/main&gt;
         &lt;/div&gt;
@@ -2789,8 +2508,8 @@ export default function NgramDashboard({ presenter }: NgramDashboardProps) {
 
     // Tooltip formatters
     const createTooltipFormatter = useCallback((type: string) =&gt; (params: DataPoint) =&gt; `
-        &lt;div class=&quot;space-y-2&quot;&gt;
-            &lt;div class=&quot;font-bold&quot;&gt;${params.ngram}&lt;/div&gt;
+        &lt;div class="space-y-2"&gt;
+            &lt;div class="font-bold"&gt;${params.ngram}&lt;/div&gt;
             &lt;div&gt;Ranking: ${params.ranking}&lt;/div&gt;
             &lt;div&gt;User Count: ${params.x}&lt;/div&gt;
             &lt;div&gt;${type === 'total_repetition' ? 'Total Reps' : 'Amplification'}: ${params.y}&lt;/div&gt;
@@ -2801,9 +2520,9 @@ export default function NgramDashboard({ presenter }: NgramDashboardProps) {
     if (isLoading) {
         return (
             &lt;Card&gt;
-                &lt;CardContent className=&quot;flex items-center justify-center h-96&quot;&gt;
-                    &lt;div className=&quot;text-center&quot;&gt;
-                        &lt;div className=&quot;animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4&quot;&gt;&lt;/div&gt;
+                &lt;CardContent className="flex items-center justify-center h-96"&gt;
+                    &lt;div className="text-center"&gt;
+                        &lt;div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"&gt;&lt;/div&gt;
                         &lt;p&gt;Loading dashboard...&lt;/p&gt;
                     &lt;/div&gt;
                 &lt;/CardContent&gt;
@@ -2813,33 +2532,33 @@ export default function NgramDashboard({ presenter }: NgramDashboardProps) {
 
     return (
         &lt;Card&gt;
-            &lt;CardContent className=&quot;space-y-6&quot;&gt;
+            &lt;CardContent className="space-y-6"&gt;
                 &lt;Tabs value={currentTab} onValueChange={handleTabChange}&gt;
-                    &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                    &lt;div className="flex items-center justify-between"&gt;
                         &lt;TabsList&gt;
-                            &lt;TabsTrigger value=&quot;total_repetition&quot;&gt;Total Repetition&lt;/TabsTrigger&gt;
-                            &lt;TabsTrigger value=&quot;amplification_factor&quot;&gt;Amplification Factor&lt;/TabsTrigger&gt;
+                            &lt;TabsTrigger value="total_repetition"&gt;Total Repetition&lt;/TabsTrigger&gt;
+                            &lt;TabsTrigger value="amplification_factor"&gt;Amplification Factor&lt;/TabsTrigger&gt;
                         &lt;/TabsList&gt;
 
                         &lt;Tooltip&gt;
                             &lt;TooltipTrigger&gt;
-                                &lt;Info className=&quot;h-5 w-5 text-zinc-500&quot; /&gt;
+                                &lt;Info className="h-5 w-5 text-zinc-500" /&gt;
                             &lt;/TooltipTrigger&gt;
                             &lt;TooltipContent&gt;
-                                &lt;p className=&quot;max-w-xs&quot;&gt;
+                                &lt;p className="max-w-xs"&gt;
                                     {presenter.explanation[currentTab]}
                                 &lt;/p&gt;
                             &lt;/TooltipContent&gt;
                         &lt;/Tooltip&gt;
                     &lt;/div&gt;
 
-                    &lt;TabsContent value=&quot;total_repetition&quot; className=&quot;space-y-6&quot;&gt;
-                        &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                    &lt;TabsContent value="total_repetition" className="space-y-6"&gt;
+                        &lt;div className="flex items-center justify-between"&gt;
                             &lt;SearchBar
                                 searchList={presenter.ngrams}
                                 onSubmit={handleSearch}
                                 onClear={handleSearchClear}
-                                placeholder=&quot;Search n-grams...&quot;
+                                placeholder="Search n-grams..."
                             /&gt;
                             &lt;DownloadButton 
                                 presenterID={presenter.id}
@@ -2870,13 +2589,13 @@ export default function NgramDashboard({ presenter }: NgramDashboardProps) {
                         /&gt;
                     &lt;/TabsContent&gt;
 
-                    &lt;TabsContent value=&quot;amplification_factor&quot; className=&quot;space-y-6&quot;&gt;
-                        &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                    &lt;TabsContent value="amplification_factor" className="space-y-6"&gt;
+                        &lt;div className="flex items-center justify-between"&gt;
                             &lt;SearchBar
                                 searchList={presenter.ngrams}
                                 onSubmit={handleSearch}
                                 onClear={handleSearchClear}
-                                placeholder=&quot;Search n-grams...&quot;
+                                placeholder="Search n-grams..."
                             /&gt;
                             &lt;DownloadButton 
                                 presenterID={presenter.id}
@@ -2921,69 +2640,38 @@ export default function NgramDashboard({ presenter }: NgramDashboardProps) {
 <li><a href="../../domains/content-domain/">Content Domain</a></li>
 <li><a href="../shiny/">Shiny Dashboards</a></li>
 </ul>
-
-
-
-
-
-
-
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
+</article>
+</div>
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
-        </div>
-        
-          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
   Back to top
 </button>
-        
-      </main>
-      
-        <footer class="md-footer">
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
-  
-    <div class="md-copyright__highlight">
-      Copyright &copy; 2025 CIB Mango Tree
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2025 CIB Mango Tree
     </div>
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
       Material for MkDocs
     </a>
-  
 </div>
-      
-    </div>
-  </div>
+</div>
+</div>
 </footer>
-      
-    </div>
-    <div class="md-dialog" data-md-component="dialog">
-      <div class="md-dialog__inner md-typeset"></div>
-    </div>
-    
-    
-    
-      
-      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
-    
-    
-      <script src="../../../assets/javascripts/bundle.50899def.min.js"></script>
-      
-    
-  </body>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../assets/javascripts/bundle.50899def.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
 </html>

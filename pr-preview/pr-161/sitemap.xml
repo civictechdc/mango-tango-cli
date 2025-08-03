@@ -13,22 +13,6 @@
          <lastmod>2025-08-03</lastmod>
     </url>
     <url>
-         <loc>https://cibmangotree.org/guides/architecture/</loc>
-         <lastmod>2025-08-03</lastmod>
-    </url>
-    <url>
-         <loc>https://cibmangotree.org/guides/contributing/</loc>
-         <lastmod>2025-08-03</lastmod>
-    </url>
-    <url>
-         <loc>https://cibmangotree.org/guides/logging/</loc>
-         <lastmod>2025-08-03</lastmod>
-    </url>
-    <url>
-         <loc>https://cibmangotree.org/guides/testing/</loc>
-         <lastmod>2025-08-03</lastmod>
-    </url>
-    <url>
          <loc>https://cibmangotree.org/guides/dashboards/react/</loc>
          <lastmod>2025-08-03</lastmod>
     </url>
@@ -49,11 +33,27 @@
          <lastmod>2025-08-03</lastmod>
     </url>
     <url>
+         <loc>https://cibmangotree.org/guides/get-started/architecture/</loc>
+         <lastmod>2025-08-03</lastmod>
+    </url>
+    <url>
+         <loc>https://cibmangotree.org/guides/get-started/contributing/</loc>
+         <lastmod>2025-08-03</lastmod>
+    </url>
+    <url>
          <loc>https://cibmangotree.org/guides/get-started/installation/</loc>
          <lastmod>2025-08-03</lastmod>
     </url>
     <url>
+         <loc>https://cibmangotree.org/guides/get-started/logging/</loc>
+         <lastmod>2025-08-03</lastmod>
+    </url>
+    <url>
          <loc>https://cibmangotree.org/guides/get-started/overview/</loc>
+         <lastmod>2025-08-03</lastmod>
+    </url>
+    <url>
+         <loc>https://cibmangotree.org/guides/get-started/testing/</loc>
          <lastmod>2025-08-03</lastmod>
     </url>
     <url>

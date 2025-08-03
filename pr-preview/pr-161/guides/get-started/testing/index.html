@@ -12,25 +12,25 @@
         <meta name="author" content="CIB Mango Tree">
       
       
-        <link rel="canonical" href="https://cibmangotree.org/guides/contributing/">
+        <link rel="canonical" href="https://cibmangotree.org/guides/get-started/testing/">
       
       
-        <link rel="prev" href="../domains/content-domain/">
+        <link rel="prev" href="../logging/">
       
       
-        <link rel="next" href="../logging/">
+        <link rel="next" href="../architecture/">
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
     
     
       
-        <title>Contributing to The Project - CIB Mango Tree</title>
+        <title>Testing - CIB Mango Tree</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
       
       
 
@@ -49,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#contributor-workflow" class="md-skip">
+        <a href="#testing" class="md-skip">
           Skip to content
         </a>
       
@@ -84,9 +84,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+    <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
-  <img src="../../img/favicon.ico" alt="logo">
+  <img src="../../../img/favicon.ico" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -103,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contributing to The Project
+              Testing
             
           </span>
         </div>
@@ -114,6 +114,46 @@
       <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
     
     
       <div class="md-header__source">
@@ -150,7 +190,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../.." class="md-tabs__link">
+        <a href="../../.." class="md-tabs__link">
           
   
   
@@ -181,7 +221,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../get-started/overview/" class="md-tabs__link">
+        <a href="../overview/" class="md-tabs__link">
           
   
   
@@ -204,7 +244,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../reference/analyzer_interface/" class="md-tabs__link">
+        <a href="../../../reference/analyzer_interface/" class="md-tabs__link">
           
   
   
@@ -238,9 +278,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+    <a href="../../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
-  <img src="../../img/favicon.ico" alt="logo">
+  <img src="../../../img/favicon.ico" alt="logo">
 
     </a>
     CIB Mango Tree
@@ -310,7 +350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -333,7 +373,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../license/" class="md-nav__link">
+      <a href="../../../license/" class="md-nav__link">
         
   
   
@@ -408,6 +448,8 @@
                 
   
   
+    
+  
   
   
     
@@ -423,11 +465,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
         
           
           <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
@@ -443,7 +485,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_1">
             <span class="md-nav__icon md-icon"></span>
             Getting Started
@@ -457,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../get-started/overview/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -480,12 +522,151 @@
   
   
     <li class="md-nav__item">
-      <a href="../get-started/installation/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing to The Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CLI design philosophy
     
   </span>
   
@@ -511,12 +692,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../analyzers/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    CLI design philosophy
+    Implementing Analyzers
     
   </span>
   
@@ -580,7 +761,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../domains/core-domain/" class="md-nav__link">
+      <a href="../../domains/core-domain/" class="md-nav__link">
         
   
   
@@ -603,7 +784,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../domains/edge-domain/" class="md-nav__link">
+      <a href="../../domains/edge-domain/" class="md-nav__link">
         
   
   
@@ -626,7 +807,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../domains/content-domain/" class="md-nav__link">
+      <a href="../../domains/content-domain/" class="md-nav__link">
         
   
   
@@ -654,113 +835,47 @@
                 
   
   
+  
+  
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+    
+    
+    
       
       
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
+        
           
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
-    Contributing to The Project
+    Dashboards
     
   </span>
   
 
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-  
-  
-  <span class="md-ellipsis">
-    Contributing to The Project
-    
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#contributor-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributor Workflow
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Contributor Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributing-new-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributing new changes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#workflow-diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      Workflow Diagram
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Dashboards
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -769,12 +884,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../logging/" class="md-nav__link">
+      <a href="../../dashboards/react/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Logging System
+    React
     
   </span>
   
@@ -792,17 +907,25 @@
   
   
     <li class="md-nav__item">
-      <a href="../analyzers/" class="md-nav__link">
+      <a href="../../dashboards/shiny/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Implementing Analyzers
+    Shiny
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -865,7 +988,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/analyzer_interface/" class="md-nav__link">
+      <a href="../../../reference/analyzer_interface/" class="md-nav__link">
         
   
   
@@ -888,7 +1011,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/components/" class="md-nav__link">
+      <a href="../../../reference/components/" class="md-nav__link">
         
   
   
@@ -911,7 +1034,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/app/" class="md-nav__link">
+      <a href="../../../reference/app/" class="md-nav__link">
         
   
   
@@ -934,7 +1057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/preprocessing/" class="md-nav__link">
+      <a href="../../../reference/preprocessing/" class="md-nav__link">
         
   
   
@@ -957,7 +1080,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/terminal_tools/" class="md-nav__link">
+      <a href="../../../reference/terminal_tools/" class="md-nav__link">
         
   
   
@@ -980,7 +1103,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/importing/" class="md-nav__link">
+      <a href="../../../reference/importing/" class="md-nav__link">
         
   
   
@@ -1003,7 +1126,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/meta/" class="md-nav__link">
+      <a href="../../../reference/meta/" class="md-nav__link">
         
   
   
@@ -1026,7 +1149,30 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/testing/" class="md-nav__link">
+      <a href="../../../reference/storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Storage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/testing/" class="md-nav__link">
         
   
   
@@ -1074,51 +1220,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#contributor-workflow" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
-      Contributor Workflow
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Contributor Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contributing-new-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributing new changes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#workflow-diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      Workflow Diagram
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
+      Testing
     </span>
   </a>
   
@@ -1143,61 +1247,11 @@
   
 
 
-  <h1>Contributing to The Project</h1>
+  <h1>Testing</h1>
 
-<p>Before following this workflow please refer to our <a href="overview.md"><strong>Getting Started</strong></a> page for instructions on installing dependencies and setting up your development environment.</p>
-<h2 id="contributor-workflow">Contributor Workflow</h2>
-<h3 id="overview">Overview</h3>
-<p>All changes should be made in a feature branch, merged into <code>develop</code>, and later merged into <code>main</code> for a new release.</p>
-<h3 id="contributing-new-changes">Contributing new changes</h3>
-<ol>
-<li><strong>Create a Feature Branch</strong></li>
-<li>Branch from <code>develop</code> using <code>feature/&lt;name&gt;</code> or <code>bugfix/&lt;name&gt;</code>.</li>
-<li>
-<p>Example:</p>
-<p><code>shell
- git checkout develop
- git pull origin develop
- git checkout -b feature/new-feature</code></p>
-</li>
-<li>
-<p><strong>Make Changes &amp; Push</strong></p>
-</li>
-<li>Commit changes with clear messages.</li>
-<li>
-<p>Push the branch.</p>
-<p><code>shell
- git add .
- git commit -m "Description of changes"
- git push origin feature/new-feature</code></p>
-</li>
-<li>
-<p><strong>Create a Pull Request</strong></p>
-</li>
-<li>Open a PR to merge into <code>develop</code>.</li>
-<li>
-<p>Address any review feedback.</p>
-</li>
-<li>
-<p><strong>Merge &amp; Clean Up</strong></p>
-</li>
-<li>After approval, merge into <code>develop</code>.</li>
-<li>
-<p>Delete the feature branch.</p>
-</li>
-<li>
-<p><strong>Release</strong></p>
-</li>
-<li>When develop is clean and ready for a new major release, we will merge <code>develop</code> into <code>main</code>.</li>
-</ol>
-<h3 id="workflow-diagram">Workflow Diagram</h3>
-<pre><code class="language-mermaid">graph TD;
-    A[Feature Branch] --&gt;|Commit &amp; Push| B[Pull Request];
-    B --&gt;|Review &amp; Merge| C[Develop Branch];
-    C --&gt;|Release| D[Main Branch];
-</code></pre>
-<h2 id="next-steps">Next Steps</h2>
-<p>Once you finish reading this it's recommended to check out the <a href="../architecture/">architecture</a> section.</p>
+<h3 id="testing">Testing</h3>
+<p>The <code>testing</code> module provides testers for the primary and
+secondary analyzer modules. See the <a href="./analyzers/example/README.md">example</a> for further references.</p>
 
 
 
@@ -1256,10 +1310,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.50899def.min.js"></script>
       
     
   </body>
