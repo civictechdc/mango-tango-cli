@@ -102,15 +102,15 @@ Dependency injection through context objects:
 
 ### For AI Assistants
 
-- **Claude Code users**: See [CLAUDE.md](./CLAUDE.md) (includes Serena integration)
-- **Cursor users**: See [.cursorrules](./.cursorrules)
+- **Claude Code users**: See [CLAUDE.md](https://github.com/civictechdc/mango-tango-cli/tree/develop/CLAUDE.md) (includes Serena integration)
+- **Cursor users**: See [.cursorrules](https://github.com/civictechdc/mango-tango-cli/tree/develop/.cursorrules)
 - **Deep semantic analysis**: Explore [.serena/memories/](https://github.com/civictechdc/mango-tango-cli/tree/develop/.serena/memories)
 
 ### Quick References
 
-- **Commands**: [.serena/memories/suggested_commands.md](./.serena/memories/suggested_commands.md)
-- **Style Guide**: [.serena/memories/code_style_conventions.md](./.serena/memories/code_style_conventions.md)
-- **Task Checklist**: [.serena/memories/task_completion_checklist.md](./.serena/memories/task_completion_checklist.md)
+- **Commands**: [.serena/memories/suggested_commands.md](https://github.com/civictechdc/mango-tango-cli/tree/develop/.serena/memories/suggested_commands.md)
+- **Style Guide**: [.serena/memories/code_style_conventions.md](https://github.com/civictechdc/mango-tango-cli/tree/develop/.serena/memories/code_style_conventions.md)
+- **Task Checklist**: [.serena/memories/task_completion_checklist.md](https://github.com/civictechdc/mango-tango-cli/tree/develop/.serena/memories/task_completion_checklist.md)
 
 ## External Dependencies
 
