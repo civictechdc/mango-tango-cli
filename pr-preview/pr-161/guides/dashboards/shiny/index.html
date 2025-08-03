@@ -12,25 +12,21 @@
         <meta name="author" content="CIB Mango Tree">
       
       
-        <link rel="canonical" href="https://cibmangotree.org/guides/architecture/">
+        <link rel="canonical" href="https://cibmangotree.org/guides/dashboards/shiny/">
       
       
-        <link rel="prev" href="../get-started/installation/">
       
       
-        <link rel="next" href="../domains/core-domain/">
-      
-      
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
     
     
       
-        <title>CLI design philosophy - CIB Mango Tree</title>
+        <title>Shiny - CIB Mango Tree</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
       
       
 
@@ -49,9 +45,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -69,11 +65,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#application-design-overview" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -84,9 +75,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+    <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
-  <img src="../../img/favicon.ico" alt="logo">
+  <img src="../../../img/favicon.ico" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -103,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CLI design philosophy
+              Shiny
             
           </span>
         </div>
@@ -150,7 +141,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../.." class="md-tabs__link">
+        <a href="../../.." class="md-tabs__link">
           
   
   
@@ -166,8 +157,6 @@
   
   
   
-    
-  
   
     
     
@@ -175,13 +164,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../get-started/overview/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../get-started/overview/" class="md-tabs__link">
           
   
   
@@ -204,7 +191,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../reference/analyzer_interface/" class="md-tabs__link">
+        <a href="../../../reference/analyzer_interface/" class="md-tabs__link">
           
   
   
@@ -238,9 +225,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+    <a href="../../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
-  <img src="../../img/favicon.ico" alt="logo">
+  <img src="../../../img/favicon.ico" alt="logo">
 
     </a>
     CIB Mango Tree
@@ -310,7 +297,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -333,7 +320,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../license/" class="md-nav__link">
+      <a href="../../../license/" class="md-nav__link">
         
   
   
@@ -360,31 +347,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -397,7 +379,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Guides
@@ -417,20 +399,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
         
           
-          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
             
   
   
@@ -457,7 +436,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../get-started/overview/" class="md-nav__link">
+      <a href="../../get-started/overview/" class="md-nav__link">
         
   
   
@@ -480,7 +459,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../get-started/installation/" class="md-nav__link">
+      <a href="../../get-started/installation/" class="md-nav__link">
         
   
   
@@ -508,30 +487,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    CLI design philosophy
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
         
   
   
@@ -542,60 +501,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#application-design-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application Design Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Architecture Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#questions-comments-and-feedback" class="md-nav__link">
-    <span class="md-ellipsis">
-      Questions, Comments, and Feedback
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -614,20 +519,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
             
   
   
@@ -654,7 +556,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../domains/core-domain/" class="md-nav__link">
+      <a href="../../domains/core-domain/" class="md-nav__link">
         
   
   
@@ -677,7 +579,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../domains/edge-domain/" class="md-nav__link">
+      <a href="../../domains/edge-domain/" class="md-nav__link">
         
   
   
@@ -700,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../domains/content-domain/" class="md-nav__link">
+      <a href="../../domains/content-domain/" class="md-nav__link">
         
   
   
@@ -731,7 +633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
+      <a href="../../contributing/" class="md-nav__link">
         
   
   
@@ -804,7 +706,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/analyzer_interface/" class="md-nav__link">
+      <a href="../../../reference/analyzer_interface/" class="md-nav__link">
         
   
   
@@ -827,7 +729,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/components/" class="md-nav__link">
+      <a href="../../../reference/components/" class="md-nav__link">
         
   
   
@@ -850,7 +752,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/app/" class="md-nav__link">
+      <a href="../../../reference/app/" class="md-nav__link">
         
   
   
@@ -873,7 +775,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/preprocessing/" class="md-nav__link">
+      <a href="../../../reference/preprocessing/" class="md-nav__link">
         
   
   
@@ -896,7 +798,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/terminal_tools/" class="md-nav__link">
+      <a href="../../../reference/terminal_tools/" class="md-nav__link">
         
   
   
@@ -919,7 +821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/importing/" class="md-nav__link">
+      <a href="../../../reference/importing/" class="md-nav__link">
         
   
   
@@ -942,7 +844,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/meta/" class="md-nav__link">
+      <a href="../../../reference/meta/" class="md-nav__link">
         
   
   
@@ -965,7 +867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/testing/" class="md-nav__link">
+      <a href="../../../reference/testing/" class="md-nav__link">
         
   
   
@@ -1006,50 +908,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#application-design-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Application Design Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Architecture Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#questions-comments-and-feedback" class="md-nav__link">
-    <span class="md-ellipsis">
-      Questions, Comments, and Feedback
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1067,59 +925,9 @@
   
 
 
-  <h1>CLI design philosophy</h1>
+  <h1>Shiny</h1>
 
-<p>Before contributing please refer to our <a href="#contributor-workflow"><strong>Contributor Workflow</strong></a></p>
-<h3 id="application-design-overview">Application Design Overview</h3>
-<p>The CIB 🥭 application is a terminal-based tool for performing data analysis and visualization. It is designed to be modular and extensible, allowing developers to contribute new analysis modules and visualization components while providing a consistent user experience around data import, preprocessing, and output generation.</p>
-<p>This design is motivated by a common pain point when moving from a data analysis script for private use to a tool that can be shared with others: A script for private consumption carries assumptions about the desired input and output data format and structure that are convenient to its author. When such a script is made available to others, debates on these aspects often arise. For a suite of analyses that this project aims to offer, if left decentralized, this debate can lead to inconsistent UX offerings across analyses, code duplication, and even bugs.</p>
-<p>The architecture of the CIB 🥭 application is designed to address this problem by providing a clear separation between the core application logic and the analysis modules, such that the analysis module does not need to be concerned with the input and output data format and structure; such responsibilities are handled by the core application, where we aim to provide a rich, consistent, and intuitive user experience.</p>
-<h3 id="architecture-overview">Architecture Overview</h3>
-<p>The application has three "domains":
-- The <a href="#core-domain"><strong>Core</strong></a> domain is responsible for workspace management, user flow, and integration of analysis runs and data import/export in a generic sense. It has three parts that correspond loosely to the MVC paradigm.
-  - The <a href="#application"><strong>Application</strong></a> defines the workspace logic and exposes generic capabilities for importing and exporting data as well as analyses and dashboards. This is the "controller" part.
-  - The <a href="#terminal-components"><strong>Terminal Components</strong></a> render the terminal interface and handle user input. This is the "view" part.
-  - The <a href="#storage-io"><strong>Storage IO</strong></a> persists the workspace data and is responsible for reading and writing data. This is the "model" part.</p>
-<p>The core application provides the context necessary for the other domains to function in a way that allows them to be agnostic about the specifics of the workspace and user flow.</p>
-<ul>
-<li>The <a href="#edge-domain"><strong>Edge</strong></a> domain is responsible for data import and export while being agnostic about the specific analysis being run. Currently, this consists of the <strong>Importers</strong> and the <strong>Semantic Preprocessor</strong>.</li>
-</ul>
-<blockquote>
-<p>Note that the Storage IO is currently responsible for data export, but we should consider moving this to the Edge domain to allow for more extensibility and looser coupling.</p>
-</blockquote>
-<ul>
-<li>The <a href="#content-domain"><strong>Content</strong></a> domain is responsible for the actual data analysis and visualization and is agnostic about data import/export or workspace specifics. This consists of the <strong>Analyzers</strong> (both <strong>Primary</strong> and <strong>Secondary</strong>) as well as the <strong>Web Presenters</strong>.</li>
-</ul>
-<pre><code class="language-mermaid">flowchart TD
-    terminal[&quot;Terminal (core)&quot;]
-    application[&quot;Application (core)&quot;]
-    storage[&quot;Storage (core)&quot;]
-
-    importers[&quot;Importers (edge)&quot;]
-    semantic[&quot;Semantic Preprocessor (edge)&quot;]
-
-    content[&quot;Analyzers/Web Presenters (content)&quot;]
-
-    terminal --&gt; application
-    application --&gt; storage
-
-    application --&gt; importers
-    application --&gt; semantic
-
-    application --&gt; content
-</code></pre>
-<h2 id="questions-comments-and-feedback">Questions, Comments, and Feedback</h2>
-<p>Talk to us on the <a href="https://civictechdc.slack.com">Civic Tech DC Slack workspace</a>!</p>
-<h2 id="next-steps">Next Steps</h2>
-<p>It would be recommended to review the sections for each domain, and the section for implementing analyzers. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
-<ul>
-<li><a href="../domains/core-domain/">Core Domain</a></li>
-<li><a href="../domains/edge-domain/">Edge Domain</a></li>
-<li><a href="../domains/content-domain/">Content Domain</a></li>
-<li><a href="../analyzers/">Implementing Analyzers</a></li>
-<li><a href="../dashboards/shiny/">Shiny Dashboards</a></li>
-<li><a href="../dashboards/react/">React Dashboards</a></li>
-</ul>
+<p>Coming soon...</p>
 
 
 
@@ -1178,10 +986,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.50899def.min.js"></script>
       
     
   </body>
