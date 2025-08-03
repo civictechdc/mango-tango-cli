@@ -669,6 +669,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1062,6 +1071,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1089,7 +1107,7 @@
 <p>The application code should be free of specific storage implementation and be agnostic about the specifics of the terminal interface and the available analyzers.</p>
 <p>Here's what the entrypoint for the application module looks like</p>
 <p><strong>./app/<strong>init</strong>.py</strong>:</p>
-<pre><code>from .analysis_context import AnalysisContext
+<pre><code class="language-python">from .analysis_context import AnalysisContext
 from .analysis_output_context import AnalysisOutputContext
 from .analysis_webserver_context import AnalysisWebServerContext
 from .app import App
@@ -1102,7 +1120,7 @@ from .settings_context import SettingsContext
 <p>The user flow understandably depends on the set of capabilities offered by the <a href="#application">Application</a>, so an adjustment there may require an adjustment here.</p>
 <p>Here's what the entrypoint for the termnal module looks like</p>
 <p><strong>./terminal_tools/<strong>init</strong>.py</strong></p>
-<pre><code>from .progress import ProgressReporter
+<pre><code class="language-python">from .progress import ProgressReporter
 from .utils import (
     clear_printed_lines,
     clear_terminal,
@@ -1117,7 +1135,7 @@ from .utils import (
 <p>The Storage IO lives Inside the <code>storage</code> directory inside the project root. It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.</p>
 <p>Here's what the entrypoint for the storage module looks like</p>
 <p><strong>./storage/<strong>init</strong>.py</strong>:</p>
-<pre><code>import math
+<pre><code class="language-python">import math
 import os
 import re
 import shutil
@@ -1690,6 +1708,14 @@ class AppFileSelectorStateManager(FileSelectorStateManager):
             Query()[&quot;class_&quot;] == &quot;file_selector_state&quot;,
         )
 </code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="../edge-domain/">Edge Domain</a></li>
+<li><a href="../content-domain/">Content Domain</a></li>
+<li><a href="../../dashboards/shiny/">Shiny Dashboards</a></li>
+<li><a href="../../dashboards/react/">React Dashboards</a></li>
+</ul>
 
 
 

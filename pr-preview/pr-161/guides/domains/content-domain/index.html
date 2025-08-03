@@ -682,6 +682,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -996,6 +1005,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1022,6 +1040,14 @@
 <p>An analysis is added to the application by defining a <strong>Primary Analyzer</strong>, which comes with an interface declaration and an implementation. The interface declaration defines the input data structure and the output tables, which the application depends on for user guidance. The implementation is made workspace-agnostic by means of the "context" object.</p>
 <p>The goal of the Primary Analyzer is to produce a set of output tables that can be used by other analyzers, including <strong>Secondary Analyzers</strong> and <strong>Web Presenters</strong>. Primary Analyzer outputs are ideally normalized, non-duplicated, and non-redundant. As such, they are not always suitable for direct user consumption. It is the job of the Secondary Analyzers to produce user-friendly outputs and the job of Web Presenters to produce interactive visualizations.</p>
 <p>Both Secondary Analyzers and Web Presenters are also defined using interface objects. Secondary Analyzers will depend on the output of Primary Analyzers, and Web Presenters will depend on the output of both Primary and Secondary Analyzers.</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="../core-domain/">Core Domain</a></li>
+<li><a href="../edge-domain/">Edge Domain</a></li>
+<li><a href="../../dashboards/shiny/">Shiny Dashboards</a></li>
+<li><a href="../../dashboards/react/">React Dashboards</a></li>
+</ul>
 
 
 

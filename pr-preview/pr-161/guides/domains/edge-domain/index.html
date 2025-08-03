@@ -683,6 +683,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1044,6 +1053,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1072,7 +1090,7 @@
 <p>The importers eventually write data to a parquet file, whose path is provisioned by the application.</p>
 <p>Here's what the entrypoint for the importer module looks like</p>
 <p><strong>./importing/<strong>init</strong>.py</strong>:</p>
-<pre><code>from .csv import CSVImporter
+<pre><code class="language-python">from .csv import CSVImporter
 from .excel import ExcelImporter
 from .importer import Importer, ImporterSession
 
@@ -1082,7 +1100,7 @@ importers: list[Importer[ImporterSession]] = [CSVImporter(), ExcelImporter()]
 <p>The Semantic Preprocessor lives inside the <code>preprocessing</code> directory inside the project root. It defines all the column data semantics—a kind of type system that is used to guide the user in selecting the right columns for the right analysis. It is agnostic about the specific analyzers but does depend on them in a generic way—the available semantics exist to support the needs of analyzers and will be extended as necessary.</p>
 <p>Here's what the entrypoint for the preprocessing module looks like</p>
 <p><strong>./preprocessing/series_semantic.py</strong>:</p>
-<pre><code>from datetime import datetime
+<pre><code class="language-python">from datetime import datetime
 from typing import Callable, Type, Union
 
 import polars as pl
@@ -1222,6 +1240,14 @@ def constant_series(series: pl.Series, constant) -&gt; pl.Series:
     &quot;&quot;&quot;Create a series with a constant value for each row of `series`.&quot;&quot;&quot;
     return pl.Series([constant] * series.len(), dtype=pl.Boolean)
 </code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="../core-domain/">Core Domain</a></li>
+<li><a href="../content-domain/">Content Domain</a></li>
+<li><a href="../../dashboards/shiny/">Shiny Dashboards</a></li>
+<li><a href="../../dashboards/react/">React Dashboards</a></li>
+</ul>
 
 
 
