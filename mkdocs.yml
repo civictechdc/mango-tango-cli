@@ -18,6 +18,8 @@ nav:
           - "Edge Domain": "guides/domains/edge-domain.md"
           - "Content Domain": "guides/domains/content-domain.md"
       - "Contributing to The Project": "guides/contributing.md"
+      - "Logging System": "guides/logging.md"
+      - "Implementing Analyzers": "guides/analyzers.md"
   - "Reference (CLI)":
       - "Analyzer Interface": "reference/analyzer_interface.md"
       - "Components": "reference/components.md"
