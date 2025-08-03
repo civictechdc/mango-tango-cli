@@ -12,7 +12,7 @@ Here's what the entrypoint for the importer module looks like
 
 **./importing/__init__.py**:
 
-```
+```python
 from .csv import CSVImporter
 from .excel import ExcelImporter
 from .importer import Importer, ImporterSession
@@ -28,7 +28,7 @@ Here's what the entrypoint for the preprocessing module looks like
 
 **./preprocessing/series_semantic.py**:
 
-```
+```python
 from datetime import datetime
 from typing import Callable, Type, Union
 
@@ -169,3 +169,12 @@ def constant_series(series: pl.Series, constant) -> pl.Series:
     """Create a series with a constant value for each row of `series`."""
     return pl.Series([constant] * series.len(), dtype=pl.Boolean)
 ```
+
+# Next Steps
+
+Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  [Shiny](https://shiny.posit.co/py/), and [React](https://react.dev) dashboards.
+
+- [Core Domain](./core-domain.md)
+- [Content Domain](./content-domain.md)
+- [Shiny Dashboards](../dashboards/shiny.md)
+- [React Dashboards](../dashboards/react.md)

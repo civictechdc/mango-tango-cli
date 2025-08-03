@@ -10,7 +10,7 @@ Here's what the entrypoint for the application module looks like
 
 **./app/__init__.py**:
 
-```
+```python
 from .analysis_context import AnalysisContext
 from .analysis_output_context import AnalysisOutputContext
 from .analysis_webserver_context import AnalysisWebServerContext
@@ -30,7 +30,7 @@ Here's what the entrypoint for the termnal module looks like
 
 **./terminal_tools/__init__.py**
 
-```
+```python
 from .progress import ProgressReporter
 from .utils import (
     clear_printed_lines,
@@ -51,7 +51,7 @@ Here's what the entrypoint for the storage module looks like
 
 **./storage/__init__.py**:
 
-```
+```python
 import math
 import os
 import re
@@ -625,3 +625,12 @@ class AppFileSelectorStateManager(FileSelectorStateManager):
             Query()["class_"] == "file_selector_state",
         )
 ```
+
+# Next Steps
+
+Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  [Shiny](https://shiny.posit.co/py/), and [React](https://react.dev) dashboards.
+
+- [Edge Domain](./edge-domain.md)
+- [Content Domain](./content-domain.md)
+- [Shiny Dashboards](../dashboards/shiny.md)
+- [React Dashboards](../dashboards/react.md)
