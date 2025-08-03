@@ -12,14 +12,17 @@ nav:
       - "Getting Started":
           - "Overview": "guides/get-started/overview.md"
           - "Installation": "guides/get-started/installation.md"
-      - "CLI design philosophy": "guides/architecture.md"
+          - "Contributing to The Project": "guides/contributing.md"
+          - "Logging System": "guides/logging.md"
+          - "CLI design philosophy": "guides/architecture.md"
+      - "Implementing Analyzers": "guides/analyzers.md"
       - "Domains":
           - "Core Domain": "guides/domains/core-domain.md"
           - "Edge Domain": "guides/domains/edge-domain.md"
           - "Content Domain": "guides/domains/content-domain.md"
-      - "Contributing to The Project": "guides/contributing.md"
-      - "Logging System": "guides/logging.md"
-      - "Implementing Analyzers": "guides/analyzers.md"
+      - "Dashboards":
+          - "React": "guides/dashboards/react.md"
+          - "Shiny": "guides/dashboards/shiny.md"
   - "Reference (CLI)":
       - "Analyzer Interface": "reference/analyzer_interface.md"
       - "Components": "reference/components.md"
