@@ -1,0 +1,2016 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="An interactive python terminal UI wrapper for Mango Tree analyzers.">
+      
+      
+        <meta name="author" content="CIB Mango Tree">
+      
+      
+        <link rel="canonical" href="https://cibmangotree.org/guides/domains/core-domain/">
+      
+      
+        <link rel="prev" href="../../analyzers/">
+      
+      
+        <link rel="next" href="../edge-domain/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Core Domain - CIB Mango Tree</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#core-domain" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CIB Mango Tree
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core Domain
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../get-started/overview/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../reference/analyzer_interface/" class="md-tabs__link">
+          
+  
+  
+  Reference (CLI)
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    CIB Mango Tree
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing to The Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CLI design philosophy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analyzers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Implementing Analyzers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Domains
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Domains
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Core Domain
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Core Domain
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Domain
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Domain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application" class="md-nav__link">
+    <span class="md-ellipsis">
+      Application
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storage IO
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edge-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Edge Domain
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../content-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Domain
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Dashboards
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Dashboards
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dashboards/react/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    React
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dashboards/shiny/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Shiny
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference (CLI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference (CLI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/analyzer_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Analyzer Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Components
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    App
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/preprocessing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preprocessing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/terminal_tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terminal Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/importing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Importing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Meta
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Storage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Domain
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Domain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application" class="md-nav__link">
+    <span class="md-ellipsis">
+      Application
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storage IO
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Core Domain</h1>
+
+<h3 id="core-domain">Core Domain</h3>
+<h4 id="application">Application</h4>
+<p>The Application lives inside the <code>app</code> directory in the project root. This is responsible for defining and executing all capabilities of the application's workspace. Any extension or modification of the application's workspace capabilities should be done here.</p>
+<p>The application code should be free of specific storage implementation and be agnostic about the specifics of the terminal interface and the available analyzers.</p>
+<p>Here's what the entrypoint for the application module looks like</p>
+<p><strong>./app/<strong>init</strong>.py</strong>:</p>
+<pre><code class="language-python">from .analysis_context import AnalysisContext
+from .analysis_output_context import AnalysisOutputContext
+from .analysis_webserver_context import AnalysisWebServerContext
+from .app import App
+from .app_context import AppContext
+from .project_context import ProjectContext
+from .settings_context import SettingsContext
+</code></pre>
+<h4 id="terminal-components">Terminal Components</h4>
+<p>The Terminal Components live inside the <code>terminal_tools</code> inside the project root. Their main responsibility is user flow, rendering the terminal interface, and handling user input.</p>
+<p>The user flow understandably depends on the set of capabilities offered by the <a href="#application">Application</a>, so an adjustment there may require an adjustment here.</p>
+<p>Here's what the entrypoint for the termnal module looks like</p>
+<p><strong>./terminal_tools/<strong>init</strong>.py</strong></p>
+<pre><code class="language-python">from .progress import ProgressReporter
+from .utils import (
+    clear_printed_lines,
+    clear_terminal,
+    draw_box,
+    enable_windows_ansi_support,
+    open_directory_explorer,
+    print_ascii_table,
+    wait_for_key,
+)
+</code></pre>
+<h4 id="storage-io">Storage IO</h4>
+<p>The Storage IO lives Inside the <code>storage</code> directory inside the project root. It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.</p>
+<p>Here's what the entrypoint for the storage module looks like</p>
+<p><strong>./storage/<strong>init</strong>.py</strong>:</p>
+<pre><code class="language-python">import math
+import os
+import re
+import shutil
+from datetime import datetime
+from typing import Callable, Iterable, Literal, Optional
+
+import platformdirs
+import polars as pl
+import pyarrow.parquet as pq
+from filelock import FileLock
+from pydantic import BaseModel
+from tinydb import Query, TinyDB
+from xlsxwriter import Workbook
+
+from analyzer_interface.interface import AnalyzerOutput
+from analyzer_interface.params import ParamValue
+
+from .file_selector import FileSelectorStateManager
+
+
+class ProjectModel(BaseModel):
+    class_: Literal[&quot;project&quot;] = &quot;project&quot;
+    id: str
+    display_name: str
+
+
+class SettingsModel(BaseModel):
+    class_: Literal[&quot;settings&quot;] = &quot;settings&quot;
+    export_chunk_size: Optional[int | Literal[False]] = None
+
+
+class FileSelectionState(BaseModel):
+    class_: Literal[&quot;file_selector_state&quot;] = &quot;file_selector_state&quot;
+    last_path: Optional[str] = None
+
+
+class AnalysisModel(BaseModel):
+    class_: Literal[&quot;analysis&quot;] = &quot;analysis&quot;
+    analysis_id: str
+    project_id: str
+    display_name: str
+    primary_analyzer_id: str
+    path: str
+    column_mapping: Optional[dict[str, str]] = None
+    create_timestamp: Optional[float] = None
+    param_values: dict[str, ParamValue] = dict()
+    is_draft: bool = False
+
+    def create_time(self):
+        return (
+            datetime.fromtimestamp(self.create_timestamp)
+            if self.create_timestamp
+            else None
+        )
+
+
+SupportedOutputExtension = Literal[&quot;parquet&quot;, &quot;csv&quot;, &quot;xlsx&quot;, &quot;json&quot;]
+
+
+class Storage:
+    def __init__(self, *, app_name: str, app_author: str):
+        self.user_data_dir = platformdirs.user_data_dir(
+            appname=app_name, appauthor=app_author, ensure_exists=True
+        )
+        self.temp_dir = platformdirs.user_cache_dir(
+            appname=app_name, appauthor=app_author, ensure_exists=True
+        )
+        self.db = TinyDB(self._get_db_path())
+        with self._lock_database():
+            self._bootstrap_analyses_v1()
+
+        self.file_selector_state = AppFileSelectorStateManager(self)
+
+    def init_project(self, *, display_name: str, input_temp_file: str):
+        with self._lock_database():
+            project_id = self._find_unique_project_id(display_name)
+            project = ProjectModel(id=project_id, display_name=display_name)
+            self.db.insert(project.model_dump())
+
+        project_dir = self._get_project_path(project_id)
+        os.makedirs(project_dir, exist_ok=True)
+
+        shutil.move(input_temp_file, self._get_project_input_path(project_id))
+        return project
+
+    def list_projects(self):
+        q = Query()
+        projects = self.db.search(q[&quot;class_&quot;] == &quot;project&quot;)
+        return sorted(
+            (ProjectModel(**project) for project in projects),
+            key=lambda project: project.display_name,
+        )
+
+    def get_project(self, project_id: str):
+        q = Query()
+        project = self.db.search((q[&quot;class_&quot;] == &quot;project&quot;) &amp; (q[&quot;id&quot;] == project_id))
+        if project:
+            return ProjectModel(**project[0])
+        return None
+
+    def delete_project(self, project_id: str):
+        with self._lock_database():
+            q = Query()
+            self.db.remove((q[&quot;id&quot;] == project_id) &amp; (q[&quot;class_&quot;] == &quot;project&quot;))
+        project_path = self._get_project_path(project_id)
+        shutil.rmtree(project_path, ignore_errors=True)
+
+    def rename_project(self, project_id: str, name: str):
+        with self._lock_database():
+            q = Query()
+            self.db.update(
+                {&quot;display_name&quot;: name},
+                (q[&quot;id&quot;] == project_id) &amp; (q[&quot;class_&quot;] == &quot;project&quot;),
+            )
+
+    def load_project_input(self, project_id: str, *, n_records: Optional[int] = None):
+        input_path = self._get_project_input_path(project_id)
+        return pl.read_parquet(input_path, n_rows=n_records)
+
+    def get_project_input_stats(self, project_id: str):
+        input_path = self._get_project_input_path(project_id)
+        num_rows = pl.scan_parquet(input_path).select(pl.count()).collect().item()
+        return TableStats(num_rows=num_rows)
+
+    def save_project_primary_outputs(
+        self, analysis: AnalysisModel, outputs: dict[str, pl.DataFrame]
+    ):
+        for output_id, output_df in outputs.items():
+            self._save_output(
+                os.path.join(
+                    self._get_project_primary_output_root_path(analysis),
+                    output_id,
+                ),
+                output_df,
+                &quot;parquet&quot;,
+            )
+
+    def save_project_secondary_outputs(
+        self,
+        analysis: AnalysisModel,
+        secondary_id: str,
+        outputs: dict[str, pl.DataFrame],
+    ):
+        for output_id, output_df in outputs.items():
+            self._save_output(
+                os.path.join(
+                    self._get_project_secondary_output_root_path(
+                        analysis, secondary_id
+                    ),
+                    output_id,
+                ),
+                output_df,
+                &quot;parquet&quot;,
+            )
+
+    def save_project_secondary_output(
+        self,
+        analysis: AnalysisModel,
+        secondary_id: str,
+        output_id: str,
+        output_df: pl.DataFrame,
+        extension: SupportedOutputExtension,
+    ):
+        root_path = self._get_project_secondary_output_root_path(analysis, secondary_id)
+        self._save_output(
+            os.path.join(root_path, output_id),
+            output_df,
+            extension,
+        )
+
+    def _save_output(
+        self,
+        output_path_without_extension,
+        output_df: pl.DataFrame | pl.LazyFrame,
+        extension: SupportedOutputExtension,
+    ):
+        output_df = output_df.lazy()
+        os.makedirs(os.path.dirname(output_path_without_extension), exist_ok=True)
+        output_path = f&quot;{output_path_without_extension}.{extension}&quot;
+        if extension == &quot;parquet&quot;:
+            output_df.sink_parquet(output_path)
+        elif extension == &quot;csv&quot;:
+            output_df.sink_csv(output_path)
+        elif extension == &quot;xlsx&quot;:
+            # See https://xlsxwriter.readthedocs.io/working_with_dates_and_time.html#timezone-handling
+            with Workbook(output_path, {&quot;remove_timezone&quot;: True}) as workbook:
+                output_df.collect().write_excel(workbook)
+        elif extension == &quot;json&quot;:
+            output_df.collect().write_json(output_path)
+        else:
+            raise ValueError(f&quot;Unsupported format: {extension}&quot;)
+        return output_path
+
+    def load_project_primary_output(self, analysis: AnalysisModel, output_id: str):
+        output_path = self.get_primary_output_parquet_path(analysis, output_id)
+        return pl.read_parquet(output_path)
+
+    def get_primary_output_parquet_path(self, analysis: AnalysisModel, output_id: str):
+        return os.path.join(
+            self._get_project_primary_output_root_path(analysis),
+            f&quot;{output_id}.parquet&quot;,
+        )
+
+    def load_project_secondary_output(
+        self, analysis: AnalysisModel, secondary_id: str, output_id: str
+    ):
+        output_path = self.get_secondary_output_parquet_path(
+            analysis, secondary_id, output_id
+        )
+        return pl.read_parquet(output_path)
+
+    def get_secondary_output_parquet_path(
+        self, analysis: AnalysisModel, secondary_id: str, output_id: str
+    ):
+        return os.path.join(
+            self._get_project_secondary_output_root_path(analysis, secondary_id),
+            f&quot;{output_id}.parquet&quot;,
+        )
+
+    def export_project_primary_output(
+        self,
+        analysis: AnalysisModel,
+        output_id: str,
+        *,
+        extension: SupportedOutputExtension,
+        spec: AnalyzerOutput,
+        export_chunk_size: Optional[int] = None,
+    ):
+        return self._export_output(
+            self.get_primary_output_parquet_path(analysis, output_id),
+            os.path.join(self._get_project_exports_root_path(analysis), output_id),
+            extension=extension,
+            spec=spec,
+            export_chunk_size=export_chunk_size,
+        )
+
+    def export_project_secondary_output(
+        self,
+        analysis: AnalysisModel,
+        secondary_id: str,
+        output_id: str,
+        *,
+        extension: SupportedOutputExtension,
+        spec: AnalyzerOutput,
+        export_chunk_size: Optional[int] = None,
+    ):
+        exported_path = os.path.join(
+            self._get_project_exports_root_path(analysis),
+            (
+                secondary_id
+                if secondary_id == output_id
+                else f&quot;{secondary_id}__{output_id}&quot;
+            ),
+        )
+        return self._export_output(
+            self.get_secondary_output_parquet_path(analysis, secondary_id, output_id),
+            exported_path,
+            extension=extension,
+            spec=spec,
+            export_chunk_size=export_chunk_size,
+        )
+
+    def _export_output(
+        self,
+        input_path: str,
+        output_path: str,
+        *,
+        extension: SupportedOutputExtension,
+        spec: AnalyzerOutput,
+        export_chunk_size: Optional[int] = None,
+    ):
+        with pq.ParquetFile(input_path) as reader:
+            num_chunks = (
+                math.ceil(reader.metadata.num_rows / export_chunk_size)
+                if export_chunk_size
+                else 1
+            )
+
+        if num_chunks == 1:
+            df = pl.scan_parquet(input_path)
+            self._save_output(output_path, spec.transform_output(df), extension)
+            return f&quot;{output_path}.{extension}&quot;
+
+        with pq.ParquetFile(input_path) as reader:
+            get_batches = (
+                df
+                for batch in reader.iter_batches()
+                if (df := pl.from_arrow(batch)) is not None
+            )
+            for chunk_id, chunk in enumerate(
+                collect_dataframe_chunks(get_batches, export_chunk_size)
+            ):
+                chunk = spec.transform_output(chunk)
+                self._save_output(f&quot;{output_path}_{chunk_id}&quot;, chunk, extension)
+                yield chunk_id / num_chunks
+            return f&quot;{output_path}_[*].{extension}&quot;
+
+    def list_project_analyses(self, project_id: str):
+        with self._lock_database():
+            q = Query()
+            analysis_models = self.db.search(
+                (q[&quot;class_&quot;] == &quot;analysis&quot;) &amp; (q[&quot;project_id&quot;] == project_id)
+            )
+        return [AnalysisModel(**analysis) for analysis in analysis_models]
+
+    def init_analysis(
+        self,
+        project_id: str,
+        display_name: str,
+        primary_analyzer_id: str,
+        column_mapping: dict[str, str],
+        param_values: dict[str, ParamValue],
+    ) -&gt; AnalysisModel:
+        with self._lock_database():
+            analysis_id = self._find_unique_analysis_id(project_id, display_name)
+            analysis = AnalysisModel(
+                analysis_id=analysis_id,
+                project_id=project_id,
+                display_name=display_name,
+                primary_analyzer_id=primary_analyzer_id,
+                path=os.path.join(&quot;analysis&quot;, analysis_id),
+                column_mapping=column_mapping,
+                create_timestamp=datetime.now().timestamp(),
+                param_values=param_values,
+                is_draft=True,
+            )
+            self.db.insert(analysis.model_dump())
+        return analysis
+
+    def save_analysis(self, analysis: AnalysisModel):
+        with self._lock_database():
+            q = Query()
+            self.db.update(
+                analysis.model_dump(),
+                (q[&quot;class_&quot;] == &quot;analysis&quot;)
+                &amp; (q[&quot;project_id&quot;] == analysis.project_id)
+                &amp; (q[&quot;analysis_id&quot;] == analysis.analysis_id),
+            )
+
+    def delete_analysis(self, analysis: AnalysisModel):
+        with self._lock_database():
+            q = Query()
+            self.db.remove(
+                (q[&quot;class_&quot;] == &quot;analysis&quot;)
+                &amp; (q[&quot;project_id&quot;] == analysis.project_id)
+                &amp; (q[&quot;analysis_id&quot;] == analysis.analysis_id)
+            )
+            analysis_path = os.path.join(
+                self._get_project_path(analysis.project_id), analysis.path
+            )
+            shutil.rmtree(analysis_path, ignore_errors=True)
+
+    def _find_unique_analysis_id(self, project_id: str, display_name: str):
+        return self._get_unique_name(
+            self._slugify_name(display_name),
+            lambda analysis_id: self._is_analysis_id_unique(project_id, analysis_id),
+        )
+
+    def _is_analysis_id_unique(self, project_id: str, analysis_id: str):
+        q = Query()
+        id_unique = not self.db.search(
+            (q[&quot;class_&quot;] == &quot;analysis&quot;)
+            &amp; (q[&quot;project_id&quot;] == project_id)
+            &amp; (q[&quot;analysis_id&quot;] == analysis_id)
+        )
+        dir_unique = not os.path.exists(
+            os.path.join(self._get_project_path(project_id), &quot;analysis&quot;, analysis_id)
+        )
+        return id_unique and dir_unique
+
+    def _bootstrap_analyses_v1(self):
+        legacy_v1_analysis_dirname = &quot;analyzers&quot;
+        projects = self.list_projects()
+        for project in projects:
+            project_id = project.id
+            project_path = self._get_project_path(project_id)
+            try:
+                v1_analyses = os.listdir(
+                    os.path.join(project_path, legacy_v1_analysis_dirname)
+                )
+            except FileNotFoundError:
+                continue
+            for analyzer_id in v1_analyses:
+                db_analyzer_id = f&quot;__v1__{analyzer_id}&quot;
+                modified_time = os.path.getmtime(
+                    os.path.join(project_path, legacy_v1_analysis_dirname, analyzer_id)
+                )
+                self.db.upsert(
+                    AnalysisModel(
+                        analysis_id=db_analyzer_id,
+                        project_id=project_id,
+                        display_name=analyzer_id,
+                        primary_analyzer_id=analyzer_id,
+                        path=os.path.join(legacy_v1_analysis_dirname, analyzer_id),
+                        create_timestamp=modified_time,
+                    ).model_dump(),
+                    (Query()[&quot;class_&quot;] == &quot;analysis&quot;)
+                    &amp; (Query()[&quot;project_id&quot;] == project_id)
+                    &amp; (Query()[&quot;analysis_id&quot;] == db_analyzer_id),
+                )
+
+    def list_secondary_analyses(self, analysis: AnalysisModel) -&gt; list[str]:
+        try:
+            analyzers = os.listdir(
+                os.path.join(
+                    self._get_project_path(analysis.project_id),
+                    analysis.path,
+                    &quot;secondary_outputs&quot;,
+                ),
+            )
+            return analyzers
+        except FileNotFoundError:
+            return []
+
+    def _find_unique_project_id(self, display_name: str):
+        &quot;&quot;&quot;Turn the display name into a unique project ID&quot;&quot;&quot;
+        return self._get_unique_name(
+            self._slugify_name(display_name), self._is_project_id_unique
+        )
+
+    def _is_project_id_unique(self, project_id: str):
+        &quot;&quot;&quot;Check the database if the project ID is unique&quot;&quot;&quot;
+        q = Query()
+        id_unique = not self.db.search(
+            q[&quot;class_&quot;] == &quot;project&quot; and q[&quot;id&quot;] == project_id
+        )
+        dir_unique = not os.path.exists(self._get_project_path(project_id))
+        return id_unique and dir_unique
+
+    def _get_db_path(self):
+        return os.path.join(self.user_data_dir, &quot;db.json&quot;)
+
+    def _get_project_path(self, project_id: str):
+        return os.path.join(self.user_data_dir, &quot;projects&quot;, project_id)
+
+    def _get_project_input_path(self, project_id: str):
+        return os.path.join(self._get_project_path(project_id), &quot;input.parquet&quot;)
+
+    def _get_project_primary_output_root_path(self, analysis: AnalysisModel):
+        return os.path.join(
+            self._get_project_path(analysis.project_id),
+            analysis.path,
+            &quot;primary_outputs&quot;,
+        )
+
+    def _get_project_secondary_output_root_path(
+        self, analysis: AnalysisModel, secondary_id: str
+    ):
+        return os.path.join(
+            self._get_project_path(analysis.project_id),
+            analysis.path,
+            &quot;secondary_outputs&quot;,
+            secondary_id,
+        )
+
+    def _get_project_exports_root_path(self, analysis: AnalysisModel):
+        return os.path.join(
+            self._get_project_path(analysis.project_id), analysis.path, &quot;exports&quot;
+        )
+
+    def _get_web_presenter_state_path(self, analysis: AnalysisModel, presenter_id: str):
+        return os.path.join(
+            self._get_project_path(analysis.project_id),
+            analysis.path,
+            &quot;web_presenters&quot;,
+            presenter_id,
+            &quot;state&quot;,
+        )
+
+    def _lock_database(self):
+        &quot;&quot;&quot;
+        Locks the database to prevent concurrent access, in case multiple instances
+        of the application are running.
+        &quot;&quot;&quot;
+        lock_path = os.path.join(self.temp_dir, &quot;db.lock&quot;)
+        return FileLock(lock_path)
+
+    def get_settings(self):
+        with self._lock_database():
+            return self._get_settings()
+
+    def _get_settings(self):
+        q = Query()
+        settings = self.db.search(q[&quot;class_&quot;] == &quot;settings&quot;)
+        if settings:
+            return SettingsModel(**settings[0])
+        return SettingsModel()
+
+    def save_settings(self, **kwargs):
+        with self._lock_database():
+            q = Query()
+            settings = self._get_settings()
+            new_settings = SettingsModel(
+                **{
+                    **settings.model_dump(),
+                    **{
+                        key: value for key, value in kwargs.items() if value is not None
+                    },
+                }
+            )
+            self.db.upsert(new_settings.model_dump(), q[&quot;class_&quot;] == &quot;settings&quot;)
+
+    @staticmethod
+    def _slugify_name(name: str):
+        return re.sub(r&quot;\W+&quot;, &quot;_&quot;, name.lower()).strip(&quot;_&quot;)
+
+    @staticmethod
+    def _get_unique_name(base_name: str, validator: Callable[[str], bool]):
+        if validator(base_name):
+            return base_name
+        i = 1
+        while True:
+            candidate = f&quot;{base_name}_{i}&quot;
+            if validator(candidate):
+                return candidate
+            i += 1
+
+
+class TableStats(BaseModel):
+    num_rows: int
+
+
+def collect_dataframe_chunks(
+    input: Iterable[pl.DataFrame], size_threshold: int
+) -&gt; Iterable[pl.DataFrame]:
+    output_buffer = []
+    size = 0
+    for df in input:
+        while True:
+            available_space = size_threshold - size
+            slice = df.head(available_space)
+            output_buffer.append(slice)
+            size = size + slice.height
+            remaining_space = available_space - slice.height
+
+            if remaining_space == 0:
+                yield pl.concat(output_buffer)
+                output_buffer = []
+                size = 0
+
+            if slice.height == df.height:
+                break
+            else:
+                df = df.tail(-available_space)
+
+    if output_buffer:
+        yield pl.concat(output_buffer)
+
+
+class AppFileSelectorStateManager(FileSelectorStateManager):
+    def __init__(self, storage: &quot;Storage&quot;):
+        self.storage = storage
+
+    def get_current_path(self):
+        return self._load_state().last_path
+
+    def set_current_path(self, path: str):
+        self._save_state(path)
+
+    def _load_state(self):
+        q = Query()
+        state = self.storage.db.search(q[&quot;class_&quot;] == &quot;file_selector_state&quot;)
+        if state:
+            return FileSelectionState(**state[0])
+        return FileSelectionState()
+
+    def _save_state(self, last_path: str):
+        self.storage.db.upsert(
+            FileSelectionState(last_path=last_path).model_dump(),
+            Query()[&quot;class_&quot;] == &quot;file_selector_state&quot;,
+        )
+</code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="../edge-domain/">Edge Domain</a></li>
+<li><a href="../content-domain/">Content Domain</a></li>
+<li><a href="../../dashboards/shiny/">Shiny Dashboards</a></li>
+<li><a href="../../dashboards/react/">React Dashboards</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 CIB Mango Tree
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>
