@@ -63,4 +63,3 @@ markdown_extensions:
       baselevel: 2
 
   - pymdownx.snippets
-
