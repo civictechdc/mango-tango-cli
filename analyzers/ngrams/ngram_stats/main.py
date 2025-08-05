@@ -40,6 +40,15 @@ def main(context: SecondaryAnalyzerContext):
 
     Uses lazy evaluation with pl.scan_parquet, chunked processing to avoid cardinality explosion,
     and RichProgressManager for detailed progress feedback.
+    
+    This analyzer can either use an existing progress manager from the context (continuing
+    from primary analyzer progress) or create its own for standalone execution.
+    
+    Progress Manager Integration:
+    - If context.progress_manager exists: Uses the existing manager to continue progress
+    - If context.progress_manager is None: Creates a new RichProgressManager 
+    - This design eliminates the clearing of progress displays when transitioning from
+      primary to secondary analyzers, providing a seamless user experience
     """
     logger.info(
         "Starting n-gram statistics analysis",
@@ -61,7 +70,21 @@ def main(context: SecondaryAnalyzerContext):
     ldf_ngrams = pl.scan_parquet(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path)
     ldf_messages = pl.scan_parquet(context.base.table(OUTPUT_MESSAGE).parquet_path)
 
-    with RichProgressManager("N-gram Statistics Analysis") as progress_manager:
+    # Check if context has an existing progress manager, otherwise create a new one
+    # This allows the secondary analyzer to continue progress from the primary analyzer
+    # instead of clearing the progress display and starting fresh
+    existing_progress_manager = getattr(context, 'progress_manager', None)
+    
+    if existing_progress_manager is not None:
+        logger.info("Using existing progress manager from context - continuing from primary analyzer")
+        progress_manager = existing_progress_manager
+        use_context_manager = False
+    else:
+        logger.info("Creating new progress manager for standalone execution")
+        use_context_manager = True
+    
+    def run_analysis(progress_manager):
+        """Inner function containing the analysis logic."""
         # Add ALL steps upfront for better UX with the enhanced progress system
         # This provides users with a complete view of the entire analysis process
         progress_manager.add_step("analyze_structure", "Analyzing data structure")
@@ -82,7 +105,7 @@ def main(context: SecondaryAnalyzerContext):
             # Calculate estimated processing requirements for full report
             # This helps us determine if we need chunked processing and what the total will be
             estimated_chunk_size = max(
-                1, min(1000, 100_000 // max(1, message_ngram_count // ngram_count))
+                1, min(10_000, 100_000 // max(1, message_ngram_count // ngram_count))
             )
             estimated_full_report_chunks = (
                 ngram_count + estimated_chunk_size - 1
@@ -118,7 +141,7 @@ def main(context: SecondaryAnalyzerContext):
 
         # Step 2: Calculate initial statistics using streaming-friendly aggregations with hierarchical progress
         progress_manager.start_step("compute_stats")
-        
+
         # Add hierarchical sub-steps for detailed progress feedback during complex operations
         progress_manager.add_substep("compute_stats", "calculate_reps", "Calculating total repetitions per n-gram")
         progress_manager.add_substep("compute_stats", "count_posters", "Counting distinct posters per n-gram")
@@ -129,7 +152,7 @@ def main(context: SecondaryAnalyzerContext):
             # Sub-step 1: Calculate total repetitions and basic aggregations per n-gram
             progress_manager.start_substep("compute_stats", "calculate_reps")
             logger.info("Starting repetition count calculation")
-            
+
             ldf_basic_stats = (
                 ldf_message_ngrams.group_by(COL_NGRAM_ID)
                 .agg(
@@ -144,14 +167,14 @@ def main(context: SecondaryAnalyzerContext):
                 )
                 .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
             )
-            
+
             logger.info("Repetition count calculation completed")
             progress_manager.complete_substep("compute_stats", "calculate_reps")
-            
+
             # Sub-step 2: Count distinct posters per n-gram through message joins
             progress_manager.start_substep("compute_stats", "count_posters")
             logger.info("Starting distinct poster count calculation")
-            
+
             # Create the poster count aggregation with optimized joins
             ldf_poster_counts = (
                 ldf_message_ngrams.join(
@@ -165,7 +188,7 @@ def main(context: SecondaryAnalyzerContext):
                     .alias(COL_NGRAM_DISTINCT_POSTER_COUNT)
                 )
             )
-            
+
             # Join basic stats with poster counts
             ldf_ngram_stats = ldf_basic_stats.join(
                 ldf_poster_counts,
@@ -178,25 +201,25 @@ def main(context: SecondaryAnalyzerContext):
                     COL_NGRAM_DISTINCT_POSTER_COUNT,
                 ]
             )
-            
+
             logger.info("Distinct poster count calculation completed")
             progress_manager.complete_substep("compute_stats", "count_posters")
 
             # Sub-step 3: Join with n-gram definitions to create summary table
             progress_manager.start_substep("compute_stats", "join_definitions")
             logger.info("Starting join with n-gram definitions")
-            
+
             ldf_ngram_summary = ldf_ngrams.join(
                 ldf_ngram_stats, on=COL_NGRAM_ID, how="inner"
             )
-            
+
             logger.info("Join with n-gram definitions completed")
             progress_manager.complete_substep("compute_stats", "join_definitions")
 
             # Sub-step 4: Sort results for final output
             progress_manager.start_substep("compute_stats", "sort_results")
             logger.info("Starting final result sorting")
-            
+
             ldf_ngram_summary = ldf_ngram_summary.sort(
                 [
                     COL_NGRAM_LENGTH,
@@ -208,7 +231,7 @@ def main(context: SecondaryAnalyzerContext):
 
             # Collect the final result using streaming engine
             df_ngram_summary = ldf_ngram_summary.collect(engine="streaming")
-            
+
             logger.info(
                 "Final result sorting and collection completed",
                 extra={
@@ -217,7 +240,7 @@ def main(context: SecondaryAnalyzerContext):
                 },
             )
             progress_manager.complete_substep("compute_stats", "sort_results")
-            
+
             logger.info(
                 "Statistics computation completed",
                 extra={
@@ -238,11 +261,11 @@ def main(context: SecondaryAnalyzerContext):
                 # Try to identify which substep was active when the error occurred
                 substep_context = {
                     "calculate_reps": "repetition calculation",
-                    "count_posters": "poster counting", 
+                    "count_posters": "poster counting",
                     "join_definitions": "definition joining",
                     "sort_results": "result sorting"
                 }
-                
+
                 # Log the specific phase that failed for better debugging
                 logger.error(
                     "Detailed error context for statistics computation",
@@ -254,7 +277,7 @@ def main(context: SecondaryAnalyzerContext):
             except Exception:
                 # Don't let error reporting failures crash the main error handling
                 pass
-                
+
             progress_manager.fail_step(
                 "compute_stats", error_context
             )
@@ -304,7 +327,7 @@ def main(context: SecondaryAnalyzerContext):
             # Process n-grams in chunks to manage memory efficiently
             # Use the actual counts to refine chunk size
             chunk_size = max(
-                1, min(1000, 100_000 // max(1, message_ngram_count // ngram_count))
+                1, min(10_000, 100_000 // max(1, message_ngram_count // ngram_count))
             )
             actual_total_chunks = (
                 total_ngrams_to_process + chunk_size - 1
@@ -426,6 +449,27 @@ def main(context: SecondaryAnalyzerContext):
                 "write_full_report", f"Failed during full report generation: {str(e)}"
             )
             raise
+
+    # Execute analysis with appropriate progress manager setup
+    try:
+        if use_context_manager:
+            # Create new progress manager for standalone execution
+            with RichProgressManager("N-gram Statistics Analysis") as progress_manager:
+                run_analysis(progress_manager)
+        else:
+            # Use existing progress manager from context
+            run_analysis(progress_manager)
+    except Exception as e:
+        logger.error(
+            "N-gram statistics analysis failed",
+            extra={
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "progress_manager_source": "existing" if existing_progress_manager else "new",
+            },
+            exc_info=True,
+        )
+        raise
 
     logger.info(
         "N-gram statistics analysis completed successfully",

@@ -9,7 +9,7 @@ import polars as pl
 
 from analyzer_interface.context import PrimaryAnalyzerContext
 from app.logger import get_logger
-from app.memory_aware_progress import MemoryAwareProgressManager
+# from app.memory_aware_progress import MemoryAwareProgressManager  # Not needed for standard display
 from app.utils import MemoryManager, MemoryPressureLevel, tokenize_text
 from terminal_tools.progress import RichProgressManager
 
@@ -333,11 +333,20 @@ def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
     """
     step_id = "write_message_ngrams"
 
-    # Add sub-steps for this write operation
-    progress_manager.add_substep(step_id, "group", "Grouping n-grams by message")
-    progress_manager.add_substep(step_id, "aggregate", "Aggregating n-gram counts")
-    progress_manager.add_substep(step_id, "sort", "Sorting grouped data")
-    progress_manager.add_substep(step_id, "write", "Writing to parquet file")
+    # Use operation counts for sub-steps instead of row counts
+    # Each sub-step is a single logical operation, so use 1 as total
+    try:
+        # Add sub-steps for this write operation with operation counts
+        progress_manager.add_substep(step_id, "group", "Grouping n-grams by message", 1)
+        progress_manager.add_substep(step_id, "aggregate", "Aggregating n-gram counts", 1)
+        progress_manager.add_substep(step_id, "sort", "Sorting grouped data", 1)
+        progress_manager.add_substep(step_id, "write", "Writing to parquet file", 1)
+    except Exception:
+        # Fallback to no totals if something fails
+        progress_manager.add_substep(step_id, "group", "Grouping n-grams by message")
+        progress_manager.add_substep(step_id, "aggregate", "Aggregating n-gram counts")
+        progress_manager.add_substep(step_id, "sort", "Sorting grouped data")
+        progress_manager.add_substep(step_id, "write", "Writing to parquet file")
 
     logger.debug(
         "Starting enhanced message n-grams write operation",
@@ -354,6 +363,13 @@ def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
         try:
             # Apply group_by operation
             grouped_ldf = ldf_with_ids.group_by([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "group", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "group")
         except Exception as e:
             progress_manager.fail_substep(step_id, "group", f"Grouping failed: {str(e)}")
@@ -364,6 +380,13 @@ def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
         try:
             # Apply aggregation
             aggregated_ldf = grouped_ldf.agg([pl.len().alias(COL_MESSAGE_NGRAM_COUNT)])
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "aggregate", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "aggregate")
         except Exception as e:
             progress_manager.fail_substep(step_id, "aggregate", f"Aggregation failed: {str(e)}")
@@ -374,6 +397,13 @@ def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
         try:
             # Apply sorting
             sorted_ldf = aggregated_ldf.sort([COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "sort", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "sort")
         except Exception as e:
             progress_manager.fail_substep(step_id, "sort", f"Sorting failed: {str(e)}")
@@ -396,12 +426,17 @@ def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
                 )
                 # Fallback to collect + write
                 sorted_ldf.collect().write_parquet(output_path)
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "write", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "write")
         except Exception as e:
             progress_manager.fail_substep(step_id, "write", f"Write operation failed: {str(e)}")
             raise
-        progress_manager.complete_step(step_id)
-
         logger.debug(
             "Enhanced message n-grams write operation completed",
             extra={
@@ -420,7 +455,6 @@ def _enhanced_write_message_ngrams(ldf_with_ids, output_path, progress_manager):
                 "error_type": type(e).__name__,
             },
         )
-        progress_manager.fail_step(step_id, f"Failed writing message n-grams: {str(e)}")
         raise
 
 
@@ -441,11 +475,20 @@ def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manag
     """
     step_id = "write_ngram_defs"
 
-    # Add sub-steps for this write operation
-    progress_manager.add_substep(step_id, "metadata", "Preparing n-gram metadata")
-    progress_manager.add_substep(step_id, "lengths", "Calculating n-gram lengths")
-    progress_manager.add_substep(step_id, "sort", "Sorting definitions")
-    progress_manager.add_substep(step_id, "write", "Writing definitions to parquet")
+    # Use operation counts for sub-steps instead of n-gram counts
+    # Each sub-step is a single logical operation, so use 1 as total
+    try:
+        # Add sub-steps for this write operation with operation counts
+        progress_manager.add_substep(step_id, "metadata", "Preparing n-gram metadata", 1)
+        progress_manager.add_substep(step_id, "lengths", "Calculating n-gram lengths", 1)
+        progress_manager.add_substep(step_id, "sort", "Sorting definitions", 1)
+        progress_manager.add_substep(step_id, "write", "Writing definitions to parquet", 1)
+    except Exception:
+        # Fallback to no totals if something fails
+        progress_manager.add_substep(step_id, "metadata", "Preparing n-gram metadata")
+        progress_manager.add_substep(step_id, "lengths", "Calculating n-gram lengths")
+        progress_manager.add_substep(step_id, "sort", "Sorting definitions")
+        progress_manager.add_substep(step_id, "write", "Writing definitions to parquet")
 
     logger.debug(
         "Starting enhanced n-gram definitions write operation",
@@ -467,6 +510,13 @@ def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manag
                     pl.col("ngram_text").alias(COL_NGRAM_WORDS),
                 ]
             )
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "metadata", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "metadata")
         except Exception as e:
             progress_manager.fail_substep(step_id, "metadata", f"Metadata preparation failed: {str(e)}")
@@ -479,6 +529,13 @@ def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manag
             length_ldf = base_ldf.with_columns(
                 [pl.col(COL_NGRAM_WORDS).str.split(" ").list.len().alias(COL_NGRAM_LENGTH)]
             )
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "lengths", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "lengths")
         except Exception as e:
             progress_manager.fail_substep(step_id, "lengths", f"Length calculation failed: {str(e)}")
@@ -489,6 +546,13 @@ def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manag
         try:
             # Sort by ngram_id for consistent ordering
             sorted_ldf = length_ldf.sort(COL_NGRAM_ID)
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "sort", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "sort")
         except Exception as e:
             progress_manager.fail_substep(step_id, "sort", f"Sorting failed: {str(e)}")
@@ -511,12 +575,17 @@ def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manag
                 )
                 # Fallback to collect + write
                 sorted_ldf.collect().write_parquet(output_path)
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "write", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "write")
         except Exception as e:
             progress_manager.fail_substep(step_id, "write", f"Write operation failed: {str(e)}")
             raise
-        progress_manager.complete_step(step_id)
-
         logger.debug(
             "Enhanced n-gram definitions write operation completed",
             extra={"operation": "write_ngram_defs", "output_path": str(output_path)},
@@ -531,9 +600,6 @@ def _enhanced_write_ngram_definitions(unique_ngrams, output_path, progress_manag
                 "error": str(e),
                 "error_type": type(e).__name__,
             },
-        )
-        progress_manager.fail_step(
-            step_id, f"Failed writing n-gram definitions: {str(e)}"
         )
         raise
 
@@ -555,11 +621,20 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
     """
     step_id = "write_message_metadata"
 
-    # Add sub-steps for this write operation
-    progress_manager.add_substep(step_id, "select", "Selecting message columns")
-    progress_manager.add_substep(step_id, "deduplicate", "Deduplicating messages")
-    progress_manager.add_substep(step_id, "sort", "Sorting by surrogate ID")
-    progress_manager.add_substep(step_id, "write", "Writing metadata to parquet")
+    # Use operation counts for sub-steps instead of message counts
+    # Each sub-step is a single logical operation, so use 1 as total
+    try:
+        # Add sub-steps for this write operation with operation counts
+        progress_manager.add_substep(step_id, "select", "Selecting message columns", 1)
+        progress_manager.add_substep(step_id, "deduplicate", "Deduplicating messages", 1)
+        progress_manager.add_substep(step_id, "sort", "Sorting by surrogate ID", 1)
+        progress_manager.add_substep(step_id, "write", "Writing metadata to parquet", 1)
+    except Exception:
+        # Fallback to no totals if something fails
+        progress_manager.add_substep(step_id, "select", "Selecting message columns")
+        progress_manager.add_substep(step_id, "deduplicate", "Deduplicating messages")
+        progress_manager.add_substep(step_id, "sort", "Sorting by surrogate ID")
+        progress_manager.add_substep(step_id, "write", "Writing metadata to parquet")
 
     logger.debug(
         "Starting enhanced message metadata write operation",
@@ -584,6 +659,13 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
                     COL_MESSAGE_TIMESTAMP,
                 ]
             )
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "select", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "select")
         except Exception as e:
             progress_manager.fail_substep(step_id, "select", f"Column selection failed: {str(e)}")
@@ -594,6 +676,13 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
         try:
             # Apply deduplication by surrogate ID
             deduplicated_ldf = selected_ldf.unique(subset=[COL_MESSAGE_SURROGATE_ID])
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "deduplicate", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "deduplicate")
         except Exception as e:
             progress_manager.fail_substep(step_id, "deduplicate", f"Deduplication failed: {str(e)}")
@@ -604,6 +693,13 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
         try:
             # Sort by surrogate ID for consistent ordering
             sorted_ldf = deduplicated_ldf.sort(COL_MESSAGE_SURROGATE_ID)
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "sort", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "sort")
         except Exception as e:
             progress_manager.fail_substep(step_id, "sort", f"Sorting failed: {str(e)}")
@@ -626,12 +722,17 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
                 )
                 # Fallback to collect + write
                 sorted_ldf.collect().write_parquet(output_path)
+            # Update progress with completion (binary progress: operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use 1 as progress to indicate completion (since total is 1)
+                    progress_manager.update_substep(step_id, "write", 1)
+                except:
+                    pass
             progress_manager.complete_substep(step_id, "write")
         except Exception as e:
             progress_manager.fail_substep(step_id, "write", f"Write operation failed: {str(e)}")
             raise
-        progress_manager.complete_step(step_id)
-
         logger.debug(
             "Enhanced message metadata write operation completed",
             extra={
@@ -649,9 +750,6 @@ def _enhanced_write_message_metadata(ldf_tokenized, output_path, progress_manage
                 "error": str(e),
                 "error_type": type(e).__name__,
             },
-        )
-        progress_manager.fail_step(
-            step_id, f"Failed writing message metadata: {str(e)}"
         )
         raise
 
@@ -705,12 +803,8 @@ def main(context: PrimaryAnalyzerContext):
     # Count total messages for progress tracking
     total_messages = ldf.select(pl.len()).collect().item()
 
-    # Use memory-aware progress manager instead of regular one
-    from app.memory_aware_progress import MemoryAwareProgressManager
-
-    with MemoryAwareProgressManager(
-        "N-gram Analysis with Memory Monitoring", memory_manager
-    ) as progress_manager:
+    # Use standard progress manager for better display compatibility
+    with RichProgressManager("N-gram Analysis Progress") as progress_manager:
         # Memory checkpoint: Initial state
         initial_memory = memory_manager.get_current_memory_usage()
         progress_manager.console.print(
@@ -792,8 +886,8 @@ def main(context: PrimaryAnalyzerContext):
         # Use percentage-based progress (0.0 to 100.0) for smooth n-gram progress display
         progress_manager.add_step("ngrams", "Generating n-grams")
 
-        # Add n-gram processing step with hierarchical sub-steps
-        progress_manager.add_step("process_ngrams", "Processing n-grams for output")
+        # Add n-gram processing step with hierarchical sub-steps (5 substeps total)
+        progress_manager.add_step("process_ngrams", "Processing n-grams for output", 5)
         progress_manager.add_substep(
             "process_ngrams", "analyze_approach", "Analyzing processing approach"
         )
@@ -870,10 +964,37 @@ def main(context: PrimaryAnalyzerContext):
             )
 
             filtered_count = ldf_filtered.select(pl.len()).collect().item()
-            progress_manager.update_step_with_memory(
-                "preprocess", filtered_count, "preprocessing"
-            )
+            progress_manager.update_step("preprocess", filtered_count)
             progress_manager.complete_step("preprocess")
+
+            # Update tokenization total with actual filtered count
+            if hasattr(progress_manager, 'update_step'):
+                # For RichProgressManager compatibility - update tokenization total based on filtered data
+                adaptive_chunk_size = memory_manager.calculate_adaptive_chunk_size(
+                    50000, "tokenization"
+                )
+                updated_tokenization_total = None
+                if filtered_count > adaptive_chunk_size:
+                    updated_tokenization_total = (
+                        filtered_count + adaptive_chunk_size - 1
+                    ) // adaptive_chunk_size
+                else:
+                    updated_tokenization_total = filtered_count
+                
+                # Try to update the tokenization step total if supported
+                try:
+                    progress_manager.update_step("tokenize", 0, updated_tokenization_total)
+                    logger.debug(
+                        "Updated tokenization total after preprocessing",
+                        extra={
+                            "original_total": total_messages,
+                            "filtered_count": filtered_count,
+                            "updated_tokenization_total": updated_tokenization_total,
+                        }
+                    )
+                except (AttributeError, TypeError):
+                    # Progress manager doesn't support dynamic total updates
+                    pass
 
             logger.info(
                 "Preprocessing step completed",
@@ -1114,6 +1235,29 @@ def main(context: PrimaryAnalyzerContext):
             CHUNKED_PROCESSING_THRESHOLD = 500_000
             use_chunked_approach = total_ngrams > CHUNKED_PROCESSING_THRESHOLD
 
+            # Set processing substep totals using operation counts instead of n-gram counts
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Use operation counts for cleaner progress display
+                    # extract_unique: use 1 for simplicity since it's a single operation
+                    progress_manager.update_substep("process_ngrams", "extract_unique", 0, 1)
+                    
+                    # Other operations are also single logical operations
+                    progress_manager.update_substep("process_ngrams", "sort_ngrams", 0, 1)
+                    progress_manager.update_substep("process_ngrams", "create_ids", 0, 1)
+                    progress_manager.update_substep("process_ngrams", "assign_ids", 0, 1)
+                    
+                    logger.debug(
+                        "Set processing substep totals using operation counts",
+                        extra={
+                            "total_ngrams": total_ngrams,
+                            "progress_method": "operation_based",
+                        }
+                    )
+                except (AttributeError, TypeError):
+                    # Progress manager doesn't support dynamic total updates
+                    pass
+
             # Also consider current memory pressure
             current_pressure = memory_manager.get_memory_pressure_level()
             if current_pressure in [
@@ -1213,6 +1357,17 @@ def main(context: PrimaryAnalyzerContext):
             # Log completion with unique n-gram count
             try:
                 unique_count = len(unique_ngram_texts)
+                
+                # Keep sorting and ID creation substeps using operation counts for consistency
+                # (Already set to 1 above, no need for updates)
+                logger.debug(
+                    "Using operation-based progress for sorting and ID creation steps",
+                    extra={
+                        "unique_count": unique_count,
+                        "progress_method": "operation_based",
+                    }
+                )
+                
                 logger.info(
                     "Unique extraction step completed",
                     extra={
@@ -1265,7 +1420,27 @@ def main(context: PrimaryAnalyzerContext):
         logger.info("Starting n-gram sorting step", extra={"step": "sort_ngrams"})
 
         try:
+            # Update progress to show sorting is happening (mid-operation)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    # Get the total for this substep and show 50% progress
+                    substep_info = progress_manager.substeps["process_ngrams"]["sort_ngrams"]
+                    total = substep_info.get("total", 1)
+                    progress_manager.update_substep("process_ngrams", "sort_ngrams", max(1, total // 2))
+                except:
+                    pass
+            
             sorted_ngrams = unique_ngram_texts.sort("ngram_text")
+            
+            # Complete the progress (operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    substep_info = progress_manager.substeps["process_ngrams"]["sort_ngrams"]
+                    total = substep_info.get("total", 1)
+                    progress_manager.update_substep("process_ngrams", "sort_ngrams", total)
+                except:
+                    pass
+                    
             progress_manager.complete_substep("process_ngrams", "sort_ngrams")
 
             logger.info("N-gram sorting step completed", extra={"step": "sort_ngrams"})
@@ -1288,9 +1463,28 @@ def main(context: PrimaryAnalyzerContext):
         logger.info("Starting ID creation step", extra={"step": "create_ids"})
 
         try:
+            # Update progress to show ID creation is happening (mid-operation)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    substep_info = progress_manager.substeps["process_ngrams"]["create_ids"]
+                    total = substep_info.get("total", 1)
+                    progress_manager.update_substep("process_ngrams", "create_ids", max(1, total // 2))
+                except:
+                    pass
+            
             unique_ngrams = sorted_ngrams.with_columns(
                 [pl.int_range(pl.len()).alias(COL_NGRAM_ID)]
             )
+            
+            # Complete the progress (operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    substep_info = progress_manager.substeps["process_ngrams"]["create_ids"]
+                    total = substep_info.get("total", 1)
+                    progress_manager.update_substep("process_ngrams", "create_ids", total)
+                except:
+                    pass
+                    
             progress_manager.complete_substep("process_ngrams", "create_ids")
 
             logger.info("ID creation step completed", extra={"step": "create_ids"})
@@ -1313,12 +1507,31 @@ def main(context: PrimaryAnalyzerContext):
         logger.info("Starting ID assignment step", extra={"step": "assign_ids"})
 
         try:
+            # Update progress to show ID assignment is happening (mid-operation)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    substep_info = progress_manager.substeps["process_ngrams"]["assign_ids"]
+                    total = substep_info.get("total", 1)
+                    progress_manager.update_substep("process_ngrams", "assign_ids", max(1, total // 2))
+                except:
+                    pass
+                    
             ldf_with_ids = ldf_ngrams.join(
                 unique_ngrams.lazy(),
                 left_on="ngram_text",
                 right_on="ngram_text",
                 how="left",
             )
+            
+            # Complete the progress (operation complete)
+            if hasattr(progress_manager, 'update_substep'):
+                try:
+                    substep_info = progress_manager.substeps["process_ngrams"]["assign_ids"]
+                    total = substep_info.get("total", 1)
+                    progress_manager.update_substep("process_ngrams", "assign_ids", total)
+                except:
+                    pass
+                    
             progress_manager.complete_substep("process_ngrams", "assign_ids")
             progress_manager.complete_step("process_ngrams")
 
@@ -1350,15 +1563,18 @@ def main(context: PrimaryAnalyzerContext):
             logger.info(
                 "Writing message n-grams output", extra={"output": "message_ngrams"}
             )
+            progress_manager.start_step("write_message_ngrams")
             _enhanced_write_message_ngrams(
                 ldf_with_ids,
                 context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path,
                 progress_manager,
             )
+            progress_manager.complete_step("write_message_ngrams")
             logger.info(
                 "Message n-grams output completed", extra={"output": "message_ngrams"}
             )
         except Exception as e:
+            progress_manager.fail_step("write_message_ngrams", f"Failed writing message n-grams: {str(e)}")
             logger.exception(
                 "Failed writing message n-grams output",
                 extra={
@@ -1374,16 +1590,19 @@ def main(context: PrimaryAnalyzerContext):
                 "Writing n-gram definitions output",
                 extra={"output": "ngram_definitions"},
             )
+            progress_manager.start_step("write_ngram_defs")
             _enhanced_write_ngram_definitions(
                 unique_ngrams,
                 context.output(OUTPUT_NGRAM_DEFS).parquet_path,
                 progress_manager,
             )
+            progress_manager.complete_step("write_ngram_defs")
             logger.info(
                 "N-gram definitions output completed",
                 extra={"output": "ngram_definitions"},
             )
         except Exception as e:
+            progress_manager.fail_step("write_ngram_defs", f"Failed writing n-gram definitions: {str(e)}")
             logger.exception(
                 "Failed writing n-gram definitions output",
                 extra={
@@ -1398,16 +1617,19 @@ def main(context: PrimaryAnalyzerContext):
             logger.info(
                 "Writing message metadata output", extra={"output": "message_metadata"}
             )
+            progress_manager.start_step("write_message_metadata")
             _enhanced_write_message_metadata(
                 ldf_tokenized,
                 context.output(OUTPUT_MESSAGE).parquet_path,
                 progress_manager,
             )
+            progress_manager.complete_step("write_message_metadata")
             logger.info(
                 "Message metadata output completed",
                 extra={"output": "message_metadata"},
             )
         except Exception as e:
+            progress_manager.fail_step("write_message_metadata", f"Failed writing message metadata: {str(e)}")
             logger.exception(
                 "Failed writing message metadata output",
                 extra={
@@ -1418,11 +1640,11 @@ def main(context: PrimaryAnalyzerContext):
             )
             raise
 
-        # Final memory report
-        progress_manager.display_memory_summary()
-
-        # Log successful completion with key metrics
+        # Final memory report and log successful completion with key metrics
         final_memory = memory_manager.get_current_memory_usage()
+        progress_manager.console.print(
+            f"[green]Analysis completed - Final memory: {final_memory['rss_mb']:.1f}MB[/green]"
+        )
         logger.info(
             "N-gram analysis completed successfully",
             extra={
@@ -1551,7 +1773,7 @@ def _generate_ngrams_vectorized(
     min_n: int,
     max_n: int,
     estimated_rows: int,
-    progress_manager: Optional[MemoryAwareProgressManager] = None,
+    progress_manager: Optional[RichProgressManager] = None,
 ) -> pl.LazyFrame:
     """
     Generate n-grams using vectorized polars expressions with enhanced phase-based progress reporting.
@@ -1720,11 +1942,15 @@ def _generate_ngrams_vectorized(
 
                             chunk_results.append(chunk_ngrams)
 
-                            # Update substep progress for this chunk
+                            # Update substep progress for this chunk (ensure integers)
                             if progress_manager is not None:
                                 try:
-                                    # Calculate progress as: chunks completed / total chunks
-                                    progress_manager.update_substep("ngrams", substep_id, chunk_idx + 1, total_chunks)
+                                    # Calculate progress as: chunks completed / total chunks (integers only)
+                                    chunk_progress = int(chunk_idx + 1)
+                                    total_chunk_count = int(total_chunks)
+                                    # Validate progress doesn't exceed total
+                                    chunk_progress = min(chunk_progress, total_chunk_count)
+                                    progress_manager.update_substep("ngrams", substep_id, chunk_progress, total_chunk_count)
                                 except Exception as progress_error:
                                     # Don't let progress reporting failures crash the analysis
                                     logger.warning(
@@ -1783,7 +2009,7 @@ def _generate_ngrams_vectorized(
                     )
                     if progress_manager is not None:
                         try:
-                            progress_manager.update_substep("ngrams", substep_id, 1, total_operations)
+                            progress_manager.update_substep("ngrams", substep_id, 1, int(total_operations))
                         except Exception:
                             pass  # Ignore progress update failures
 
@@ -1791,7 +2017,7 @@ def _generate_ngrams_vectorized(
                     exploded_ngrams = selected_ngrams.explode(ngram_col)
                     if progress_manager is not None:
                         try:
-                            progress_manager.update_substep("ngrams", substep_id, 2, total_operations)
+                            progress_manager.update_substep("ngrams", substep_id, 2, int(total_operations))
                         except Exception:
                             pass  # Ignore progress update failures
 
@@ -1802,7 +2028,7 @@ def _generate_ngrams_vectorized(
                     )
                     if progress_manager is not None:
                         try:
-                            progress_manager.update_substep("ngrams", substep_id, 3, total_operations)
+                            progress_manager.update_substep("ngrams", substep_id, 3, int(total_operations))
                         except Exception:
                             pass  # Ignore progress update failures
 
@@ -1815,7 +2041,7 @@ def _generate_ngrams_vectorized(
                     )
                     if progress_manager is not None:
                         try:
-                            progress_manager.update_substep("ngrams", substep_id, 4, total_operations)
+                            progress_manager.update_substep("ngrams", substep_id, 4, int(total_operations))
                         except Exception:
                             pass  # Ignore progress update failures
 

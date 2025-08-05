@@ -142,3 +142,78 @@ def test_ngram_stats():
         assert actual_full_grouped.equals(
             expected_full_grouped
         ), "ngram_full content differs when grouped by words"
+
+
+def test_ngram_stats_with_progress_manager():
+    """
+    Test that ngram_stats works correctly when provided with an existing progress manager.
+    
+    This test verifies that the analyzer can continue from an existing progress manager
+    instead of creating a new one, which is the desired behavior when running as part
+    of a pipeline with the primary n-gram analyzer.
+    """
+    import os
+    import tempfile
+    from unittest.mock import Mock
+    
+    import polars as pl
+    
+    from testing.testers import TestSecondaryAnalyzerContext
+    from terminal_tools.progress import RichProgressManager
+
+    # Set up test data
+    primary_outputs = {
+        OUTPUT_MESSAGE_NGRAMS: ParquetTestData(
+            filepath=str(Path(test_data_dir, OUTPUT_MESSAGE_NGRAMS + ".parquet"))
+        ),
+        OUTPUT_NGRAM_DEFS: ParquetTestData(
+            filepath=str(Path(test_data_dir, OUTPUT_NGRAM_DEFS + ".parquet"))
+        ),
+        OUTPUT_MESSAGE: ParquetTestData(
+            filepath=str(Path(test_data_dir, OUTPUT_MESSAGE + ".parquet"))
+        ),
+    }
+
+    # Run the analyzer with a mock progress manager
+    with tempfile.TemporaryDirectory(
+        delete=True
+    ) as temp_dir, tempfile.TemporaryDirectory(
+        delete=True
+    ) as actual_output_dir, tempfile.TemporaryDirectory(
+        delete=True
+    ) as actual_base_output_dir:
+
+        # Convert primary outputs to parquet files
+        for output_id, output_data in primary_outputs.items():
+            output_data.convert_to_parquet(
+                os.path.join(actual_base_output_dir, f"{output_id}.parquet")
+            )
+
+        # Create test context with a mock progress manager
+        context = TestSecondaryAnalyzerContext(
+            temp_dir=temp_dir,
+            primary_param_values={},
+            primary_output_parquet_paths={
+                output_id: os.path.join(actual_base_output_dir, f"{output_id}.parquet")
+                for output_id in primary_outputs.keys()
+            },
+            dependency_output_parquet_paths={},
+            output_parquet_root_path=actual_output_dir,
+        )
+        
+        # Add a mock progress manager to the context using setattr to bypass Pydantic validation
+        mock_progress_manager = Mock(spec=RichProgressManager)
+        object.__setattr__(context, 'progress_manager', mock_progress_manager)
+
+        # Run the analyzer
+        main(context)
+
+        # Verify that the mock progress manager methods were called
+        # This confirms that the analyzer used the existing progress manager
+        assert mock_progress_manager.add_step.called, "add_step should have been called on existing progress manager"
+        assert mock_progress_manager.start_step.called, "start_step should have been called on existing progress manager"
+        assert mock_progress_manager.complete_step.called, "complete_step should have been called on existing progress manager"
+        
+        # Verify outputs were created (functionality still works)
+        assert os.path.exists(context.output_path(OUTPUT_NGRAM_STATS)), "ngram_stats output should exist"
+        assert os.path.exists(context.output_path(OUTPUT_NGRAM_FULL)), "ngram_full output should exist"
