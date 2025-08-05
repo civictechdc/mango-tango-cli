@@ -3,7 +3,6 @@ from traceback import format_exc
 from typing import Optional
 
 import polars as pl
-from rich import print
 
 from analyzer_interface import (
     AnalyzerInterface,
@@ -15,7 +14,13 @@ from analyzer_interface import (
 )
 from app import ProjectContext
 from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
-from terminal_tools import draw_box, print_data_frame, prompts, wait_for_key
+from terminal_tools import (
+    draw_box,
+    print_data_frame,
+    print_dialog_section_title,
+    prompts,
+    wait_for_key,
+)
 
 from .analysis_params import customize_analysis
 from .context import ViewContext
@@ -48,16 +53,30 @@ def new_analysis(
             print("")
             print(analyzer.long_description or analyzer.short_description)
             print("")
-            print("◆◆ Required Input ◆◆")
+            print_dialog_section_title("◆◆ Required Input ◆◆")
             print("The test requires these columns in the input data:")
             print("")
-            for index, input_column in enumerate(analyzer.input.columns):
-                print(
-                    f"[{index + 1}] {input_column.human_readable_name_or_fallback()}"
-                    f" ({input_column.data_type})"
+
+            required_cols_dict = {"Column ID": [], "Description": []}
+            for input_column in analyzer.input.columns:
+                required_cols_dict["Column ID"].append(
+                    input_column.human_readable_name_or_fallback()
                 )
-                print(input_column.description or "")
-                print("")
+                required_cols_dict["Description"].append(input_column.description)
+
+            print_data_frame(
+                data_frame=pl.DataFrame(required_cols_dict),
+                title=None,
+                apply_color="row-wise",
+            )
+
+            # for index, input_column in enumerate(analyzer.input.columns):
+            #    print(
+            #        f"[{index + 1}] {input_column.human_readable_name_or_fallback()}"
+            #        f" ({input_column.data_type})"
+            #    )
+            #    print(input_column.description or "")
+            #    print("")
 
             user_columns = project.columns
             user_columns_by_name = {
@@ -92,7 +111,7 @@ def new_analysis(
 
         final_column_mapping = draft_column_mapping
         while True:
-            with terminal.nest("Column selection") as column_mapping_scope:
+            with terminal.nest("◆◆ Column selection ◆◆") as column_mapping_scope:
                 mapping_df = pl.DataFrame(
                     {
                         "Column Name for Analyzer Input": [
@@ -126,8 +145,6 @@ def new_analysis(
                     title="Sample input data",
                     apply_color="column-wise",
                 )
-
-                breakpoint()
 
                 mapping_ok = prompts.confirm(
                     "Are you happy with this mapping?",
