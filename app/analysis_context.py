@@ -16,6 +16,7 @@ from context import (
     SecondaryAnalyzerContext,
 )
 from storage import AnalysisModel
+from terminal_tools.progress import RichProgressManager
 
 from .app_context import AppContext
 from .project_context import ProjectContext
@@ -93,39 +94,45 @@ class AnalysisContext(BaseModel):
             )
         )
 
-        with TemporaryDirectory() as temp_dir:
-            yield AnalysisRunProgressEvent(analyzer=self.analyzer_spec, event="start")
-            analyzer_context = PrimaryAnalyzerContext(
-                analysis=self.model,
-                analyzer=self.analyzer_spec,
-                store=self.app_context.storage,
-                temp_dir=temp_dir,
-                input_columns={
-                    analyzer_column_name: InputColumnProvider(
-                        user_column_name=user_column_name,
-                        semantic=self.project_context.column_dict[
-                            user_column_name
-                        ].semantic,
-                    )
-                    for analyzer_column_name, user_column_name in self.column_mapping.items()
-                },
-            )
-            analyzer_context.prepare()
-            self.analyzer_spec.entry_point(analyzer_context)
-            yield AnalysisRunProgressEvent(analyzer=self.analyzer_spec, event="finish")
-
-        for secondary in secondary_analyzers:
-            yield AnalysisRunProgressEvent(analyzer=secondary, event="start")
+        # Create a unified progress manager for the entire analysis pipeline
+        analysis_title = f"{self.analyzer_spec.name} Analysis"
+        with RichProgressManager(analysis_title) as progress_manager:
             with TemporaryDirectory() as temp_dir:
-                analyzer_context = SecondaryAnalyzerContext(
+                yield AnalysisRunProgressEvent(analyzer=self.analyzer_spec, event="start")
+                analyzer_context = PrimaryAnalyzerContext(
                     analysis=self.model,
-                    secondary_analyzer=secondary,
-                    temp_dir=temp_dir,
+                    analyzer=self.analyzer_spec,
                     store=self.app_context.storage,
+                    temp_dir=temp_dir,
+                    progress_manager=progress_manager,
+                    input_columns={
+                        analyzer_column_name: InputColumnProvider(
+                            user_column_name=user_column_name,
+                            semantic=self.project_context.column_dict[
+                                user_column_name
+                            ].semantic,
+                        )
+                        for analyzer_column_name, user_column_name in self.column_mapping.items()
+                    },
                 )
                 analyzer_context.prepare()
-                secondary.entry_point(analyzer_context)
-            yield AnalysisRunProgressEvent(analyzer=secondary, event="finish")
+                self.analyzer_spec.entry_point(analyzer_context)
+                yield AnalysisRunProgressEvent(analyzer=self.analyzer_spec, event="finish")
+
+            # Pass the same progress manager to secondary analyzers for continuous progress flow
+            for secondary in secondary_analyzers:
+                yield AnalysisRunProgressEvent(analyzer=secondary, event="start")
+                with TemporaryDirectory() as temp_dir:
+                    analyzer_context = SecondaryAnalyzerContext(
+                        analysis=self.model,
+                        secondary_analyzer=secondary,
+                        temp_dir=temp_dir,
+                        store=self.app_context.storage,
+                        progress_manager=progress_manager,
+                    )
+                    analyzer_context.prepare()
+                    secondary.entry_point(analyzer_context)
+                yield AnalysisRunProgressEvent(analyzer=secondary, event="finish")
 
         self.model.is_draft = False
         self.app_context.storage.save_analysis(self.model)

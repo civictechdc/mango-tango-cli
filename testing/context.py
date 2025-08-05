@@ -1,6 +1,7 @@
 import os
 from functools import cached_property
 from tempfile import TemporaryDirectory
+from typing import TYPE_CHECKING, Optional, Any
 
 import polars as pl
 from pydantic import BaseModel
@@ -16,6 +17,9 @@ from analyzer_interface.context import (
 from analyzer_interface.context import TableReader, TableWriter
 from preprocessing.series_semantic import SeriesSemantic
 
+if TYPE_CHECKING:
+    from terminal_tools.progress import RichProgressManager
+
 
 class TestInputColumnProvider:
     """Simple test version of InputColumnProvider."""
@@ -30,6 +34,8 @@ class TestPrimaryAnalyzerContext(BasePrimaryAnalyzerContext):
     output_parquet_root_path: str
     param_values: dict[str, ParamValue]
     input_columns: dict[str, TestInputColumnProvider]
+    temp_dir: str = TemporaryDirectory().name
+    progress_manager: Optional[Any] = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -80,6 +86,8 @@ class TestSecondaryAnalyzerContext(BaseSecondaryAnalyzerContext):
     dependency_output_parquet_paths: dict[str, dict[str, str]] = dict()
     output_parquet_root_path: str
     primary_param_values: dict[str, ParamValue]
+    temp_dir: str = TemporaryDirectory().name
+    progress_manager: Optional[Any] = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -124,3 +132,6 @@ class TestOutputReaderGroupContext(AssetsReader, BaseModel):
 
     def table(self, output_id: str) -> TableReader:
         return TestTableReader(parquet_path=self.output_parquet_paths[output_id])
+
+
+# Note: model_rebuild() is called automatically when needed for forward references

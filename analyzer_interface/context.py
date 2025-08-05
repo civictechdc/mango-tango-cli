@@ -1,22 +1,34 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, Callable, Optional, TypeVar, Union, TYPE_CHECKING
 
 import polars as pl
 from dash import Dash
 from polars import DataFrame
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from shiny import Inputs, Outputs, Session
 from shiny.ui._navs import NavPanel
 
 from .interface import SecondaryAnalyzerInterface
 from .params import ParamValue
 
+# if TYPE_CHECKING:
+#     from terminal_tools.progress import RichProgressManager
+from terminal_tools.progress import RichProgressManager
+
 
 class PrimaryAnalyzerContext(ABC, BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     temp_dir: str
     """
   Gets the temporary directory that the module can freely write content to
   during its lifetime. This directory will not persist between runs.
+  """
+
+    progress_manager: Optional[RichProgressManager] = None
+    """
+  Optional progress manager for hierarchical progress reporting.
+  When provided, analyzers can use this to report progress with
+  visual feedback and memory monitoring capabilities.
   """
 
     @abstractmethod
@@ -46,6 +58,7 @@ class PrimaryAnalyzerContext(ABC, BaseModel):
 
 
 class BaseDerivedModuleContext(ABC, BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     """
     Common interface for secondary analyzers and web presenters runtime contexts.
     """
@@ -54,6 +67,13 @@ class BaseDerivedModuleContext(ABC, BaseModel):
     """
   Gets the temporary directory that the module can freely write content to
   during its lifetime. This directory will not persist between runs.
+  """
+
+    progress_manager: Optional["RichProgressManager"] = None
+    """
+  Optional progress manager shared from primary analyzer for continuous progress reporting.
+  Secondary analyzers and web presenters can use this to continue the progress flow
+  started by the primary analyzer.
   """
 
     @property
