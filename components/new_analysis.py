@@ -3,6 +3,7 @@ from traceback import format_exc
 from typing import Optional
 
 import polars as pl
+from rich import print
 
 from analyzer_interface import (
     AnalyzerInterface,
@@ -14,7 +15,7 @@ from analyzer_interface import (
 )
 from app import ProjectContext
 from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
-from terminal_tools import draw_box, print_ascii_table, prompts, wait_for_key
+from terminal_tools import draw_box, print_data_frame, prompts, wait_for_key
 
 from .analysis_params import customize_analysis
 from .context import ViewContext
@@ -44,7 +45,6 @@ def new_analysis(
 
     with terminal.nest(draw_box(analyzer.name, padding_lines=0)):
         with terminal.nest("◆◆ About this test ◆◆"):
-
             print("")
             print(analyzer.long_description or analyzer.short_description)
             print("")
@@ -75,8 +75,8 @@ def new_analysis(
                 print("These columns cannot be satisfied:")
                 for input_column in unmapped_columns:
                     print(
-                        f"- {input_column.human_readable_name_or_fallback()
-                     } ({input_column.data_type})"
+                        f"- {input_column.human_readable_name_or_fallback()}"
+                        + f" ({input_column.data_type})"
                     )
 
                 print("")
@@ -92,16 +92,22 @@ def new_analysis(
 
         final_column_mapping = draft_column_mapping
         while True:
-            with terminal.nest("Column mapping") as column_mapping_scope:
-                print_ascii_table(
-                    rows=[
-                        [
-                            input_column.human_readable_name_or_fallback(),
-                            '"' + draft_column_mapping.get(input_column.name) + '"',
-                        ]
-                        for input_column in analyzer.input.columns
-                    ],
-                    header=["Test's Input Column", "← Your Dataset's Column"],
+            with terminal.nest("Column selection") as column_mapping_scope:
+                mapping_df = pl.DataFrame(
+                    {
+                        "Column Name for Analyzer Input": [
+                            input_column.human_readable_name_or_fallback()
+                            for input_column in analyzer.input.columns
+                        ],
+                        "← Column Name In Your Dataset": [
+                            draft_column_mapping.get(input_column.name)
+                            for input_column in analyzer.input.columns
+                        ],
+                    }
+                )
+
+                print_data_frame(
+                    data_frame=mapping_df, title=None, apply_color="row-wise"
                 )
 
                 sample_input_df = pl.DataFrame(
@@ -115,7 +121,13 @@ def new_analysis(
                     }
                 )
                 print("Your test data would look like this:")
-                print(sample_input_df)
+                print_data_frame(
+                    data_frame=sample_input_df,
+                    title="Sample input data",
+                    apply_color="column-wise",
+                )
+
+                breakpoint()
 
                 mapping_ok = prompts.confirm(
                     "Are you happy with this mapping?",
@@ -163,8 +175,8 @@ def new_analysis(
                     print("Explanation: " + selected_analyzer_column.description)
                 print("")
                 print(
-                    f"The test requires data type [{
-              selected_analyzer_column.data_type}] for this column."
+                    "The test requires data type"
+                    + f"[{selected_analyzer_column.data_type}] for this column."
                 )
                 print("")
 
@@ -188,9 +200,9 @@ def new_analysis(
                 )
 
                 if selected_user_column is not None:
-                    draft_column_mapping[selected_analyzer_column.name] = (
-                        selected_user_column.name
-                    )
+                    draft_column_mapping[
+                        selected_analyzer_column.name
+                    ] = selected_user_column.name
 
         param_values = customize_analysis(
             context, project, analyzer, final_column_mapping
