@@ -2,6 +2,10 @@ import os
 import subprocess
 import sys
 
+import polars as pl
+from rich.console import Console
+from rich.table import Table
+
 
 def clear_terminal():
     """Clears the terminal"""
@@ -188,3 +192,38 @@ def print_ascii_table(
 
     # bottom border
     print(border_row("└─", "─┴─", "─┘"))
+
+
+def print_data_frame(data_frame, title: str, apply_color: str):
+    # see: https://rich.readthedocs.io/en/stable/appendix/colors.html
+    DF_COLORS = [
+        "orange3",
+        "dodger_blue1",
+        "dark_cyan",
+        "medium_purple1",
+        "deep_pink4",
+        "bright_yellow",
+        "grey66",
+    ]
+
+    # make sure ints atr strings
+    data_frame = data_frame.with_columns(pl.exclude(pl.String).cast(str))
+
+    table = Table(title=title)
+
+    n_col = len(data_frame.columns)
+
+    if n_col > len(DF_COLORS):
+        DF_COLORS = DF_COLORS * 2
+
+    for col, col_clr in zip(data_frame.columns, DF_COLORS[0:n_col]):
+        clr = col_clr if apply_color == "column-wise" else None
+        table.add_column(col, style=clr)
+
+    for row, row_clr in zip(data_frame.iter_rows(), DF_COLORS):
+        clr = row_clr if apply_color == "row-wise" else None
+        table.add_row(*row, style=clr)
+
+    console = Console()
+
+    console.print(table)

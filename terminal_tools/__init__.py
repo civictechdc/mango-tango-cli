@@ -6,5 +6,6 @@ from .utils import (
     enable_windows_ansi_support,
     open_directory_explorer,
     print_ascii_table,
+    print_data_frame,
     wait_for_key,
 )
