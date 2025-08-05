@@ -4,6 +4,7 @@ import sys
 
 import polars as pl
 from rich.console import Console
+from rich.style import Style
 from rich.table import Table
 
 
@@ -194,6 +195,9 @@ def print_ascii_table(
     print(border_row("└─", "─┴─", "─┘"))
 
 
+console = Console()
+
+
 def print_data_frame(data_frame, title: str, apply_color: str):
     # see: https://rich.readthedocs.io/en/stable/appendix/colors.html
     DF_COLORS = [
@@ -224,6 +228,10 @@ def print_data_frame(data_frame, title: str, apply_color: str):
         clr = row_clr if apply_color == "row-wise" else None
         table.add_row(*row, style=clr)
 
-    console = Console()
-
     console.print(table)
+
+
+def print_dialog_section_title(print_str):
+    mango_style = Style(color="#F3921E", bold=True)
+
+    console.print(print_str, style=mango_style)

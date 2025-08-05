@@ -7,5 +7,6 @@ from .utils import (
     open_directory_explorer,
     print_ascii_table,
     print_data_frame,
+    print_dialog_section_title,
     wait_for_key,
 )

@@ -5,6 +5,8 @@ instances. Each `Scope` instance represents a block of text that are buffered
 in memory and printed to the terminal at each refresh.
 """
 
+from terminal_tools import print_dialog_section_title
+
 from .utils import clear_terminal
 
 
@@ -34,7 +36,7 @@ class Scope:
         self.text = text
 
     def print(self):
-        print(self.text)
+        print_dialog_section_title(self.text)
 
     def refresh(self):
         """Clear the terminal and repaint with every scope up and including to this one"""
