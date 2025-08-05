@@ -1267,6 +1267,182 @@ class TestRichProgressManagerHierarchical(unittest.TestCase):
             self.progress_manager.substeps["step_with_subs"]["sub1"]["state"], "active"
         )
 
+    def test_dynamic_total_updates(self):
+        """Test dynamic total updates for steps and substeps."""
+        # Test step total update
+        self.progress_manager.add_step("dynamic_step", "Dynamic Step", 100)
+        
+        # Update total to a new value
+        self.progress_manager.update_step("dynamic_step", 50, 200)
+        
+        # Verify total was updated
+        self.assertEqual(self.progress_manager.steps["dynamic_step"]["total"], 200)
+        self.assertEqual(self.progress_manager.steps["dynamic_step"]["progress"], 50)
+        
+        # Test substep total update
+        self.progress_manager.add_step("parent_step", "Parent Step")
+        self.progress_manager.add_substep("parent_step", "dynamic_sub", "Dynamic Substep", 50)
+        
+        # Update substep total
+        self.progress_manager.update_substep("parent_step", "dynamic_sub", 25, 75)
+        
+        # Verify substep total was updated
+        substep = self.progress_manager.substeps["parent_step"]["dynamic_sub"]
+        self.assertEqual(substep["total"], 75)
+        self.assertEqual(substep["progress"], 25)
+        
+        # Test validation: progress cannot exceed new total
+        with self.assertRaises(ValueError) as cm:
+            self.progress_manager.update_step("dynamic_step", 250, 200)  # progress > new total
+        self.assertIn("Progress 250.0 exceeds new total 200", str(cm.exception))
+        
+        # Test validation: new total must be positive
+        with self.assertRaises(ValueError) as cm:
+            self.progress_manager.update_step("dynamic_step", 50, 0)  # invalid total
+        self.assertIn("total must be a positive integer", str(cm.exception))
+
+    def test_ngram_analyzer_dynamic_updates_simulation(self):
+        """Test realistic n-gram analyzer scenario with dynamic total updates."""
+        manager = RichProgressManager("N-gram Analysis with Dynamic Updates")
+        
+        # Initial setup with estimated totals
+        manager.add_step("preprocess", "Preprocessing messages", 10000)  # Initial estimate
+        manager.add_step("tokenize", "Tokenizing text", None)  # No total initially
+        manager.add_step("process_ngrams", "Processing n-grams")
+        
+        # Add processing substeps without totals initially
+        manager.add_substep("process_ngrams", "extract_unique", "Extracting unique n-grams")
+        manager.add_substep("process_ngrams", "sort_ngrams", "Sorting n-grams")
+        manager.add_substep("process_ngrams", "assign_ids", "Assigning n-gram IDs")
+            
+        # Simulate preprocessing step with updated total after filtering
+        manager.start_step("preprocess")
+        # After preprocessing, we know the actual filtered count
+        filtered_count = 8500  # Fewer than estimated due to filtering
+        manager.update_step("preprocess", filtered_count, filtered_count)
+        manager.complete_step("preprocess")
+        
+        # Update tokenization total based on filtered data
+        manager.update_step("tokenize", 0, filtered_count)
+        manager.start_step("tokenize")
+        manager.update_step("tokenize", filtered_count)
+        manager.complete_step("tokenize")
+        
+        # Start processing with dynamic substep updates
+        manager.start_step("process_ngrams")
+        
+        # Simulate getting actual n-gram counts and updating substep totals
+        total_ngrams = 25000
+        unique_ngrams = 8500
+        
+        # Update substep totals with actual counts
+        manager.update_substep("process_ngrams", "extract_unique", 0, total_ngrams)
+        manager.update_substep("process_ngrams", "sort_ngrams", 0, unique_ngrams)  
+        manager.update_substep("process_ngrams", "assign_ids", 0, total_ngrams)
+        
+        # Simulate substep execution
+        manager.start_substep("process_ngrams", "extract_unique")
+        manager.update_substep("process_ngrams", "extract_unique", total_ngrams)
+        manager.complete_substep("process_ngrams", "extract_unique")
+        
+        manager.start_substep("process_ngrams", "sort_ngrams")
+        manager.update_substep("process_ngrams", "sort_ngrams", unique_ngrams)
+        manager.complete_substep("process_ngrams", "sort_ngrams")
+        
+        manager.start_substep("process_ngrams", "assign_ids")
+        manager.update_substep("process_ngrams", "assign_ids", total_ngrams)
+        manager.complete_substep("process_ngrams", "assign_ids")
+        
+        manager.complete_step("process_ngrams")
+        
+        # Verify final states
+        self.assertEqual(manager.steps["preprocess"]["total"], filtered_count)
+        self.assertEqual(manager.steps["tokenize"]["total"], filtered_count)
+        self.assertEqual(manager.substeps["process_ngrams"]["extract_unique"]["total"], total_ngrams)
+        self.assertEqual(manager.substeps["process_ngrams"]["sort_ngrams"]["total"], unique_ngrams)
+        self.assertEqual(manager.substeps["process_ngrams"]["assign_ids"]["total"], total_ngrams)
+        
+        # All steps should be completed
+        for step_id in ["preprocess", "tokenize", "process_ngrams"]:
+            self.assertEqual(manager.steps[step_id]["state"], "completed")
+
+    def test_hierarchical_progress_bar_display(self):
+        """Test that parent steps with substeps properly update progress bars."""
+        manager = RichProgressManager("Progress Bar Display Test")
+        
+        # Add parent step with total (like process_ngrams)
+        manager.add_step("parent_with_total", "Parent with 3 substeps", 3)
+        manager.add_substep("parent_with_total", "sub1", "First substep")
+        manager.add_substep("parent_with_total", "sub2", "Second substep") 
+        manager.add_substep("parent_with_total", "sub3", "Third substep")
+        
+        # Start the parent step
+        manager.start_step("parent_with_total")
+        
+        # Initially parent should have 0 progress
+        self.assertEqual(manager.steps["parent_with_total"]["progress"], 0)
+        
+        # Complete first substep - parent should be 1/3 complete
+        manager.start_substep("parent_with_total", "sub1")
+        manager.complete_substep("parent_with_total", "sub1")
+        
+        # Check parent progress updated to 1.0 (1/3 * 3 total)
+        self.assertEqual(manager.steps["parent_with_total"]["progress"], 1.0)
+        self.assertAlmostEqual(manager.steps["parent_with_total"]["substep_progress"], 100/3, places=5)
+        
+        # Complete second substep - parent should be 2/3 complete  
+        manager.start_substep("parent_with_total", "sub2")
+        manager.complete_substep("parent_with_total", "sub2")
+        
+        # Check parent progress updated to 2.0 (2/3 * 3 total)
+        self.assertEqual(manager.steps["parent_with_total"]["progress"], 2.0)
+        self.assertAlmostEqual(manager.steps["parent_with_total"]["substep_progress"], 200/3, places=5)
+        
+        # Complete third substep - parent should be fully complete
+        manager.start_substep("parent_with_total", "sub3") 
+        manager.complete_substep("parent_with_total", "sub3")
+        
+        # Check parent progress updated to 3.0 (3/3 * 3 total = fully complete)
+        self.assertEqual(manager.steps["parent_with_total"]["progress"], 3.0)
+        self.assertEqual(manager.steps["parent_with_total"]["substep_progress"], 100.0)
+        
+        # Complete the parent step
+        manager.complete_step("parent_with_total")
+        self.assertEqual(manager.steps["parent_with_total"]["state"], "completed")
+
+    def test_substep_rich_task_creation_from_dynamic_totals(self):
+        """Test that Rich tasks are created when substeps get totals dynamically."""
+        manager = RichProgressManager("Dynamic Rich Task Test")
+        
+        # Add parent step and substep without initial total
+        manager.add_step("parent", "Parent step", 2)
+        manager.add_substep("parent", "dynamic_sub", "Substep without initial total")
+        
+        # Initially, no Rich task should exist for the substep
+        task_key = ("parent", "dynamic_sub")
+        self.assertNotIn(task_key, manager.rich_substep_task_ids)
+        
+        # Update substep with total - this should create a Rich task
+        manager.update_substep("parent", "dynamic_sub", 0, 100)
+        
+        # Now Rich task should exist
+        self.assertIn(task_key, manager.rich_substep_task_ids)
+        
+        # Verify substep has the total
+        substep = manager.substeps["parent"]["dynamic_sub"]
+        self.assertEqual(substep["total"], 100)
+        
+        # Start substep and update progress to verify Rich task works
+        manager.start_substep("parent", "dynamic_sub")
+        manager.update_substep("parent", "dynamic_sub", 50)
+        
+        # Verify progress was set correctly
+        self.assertEqual(substep["progress"], 50)
+        
+        # Complete substep
+        manager.complete_substep("parent", "dynamic_sub")
+        self.assertEqual(substep["state"], "completed")
+
 
 if __name__ == "__main__":
     unittest.main()

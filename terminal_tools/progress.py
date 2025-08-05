@@ -2,6 +2,11 @@ import sys
 import threading
 import time
 from multiprocessing import Event, Manager, Process, Value
+from typing import Dict, Optional, TYPE_CHECKING
+from pydantic import BaseModel
+
+if TYPE_CHECKING:
+    from app.utils import MemoryManager, MemoryPressureLevel
 
 _spinner_frames = [
     "▁",
@@ -100,12 +105,19 @@ class RichProgressManager:
     Manages multiple progress steps simultaneously with visual state indicators
     and progress bars for the currently active step. Uses Rich library components
     for enhanced terminal display with better formatting and responsive layout.
+    Optionally integrates real-time memory monitoring for resource-aware processing.
 
     Step states:
     - pending (⏸): Not yet started
     - active (⏳): Currently running with progress bar
     - completed (✓): Successfully finished
     - failed (❌): Failed with optional error message
+
+    Memory features (when memory_manager provided):
+    - Real-time memory usage monitoring
+    - Memory pressure warnings
+    - Automatic garbage collection suggestions
+    - Memory trend analysis
 
     Example:
         with RichProgressManager("N-gram Analysis Progress") as manager:
@@ -120,13 +132,22 @@ class RichProgressManager:
 
             manager.start_step("tokenize")
             # ... etc
+
+    Example with memory monitoring:
+        from app.utils import MemoryManager
+        memory_manager = MemoryManager(max_memory_gb=4.0)
+        with RichProgressManager("Analysis", memory_manager=memory_manager) as manager:
+            # Memory-aware progress updates
+            manager.update_step_with_memory("process", current, "data processing")
     """
 
-    def __init__(self, title: str):
+    def __init__(self, title: str, memory_manager: Optional['MemoryManager'] = None):
+        super().__init__()
         """Initialize the rich progress manager.
 
         Args:
             title: The overall title for the progress checklist
+            memory_manager: Optional MemoryManager for memory monitoring features
         """
         from rich.console import Console
         from rich.progress import (
@@ -146,6 +167,10 @@ class RichProgressManager:
         self.active_step = None
         self.active_substeps = {}  # step_id -> active_substep_id mapping
         self._started = False
+
+        # Memory monitoring components (optional)
+        self.memory_manager = memory_manager
+        self.last_memory_warning = None if memory_manager else None
 
         # Rich components - use a single console and progress instance
         self.console = Console()
@@ -273,15 +298,16 @@ class RichProgressManager:
             step_info = self.steps[parent_step_id]
             step_info["state"] = "active"
 
-            # Make Rich progress task visible and start it if it exists
-            if parent_step_id in self.rich_task_ids:
-                task_id = self.rich_task_ids[parent_step_id]
-                self.progress.update(task_id, visible=True)
-                self.progress.start_task(task_id)
-
             # Only update active_step if there isn't one already (maintain backward compatibility)
             if not self.active_step:
                 self.active_step = parent_step_id
+
+        # When starting a substep, hide the parent step's Rich progress task
+        # to avoid conflicts and show only the active substep's progress
+        if parent_step_id in self.rich_task_ids:
+            parent_task_id = self.rich_task_ids[parent_step_id]
+            self.progress.update(parent_task_id, visible=False)
+            self.progress.stop_task(parent_task_id)
 
         # Complete any currently active substep for this parent first
         if parent_step_id in self.active_substeps:
@@ -308,13 +334,14 @@ class RichProgressManager:
         # Update display to show substep activation
         self._update_display()
 
-    def update_substep(self, parent_step_id: str, substep_id: str, progress: int):
+    def update_substep(self, parent_step_id: str, substep_id: str, progress: int, total: int = None):
         """Update the progress of a specific substep.
 
         Args:
             parent_step_id: ID of the parent step
             substep_id: ID of the substep to update
             progress: Current progress value
+            total: Optional new total to update for this substep
         """
         # Validate inputs
         if not isinstance(parent_step_id, str) or not parent_step_id:
@@ -350,12 +377,58 @@ class RichProgressManager:
         if progress < 0:
             raise ValueError(f"Progress cannot be negative, got {progress}")
 
-        # Check against total if specified
-        if substep_info["total"] is not None:
-            if progress > substep_info["total"]:
+        # Handle optional total update
+        if total is not None:
+            # Validate total is positive integer
+            if not isinstance(total, int) or total <= 0:
+                raise ValueError(f"total must be a positive integer, got {total}")
+
+            # Validate current progress doesn't exceed new total
+            if progress > total:
                 raise ValueError(
-                    f"Progress {progress} exceeds total {substep_info['total']} for substep '{parent_step_id}.{substep_id}'"
+                    f"Progress {progress} exceeds new total {total} for substep '{parent_step_id}.{substep_id}'"
                 )
+
+            # Update internal tracking with new total
+            old_total = substep_info["total"]
+            substep_info["total"] = total
+
+            # Update or create Rich progress task total
+            task_key = (parent_step_id, substep_id)
+            if task_key in self.rich_substep_task_ids:
+                # Update existing Rich task total
+                task_id = self.rich_substep_task_ids[task_key]
+                self.progress.update(task_id, total=total)
+            else:
+                # Create new Rich task if it didn't exist (substep was created without total)
+                task_id = self.progress.add_task(
+                    description=f"  └─ {substep_info['description']}",  # Indent substeps visually
+                    total=total,
+                    visible=False,  # Will show when substep becomes active
+                    start=False,  # Timer starts when substep is activated
+                )
+                self.rich_substep_task_ids[task_key] = task_id
+
+            # Log the total update for debugging
+            from app.logger import get_logger
+            logger = get_logger(__name__)
+            logger.debug(
+                "Substep total updated",
+                extra={
+                    "parent_step_id": parent_step_id,
+                    "substep_id": substep_id,
+                    "old_total": old_total,
+                    "new_total": total,
+                    "current_progress": progress,
+                }
+            )
+        else:
+            # Check against existing total if specified
+            if substep_info["total"] is not None:
+                if progress > substep_info["total"]:
+                    raise ValueError(
+                        f"Progress {progress} exceeds total {substep_info['total']} for substep '{parent_step_id}.{substep_id}'"
+                    )
 
         # Update substep progress
         substep_info["progress"] = progress
@@ -411,6 +484,24 @@ class RichProgressManager:
             and self.active_substeps[parent_step_id] == substep_id
         ):
             self.active_substeps[parent_step_id] = None
+
+            # Check if this was the last active substep for this parent
+            # If so, restore the parent step's Rich progress task visibility
+            remaining_active_substeps = False
+            if parent_step_id in self.substeps:
+                for other_substep_id, other_substep_info in self.substeps[parent_step_id].items():
+                    if other_substep_info["state"] == "active":
+                        remaining_active_substeps = True
+                        break
+
+            # If no more active substeps and parent step is still active, restore parent Rich task
+            if (not remaining_active_substeps
+                and parent_step_id in self.steps
+                and self.steps[parent_step_id]["state"] == "active"
+                and parent_step_id in self.rich_task_ids):
+                parent_task_id = self.rich_task_ids[parent_step_id]
+                self.progress.update(parent_task_id, visible=True)
+                self.progress.start_task(parent_task_id)
 
         # Update parent step progress
         self._update_parent_progress(parent_step_id)
@@ -473,10 +564,22 @@ class RichProgressManager:
         )
         total_substeps = len(substeps)
 
-        # Update parent step progress (this affects display but not Rich task)
+        # Update parent step progress and Rich task for proper display
         if total_substeps > 0:
             parent_progress_percent = (completed_substeps / total_substeps) * 100
             self.steps[parent_step_id]["substep_progress"] = parent_progress_percent
+
+            # Also update the main step progress for Rich display
+            parent_step = self.steps[parent_step_id]
+            if parent_step["total"] is not None:
+                # Update progress relative to the parent step's total
+                parent_progress = (completed_substeps / total_substeps) * parent_step["total"]
+                parent_step["progress"] = parent_progress
+
+                # Update Rich progress task if it exists
+                if parent_step_id in self.rich_task_ids:
+                    task_id = self.rich_task_ids[parent_step_id]
+                    self.progress.update(task_id, completed=parent_progress)
 
     def start_step(self, step_id: str):
         """Start/activate a specific step.
@@ -504,12 +607,13 @@ class RichProgressManager:
         # Update display to show new state
         self._update_display()
 
-    def update_step(self, step_id: str, progress: float):
+    def update_step(self, step_id: str, progress: float, total: int = None):
         """Update the progress of a specific step.
 
         Args:
             step_id: ID of the step to update
             progress: Current progress value
+            total: Optional new total to update for this step
         """
         # Validate step_id exists
         if not isinstance(step_id, str) or not step_id:
@@ -537,12 +641,44 @@ class RichProgressManager:
         if progress < 0:
             raise ValueError(f"Progress cannot be negative, got {progress}")
 
-        # Check against total if specified
-        if step_info["total"] is not None:
-            if progress > step_info["total"]:
-                raise ValueError(
-                    f"Progress {progress} exceeds total {step_info['total']} for step '{step_id}'"
-                )
+        # Handle optional total update
+        if total is not None:
+            # Validate total is positive integer
+            if not isinstance(total, int) or total <= 0:
+                raise ValueError(f"total must be a positive integer, got {total}")
+
+            # Validate current progress doesn't exceed new total
+            if progress > total:
+                raise ValueError(f"Progress {progress} exceeds new total {total} for step '{step_id}'")
+
+            # Update internal tracking with new total
+            old_total = step_info["total"]
+            step_info["total"] = total
+
+            # Update Rich progress task total if it exists
+            if step_id in self.rich_task_ids:
+                task_id = self.rich_task_ids[step_id]
+                self.progress.update(task_id, total=total)
+
+            # Log the total update for debugging
+            from app.logger import get_logger
+            logger = get_logger(__name__)
+            logger.debug(
+                "Step total updated",
+                extra={
+                    "step_id": step_id,
+                    "old_total": old_total,
+                    "new_total": total,
+                    "current_progress": progress,
+                }
+            )
+        else:
+            # Check against existing total if specified
+            if step_info["total"] is not None:
+                if progress > step_info["total"]:
+                    raise ValueError(
+                        f"Progress {progress} exceeds total {step_info['total']} for step '{step_id}'"
+                    )
 
         # Update step progress in our tracking
         step_info["progress"] = progress
@@ -721,7 +857,15 @@ class RichProgressManager:
                             if substep_info["total"] > 0
                             else 0
                         )
-                        substep_text = f"  └─ {substep_description} ({substep_info['progress']}/{substep_info['total']} - {substep_percentage:.0f}%)"
+
+                        # Create a simple text-based progress bar for active substeps
+                        if substep_info["state"] == "active":
+                            bar_width = 20  # Width of the progress bar
+                            filled_width = int((substep_percentage / 100) * bar_width)
+                            bar = "█" * filled_width + "░" * (bar_width - filled_width)
+                            substep_text = f"  └─ {substep_description} [{bar}] ({substep_info['progress']}/{substep_info['total']} - {substep_percentage:.0f}%)"
+                        else:
+                            substep_text = f"  └─ {substep_description} ({substep_info['progress']}/{substep_info['total']} - {substep_percentage:.0f}%)"
                     else:
                         substep_text = f"  └─ {substep_description}"
 
@@ -783,8 +927,272 @@ class RichProgressManager:
         self.start()
         return self
 
+    def update_step_with_memory(
+        self, step_id: str, current: int, memory_context: str = ""
+    ) -> None:
+        """Update progress step with current memory usage information.
+
+        This method combines standard progress updates with memory monitoring.
+        Only active when memory_manager is provided during initialization.
+
+        Args:
+            step_id: ID of the step to update
+            current: Current progress value
+            memory_context: Optional context string for memory logging
+        """
+        if self.memory_manager is None:
+            # Fallback to standard update when no memory manager
+            self.update_step(step_id, current)
+            return
+
+        # Get current memory stats
+        try:
+            memory_stats = self.memory_manager.get_current_memory_usage()
+        except Exception as e:
+            # If memory monitoring fails, continue with standard progress update
+            from app.logger import get_logger
+
+            logger = get_logger(__name__)
+            logger.warning(
+                "Memory monitoring failed, continuing with standard progress update",
+                extra={
+                    "step_id": step_id,
+                    "current": current,
+                    "memory_context": memory_context,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                }
+            )
+            self.update_step(step_id, current)
+            return
+
+        # Log memory-aware progress update for debugging
+        from app.logger import get_logger
+
+        logger = get_logger(__name__)
+        logger.debug(
+            "Memory-aware progress update",
+            extra={
+                "step_id": step_id,
+                "current": current,
+                "memory_context": memory_context,
+                "memory_mb": memory_stats.get("rss_mb", "unknown"),
+                "pressure_level": memory_stats.get("pressure_level", "unknown"),
+            },
+        )
+
+        # Update the progress step with enhanced error handling
+        try:
+            self.update_step(step_id, current)
+        except Exception as progress_error:
+            # Critical: progress updates must not fail
+            logger.error(
+                "Critical failure in progress step update",
+                extra={
+                    "step_id": step_id,
+                    "current": current,
+                    "memory_context": memory_context,
+                    "error": str(progress_error),
+                    "error_type": type(progress_error).__name__,
+                },
+                exc_info=True,
+            )
+            # Try to continue with a simpler progress update
+            try:
+                # Fallback: try to update without memory context
+                super().update_step(step_id, current)
+                logger.info(
+                    "Progress update recovered using fallback method",
+                    extra={"step_id": step_id, "current": current},
+                )
+            except Exception as fallback_error:
+                logger.critical(
+                    "Complete failure in progress reporting - both primary and fallback methods failed",
+                    extra={
+                        "step_id": step_id,
+                        "current": current,
+                        "primary_error": str(progress_error),
+                        "fallback_error": str(fallback_error),
+                    },
+                )
+                # At this point, continue execution but progress display may be broken
+
+        # Check for memory pressure and warn if necessary
+        try:
+            # Import MemoryPressureLevel for comparison
+            from app.utils import MemoryPressureLevel
+
+            # Fix: Properly convert string to enum
+            pressure_level_str = memory_stats["pressure_level"]
+            pressure_level = next(
+                (
+                    level
+                    for level in MemoryPressureLevel
+                    if level.value == pressure_level_str
+                ),
+                MemoryPressureLevel.LOW,  # Default fallback
+            )
+
+            if pressure_level in [
+                MemoryPressureLevel.HIGH,
+                MemoryPressureLevel.CRITICAL,
+            ]:
+                self._display_memory_warning(
+                    pressure_level, memory_stats, memory_context
+                )
+
+        except Exception as e:
+            # Log error but don't let it crash progress reporting
+            logger.warning(
+                "Failed to process memory pressure level in progress reporting",
+                extra={
+                    "step_id": step_id,
+                    "pressure_level_str": memory_stats.get("pressure_level", "unknown"),
+                    "memory_context": memory_context,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+            # Continue with progress reporting even if memory monitoring fails
+
+        # Trigger GC if needed
+        try:
+            if self.memory_manager.should_trigger_gc():
+                cleanup_stats = self.memory_manager.enhanced_gc_cleanup()
+                if cleanup_stats["memory_freed_mb"] > 50:  # Significant cleanup
+                    self.console.print(
+                        f"[green]Freed {cleanup_stats['memory_freed_mb']:.1f}MB memory[/green]"
+                    )
+        except Exception as e:
+            # Don't let GC failures crash progress reporting
+            logger.warning(
+                "Failed to trigger garbage collection in progress reporting",
+                extra={
+                    "step_id": step_id,
+                    "memory_context": memory_context,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+            )
+
+    def _display_memory_warning(
+        self, pressure_level: 'MemoryPressureLevel', memory_stats: Dict, context: str
+    ) -> None:
+        """Display memory pressure warning to user.
+
+        Args:
+            pressure_level: Current memory pressure level
+            memory_stats: Memory statistics dictionary
+            context: Context string for the warning
+        """
+        if self.memory_manager is None:
+            return
+
+        # Avoid spam - only show warning every 30 seconds
+        current_time = time.time()
+        if self.last_memory_warning and current_time - self.last_memory_warning < 30:
+            return
+
+        self.last_memory_warning = current_time
+
+        try:
+            from app.utils import MemoryPressureLevel
+            from rich.text import Text
+            from rich.panel import Panel
+
+            memory_mb = memory_stats["rss_mb"]
+            pressure_color = {
+                MemoryPressureLevel.HIGH: "yellow",
+                MemoryPressureLevel.CRITICAL: "red",
+            }.get(pressure_level, "yellow")
+
+            warning_text = Text()
+            warning_text.append(f"Memory Usage: {memory_mb:.1f}MB ", style=pressure_color)
+            warning_text.append(
+                f"({memory_stats['process_memory_percent']:.1f}% of limit)",
+                style=pressure_color,
+            )
+
+            if context:
+                warning_text.append(f" during {context}", style="dim")
+
+            # Suggest actions based on pressure level
+            if pressure_level == MemoryPressureLevel.CRITICAL:
+                warning_text.append(
+                    "\n⚠️  Critical memory pressure - switching to disk-based processing",
+                    style="red bold",
+                )
+            elif pressure_level == MemoryPressureLevel.HIGH:
+                warning_text.append(
+                    "\n⚠️  High memory pressure - reducing chunk sizes", style="yellow"
+                )
+
+            panel = Panel(warning_text, title="Memory Monitor", border_style=pressure_color)
+            self.console.print(panel)
+
+        except Exception as e:
+            # If warning display fails, at least log it
+            from app.logger import get_logger
+
+            logger = get_logger(__name__)
+            logger.warning(
+                "Failed to display memory warning",
+                extra={
+                    "pressure_level": pressure_level.value if hasattr(pressure_level, 'value') else str(pressure_level),
+                    "memory_mb": memory_stats.get("rss_mb", "unknown"),
+                    "context": context,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                }
+            )
+
+    def display_memory_summary(self) -> None:
+        """Display final memory usage summary.
+
+        Only active when memory_manager is provided during initialization.
+        """
+        if self.memory_manager is None:
+            return
+
+        try:
+            from rich.panel import Panel
+
+            final_memory = self.memory_manager.get_current_memory_usage()
+            memory_trend = self.memory_manager.get_memory_trend()
+
+            summary_panel = Panel(
+                f"Analysis completed successfully!\n"
+                f"Peak memory usage: {final_memory['rss_mb']:.1f}MB\n"
+                f"Memory trend: {memory_trend}\n"
+                f"Final pressure level: {final_memory['pressure_level']}",
+                title="Memory Summary",
+                border_style="green",
+            )
+            self.console.print(summary_panel)
+
+        except Exception as e:
+            # If summary display fails, at least log it
+            from app.logger import get_logger
+
+            logger = get_logger(__name__)
+            logger.warning(
+                "Failed to display memory summary",
+                extra={
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                }
+            )
+
     def __exit__(self, exc_type, _exc_value, _traceback):
         """Context manager exit - finishes the checklist display."""
+        # Display memory summary if memory manager is active
+        if exc_type is None and self.memory_manager is not None:
+            try:
+                self.display_memory_summary()
+            except Exception:
+                # Don't let memory summary failures crash the exit
+                pass
+
         # Handle KeyboardInterrupt specially to ensure clean terminal state
         if exc_type is KeyboardInterrupt:
             # Stop Rich display immediately and cleanly
