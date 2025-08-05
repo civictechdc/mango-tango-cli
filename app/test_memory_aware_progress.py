@@ -1,5 +1,5 @@
 """
-Tests for the MemoryAwareProgressManager class.
+Tests for the enhanced RichProgressManager with memory monitoring features.
 """
 
 import time
@@ -7,19 +7,27 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from app.memory_aware_progress import MemoryAwareProgressManager
+from terminal_tools.progress import RichProgressManager
 from app.utils import MemoryManager, MemoryPressureLevel
 
 
-class TestMemoryAwareProgressManager:
-    """Test memory-aware progress manager functionality."""
+class TestRichProgressManagerMemoryFeatures:
+    """Test enhanced RichProgressManager memory monitoring functionality."""
 
-    def test_initialization(self):
-        """Test MemoryAwareProgressManager initializes correctly."""
+    def test_initialization_with_memory_manager(self):
+        """Test RichProgressManager initializes correctly with memory manager."""
         memory_manager = MagicMock(spec=MemoryManager)
-        progress_manager = MemoryAwareProgressManager("Test Analysis", memory_manager)
+        progress_manager = RichProgressManager("Test Analysis", memory_manager=memory_manager)
 
         assert progress_manager.memory_manager == memory_manager
+        assert progress_manager.last_memory_warning is None
+        assert "Test Analysis" in progress_manager.title
+        
+    def test_initialization_without_memory_manager(self):
+        """Test RichProgressManager initializes correctly without memory manager."""
+        progress_manager = RichProgressManager("Test Analysis")
+
+        assert progress_manager.memory_manager is None
         assert progress_manager.last_memory_warning is None
         assert "Test Analysis" in progress_manager.title
 
@@ -33,7 +41,7 @@ class TestMemoryAwareProgressManager:
         }
         memory_manager.should_trigger_gc.return_value = False
 
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         # Should update normally without warnings
@@ -57,7 +65,7 @@ class TestMemoryAwareProgressManager:
         memory_manager.should_trigger_gc.return_value = True
         memory_manager.enhanced_gc_cleanup.return_value = {"memory_freed_mb": 100.0}
 
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         # Mock console to avoid actual output during tests
@@ -80,7 +88,7 @@ class TestMemoryAwareProgressManager:
         memory_manager.should_trigger_gc.return_value = True
         memory_manager.enhanced_gc_cleanup.return_value = {"memory_freed_mb": 200.0}
 
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         # Mock console and _display_memory_warning to capture calls
@@ -106,7 +114,7 @@ class TestMemoryAwareProgressManager:
             "pressure_level": "high",
         }
 
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         # Mock console to capture calls
@@ -133,7 +141,7 @@ class TestMemoryAwareProgressManager:
     def test_memory_warning_throttling_timeout(self):
         """Test that memory warnings can be displayed again after timeout."""
         memory_manager = MagicMock(spec=MemoryManager)
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
 
         # Set last warning time to 31 seconds ago (past the 30-second threshold)
         progress_manager.last_memory_warning = time.time() - 31
@@ -151,7 +159,7 @@ class TestMemoryAwareProgressManager:
     def test_display_memory_warning_content(self):
         """Test the content and formatting of memory warnings."""
         memory_manager = MagicMock(spec=MemoryManager)
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
 
         with patch.object(progress_manager, "console") as mock_console:
             # Test HIGH pressure warning
@@ -209,7 +217,7 @@ class TestMemoryAwareProgressManager:
         }
         memory_manager.get_memory_trend.return_value = "stable"
 
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
 
         with patch.object(progress_manager, "console") as mock_console:
             progress_manager.display_memory_summary()
@@ -238,7 +246,7 @@ class TestMemoryAwareProgressManager:
             "memory_freed_mb": 150.0  # Significant cleanup
         }
 
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         with patch.object(progress_manager, "console") as mock_console:
@@ -257,7 +265,7 @@ class TestMemoryAwareProgressManager:
             "memory_freed_mb": 10.0  # Small cleanup
         }
 
-        progress_manager = MemoryAwareProgressManager("Test", memory_manager)
+        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         with patch.object(progress_manager, "console") as mock_console:
@@ -270,8 +278,8 @@ class TestMemoryAwareProgressManager:
             )
 
 
-class TestMemoryAwareProgressManagerIntegration:
-    """Integration tests for MemoryAwareProgressManager."""
+class TestRichProgressManagerMemoryIntegration:
+    """Integration tests for RichProgressManager memory features."""
 
     def test_full_analysis_simulation(self):
         """Simulate a full analysis workflow with memory monitoring."""
@@ -316,8 +324,8 @@ class TestMemoryAwareProgressManagerIntegration:
         memory_manager.enhanced_gc_cleanup.return_value = {"memory_freed_mb": 400.0}
         memory_manager.get_memory_trend.return_value = "increasing"
 
-        progress_manager = MemoryAwareProgressManager(
-            "Simulated Analysis", memory_manager
+        progress_manager = RichProgressManager(
+            "Simulated Analysis", memory_manager=memory_manager
         )
 
         # Add analysis steps
