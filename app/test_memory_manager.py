@@ -78,7 +78,7 @@ class TestMemoryManager:
         manager = MemoryManager()
         base_size = 10000
 
-        with patch.object(manager, "get_memory_pressure_level") as mock_pressure:
+        with patch("app.utils.MemoryManager.get_memory_pressure_level") as mock_pressure:
             # Test LOW pressure - no reduction
             mock_pressure.return_value = MemoryPressureLevel.LOW
             size = manager.calculate_adaptive_chunk_size(base_size, "tokenization")
@@ -104,7 +104,7 @@ class TestMemoryManager:
         manager = MemoryManager()
         base_size = 10000
 
-        with patch.object(manager, "get_memory_pressure_level") as mock_pressure:
+        with patch("app.utils.MemoryManager.get_memory_pressure_level") as mock_pressure:
             mock_pressure.return_value = MemoryPressureLevel.LOW
 
             # Test different operation types
@@ -128,7 +128,7 @@ class TestMemoryManager:
         manager = MemoryManager()
         small_base = 5000
 
-        with patch.object(manager, "get_memory_pressure_level") as mock_pressure:
+        with patch("app.utils.MemoryManager.get_memory_pressure_level") as mock_pressure:
             mock_pressure.return_value = MemoryPressureLevel.CRITICAL
 
             size = manager.calculate_adaptive_chunk_size(small_base, "ngram_generation")
@@ -154,7 +154,7 @@ class TestMemoryManager:
         """Test enhanced garbage collection functionality."""
         manager = MemoryManager()
 
-        with patch.object(manager, "get_current_memory_usage") as mock_usage:
+        with patch("app.utils.MemoryManager.get_current_memory_usage") as mock_usage:
             # Mock memory before and after cleanup
             mock_usage.side_effect = [
                 {"rss_mb": 1000, "pressure_level": "high"},  # Before

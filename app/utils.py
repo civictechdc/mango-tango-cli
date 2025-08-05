@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import polars as pl
 import pyarrow.parquet as pq
-
+from pydantic import BaseModel, ConfigDict
 from app.logger import get_logger
 
 if TYPE_CHECKING:
-    from app.memory_aware_progress import MemoryAwareProgressManager
+    from terminal_tools.progress import RichProgressManager
 
 
 # Initialize module-level logger
@@ -52,42 +52,40 @@ class MemoryPressureLevel(Enum):
     CRITICAL = "critical"  # > 85% of limit
 
 
-class MemoryManager:
+class MemoryManager(BaseModel):
     """
     Real-time memory monitoring and adaptive processing control.
 
     Provides memory usage tracking, adaptive chunk sizing, early warning system,
     and automatic garbage collection triggering for memory pressure scenarios.
     """
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    max_memory_gb: float = 4.0
+    process_name: str = "memory_manager"
+    max_memory_bytes: float = 0
+    process: Optional[psutil.Process] = None
+    thresholds: Dict[MemoryPressureLevel, float] = {
+        MemoryPressureLevel.MEDIUM: 0.60,
+        MemoryPressureLevel.HIGH: 0.75,
+        MemoryPressureLevel.CRITICAL: 0.85,
+    }
+    chunk_size_factors: Dict[MemoryPressureLevel, float] = {
+        MemoryPressureLevel.LOW: 1.0,
+        MemoryPressureLevel.MEDIUM: 0.7,
+        MemoryPressureLevel.HIGH: 0.4,
+        MemoryPressureLevel.CRITICAL: 0.2,
+    }
+    memory_history: list = []
+    max_history_size: int = 100
+    logger: Optional[logging.Logger] = None
 
     def __init__(
-        self, max_memory_gb: float = 4.0, process_name: str = "ngram_analyzer"
+        self, **data
     ):
-        self.max_memory_bytes = max_memory_gb * 1024**3
-        self.process_name = process_name
+        super().__init__(**data)
+        self.max_memory_bytes = self.max_memory_gb * 1024**3
         self.process = psutil.Process()
-
-        # Memory pressure thresholds
-        self.thresholds = {
-            MemoryPressureLevel.MEDIUM: 0.60,
-            MemoryPressureLevel.HIGH: 0.75,
-            MemoryPressureLevel.CRITICAL: 0.85,
-        }
-
-        # Adaptive chunk size factors
-        self.chunk_size_factors = {
-            MemoryPressureLevel.LOW: 1.0,
-            MemoryPressureLevel.MEDIUM: 0.7,
-            MemoryPressureLevel.HIGH: 0.4,
-            MemoryPressureLevel.CRITICAL: 0.2,
-        }
-
-        # Memory usage history for trend analysis
-        self.memory_history = []
-        self.max_history_size = 100
-
-        # Use structured logger instead of basic logging
-        self.logger = get_logger(f"{__name__}.{process_name}_memory")
+        self.logger = get_logger(f"{__name__}.{self.process_name}_memory")
 
     def get_current_memory_usage(self) -> Dict:
         """Get comprehensive current memory statistics."""
@@ -295,7 +293,7 @@ def is_space_separated(text: Union[str, pl.Expr]) -> Union[bool, pl.Expr]:
 def tokenize_text(
     ldf: pl.LazyFrame,
     text_column: str,
-    progress_manager: Optional["MemoryAwareProgressManager"] = None,
+    progress_manager: Optional["RichProgressManager"] = None,
     memory_manager: Optional[MemoryManager] = None,
 ) -> pl.LazyFrame:
     """
