@@ -98,7 +98,9 @@ class AnalysisContext(BaseModel):
         analysis_title = f"{self.analyzer_spec.name} Analysis"
         with RichProgressManager(analysis_title) as progress_manager:
             with TemporaryDirectory() as temp_dir:
-                yield AnalysisRunProgressEvent(analyzer=self.analyzer_spec, event="start")
+                yield AnalysisRunProgressEvent(
+                    analyzer=self.analyzer_spec, event="start"
+                )
                 analyzer_context = PrimaryAnalyzerContext(
                     analysis=self.model,
                     analyzer=self.analyzer_spec,
@@ -117,7 +119,9 @@ class AnalysisContext(BaseModel):
                 )
                 analyzer_context.prepare()
                 self.analyzer_spec.entry_point(analyzer_context)
-                yield AnalysisRunProgressEvent(analyzer=self.analyzer_spec, event="finish")
+                yield AnalysisRunProgressEvent(
+                    analyzer=self.analyzer_spec, event="finish"
+                )
 
             # Pass the same progress manager to secondary analyzers for continuous progress flow
             for secondary in secondary_analyzers:

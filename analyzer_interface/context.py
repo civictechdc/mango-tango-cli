@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional, TypeVar, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union
 
 import polars as pl
 from dash import Dash
@@ -8,12 +8,12 @@ from pydantic import BaseModel, ConfigDict
 from shiny import Inputs, Outputs, Session
 from shiny.ui._navs import NavPanel
 
-from .interface import SecondaryAnalyzerInterface
-from .params import ParamValue
-
 # if TYPE_CHECKING:
 #     from terminal_tools.progress import RichProgressManager
 from terminal_tools.progress import RichProgressManager
+
+from .interface import SecondaryAnalyzerInterface
+from .params import ParamValue
 
 
 class PrimaryAnalyzerContext(ABC, BaseModel):

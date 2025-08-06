@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Optional, Union
 import polars as pl
 import pyarrow.parquet as pq
 from pydantic import BaseModel, ConfigDict
+
 from app.logger import get_logger
 
 if TYPE_CHECKING:
@@ -59,33 +60,81 @@ class MemoryManager(BaseModel):
     Provides memory usage tracking, adaptive chunk sizing, early warning system,
     and automatic garbage collection triggering for memory pressure scenarios.
     """
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
     max_memory_gb: float = 4.0
     process_name: str = "memory_manager"
     max_memory_bytes: float = 0
     process: Optional[psutil.Process] = None
+    # More lenient thresholds for higher-memory systems
     thresholds: Dict[MemoryPressureLevel, float] = {
-        MemoryPressureLevel.MEDIUM: 0.60,
-        MemoryPressureLevel.HIGH: 0.75,
-        MemoryPressureLevel.CRITICAL: 0.85,
+        MemoryPressureLevel.MEDIUM: 0.70,  # Increased from 0.60
+        MemoryPressureLevel.HIGH: 0.80,  # Increased from 0.75
+        MemoryPressureLevel.CRITICAL: 0.90,  # Increased from 0.85
     }
+    # Less aggressive chunk size reduction
     chunk_size_factors: Dict[MemoryPressureLevel, float] = {
         MemoryPressureLevel.LOW: 1.0,
-        MemoryPressureLevel.MEDIUM: 0.7,
-        MemoryPressureLevel.HIGH: 0.4,
-        MemoryPressureLevel.CRITICAL: 0.2,
+        MemoryPressureLevel.MEDIUM: 0.8,  # Increased from 0.7
+        MemoryPressureLevel.HIGH: 0.6,  # Increased from 0.4
+        MemoryPressureLevel.CRITICAL: 0.4,  # Increased from 0.2
     }
     memory_history: list = []
     max_history_size: int = 100
     logger: Optional[logging.Logger] = None
 
-    def __init__(
-        self, **data
-    ):
+    def __init__(self, max_memory_gb: Optional[float] = None, **data):
+        # Auto-detect memory limit if not provided
+        was_auto_detected = max_memory_gb is None
+        if max_memory_gb is None:
+            max_memory_gb = self._auto_detect_memory_limit()
+
+        # Update data with detected/provided memory limit
+        data["max_memory_gb"] = max_memory_gb
+
         super().__init__(**data)
         self.max_memory_bytes = self.max_memory_gb * 1024**3
         self.process = psutil.Process()
         self.logger = get_logger(f"{__name__}.{self.process_name}_memory")
+
+        # Log detected configuration for transparency
+        system_memory = psutil.virtual_memory()
+        total_gb = system_memory.total / 1024**3
+        self.logger.info(
+            "Memory manager initialized with intelligent detection",
+            extra={
+                "system_total_gb": round(total_gb, 1),
+                "detected_limit_gb": round(self.max_memory_gb, 1),
+                "allocation_percent": round((self.max_memory_gb / total_gb) * 100, 1),
+                "detection_method": "auto" if was_auto_detected else "manual_override",
+            },
+        )
+
+    @classmethod
+    def _auto_detect_memory_limit(cls) -> float:
+        """
+        Auto-detect appropriate memory limit based on system RAM.
+
+        Uses tiered allocation strategy:
+        - ≥32GB systems: 40% of total RAM (12-16GB)
+        - ≥16GB systems: 30% of total RAM (5-8GB)
+        - ≥8GB systems: 25% of total RAM (2-4GB)
+        - <8GB systems: 20% of total RAM (conservative)
+
+        Returns:
+            float: Recommended memory limit in GB
+        """
+        system_memory = psutil.virtual_memory()
+        total_gb = system_memory.total / 1024**3
+
+        if total_gb >= 32:  # High-memory system
+            return total_gb * 0.4
+        elif total_gb >= 16:  # Standard system
+            return total_gb * 0.3
+        elif total_gb >= 8:  # Lower-memory system
+            return total_gb * 0.25
+        else:  # Very constrained
+            return total_gb * 0.2
 
     def get_current_memory_usage(self) -> Dict:
         """Get comprehensive current memory statistics."""
