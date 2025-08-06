@@ -1,8 +1,6 @@
-# Setup
+# Prerequisites
 
-## Prerequisites
-
-### Required Software
+## Required Software
 
 - **Python 3.12** - Required for all features to work correctly
 - Node.JS (20.0.0 or above) - Required for the React dashboards
@@ -10,13 +8,13 @@
 - **Git** - For version control and contributing
 - **Terminal/Command Line** - Application runs in terminal interface
 
-### System Requirements
+## System Requirements
 
 - **Operating System**: Windows (PowerShell), macOS, Linux
 - **Memory**: 4GB+ RAM (for processing large datasets)
 - **Storage**: 1GB+ free space (for project data and virtual environment)
 
-### Resources
+## Resources
 
 If you haven't installed git, node.js, and/or python yet refer to the
 following links for instructions on downloading and installing said packages:
@@ -25,33 +23,33 @@ following links for instructions on downloading and installing said packages:
 - [https://nodejs.org/en/download](https://nodejs.org/en/download)
 - [https://realpython.com/installing-python/](https://realpython.com/installing-python/)
 
-### Checking Dependencies
+## Checking Dependencies
 
 If you're not sure which packages you already have installed on your system, the
 following commands can be used to figure what packages you already installed:
 
-#### Linux & Mac OS
+### Linux & Mac OS
 
 ```bash
 which <program_name_here (node|python|git)>
 ```
 
-#### Windows
+### Windows
 
 ```PowerShell
 where.exe <program_name_here (node|python|git)> 
 ```
 
-## Installation
+# Installation
 
-### 1. Clone Repository
+## 1. Clone Repository
 
 ```bash
 git clone https://github.com/CIB-Mango-Tree/mango-tango-cli.git
 cd mango-tango-cli
 ```
 
-### 2. Create Virtual Environment
+## 2. Create Virtual Environment
 
 ```bash
 python -m venv venv
@@ -63,7 +61,7 @@ python -m venv venv
 python --version  # Should show Python 3.12.x
 ```
 
-### 3. Bootstrap Development Environment
+## 3. Bootstrap Development Environment
 
 **Mac OS/Linux (Bash)**:
 
@@ -83,7 +81,7 @@ The bootstrap script will:
 - Install all dependencies from `requirements-dev.txt`
 - Set up pre-commit hooks for code formatting
 
-### 4. Verify Installation
+## 4. Verify Installation
 
 ```bash
 python -m mangotango --noop
@@ -91,7 +89,7 @@ python -m mangotango --noop
 
 Should output: "No-op flag detected. Exiting successfully."
 
-## Activating Virtual Environment
+# Activating Virtual Environment
 
 After Completing the Installation the following commands can be used to activate
 the virtual environment in order to work with the project.
@@ -108,9 +106,9 @@ source ./venv/bin/activate
 ./env/bin/Activate.ps1
 ```
 
-## Development Environment Setup
+# Development Environment Setup
 
-### Dependencies Overview
+## Dependencies Overview
 
 **Production Dependencies** (`requirements.txt`):
 
@@ -143,7 +141,7 @@ source ./venv/bin/activate
 - tailwindcss: 4.0.6
 - lucide-react: 0.475.0
 
-### Code Formatting Setup
+## Code Formatting Setup
 
 The project uses automatic code formatting:
 
@@ -158,7 +156,7 @@ isort .
 black .
 ```
 
-### Project Structure Setup
+## Project Structure Setup
 
 After installation, your project structure should be:
 
@@ -179,9 +177,9 @@ mango-tango-cli/
 └── mangotango.py          # Main entry point
 ```
 
-## Database and Storage Setup
+# Database and Storage Setup
 
-### Application Data Directory
+## Application Data Directory
 
 The application automatically creates data directories:
 
@@ -189,7 +187,7 @@ The application automatically creates data directories:
 - **Windows**: `%APPDATA%/Civic Tech DC/MangoTango/`
 - **Linux**: `~/.local/share/MangoTango/`
 
-### Database Initialization
+## Database Initialization
 
 - **TinyDB**: Automatically initialized on first run
 - **Project Files**: Created in user data directory
@@ -197,23 +195,23 @@ The application automatically creates data directories:
 
 No manual database setup required.
 
-## Running the Application
+# Running the Application
 
-### Basic Usage
+## Basic Usage
 
 ```bash
 # Start the application
 python -m mangotango
 ```
 
-### Development Mode
+## Development Mode
 
 ```bash
 # Run with debugging/development flags
 python -m mangotango --noop  # Test mode, exits immediately
 ```
 
-### Development Mode for The React Dashboards
+## Development Mode for The React Dashboards
 
 The following commands can be used to start the development vite server for the
 react dashboards that are currently in development.
@@ -234,7 +232,7 @@ pnpm dev
 
 ## Testing Setup
 
-### Run Tests
+## Run Tests
 
 ```bash
 # Run all tests
@@ -250,15 +248,15 @@ pytest -v
 pytest analyzers/hashtags/test_hashtags_analyzer.py::test_gini
 ```
 
-### Test Data
+## Test Data
 
 - Test data is co-located with analyzers in `test_data/` directories
 - Each analyzer should include its own test files
 - Tests use sample data to verify functionality
 
-## Build Setup (Optional)
+# Build Setup (Optional)
 
-### Executable Building
+## Executable Building
 
 ```bash
 # Build standalone executable
@@ -267,7 +265,7 @@ pyinstaller pyinstaller.spec
 # Output will be in dist/ directory
 ```
 
-### Bundle Building for React Dashboard
+## Bundle Building for React Dashboard
 
 **npm**:
 
@@ -281,15 +279,15 @@ npm run build
 pnpm build
 ```
 
-### Build Requirements
+## Build Requirements
 
 - Included in `requirements-dev.txt`
 - Used primarily for release distribution
 - Not required for development
 
-## IDE Integration
+# IDE Integration
 
-### Recommended IDE Settings
+## Recommended IDE Settings
 
 **VS Code** (`.vscode/` configuration):
 
@@ -304,7 +302,7 @@ pnpm build
 - Code style: Black
 - Import optimizer: isort
 
-### Git Configuration
+## Git Configuration
 
 **Pre-commit Hooks**:
 
@@ -321,7 +319,7 @@ pre-commit install
 - Feature branches: `feature/name`
 - Bug fixes: `bugfix/name`
 
-## Version Management
+# Version Management
 
 If you already have Python and Node.JS installed but are on different versions
 from the versions outlined in the [requirements](#prerequisites) above you can switch
@@ -339,23 +337,23 @@ references to go off of.
 Once you have both version managers installed the following commands can be used
 to switch versions.
 
-### pyenv
+## pyenv
 
 ```shell
 pyenv install 3.12
 pyenv local 3.12
 ```
 
-### nvm
+## nvm
 
 ```shell
 nvm install v21.0.0
 nvm use v21.0.0
 ```
 
-## Troubleshooting
+# Troubleshooting
 
-### Common Dependency Issues
+## Common Dependency Issues
 
 One common issue when installing the dependencies for python is the installation
 failing due to compatibility issues with the python package `pyarrow`. The compatibility
@@ -376,7 +374,7 @@ cd ./app/web_templates
 npm install --legacy-peer-deps
 ```
 
-### Other Common Issues
+## Other Common Issues
 
 **Import Errors**:
 
@@ -407,14 +405,14 @@ ls analyzers/*/test_data/
 pytest analyzers/hashtags/ -v
 ```
 
-### Environment Variables
+## Environment Variables
 
 **Optional Configuration**:
 
 - `MANGOTANGO_DATA_DIR` - Override default data directory
 - `MANGOTANGO_LOG_LEVEL` - Set logging verbosity
 
-## Next Steps
+# Next Steps
 
 Once you have everything installed and running without any problems,
 the next step is to check out the [Contributor Workflow](./contributing.md)

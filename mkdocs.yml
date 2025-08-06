@@ -12,18 +12,19 @@ nav:
       - "Getting Started":
           - "Overview": "guides/get-started/overview.md"
           - "Installation": "guides/get-started/installation.md"
-          - "Contributing to The Project": "guides/get-started/contributing.md"
-          - "Logging System": "guides/get-started/logging.md"
-          - "Testing": "guides/get-started/testing.md"
-          - "CLI design philosophy": "guides/get-started/architecture.md"
-      - "Implementing Analyzers": "guides/analyzers.md"
-      - "Domains":
-          - "Core Domain": "guides/domains/core-domain.md"
-          - "Edge Domain": "guides/domains/edge-domain.md"
-          - "Content Domain": "guides/domains/content-domain.md"
-      - "Dashboards":
-          - "React": "guides/dashboards/react.md"
-          - "Shiny": "guides/dashboards/shiny.md"
+      - "Contributing":
+          - "Contributor Workflow": "guides/contributing/contributing.md"
+          - "Implementing Analyzers": "guides/contributing/analyzers.md"
+          - "Dashboards":
+              - "Shiny": "guides/contributing/dashboards/shiny.md"
+              - "React (WIP)": "guides/contributing/dashboards/react.md"
+          - "Logging": "guides/contributing/logging.md"
+          - "Testing": "guides/contributing/testing.md"
+      - "Design Philosophy":
+          - "Architecture": "guides/design-philosophy/architecture.md"
+          - "Core Domain": "guides/design-philosophy/core-domain.md"
+          - "Edge Domain": "guides/design-philosophy/edge-domain.md"
+          - "Content Domain": "guides/design-philosophy/content-domain.md"
   - "Reference (CLI)":
       - "Analyzer Interface": "reference/analyzer_interface.md"
       - "Components": "reference/components.md"
