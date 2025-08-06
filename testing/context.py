@@ -1,7 +1,7 @@
 import os
 from functools import cached_property
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Optional, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 import polars as pl
 from pydantic import BaseModel

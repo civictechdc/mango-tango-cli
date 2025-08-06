@@ -147,7 +147,7 @@ def test_ngram_stats():
 def test_ngram_stats_with_progress_manager():
     """
     Test that ngram_stats works correctly when provided with an existing progress manager.
-    
+
     This test verifies that the analyzer can continue from an existing progress manager
     instead of creating a new one, which is the desired behavior when running as part
     of a pipeline with the primary n-gram analyzer.
@@ -155,11 +155,11 @@ def test_ngram_stats_with_progress_manager():
     import os
     import tempfile
     from unittest.mock import Mock
-    
+
     import polars as pl
-    
-    from testing.testers import TestSecondaryAnalyzerContext
+
     from terminal_tools.progress import RichProgressManager
+    from testing.testers import TestSecondaryAnalyzerContext
 
     # Set up test data
     primary_outputs = {
@@ -200,20 +200,30 @@ def test_ngram_stats_with_progress_manager():
             dependency_output_parquet_paths={},
             output_parquet_root_path=actual_output_dir,
         )
-        
+
         # Add a mock progress manager to the context using setattr to bypass Pydantic validation
         mock_progress_manager = Mock(spec=RichProgressManager)
-        object.__setattr__(context, 'progress_manager', mock_progress_manager)
+        object.__setattr__(context, "progress_manager", mock_progress_manager)
 
         # Run the analyzer
         main(context)
 
         # Verify that the mock progress manager methods were called
         # This confirms that the analyzer used the existing progress manager
-        assert mock_progress_manager.add_step.called, "add_step should have been called on existing progress manager"
-        assert mock_progress_manager.start_step.called, "start_step should have been called on existing progress manager"
-        assert mock_progress_manager.complete_step.called, "complete_step should have been called on existing progress manager"
-        
+        assert (
+            mock_progress_manager.add_step.called
+        ), "add_step should have been called on existing progress manager"
+        assert (
+            mock_progress_manager.start_step.called
+        ), "start_step should have been called on existing progress manager"
+        assert (
+            mock_progress_manager.complete_step.called
+        ), "complete_step should have been called on existing progress manager"
+
         # Verify outputs were created (functionality still works)
-        assert os.path.exists(context.output_path(OUTPUT_NGRAM_STATS)), "ngram_stats output should exist"
-        assert os.path.exists(context.output_path(OUTPUT_NGRAM_FULL)), "ngram_full output should exist"
+        assert os.path.exists(
+            context.output_path(OUTPUT_NGRAM_STATS)
+        ), "ngram_stats output should exist"
+        assert os.path.exists(
+            context.output_path(OUTPUT_NGRAM_FULL)
+        ), "ngram_full output should exist"

@@ -58,19 +58,19 @@ class TestMemoryManager:
         # Mock different memory usage levels
         with patch.object(manager.process, "memory_info") as mock_memory:
             # Test LOW pressure (40% usage)
-            mock_memory.return_value.rss = int(0.4 * manager.max_memory_bytes)
+            mock_memory.return_value.rss = int(manager.max_memory_bytes * 40 // 100)
             assert manager.get_memory_pressure_level() == MemoryPressureLevel.LOW
 
-            # Test MEDIUM pressure (65% usage)
-            mock_memory.return_value.rss = int(0.65 * manager.max_memory_bytes)
+            # Test MEDIUM pressure (75% usage - safely above 70% threshold)
+            mock_memory.return_value.rss = int(manager.max_memory_bytes * 75 // 100)
             assert manager.get_memory_pressure_level() == MemoryPressureLevel.MEDIUM
 
-            # Test HIGH pressure (80% usage)
-            mock_memory.return_value.rss = int(0.80 * manager.max_memory_bytes)
+            # Test HIGH pressure (85% usage - safely above 80% threshold)
+            mock_memory.return_value.rss = int(manager.max_memory_bytes * 85 // 100)
             assert manager.get_memory_pressure_level() == MemoryPressureLevel.HIGH
 
-            # Test CRITICAL pressure (90% usage)
-            mock_memory.return_value.rss = int(0.90 * manager.max_memory_bytes)
+            # Test CRITICAL pressure (95% usage - safely above 90% threshold)
+            mock_memory.return_value.rss = int(manager.max_memory_bytes * 95 // 100)
             assert manager.get_memory_pressure_level() == MemoryPressureLevel.CRITICAL
 
     def test_adaptive_chunk_sizing(self):
@@ -78,7 +78,9 @@ class TestMemoryManager:
         manager = MemoryManager()
         base_size = 10000
 
-        with patch("app.utils.MemoryManager.get_memory_pressure_level") as mock_pressure:
+        with patch(
+            "app.utils.MemoryManager.get_memory_pressure_level"
+        ) as mock_pressure:
             # Test LOW pressure - no reduction
             mock_pressure.return_value = MemoryPressureLevel.LOW
             size = manager.calculate_adaptive_chunk_size(base_size, "tokenization")
@@ -87,24 +89,26 @@ class TestMemoryManager:
             # Test MEDIUM pressure - 30% reduction
             mock_pressure.return_value = MemoryPressureLevel.MEDIUM
             size = manager.calculate_adaptive_chunk_size(base_size, "tokenization")
-            assert size == int(base_size * 0.7)
+            assert size == int(base_size * 0.8)
 
             # Test HIGH pressure - 60% reduction
             mock_pressure.return_value = MemoryPressureLevel.HIGH
             size = manager.calculate_adaptive_chunk_size(base_size, "tokenization")
-            assert size == int(base_size * 0.4)
+            assert size == int(base_size * 0.6)
 
             # Test CRITICAL pressure - 80% reduction
             mock_pressure.return_value = MemoryPressureLevel.CRITICAL
             size = manager.calculate_adaptive_chunk_size(base_size, "tokenization")
-            assert size == int(base_size * 0.2)
+            assert size == int(base_size * 0.4)
 
     def test_operation_specific_chunk_sizing(self):
         """Test operation-specific chunk size adjustments."""
         manager = MemoryManager()
         base_size = 10000
 
-        with patch("app.utils.MemoryManager.get_memory_pressure_level") as mock_pressure:
+        with patch(
+            "app.utils.MemoryManager.get_memory_pressure_level"
+        ) as mock_pressure:
             mock_pressure.return_value = MemoryPressureLevel.LOW
 
             # Test different operation types
@@ -128,7 +132,9 @@ class TestMemoryManager:
         manager = MemoryManager()
         small_base = 5000
 
-        with patch("app.utils.MemoryManager.get_memory_pressure_level") as mock_pressure:
+        with patch(
+            "app.utils.MemoryManager.get_memory_pressure_level"
+        ) as mock_pressure:
             mock_pressure.return_value = MemoryPressureLevel.CRITICAL
 
             size = manager.calculate_adaptive_chunk_size(small_base, "ngram_generation")

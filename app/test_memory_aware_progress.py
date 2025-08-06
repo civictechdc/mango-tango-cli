@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from terminal_tools.progress import RichProgressManager
 from app.utils import MemoryManager, MemoryPressureLevel
+from terminal_tools.progress import RichProgressManager
 
 
 class TestRichProgressManagerMemoryFeatures:
@@ -17,12 +17,14 @@ class TestRichProgressManagerMemoryFeatures:
     def test_initialization_with_memory_manager(self):
         """Test RichProgressManager initializes correctly with memory manager."""
         memory_manager = MagicMock(spec=MemoryManager)
-        progress_manager = RichProgressManager("Test Analysis", memory_manager=memory_manager)
+        progress_manager = RichProgressManager(
+            "Test Analysis", memory_manager=memory_manager
+        )
 
         assert progress_manager.memory_manager == memory_manager
         assert progress_manager.last_memory_warning is None
         assert "Test Analysis" in progress_manager.title
-        
+
     def test_initialization_without_memory_manager(self):
         """Test RichProgressManager initializes correctly without memory manager."""
         progress_manager = RichProgressManager("Test Analysis")
