@@ -1,14 +1,27 @@
 # Claude Code - Mango Tango CLI Integration
 
-## Session Initialization - CRITICAL
+## Critical Thinking and Feedback
 
-**Always start every Claude Code session with**:
+**IMPORTANT: Always critically evaluate and challenge user suggestions, even when they seem reasonable.**
 
-```markdown
-Read the initial instructions
-```
+**USE BRUTAL HONESTY**: Don't try to be polite or agreeable. Be direct, challenge assumptions, and point out flaws immediately.
 
-This initializes Serena semantic analysis capabilities and loads project context.
+- **Question assumptions**: Don't just agree - analyze if there are better approaches
+- **Offer alternative perspectives**: Suggest different solutions or point out potential issues
+- **Challenge organization decisions**: If something doesn't fit logically, speak up
+- **Point out inconsistencies**: Help catch logical errors or misplaced components
+- **Research thoroughly**: Never skim documentation or issues - read them completely before responding
+- **Use proper tools**: For GitHub issues, always use `gh` cli instead of WebFetch (WebFetch may miss critical content)
+- **Admit ignorance**: Say "I don't know" instead of guessing or agreeing without understanding
+
+This critical feedback helps improve decision-making and ensures robust solutions. Being agreeable is less valuable than being thoughtful and analytical.
+
+### Example Behaviors
+
+- ✅ "I disagree - that component belongs in a different file because..."
+- ✅ "Have you considered this alternative approach?"
+- ✅ "This seems inconsistent with the pattern we established..."
+- ❌ Just implementing suggestions without evaluation
 
 ## Project Context
 
@@ -40,8 +53,7 @@ This initializes Serena semantic analysis capabilities and loads project context
 **Project Onboarding** (done once):
 
 ```markdown
-- Call `initial_instructions` tool first
-- Use `check_onboarding_performed` to verify setup
+- Use `check_onboarding_performed` to verify onboarding has been completed.
 - If needed, call `onboarding` tool for comprehensive analysis
 ```
 
@@ -110,40 +122,18 @@ find_symbol("AppContext", include_body=True)
 
 ### Session Startup Checklist
 
-1. ✅ **Call `initial_instructions`**
-2. ✅ Load @.ai-context/README.md for project overview
-3. ✅ Check `.serena/memories/` for deep insights if needed
-4. ✅ Use semantic tools for code exploration
-5. ✅ Maintain context throughout development
+1. ✅ Load @.ai-context/README.md for project overview
+2. ✅ Check `.serena/memories/` for deep insights if needed
+3. ✅ Use semantic tools for code exploration
+4. ✅ Maintain context throughout development
 
 ### Code Development Standards
 
-**Logging Integration:**
-```python
-from app.logger import get_logger
-logger = get_logger(__name__)
-logger.info("Operation started", extra={"context": "value"})
-```
+For logging integration, progress reporting, and all coding standards, see:
 
-Use structured logging throughout development for debugging and monitoring. See @docs/dev-guide.md#logging for complete usage patterns.
-
-**Progress Reporting Integration:**
-```python
-from terminal_tools.progress import RichProgressManager
-
-def main(context):
-    with RichProgressManager("Analysis Progress") as progress:
-        progress.add_step("step_1", "Processing data", total=data_size)
-        progress.start_step("step_1")
-        # Use hierarchical sub-steps for complex operations
-        progress.add_substep("step_1", "prepare", "Preparing", total=100)
-        progress.start_substep("step_1", "prepare")
-        # ... processing with progress updates
-        progress.complete_substep("step_1", "prepare")
-        progress.complete_step("step_1")
-```
-
-Use hierarchical progress reporting for long-running analyzers. See @docs/dev-guide.md#progress-reporting-system and read_memory("progress_reporting_architecture") for comprehensive guidance.
+- **@docs/dev-guide.md#logging** - Complete logging patterns and best practices
+- **@docs/dev-guide.md#progress-reporting-system** - Hierarchical progress reporting guide
+- **read_memory("code_style_conventions")** - Project-specific conventions and patterns
 
 ### Task-Specific Patterns
 
