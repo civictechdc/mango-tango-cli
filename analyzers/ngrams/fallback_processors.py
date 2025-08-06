@@ -14,8 +14,8 @@ import polars as pl
 
 from analyzers.ngrams.ngrams_base.interface import COL_MESSAGE_SURROGATE_ID
 from app.logger import get_logger
-from terminal_tools.progress import RichProgressManager
 from app.utils import MemoryManager, MemoryPressureLevel
+from terminal_tools.progress import RichProgressManager
 
 # Initialize module-level logger
 logger = get_logger(__name__)
@@ -46,12 +46,36 @@ def generate_ngrams_disk_based(
 
     if memory_manager is None:
         memory_manager = MemoryManager()
+        
+    logger.debug(
+        "Disk-based n-gram generation initialized",
+        extra={
+            "memory_manager_provided": memory_manager is not None,
+            "progress_manager_provided": progress_manager is not None,
+            "estimated_rows": estimated_rows,
+            "processing_mode": "disk_based_fallback",
+        },
+    )
 
-    # Use extremely small chunks for critical memory conditions
-    chunk_size = memory_manager.calculate_adaptive_chunk_size(25000, "ngram_generation")
+    # Use optimized chunks for critical memory conditions
+    chunk_size = memory_manager.calculate_adaptive_chunk_size(
+        100000, "ngram_generation"
+    )
 
     total_rows = estimated_rows
     total_chunks = (total_rows + chunk_size - 1) // chunk_size
+    
+    logger.debug(
+        "Disk-based chunking strategy determined",
+        extra={
+            "base_chunk_size": 100000,
+            "adaptive_chunk_size": chunk_size,
+            "total_rows": total_rows,
+            "total_chunks": total_chunks,
+            "chunk_adjustment_factor": chunk_size / 100000,
+            "memory_optimization": "critical_pressure_handling",
+        },
+    )
 
     # Integrate with existing ngrams step as a sub-step instead of creating new step
     if progress_manager:
@@ -75,11 +99,31 @@ def generate_ngrams_disk_based(
     temp_dir = tempfile.mkdtemp(prefix="ngram_disk_")
     temp_files = []
     import time
+    
+    logger.debug(
+        "Temporary directory created for disk-based processing",
+        extra={
+            "temp_dir": temp_dir,
+            "temp_dir_prefix": "ngram_disk_",
+            "expected_temp_files": total_chunks,
+        },
+    )
 
     try:
         # Process each chunk and write results to disk
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
+            
+            logger.debug(
+                "Starting disk-based chunk processing",
+                extra={
+                    "chunk_index": chunk_idx + 1,
+                    "total_chunks": total_chunks,
+                    "chunk_start": chunk_start,
+                    "chunk_size": chunk_size,
+                    "processing_progress_percent": round((chunk_idx / total_chunks) * 100, 1),
+                },
+            )
 
             # Process small chunk in memory
             chunk_ldf = ldf.slice(chunk_start, chunk_size)
@@ -88,9 +132,16 @@ def generate_ngrams_disk_based(
             ngram_start = time.time()
             chunk_ngrams = _generate_ngrams_minimal_memory(chunk_ldf, min_n, max_n)
             ngram_end = time.time()
+            
             logger.debug(
                 "N-gram generation finished on chunk",
-                extra={"elapsed_time": f"{ngram_end - ngram_start:.2f} seconds"},
+                extra={
+                    "chunk_index": chunk_idx + 1,
+                    "elapsed_time": f"{ngram_end - ngram_start:.2f} seconds",
+                    "min_n": min_n,
+                    "max_n": max_n,
+                    "generation_method": "minimal_memory",
+                },
             )
 
             # Write chunk results to temporary file
@@ -100,7 +151,17 @@ def generate_ngrams_disk_based(
             chunk_ngrams.sink_parquet(temp_file)
             write_end = time.time()
             elapsed_time = f"{write_end - write_start:.2f} seconds"
-            logger.debug("N-gram chunk written", extra={"elapsed_time": elapsed_time})
+            
+            logger.debug(
+                "N-gram chunk written to disk",
+                extra={
+                    "chunk_index": chunk_idx + 1,
+                    "temp_file": temp_file,
+                    "write_elapsed_time": elapsed_time,
+                    "write_method": "sink_parquet",
+                    "compression": "default",
+                },
+            )
 
             temp_files.append(temp_file)
 
@@ -108,13 +169,30 @@ def generate_ngrams_disk_based(
             del chunk_ngrams
 
             # Only perform expensive cleanup if memory pressure is high
-            if memory_manager.get_memory_pressure_level() in [
+            current_pressure = memory_manager.get_memory_pressure_level()
+            if current_pressure in [
                 MemoryPressureLevel.HIGH,
                 MemoryPressureLevel.CRITICAL,
             ]:
-                memory_manager.enhanced_gc_cleanup()
+                cleanup_stats = memory_manager.enhanced_gc_cleanup()
+                logger.debug(
+                    "Enhanced cleanup performed after chunk",
+                    extra={
+                        "chunk_index": chunk_idx + 1,
+                        "pressure_level": current_pressure.value,
+                        "cleanup_method": "enhanced_gc",
+                    },
+                )
             else:
                 gc.collect()  # Lightweight cleanup
+                logger.debug(
+                    "Lightweight cleanup performed after chunk",
+                    extra={
+                        "chunk_index": chunk_idx + 1,
+                        "pressure_level": current_pressure.value,
+                        "cleanup_method": "standard_gc",
+                    },
+                )
 
             # Update progress with current chunk
             if progress_manager:
@@ -148,19 +226,54 @@ def generate_ngrams_disk_based(
 
         # Combine all temporary files using streaming
         if not temp_files:
+            logger.debug(
+                "No temporary files created - returning empty result",
+                extra={
+                    "temp_files_count": 0,
+                    "chunks_processed": total_chunks,
+                    "result_type": "empty_dataframe",
+                },
+            )
             return (
                 ldf.select([COL_MESSAGE_SURROGATE_ID])
                 .limit(0)
                 .with_columns([pl.lit("").alias("ngram_text")])
             )
+            
+        logger.debug(
+            "Combining temporary files into final result",
+            extra={
+                "temp_files_count": len(temp_files),
+                "combination_method": "polars_concat_streaming",
+                "files_to_combine": [os.path.basename(f) for f in temp_files[:5]],  # Sample of file names
+            },
+        )
 
         # Stream all temp files together and collect immediately
         # to avoid file cleanup race condition
         chunk_lazyframes = [pl.scan_parquet(f) for f in temp_files]
         result_ldf = pl.concat(chunk_lazyframes)
+        
+        logger.debug(
+            "Temporary files concatenated, collecting final result",
+            extra={
+                "lazy_frames_count": len(chunk_lazyframes),
+                "concat_method": "polars_concat",
+                "collection_timing": "before_cleanup",
+            },
+        )
 
         # Collect the result before cleanup to avoid file access issues
         result_df = result_ldf.collect()
+        
+        logger.debug(
+            "Final result collected from disk-based processing",
+            extra={
+                "result_rows": result_df.height,
+                "result_columns": result_df.columns,
+                "processing_mode": "disk_based_completed",
+            },
+        )
 
         # Complete progress sub-step on success
         if progress_manager:
@@ -261,9 +374,20 @@ def stream_unique_memory_optimized(
     Integrates with the hierarchical progress structure by using the existing extract_unique sub-step.
     """
 
-    # Use smaller chunks than normal streaming
+    # Use optimized chunks than normal streaming
     chunk_size = memory_manager.calculate_adaptive_chunk_size(
-        25000, "unique_extraction"
+        100000, "unique_extraction"
+    )
+    
+    logger.debug(
+        "Memory-optimized streaming unique extraction initialized",
+        extra={
+            "base_chunk_size": 100000,
+            "adaptive_chunk_size": chunk_size,
+            "column_name": column_name,
+            "optimization_level": "high_memory_pressure",
+            "chunk_adjustment_factor": chunk_size / 100000,
+        },
     )
 
     logger.info(
@@ -279,6 +403,16 @@ def stream_unique_memory_optimized(
     # For now, we still need to get the count, but this should be optimized in future versions
     total_count = ldf_data.select(pl.len()).collect().item()
     total_chunks = (total_count + chunk_size - 1) // chunk_size
+    
+    logger.debug(
+        "Memory-optimized streaming parameters calculated",
+        extra={
+            "total_count": total_count,
+            "chunk_size": chunk_size,
+            "total_chunks": total_chunks,
+            "chunking_efficiency": total_count / chunk_size if chunk_size > 0 else "N/A",
+        },
+    )
 
     # Use temporary files for intermediate storage
     temp_files = []
@@ -287,6 +421,17 @@ def stream_unique_memory_optimized(
         # Process each chunk and stream unique values to separate temp files
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
+            
+            logger.debug(
+                "Processing memory-optimized streaming chunk",
+                extra={
+                    "chunk_index": chunk_idx + 1,
+                    "total_chunks": total_chunks,
+                    "chunk_start": chunk_start,
+                    "chunk_size": chunk_size,
+                    "progress_percent": round((chunk_idx / total_chunks) * 100, 1),
+                },
+            )
 
             # Update progress before processing chunk - integrate with hierarchical structure
             try:
@@ -321,13 +466,30 @@ def stream_unique_memory_optimized(
                 )
 
                 # Only perform expensive cleanup if memory pressure is high
-                if memory_manager.get_memory_pressure_level() in [
+                current_pressure = memory_manager.get_memory_pressure_level()
+                if current_pressure in [
                     MemoryPressureLevel.HIGH,
                     MemoryPressureLevel.CRITICAL,
                 ]:
                     memory_manager.enhanced_gc_cleanup()
+                    logger.debug(
+                        "Enhanced cleanup after streaming chunk",
+                        extra={
+                            "chunk_index": chunk_idx + 1,
+                            "pressure_level": current_pressure.value,
+                            "cleanup_method": "enhanced",
+                        },
+                    )
                 else:
                     gc.collect()  # Lightweight cleanup
+                    logger.debug(
+                        "Standard cleanup after streaming chunk",
+                        extra={
+                            "chunk_index": chunk_idx + 1,
+                            "pressure_level": current_pressure.value,
+                            "cleanup_method": "standard",
+                        },
+                    )
 
             except Exception as e:
                 logger.warning(
