@@ -135,6 +135,17 @@ For logging integration, progress reporting, and all coding standards, see:
 - **@docs/dev-guide.md#progress-reporting-system** - Hierarchical progress reporting guide
 - **read_memory("code_style_conventions")** - Project-specific conventions and patterns
 
+### Code Development Standards
+
+**Logging Integration:**
+```python
+from app.logger import get_logger
+logger = get_logger(__name__)
+logger.info("Operation started", extra={"context": "value"})
+```
+
+Use structured logging throughout development for debugging and monitoring. See @docs/dev-guide.md#logging for complete usage patterns.
+
 ### Task-Specific Patterns
 
 **New Analyzer Development**:
