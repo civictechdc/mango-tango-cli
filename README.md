@@ -13,6 +13,10 @@
 
 ---
 
+## Technical Documentation
+
+For in-depth technical docs related to this repository please visit [https://civictechdc.github.io/mango-tango-cli](https://civictechdc.github.io/mango-tango-cli)
+
 ## Requirements
 
 Python 3.12
