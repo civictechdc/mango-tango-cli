@@ -137,6 +137,7 @@ class RichProgressManager:
 ```
 
 **Enhanced N-gram Analysis Progress Flow**:
+
 - Steps 1-8: Data processing with traditional progress reporting
 - Steps 9-11: Final write operations with hierarchical sub-step progress
   - Each write operation broken into 4 sub-steps (prepare, transform, sort, write)
@@ -144,6 +145,7 @@ class RichProgressManager:
   - Memory-aware progress calculation based on dataset size
 
 **Integration Points**:
+
 - `AnalysisContext.progress_callback` provides progress manager to analyzers
 - Enhanced write functions use sub-step progress for granular feedback
 - Rich terminal display with hierarchical progress visualization
@@ -200,6 +202,62 @@ interface = AnalyzerInterface(
    - Input: Primary + secondary outputs
    - Output: Dash/Shiny web applications
    - Examples: interactive charts, data exploration interfaces
+
+### Performance Optimization Architecture
+
+The application includes sophisticated performance optimization strategies for handling large datasets efficiently across different system configurations.
+
+#### Memory-Aware Processing
+
+**Adaptive Memory Management**:
+
+```python
+# System-aware memory allocation
+class MemoryManager:
+    def __init__(self):
+        total_gb = psutil.virtual_memory().total / 1024**3
+        if total_gb >= 32:
+            self.allocation_factor = 0.4    # High-memory systems
+        elif total_gb >= 16:
+            self.allocation_factor = 0.3    # Standard systems
+        else:
+            self.allocation_factor = 0.25   # Conservative systems
+```
+
+**Tiered Processing Strategy**:
+
+- **In-Memory Processing**: Optimal for datasets within memory constraints
+- **Chunked Processing**: Adaptive chunk sizes based on system capabilities
+- **Disk-Based Fallback**: External sorting and streaming for constrained systems
+
+#### Performance Components
+
+**Memory Strategies** (`analyzers/ngrams/memory_strategies.py`):
+
+- `ExternalSortUniqueExtractor` - Disk-based unique extraction for large datasets
+- Temporary file management with cleanup
+- Configurable chunk sizes based on system memory
+
+**Fallback Processors** (`analyzers/ngrams/fallback_processors.py`):
+
+- `generate_ngrams_disk_based()` - Minimal memory n-gram generation
+- `stream_unique_memory_optimized()` - Streaming unique extraction
+- Memory pressure detection and adaptive processing
+
+#### Chunk Size Optimization
+
+**System-Specific Scaling**:
+
+- **≥32GB systems**: 2.0x chunk size multiplier (200K-400K rows)
+- **≥16GB systems**: 1.5x chunk size multiplier (150K-300K rows)  
+- **≥8GB systems**: 1.0x baseline chunks (100K-200K rows)
+- **<8GB systems**: 0.5x conservative chunks (50K-100K rows)
+
+**Fallback Thresholds**:
+
+- **High-memory systems**: 3M+ rows before disk-based processing
+- **Standard systems**: 1.5M+ rows before disk-based processing
+- **Constrained systems**: 500K+ rows before disk-based processing
 
 ## Integration Points
 

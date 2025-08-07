@@ -144,6 +144,22 @@ Base interface for data importers
   - Word matching: `create_word_matcher()`
 - `temporal_barplot` - `analyzers/temporal_barplot/factory.py:factory()` - Temporal visualization
 
+#### Performance Optimization Components
+
+**Memory Management** (`analyzers/ngrams/memory_strategies.py`):
+
+- `ExternalSortUniqueExtractor` - External sorting for memory-constrained n-gram processing
+  - Disk-based unique extraction with configurable chunk sizes
+  - Temporary file management and cleanup
+  - Memory-aware processing with fallback strategies
+- `extract_unique_external_sort()` - High-level function for external sorting operations
+
+**Fallback Processors** (`analyzers/ngrams/fallback_processors.py`):
+
+- `generate_ngrams_disk_based()` - Disk-based n-gram generation for large datasets
+- `_generate_ngrams_minimal_memory()` - Minimal memory approach for constrained systems
+- `stream_unique_memory_optimized()` - Memory-optimized streaming unique extraction
+
 #### Analyzer Registration
 
 - `analyzers.suite` - `analyzers/__init__.py` - Central registry of all analyzers
@@ -221,17 +237,20 @@ Base interface for data importers
 Application-wide structured JSON logging with configurable levels and automatic rotation.
 
 **Core Functions:**
+
 - `setup_logging(log_file_path: Path, level: int = logging.INFO)` - Configure application logging
 - `get_logger(name: str) -> logging.Logger` - Get logger instance for module
 
 **Features:**
-- Dual handlers: console (ERROR+) and file (INFO+) 
+
+- Dual handlers: console (ERROR+) and file (INFO+)
 - JSON-formatted structured logs with timestamps and context
 - Automatic log rotation (10MB files, 5 backups)
 - CLI-configurable log levels via `--log-level` flag
 - Log location: `~/.local/share/MangoTango/logs/mangotango.log`
 
 **Usage Pattern:**
+
 ```python
 from app.logger import get_logger
 logger = get_logger(__name__)
@@ -288,6 +307,17 @@ logger.info("Message", extra={"context": "value"})
   - 18 test methods covering substep functionality, validation, error handling, performance
 - `TestProgressReporter` - Basic progress reporter tests
 - `TestAdvancedProgressReporter` - Advanced progress reporter with tqdm integration
+
+#### Performance Testing Infrastructure
+
+**Performance Testing Suite** (`testing/performance/`):
+
+- `test_performance_benchmarks.py` - Core performance benchmarks for analyzer operations
+- `test_enhanced_benchmarks.py` - Enhanced benchmarking with memory profiling
+- `test_chunking_optimization.py` - Chunking strategy validation and performance tests
+- `test_integration_validation.py` - Integration tests for performance optimizations
+- `run_performance_tests.py` - Performance test runner with configurable parameters
+- `run_enhanced_benchmarks.py` - Enhanced benchmark execution with detailed metrics
 
 ### Example Tests
 

@@ -83,6 +83,7 @@ Should output: "No-op flag detected. Exiting successfully."
 - `black==24.10.0` - Code formatter
 - `isort==5.13.2` - Import organizer
 - `pytest==8.3.4` - Testing framework
+- `pytest-benchmark==5.1.0` - Performance testing and benchmarking
 - `pyinstaller==6.14.1` - Executable building
 
 ### Code Formatting Setup
