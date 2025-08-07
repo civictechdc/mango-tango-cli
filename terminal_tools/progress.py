@@ -4,7 +4,6 @@ Progress reporting functionality for terminal-based analysis workflows.
 This module provides various progress reporting implementations:
 - ProgressReporter: Basic progress reporting with start/finish lifecycle
 - RichProgressManager: Advanced progress manager with Rich library integration
-- AdvancedProgressReporter: tqdm-based progress reporting (defined but not used)
 
 The RichProgressManager is the recommended progress reporting solution for analyzers,
 providing hierarchical step and sub-step support with Rich terminal visualization.
