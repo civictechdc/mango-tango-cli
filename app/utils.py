@@ -412,7 +412,11 @@ def tokenize_text(
             r"[\u0400-\u04FF\u0500-\u052F]+",  # Cyrillic words
             r"[a-zA-Z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF][a-zA-Z0-9\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF.!?,;:()'\"\\-]*",  # Latin words with accented chars and punctuation
             r"[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF]",  # Individual CJK characters
-            r"[^\s\p{P}\p{Sm}\p{Sc}]" if UNICODE_SUPPORT else r"[a-zA-Z0-9\u00C0-\u9FFF\uAC00-\uD7AF\u0400-\u052F]",  # Any other non-whitespace excluding punctuation and math/currency symbols
+            (
+                r"[^\s\p{P}\p{Sm}\p{Sc}]"
+                if UNICODE_SUPPORT
+                else r"[a-zA-Z0-9\u00C0-\u9FFF\uAC00-\uD7AF\u0400-\u052F]"
+            ),  # Any other non-whitespace excluding punctuation and math/currency symbols
         ]
     )
 
@@ -450,7 +454,11 @@ def tokenize_text(
                                     r"#\w+",  # #hashtags
                                     r"[a-zA-Z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]+",  # Pure Latin sequences with accented chars
                                     r"[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF]",  # Individual CJK characters
-                                    r"[^\s\p{P}\p{Sm}\p{Sc}]" if UNICODE_SUPPORT else r"[a-zA-Z0-9\u00C0-\u9FFF\uAC00-\uD7AF\u0400-\u052F]",  # Any other non-whitespace excluding punctuation and math/currency symbols
+                                    (
+                                        r"[^\s\p{P}\p{Sm}\p{Sc}]"
+                                        if UNICODE_SUPPORT
+                                        else r"[a-zA-Z0-9\u00C0-\u9FFF\uAC00-\uD7AF\u0400-\u052F]"
+                                    ),  # Any other non-whitespace excluding punctuation and math/currency symbols
                                 ]
                             )
                         )

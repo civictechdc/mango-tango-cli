@@ -295,130 +295,166 @@ class TestTokenizeText:
 
     def test_pure_punctuation_filtering(self):
         """Test that pure punctuation tokens are filtered out."""
-        df = pl.DataFrame({
-            "text": [
-                "!!! ... ,,, ??? ::: ;;;",  # Pure punctuation only
-                "Hello!!! World... Test,,,",  # Mixed content 
-                "。。。 ！！！ ？？？",  # CJK punctuation
-                "((())) [[[]]] {{{}}}"  # Brackets and braces
-            ]
-        }).lazy()
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "!!! ... ,,, ??? ::: ;;;",  # Pure punctuation only
+                    "Hello!!! World... Test,,,",  # Mixed content
+                    "。。。 ！！！ ？？？",  # CJK punctuation
+                    "((())) [[[]]] {{{}}}",  # Brackets and braces
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
-        
+
         # First row: pure punctuation should be filtered to empty list
         tokens_0 = result["tokens"][0].to_list()
-        assert tokens_0 == [], f"Expected empty tokens for pure punctuation, got: {tokens_0}"
-        
-        # Second row: mixed content should preserve words but filter pure punctuation  
+        assert (
+            tokens_0 == []
+        ), f"Expected empty tokens for pure punctuation, got: {tokens_0}"
+
+        # Second row: mixed content should preserve words but filter pure punctuation
         tokens_1 = result["tokens"][1].to_list()
         # Should contain words but not pure punctuation sequences
         word_tokens = [token for token in tokens_1 if any(c.isalnum() for c in token)]
         assert len(word_tokens) >= 2, f"Expected words to be preserved, got: {tokens_1}"
-        
+
         # Third row: CJK punctuation should also be filtered
         tokens_2 = result["tokens"][2].to_list()
-        assert tokens_2 == [], f"Expected CJK punctuation to be filtered, got: {tokens_2}"
-        
+        assert (
+            tokens_2 == []
+        ), f"Expected CJK punctuation to be filtered, got: {tokens_2}"
+
         # Fourth row: brackets and braces should be filtered
         tokens_3 = result["tokens"][3].to_list()
-        assert tokens_3 == [], f"Expected brackets/braces to be filtered, got: {tokens_3}"
+        assert (
+            tokens_3 == []
+        ), f"Expected brackets/braces to be filtered, got: {tokens_3}"
 
     def test_punctuation_edge_cases_preserved(self):
         """Test that legitimate tokens with punctuation are preserved."""
-        df = pl.DataFrame({
-            "text": [
-                "Visit https://example.com/path?query=test&param=1 today",
-                "Contact @user123 and check #hashtag!",  
-                "Words like don't, can't, won't should work",
-                "Email test@example.com or visit sub.domain.com"
-            ]
-        }).lazy()
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "Visit https://example.com/path?query=test&param=1 today",
+                    "Contact @user123 and check #hashtag!",
+                    "Words like don't, can't, won't should work",
+                    "Email test@example.com or visit sub.domain.com",
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
-        
+
         # URLs with punctuation should be preserved
-        tokens_0 = result["tokens"][0].to_list() 
+        tokens_0 = result["tokens"][0].to_list()
         assert "https://example.com/path?query=test&param=1" in tokens_0
-        
+
         # Social media entities should be preserved
         tokens_1 = result["tokens"][1].to_list()
         assert "@user123" in tokens_1
         assert "#hashtag" in tokens_1
-        
+
         # Contractions should be preserved
         tokens_2 = result["tokens"][2].to_list()
         contraction_found = any("'" in token for token in tokens_2)
-        assert contraction_found, f"Expected contractions to be preserved, got: {tokens_2}"
-        
+        assert (
+            contraction_found
+        ), f"Expected contractions to be preserved, got: {tokens_2}"
+
         # Email-like patterns should work (even if not in URL pattern)
         tokens_3 = result["tokens"][3].to_list()
-        email_or_domain_found = any("." in token and len(token) > 1 for token in tokens_3)
+        email_or_domain_found = any(
+            "." in token and len(token) > 1 for token in tokens_3
+        )
         assert email_or_domain_found, f"Expected domain/email patterns, got: {tokens_3}"
 
     def test_punctuation_with_multilingual_text(self):
         """Test punctuation filtering with various languages."""
-        df = pl.DataFrame({
-            "text": [
-                "English... 中文。。。 한국어!!! русский???",
-                "Mixed iPhone用户!!! can use this.",
-                "URL https://例え.com/パス works fine."
-            ]
-        }).lazy()
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "English... 中文。。。 한국어!!! русский???",
+                    "Mixed iPhone用户!!! can use this.",
+                    "URL https://例え.com/パス works fine.",
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
-        
+
         # Should preserve language text but filter pure punctuation
         tokens_0 = result["tokens"][0].to_list()
-        has_text = any(any(c.isalnum() or ord(c) > 127 for c in token) for token in tokens_0)
+        has_text = any(
+            any(c.isalnum() or ord(c) > 127 for c in token) for token in tokens_0
+        )
         assert has_text, f"Expected multilingual text to be preserved, got: {tokens_0}"
-        
+
         # Mixed script tokens should be preserved
         tokens_1 = result["tokens"][1].to_list()
-        assert any("iphone" in token.lower() for token in tokens_1), f"Mixed script not found: {tokens_1}"
-        
+        assert any(
+            "iphone" in token.lower() for token in tokens_1
+        ), f"Mixed script not found: {tokens_1}"
+
         # International domain names: protocol should be preserved, but non-ASCII parts will be tokenized separately
         tokens_2 = result["tokens"][2].to_list()
         https_found = any("https:" in token for token in tokens_2)
-        japanese_chars_found = any(ord(c) > 127 for token in tokens_2 for c in token if c.isalpha())
+        japanese_chars_found = any(
+            ord(c) > 127 for token in tokens_2 for c in token if c.isalpha()
+        )
         assert https_found, f"HTTPS protocol not preserved: {tokens_2}"
         assert japanese_chars_found, f"Japanese characters not preserved: {tokens_2}"
 
     def test_ngram_punctuation_regression(self):
         """Test that n-gram analysis won't generate pure punctuation n-grams."""
-        df = pl.DataFrame({
-            "text": [
-                "Normal text with... excessive punctuation!!! And more???",
-                "!!! ... ,,, !!! ... ,,,", # Pattern that previously generated bad n-grams
-                "Good content. Bad punctuation!!!"
-            ]
-        }).lazy()
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "Normal text with... excessive punctuation!!! And more???",
+                    "!!! ... ,,, !!! ... ,,,",  # Pattern that previously generated bad n-grams
+                    "Good content. Bad punctuation!!!",
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
-        
+
         # Collect all tokens and ensure no pure punctuation tokens exist
         all_tokens = []
         for token_list in result["tokens"].to_list():
             all_tokens.extend(token_list)
-        
+
         # No token should be pure punctuation
         pure_punctuation_tokens = [
-            token for token in all_tokens 
-            if token and all(not c.isalnum() and ord(c) < 256 for c in token)
-            and not token.startswith(('http', '@', '#'))  # Exclude legitimate patterns
+            token
+            for token in all_tokens
+            if token
+            and all(not c.isalnum() and ord(c) < 256 for c in token)
+            and not token.startswith(("http", "@", "#"))  # Exclude legitimate patterns
         ]
-        
-        assert pure_punctuation_tokens == [], f"Found pure punctuation tokens: {pure_punctuation_tokens}"
-        
+
+        assert (
+            pure_punctuation_tokens == []
+        ), f"Found pure punctuation tokens: {pure_punctuation_tokens}"
+
         # Should still have legitimate content
-        content_tokens = [token for token in all_tokens if any(c.isalnum() for c in token)]
-        assert len(content_tokens) > 0, "No content tokens found - over-filtering occurred"
+        content_tokens = [
+            token for token in all_tokens if any(c.isalnum() for c in token)
+        ]
+        assert (
+            len(content_tokens) > 0
+        ), "No content tokens found - over-filtering occurred"
 
     def test_complex_urls_with_punctuation(self):
         """Test complex URLs with various punctuation marks are preserved."""
-        df = pl.DataFrame({
-            "text": ["Check https://example.com/path?query=1&param=test#anchor and http://sub.domain.co.uk/"]
-        }).lazy()
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "Check https://example.com/path?query=1&param=test#anchor and http://sub.domain.co.uk/"
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
         tokens = result["tokens"][0].to_list()
@@ -431,28 +467,32 @@ class TestTokenizeText:
 
     def test_symbol_filtering_specificity(self):
         """Test that only problematic symbols are filtered, not meaningful ones."""
-        df = pl.DataFrame({
-            "text": [
-                "Math symbols === +++ --- should be filtered",
-                "But emojis 😀😎🎉 should be preserved",
-                "Currency symbols $100 €50 should be filtered"
-            ]
-        }).lazy()
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "Math symbols === +++ --- should be filtered",
+                    "But emojis 😀😎🎉 should be preserved",
+                    "Currency symbols $100 €50 should be filtered",
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
-        
+
         # Math symbols should be filtered
         tokens_0 = result["tokens"][0].to_list()
         math_symbols_found = any(token in ["===", "+++", "---"] for token in tokens_0)
         assert not math_symbols_found, f"Math symbols not filtered: {tokens_0}"
         assert "math" in tokens_0
         assert "symbols" in tokens_0
-        
-        # Emojis should be preserved  
+
+        # Emojis should be preserved
         tokens_1 = result["tokens"][1].to_list()
-        emoji_found = any(ord(c) > 127 and not c.isalpha() for token in tokens_1 for c in token)
+        emoji_found = any(
+            ord(c) > 127 and not c.isalpha() for token in tokens_1 for c in token
+        )
         assert emoji_found, f"Emojis not preserved: {tokens_1}"
-        
+
         # Currency symbols should be filtered, numbers preserved as individual digits
         tokens_2 = result["tokens"][2].to_list()
         currency_symbols_found = any(token in ["$", "€"] for token in tokens_2)
@@ -463,16 +503,20 @@ class TestTokenizeText:
 
     def test_real_world_social_media_example(self):
         """Test realistic social media content with mixed punctuation."""
-        df = pl.DataFrame({
-            "text": ["OMG!!! Check this out: https://tinyurl.com/demo @everyone #viral #trending... So cool!!!"]
-        }).lazy()
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "OMG!!! Check this out: https://tinyurl.com/demo @everyone #viral #trending... So cool!!!"
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
         tokens = result["tokens"][0].to_list()
 
         # Should preserve content but filter pure punctuation
         assert "https://tinyurl.com/demo" in tokens
-        assert "@everyone" in tokens  
+        assert "@everyone" in tokens
         assert "#viral" in tokens
         assert "#trending" in tokens
         assert any("omg" in token.lower() for token in tokens)
@@ -480,25 +524,27 @@ class TestTokenizeText:
         assert any("cool" in token.lower() for token in tokens)
 
     def test_comprehensive_punctuation_categories(self):
-        """Test various Unicode punctuation categories are properly filtered.""" 
-        df = pl.DataFrame({
-            "text": [
-                "Brackets: ()[]{}  Quotes: \"'`  Dashes: -–—  Math: +=*÷",
-                "CJK punct: 。！？，：；  Symbols: @#$%^&*  Mixed: word!!! ...word"
-            ]
-        }).lazy()
+        """Test various Unicode punctuation categories are properly filtered."""
+        df = pl.DataFrame(
+            {
+                "text": [
+                    "Brackets: ()[]{}  Quotes: \"'`  Dashes: -–—  Math: +=*÷",
+                    "CJK punct: 。！？，：；  Symbols: @#$%^&*  Mixed: word!!! ...word",
+                ]
+            }
+        ).lazy()
 
         result = tokenize_text(df, "text").collect()
-        
+
         # First row: various punctuation types
-        tokens_0 = result["tokens"][0].to_list() 
+        tokens_0 = result["tokens"][0].to_list()
         content_words = [token for token in tokens_0 if any(c.isalpha() for c in token)]
         # Words may include attached punctuation (like "brackets:")
-        word_stems = [w.rstrip(':').lower() for w in content_words]
+        word_stems = [w.rstrip(":").lower() for w in content_words]
         assert "brackets" in word_stems
         assert "quotes" in word_stems
-        
-        # Second row: mixed content  
+
+        # Second row: mixed content
         tokens_1 = result["tokens"][1].to_list()
         # Should preserve mixed punctuation with letters but filter pure punctuation
         mixed_tokens = [token for token in tokens_1 if any(c.isalpha() for c in token)]
