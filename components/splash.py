@@ -1,8 +1,3 @@
-"""
-Logo generated with: https://github.com/shinshin86/oh-my-logo
-(used as: `npx oh-my-logo "CIB Mango Tree" gold --filled --no-color`)
-Ascii tree was generated with: https://www.asciiart.eu/image-to-ascii
-"""
 from rich import print
 from rich.panel import Panel
 
@@ -57,3 +52,10 @@ _FOOTER: str = Panel.fit(
        ╲ ===== ╱  ╱[/red]
 """
 )
+
+"""
+Notes:
+Logo generated with: https://github.com/shinshin86/oh-my-logo
+(used as: `npx oh-my-logo "CIB Mango Tree" gold --filled --no-color`)
+Ascii tree was generated with: https://www.asciiart.eu/image-to-ascii
+"""
