@@ -119,7 +119,9 @@ def _stream_unique_batch_accumulator(
             "chunk_size": chunk_size,
             "total_chunks": total_chunks,
             "column_name": column_name,
-            "chunking_efficiency": total_count / chunk_size if chunk_size > 0 else "N/A",
+            "chunking_efficiency": (
+                total_count / chunk_size if chunk_size > 0 else "N/A"
+            ),
         },
     )
 
@@ -217,7 +219,9 @@ def _stream_unique_batch_accumulator(
             "Starting temporary file combination phase",
             extra={
                 "temp_files_count": len(temp_files),
-                "temp_files_successfully_processed": len([f for f in temp_files if os.path.exists(f)]),
+                "temp_files_successfully_processed": len(
+                    [f for f in temp_files if os.path.exists(f)]
+                ),
                 "combination_method": "polars_streaming",
             },
         )
@@ -975,7 +979,8 @@ def main(context: PrimaryAnalyzerContext):
                 "total_messages": total_messages,
                 "will_use_chunking": total_messages > adaptive_chunk_size,
                 "tokenization_total": tokenization_total,
-                "chunk_size_adjustment_factor": adaptive_chunk_size / initial_chunk_size,
+                "chunk_size_adjustment_factor": adaptive_chunk_size
+                / initial_chunk_size,
             },
         )
 
@@ -1048,15 +1053,36 @@ def main(context: PrimaryAnalyzerContext):
 
         # Debug: Detailed chunking algorithm analysis
         import psutil
+
         system_memory_gb = psutil.virtual_memory().total / 1024**3
         logger.debug(
             "Detailed chunking calculation analysis",
             extra={
                 "system_memory_gb": system_memory_gb,
-                "memory_factor_applied": 2.0 if system_memory_gb >= 32 else (1.5 if system_memory_gb >= 16 else (1.0 if system_memory_gb >= 8 else 0.5)),
-                "dataset_size_category": ("small" if estimated_rows <= 500_000 else ("medium" if estimated_rows <= 2_000_000 else ("large" if estimated_rows <= 5_000_000 else "very_large"))),
+                "memory_factor_applied": (
+                    2.0
+                    if system_memory_gb >= 32
+                    else (
+                        1.5
+                        if system_memory_gb >= 16
+                        else (1.0 if system_memory_gb >= 8 else 0.5)
+                    )
+                ),
+                "dataset_size_category": (
+                    "small"
+                    if estimated_rows <= 500_000
+                    else (
+                        "medium"
+                        if estimated_rows <= 2_000_000
+                        else ("large" if estimated_rows <= 5_000_000 else "very_large")
+                    )
+                ),
                 "chunk_threshold": MEMORY_CHUNK_THRESHOLD,
-                "chunking_efficiency_ratio": estimated_rows / MEMORY_CHUNK_THRESHOLD if MEMORY_CHUNK_THRESHOLD > 0 else "N/A",
+                "chunking_efficiency_ratio": (
+                    estimated_rows / MEMORY_CHUNK_THRESHOLD
+                    if MEMORY_CHUNK_THRESHOLD > 0
+                    else "N/A"
+                ),
             },
         )
 
@@ -1125,8 +1151,11 @@ def main(context: PrimaryAnalyzerContext):
                     "memory_before_rss_mb": memory_before_preprocess["rss_mb"],
                     "memory_before_vms_mb": memory_before_preprocess["vms_mb"],
                     "pressure_level": pressure_level.value,
-                    "available_mb": memory_before_preprocess.get("available_mb", "unknown"),
-                    "will_use_critical_fallback": pressure_level == MemoryPressureLevel.CRITICAL,
+                    "available_mb": memory_before_preprocess.get(
+                        "available_mb", "unknown"
+                    ),
+                    "will_use_critical_fallback": pressure_level
+                    == MemoryPressureLevel.CRITICAL,
                 },
             )
 
@@ -1162,8 +1191,20 @@ def main(context: PrimaryAnalyzerContext):
                 extra={
                     "memory_before_cleanup_mb": memory_before_preprocess["rss_mb"],
                     "memory_after_cleanup_mb": memory_after_cleanup["rss_mb"],
-                    "memory_freed_mb": memory_before_preprocess["rss_mb"] - memory_after_cleanup["rss_mb"],
-                    "cleanup_effectiveness_percent": ((memory_before_preprocess["rss_mb"] - memory_after_cleanup["rss_mb"]) / memory_before_preprocess["rss_mb"] * 100) if memory_before_preprocess["rss_mb"] > 0 else 0,
+                    "memory_freed_mb": memory_before_preprocess["rss_mb"]
+                    - memory_after_cleanup["rss_mb"],
+                    "cleanup_effectiveness_percent": (
+                        (
+                            (
+                                memory_before_preprocess["rss_mb"]
+                                - memory_after_cleanup["rss_mb"]
+                            )
+                            / memory_before_preprocess["rss_mb"]
+                            * 100
+                        )
+                        if memory_before_preprocess["rss_mb"] > 0
+                        else 0
+                    ),
                 },
             )
 
@@ -1346,10 +1387,18 @@ def main(context: PrimaryAnalyzerContext):
                     "size_threshold": DATASET_SIZE_FALLBACK_THRESHOLD,
                     "size_based_fallback_needed": should_use_disk_fallback,
                     "current_pressure_level": current_pressure.value,
-                    "pressure_based_fallback_needed": current_pressure == MemoryPressureLevel.CRITICAL,
+                    "pressure_based_fallback_needed": current_pressure
+                    == MemoryPressureLevel.CRITICAL,
                     "current_memory_mb": current_memory_state["rss_mb"],
                     "system_memory_gb": system_memory_gb,
-                    "algorithm_selection": "disk_based" if (should_use_disk_fallback or current_pressure == MemoryPressureLevel.CRITICAL) else "vectorized",
+                    "algorithm_selection": (
+                        "disk_based"
+                        if (
+                            should_use_disk_fallback
+                            or current_pressure == MemoryPressureLevel.CRITICAL
+                        )
+                        else "vectorized"
+                    ),
                 },
             )
 
@@ -1577,9 +1626,13 @@ def main(context: PrimaryAnalyzerContext):
                     "current_memory_mb": current_memory_debug["rss_mb"],
                     "total_ngrams": total_ngrams,
                     "algorithm_selected": (
-                        "external_sort" if pressure_level == MemoryPressureLevel.CRITICAL
-                        else "memory_optimized_streaming" if pressure_level == MemoryPressureLevel.HIGH
-                        else "batch_accumulator"
+                        "external_sort"
+                        if pressure_level == MemoryPressureLevel.CRITICAL
+                        else (
+                            "memory_optimized_streaming"
+                            if pressure_level == MemoryPressureLevel.HIGH
+                            else "batch_accumulator"
+                        )
                     ),
                 },
             )
@@ -2225,7 +2278,11 @@ def _generate_ngrams_vectorized(
             "memory_chunk_threshold": MEMORY_CHUNK_THRESHOLD,
             "estimated_rows": estimated_rows,
             "use_chunking": use_chunking,
-            "chunking_reason": "dataset_size_exceeds_threshold" if use_chunking else "dataset_fits_in_memory",
+            "chunking_reason": (
+                "dataset_size_exceeds_threshold"
+                if use_chunking
+                else "dataset_fits_in_memory"
+            ),
         },
     )
 
@@ -2301,7 +2358,11 @@ def _generate_ngrams_vectorized(
                             "adjusted_chunk_size": chunk_size,
                             "total_chunks_for_length": total_chunks,
                             "estimated_rows": estimated_rows,
-                            "chunk_adjustment_factor": chunk_size / MEMORY_CHUNK_THRESHOLD if MEMORY_CHUNK_THRESHOLD > 0 else "N/A",
+                            "chunk_adjustment_factor": (
+                                chunk_size / MEMORY_CHUNK_THRESHOLD
+                                if MEMORY_CHUNK_THRESHOLD > 0
+                                else "N/A"
+                            ),
                         },
                     )
 
@@ -2486,7 +2547,9 @@ def _generate_ngrams_vectorized(
             "Starting n-gram results combination phase",
             extra={
                 "total_results_to_combine": len(all_ngram_results),
-                "combination_method": "single_result" if len(all_ngram_results) == 1 else "polars_concat",
+                "combination_method": (
+                    "single_result" if len(all_ngram_results) == 1 else "polars_concat"
+                ),
             },
         )
 

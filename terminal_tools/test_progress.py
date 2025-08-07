@@ -497,7 +497,11 @@ class TestRichProgressManager:
         assert len(manager.step_order) == 5
 
         # Verify steps with totals are properly tracked
-        steps_with_totals = {step_id for step_id, step_info in manager.steps.items() if step_info["total"] is not None}
+        steps_with_totals = {
+            step_id
+            for step_id, step_info in manager.steps.items()
+            if step_info["total"] is not None
+        }
         expected_steps_with_totals = {"step1", "step2", "step4"}
         assert steps_with_totals == expected_steps_with_totals
 
@@ -581,7 +585,7 @@ class TestRichProgressManager:
         assert manager._started
         # Live display should be None until we start using steps
         assert manager.live is None
-        
+
         # Once we start a step, live display should be created
         manager.start_step("step1")
         assert manager.live is not None

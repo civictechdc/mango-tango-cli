@@ -35,7 +35,7 @@ class ExternalSortUniqueExtractor:
         self.temp_files = []
         self.progress_manager = progress_manager
         self.logger = get_logger(f"{__name__}.ExternalSortUniqueExtractor")
-        
+
         self.logger.debug(
             "ExternalSortUniqueExtractor initialized",
             extra={
@@ -50,12 +50,16 @@ class ExternalSortUniqueExtractor:
         self, ldf_data: pl.LazyFrame, column_name: str = "ngram_text"
     ) -> pl.DataFrame:
         """Extract unique values using external sorting."""
-        
+
         self.logger.debug(
             "External sort unique extraction started",
             extra={
                 "column_name": column_name,
-                "processing_phases": ["create_sorted_chunks", "merge_sorted_chunks", "cleanup"],
+                "processing_phases": [
+                    "create_sorted_chunks",
+                    "merge_sorted_chunks",
+                    "cleanup",
+                ],
                 "algorithm": "external_merge_sort",
             },
         )
@@ -63,7 +67,7 @@ class ExternalSortUniqueExtractor:
         try:
             # Phase 1: Sort and split data into sorted chunks
             sorted_chunks = self._create_sorted_chunks(ldf_data, column_name)
-            
+
             self.logger.debug(
                 "Phase 1 completed: sorted chunks created",
                 extra={
@@ -74,7 +78,7 @@ class ExternalSortUniqueExtractor:
 
             # Phase 2: Merge sorted chunks while eliminating duplicates
             result = self._merge_sorted_chunks(sorted_chunks, column_name)
-            
+
             self.logger.debug(
                 "Phase 2 completed: chunks merged",
                 extra={
@@ -89,7 +93,7 @@ class ExternalSortUniqueExtractor:
             # Phase 3: Always cleanup temporary files
             cleanup_count = len(self.temp_files)
             self._cleanup_temp_files()
-            
+
             self.logger.debug(
                 "Phase 3 completed: cleanup finished",
                 extra={
@@ -111,7 +115,7 @@ class ExternalSortUniqueExtractor:
 
         total_count = ldf_data.select(pl.len()).collect().item()
         total_chunks = (total_count + chunk_size - 1) // chunk_size
-        
+
         self.logger.debug(
             "External sort chunk parameters calculated",
             extra={
@@ -119,7 +123,9 @@ class ExternalSortUniqueExtractor:
                 "adaptive_chunk_size": chunk_size,
                 "total_count": total_count,
                 "total_chunks": total_chunks,
-                "chunk_efficiency": total_count / chunk_size if chunk_size > 0 else "N/A",
+                "chunk_efficiency": (
+                    total_count / chunk_size if chunk_size > 0 else "N/A"
+                ),
                 "memory_pressure_optimization": "critical",
             },
         )
@@ -151,7 +157,7 @@ class ExternalSortUniqueExtractor:
 
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
-            
+
             self.logger.debug(
                 "Processing external sort chunk",
                 extra={
@@ -172,13 +178,19 @@ class ExternalSortUniqueExtractor:
                     .sort(column_name)
                     .collect()
                 )
-                
+
                 self.logger.debug(
                     "Chunk processing completed",
                     extra={
                         "chunk_index": chunk_idx + 1,
                         "chunk_unique_values": len(chunk_df),
-                        "operations_performed": ["slice", "select", "unique", "sort", "collect"],
+                        "operations_performed": [
+                            "slice",
+                            "select",
+                            "unique",
+                            "sort",
+                            "collect",
+                        ],
                     },
                 )
 
@@ -203,7 +215,7 @@ class ExternalSortUniqueExtractor:
                 chunk_df.write_parquet(chunk_file, compression="snappy")
                 chunk_files.append(chunk_file)
                 self.temp_files.append(chunk_file)
-                
+
                 self.logger.debug(
                     "Chunk written to temporary file",
                     extra={
@@ -305,7 +317,7 @@ class ExternalSortUniqueExtractor:
         heap = []
         chunk_iterators = []
         active_chunks = 0
-        
+
         self.logger.debug(
             "Initializing k-way merge algorithm",
             extra={
@@ -319,7 +331,7 @@ class ExternalSortUniqueExtractor:
         for i, chunk_file in enumerate(chunk_files):
             try:
                 chunk_data = pl.read_parquet(chunk_file)
-                
+
                 self.logger.debug(
                     "Loading chunk file for merge",
                     extra={
@@ -336,12 +348,14 @@ class ExternalSortUniqueExtractor:
                         heapq.heappush(heap, (first_value, i, chunk_iter))
                         chunk_iterators.append(chunk_iter)
                         active_chunks += 1
-                        
+
                         self.logger.debug(
                             "Chunk initialized in heap",
                             extra={
                                 "chunk_index": i + 1,
-                                "first_value": str(first_value)[:50],  # Truncate for logging
+                                "first_value": str(first_value)[
+                                    :50
+                                ],  # Truncate for logging
                                 "active_chunks": active_chunks,
                             },
                         )
@@ -367,7 +381,7 @@ class ExternalSortUniqueExtractor:
         update_interval = max(
             1, active_chunks // 20
         )  # Update progress ~20 times during merge
-        
+
         self.logger.debug(
             "Starting k-way merge execution",
             extra={
@@ -410,7 +424,7 @@ class ExternalSortUniqueExtractor:
             except StopIteration:
                 # This chunk is exhausted - update progress to show one chunk completed
                 active_chunks -= 1
-                
+
                 self.logger.debug(
                     "Chunk exhausted during merge",
                     extra={
@@ -419,7 +433,7 @@ class ExternalSortUniqueExtractor:
                         "total_processed_items": processed_items,
                     },
                 )
-                
+
                 if self.progress_manager:
                     try:
                         completed_chunks = len(chunk_files) - active_chunks
@@ -443,17 +457,21 @@ class ExternalSortUniqueExtractor:
                 )
 
         final_result = pl.DataFrame({column_name: result_values})
-        
+
         self.logger.debug(
             "K-way merge completed",
             extra={
                 "total_processed_items": processed_items,
                 "final_unique_count": len(result_values),
-                "deduplication_effectiveness": f"{len(result_values)}/{processed_items}" if processed_items > 0 else "N/A",
+                "deduplication_effectiveness": (
+                    f"{len(result_values)}/{processed_items}"
+                    if processed_items > 0
+                    else "N/A"
+                ),
                 "merge_algorithm": "heap_based_k_way_complete",
             },
         )
-        
+
         return final_result
 
     def _cleanup_temp_files(self):
@@ -461,7 +479,7 @@ class ExternalSortUniqueExtractor:
         cleanup_attempted = len(self.temp_files)
         cleanup_successful = 0
         cleanup_failed = 0
-        
+
         self.logger.debug(
             "Starting temporary file cleanup",
             extra={
@@ -469,7 +487,7 @@ class ExternalSortUniqueExtractor:
                 "temp_file_sample": [os.path.basename(f) for f in self.temp_files[:3]],
             },
         )
-        
+
         for temp_file in self.temp_files:
             try:
                 os.unlink(temp_file)
@@ -485,14 +503,18 @@ class ExternalSortUniqueExtractor:
                     },
                 )
         self.temp_files.clear()
-        
+
         self.logger.debug(
             "Temporary file cleanup completed",
             extra={
                 "cleanup_attempted": cleanup_attempted,
                 "cleanup_successful": cleanup_successful,
                 "cleanup_failed": cleanup_failed,
-                "cleanup_success_rate": f"{cleanup_successful}/{cleanup_attempted}" if cleanup_attempted > 0 else "N/A",
+                "cleanup_success_rate": (
+                    f"{cleanup_successful}/{cleanup_attempted}"
+                    if cleanup_attempted > 0
+                    else "N/A"
+                ),
             },
         )
 
@@ -510,7 +532,7 @@ def extract_unique_external_sort(
     memory pressure becomes critical. Integrates with hierarchical progress structure.
     """
     logger = get_logger(f"{__name__}.extract_unique_external_sort")
-    
+
     logger.debug(
         "External sort convenience function called",
         extra={
@@ -520,14 +542,14 @@ def extract_unique_external_sort(
             "extraction_method": "external_sort_convenience",
         },
     )
-    
+
     extractor = ExternalSortUniqueExtractor(
         memory_manager, progress_manager=progress_manager
     )
 
     try:
         result = extractor.extract_unique(ldf_data, column_name)
-        
+
         logger.debug(
             "External sort extraction completed successfully",
             extra={
@@ -536,7 +558,7 @@ def extract_unique_external_sort(
                 "extraction_successful": True,
             },
         )
-        
+
         return result
     except Exception as e:
         logger.error(
@@ -548,7 +570,7 @@ def extract_unique_external_sort(
             },
             exc_info=True,
         )
-        
+
         # Use hierarchical progress structure - external sort happens within extract_unique substep
         if progress_manager:
             try:

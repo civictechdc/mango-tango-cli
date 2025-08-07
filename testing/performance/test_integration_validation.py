@@ -61,12 +61,12 @@ class TestChunkingOptimizationIntegration:
                 )  # Allow for pressure reduction
 
                 # For low pressure, should be at or below base chunk
-                with patch.object(manager.process, 'memory_info') as mock_memory:
+                with patch.object(manager.process, "memory_info") as mock_memory:
                     # Simulate low memory usage (50% of max) for LOW pressure
                     mock_memory.return_value.rss = int(0.5 * manager.max_memory_bytes)
 
                     low_pressure_chunk = manager.calculate_adaptive_chunk_size(
-                        base_chunk, "ngram_generation"  
+                        base_chunk, "ngram_generation"
                     )
 
                     # Should use operation-specific adjustment
@@ -278,9 +278,11 @@ class TestChunkingOptimizationIntegration:
         assert chunk_size >= 1000  # Should enforce some minimum
 
         # Test with extreme memory pressure
-        with patch.object(constrained_manager.process, 'memory_info') as mock_memory:
+        with patch.object(constrained_manager.process, "memory_info") as mock_memory:
             # Simulate critical memory usage (95% of max)
-            mock_memory.return_value.rss = int(0.95 * constrained_manager.max_memory_bytes)
+            mock_memory.return_value.rss = int(
+                0.95 * constrained_manager.max_memory_bytes
+            )
 
             critical_chunk = constrained_manager.calculate_adaptive_chunk_size(
                 100000, "ngram_generation"

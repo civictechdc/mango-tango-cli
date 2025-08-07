@@ -46,7 +46,7 @@ def generate_ngrams_disk_based(
 
     if memory_manager is None:
         memory_manager = MemoryManager()
-        
+
     logger.debug(
         "Disk-based n-gram generation initialized",
         extra={
@@ -64,7 +64,7 @@ def generate_ngrams_disk_based(
 
     total_rows = estimated_rows
     total_chunks = (total_rows + chunk_size - 1) // chunk_size
-    
+
     logger.debug(
         "Disk-based chunking strategy determined",
         extra={
@@ -99,7 +99,7 @@ def generate_ngrams_disk_based(
     temp_dir = tempfile.mkdtemp(prefix="ngram_disk_")
     temp_files = []
     import time
-    
+
     logger.debug(
         "Temporary directory created for disk-based processing",
         extra={
@@ -113,7 +113,7 @@ def generate_ngrams_disk_based(
         # Process each chunk and write results to disk
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
-            
+
             logger.debug(
                 "Starting disk-based chunk processing",
                 extra={
@@ -121,7 +121,9 @@ def generate_ngrams_disk_based(
                     "total_chunks": total_chunks,
                     "chunk_start": chunk_start,
                     "chunk_size": chunk_size,
-                    "processing_progress_percent": round((chunk_idx / total_chunks) * 100, 1),
+                    "processing_progress_percent": round(
+                        (chunk_idx / total_chunks) * 100, 1
+                    ),
                 },
             )
 
@@ -132,7 +134,7 @@ def generate_ngrams_disk_based(
             ngram_start = time.time()
             chunk_ngrams = _generate_ngrams_minimal_memory(chunk_ldf, min_n, max_n)
             ngram_end = time.time()
-            
+
             logger.debug(
                 "N-gram generation finished on chunk",
                 extra={
@@ -151,7 +153,7 @@ def generate_ngrams_disk_based(
             chunk_ngrams.sink_parquet(temp_file)
             write_end = time.time()
             elapsed_time = f"{write_end - write_start:.2f} seconds"
-            
+
             logger.debug(
                 "N-gram chunk written to disk",
                 extra={
@@ -239,13 +241,15 @@ def generate_ngrams_disk_based(
                 .limit(0)
                 .with_columns([pl.lit("").alias("ngram_text")])
             )
-            
+
         logger.debug(
             "Combining temporary files into final result",
             extra={
                 "temp_files_count": len(temp_files),
                 "combination_method": "polars_concat_streaming",
-                "files_to_combine": [os.path.basename(f) for f in temp_files[:5]],  # Sample of file names
+                "files_to_combine": [
+                    os.path.basename(f) for f in temp_files[:5]
+                ],  # Sample of file names
             },
         )
 
@@ -253,7 +257,7 @@ def generate_ngrams_disk_based(
         # to avoid file cleanup race condition
         chunk_lazyframes = [pl.scan_parquet(f) for f in temp_files]
         result_ldf = pl.concat(chunk_lazyframes)
-        
+
         logger.debug(
             "Temporary files concatenated, collecting final result",
             extra={
@@ -265,7 +269,7 @@ def generate_ngrams_disk_based(
 
         # Collect the result before cleanup to avoid file access issues
         result_df = result_ldf.collect()
-        
+
         logger.debug(
             "Final result collected from disk-based processing",
             extra={
@@ -378,7 +382,7 @@ def stream_unique_memory_optimized(
     chunk_size = memory_manager.calculate_adaptive_chunk_size(
         100000, "unique_extraction"
     )
-    
+
     logger.debug(
         "Memory-optimized streaming unique extraction initialized",
         extra={
@@ -403,14 +407,16 @@ def stream_unique_memory_optimized(
     # For now, we still need to get the count, but this should be optimized in future versions
     total_count = ldf_data.select(pl.len()).collect().item()
     total_chunks = (total_count + chunk_size - 1) // chunk_size
-    
+
     logger.debug(
         "Memory-optimized streaming parameters calculated",
         extra={
             "total_count": total_count,
             "chunk_size": chunk_size,
             "total_chunks": total_chunks,
-            "chunking_efficiency": total_count / chunk_size if chunk_size > 0 else "N/A",
+            "chunking_efficiency": (
+                total_count / chunk_size if chunk_size > 0 else "N/A"
+            ),
         },
     )
 
@@ -421,7 +427,7 @@ def stream_unique_memory_optimized(
         # Process each chunk and stream unique values to separate temp files
         for chunk_idx in range(total_chunks):
             chunk_start = chunk_idx * chunk_size
-            
+
             logger.debug(
                 "Processing memory-optimized streaming chunk",
                 extra={

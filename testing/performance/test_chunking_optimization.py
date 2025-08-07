@@ -665,10 +665,10 @@ class TestErrorHandlingAndEdgeCases:
         memory_manager = MemoryManager(max_memory_gb=0.5)  # Very limited
 
         # Mock the process memory info to simulate critical pressure
-        with patch.object(memory_manager.process, 'memory_info') as mock_memory:
+        with patch.object(memory_manager.process, "memory_info") as mock_memory:
             # Simulate critical memory usage (95% of max)
             mock_memory.return_value.rss = int(0.95 * memory_manager.max_memory_bytes)
-            
+
             # Should drastically reduce chunk size under critical pressure
             base_size = 100_000
             adaptive_size = memory_manager.calculate_adaptive_chunk_size(
