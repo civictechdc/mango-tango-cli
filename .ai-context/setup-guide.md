@@ -69,7 +69,7 @@ Should output: "No-op flag detected. Exiting successfully."
 
 **Production Dependencies** (`requirements.txt`):
 
-- `polars==1.9.0` - Primary data processing
+- `polars==1.31.0` - Primary data processing (updated for performance)
 - `pydantic==2.9.1` - Data validation and models
 - `inquirer==3.4.0` - Interactive terminal prompts
 - `tinydb==4.8.0` - Lightweight JSON database
@@ -77,6 +77,10 @@ Should output: "No-op flag detected. Exiting successfully."
 - `shiny==1.4.0` - Modern web UI framework
 - `plotly==5.24.1` - Data visualization
 - `XlsxWriter==3.2.0` - Excel export functionality
+- `rich==14.0.0` - Terminal formatting and progress display
+- `python-json-logger==3.3.0` - Structured JSON logging
+- `tqdm==4.67.1` - Progress bars and monitoring
+- `regex==2025.7.34` - Advanced regex pattern matching
 
 **Development Dependencies** (`requirements-dev.txt`):
 
@@ -183,6 +187,30 @@ pytest analyzers/hashtags/test_hashtags_analyzer.py::test_gini
 - Test data is co-located with analyzers in `test_data/` directories
 - Each analyzer should include its own test files
 - Tests use sample data to verify functionality
+
+### Performance Testing
+
+The project includes comprehensive performance testing and benchmarking:
+
+```bash
+# Run performance benchmarks
+pytest testing/performance/ -v
+
+# Run specific performance tests
+pytest testing/performance/test_chunking_optimization.py -v
+
+# Run benchmarks with detailed metrics
+python testing/performance/run_enhanced_benchmarks.py
+
+# Run integration validation tests
+pytest testing/performance/test_integration_validation.py -v
+```
+
+**Performance Test Categories**:
+- **Memory detection tests**: Validate auto-detection of system RAM
+- **Adaptive chunking tests**: Verify chunk size optimization
+- **System configuration tests**: Test behavior on different system configs
+- **Benchmarking framework**: Measure actual performance improvements
 
 ## Build Setup (Optional)
 

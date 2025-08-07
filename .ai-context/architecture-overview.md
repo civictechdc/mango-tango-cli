@@ -68,6 +68,25 @@ Key Classes:
 - `FileSelectionState` - File picker state management
 - `TableStats` - Data statistics and preview information
 
+### Infrastructure Layer (`app/`)
+
+Cross-cutting concerns and shared infrastructure
+
+Key Components:
+
+- `Logger` - Application-wide structured JSON logging system
+  - **Dual handlers**: Console (ERROR+) and file (INFO+) output separation
+  - **JSON formatting**: Structured logs with timestamps and context
+  - **Auto rotation**: 10MB files with 5 backup retention
+  - **CLI integration**: Configurable log levels via `--log-level` flag
+  - **Location**: `~/.local/share/MangoTango/logs/mangotango.log`
+
+- `MemoryManager` - Intelligent memory management and system detection
+  - **Auto-detection**: System RAM analysis with tiered allocation strategies
+  - **Adaptive limits**: 20-40% allocation based on system capacity (≥32GB: 40%, ≥16GB: 30%, ≥8GB: 25%, <8GB: 20%)
+  - **Pressure monitoring**: Real-time memory usage tracking and adaptive scaling
+  - **Fallback thresholds**: System-specific limits for disk-based processing
+
 ## Data Flow Architecture
 
 ### Import → Analysis → Export Pipeline

@@ -261,6 +261,15 @@ logger.info("Message", extra={"context": "value"})
 
 - `parquet_row_count(path) -> int` - Efficient row counting for large files
 
+#### Memory Management
+
+- `MemoryManager` - `app/utils.py` - Memory-aware processing with auto-detection
+  - **Auto-detection**: `MemoryManager()` - Detects system RAM and sets optimal limits
+  - **Manual override**: `MemoryManager(max_memory_gb=8.0)` - Custom memory limits
+  - **System-specific allocation**: 20-40% of total RAM based on system capacity
+  - **Pressure monitoring**: `check_memory_pressure()` - Real-time memory usage tracking
+  - **Adaptive scaling**: Dynamic chunk size adjustment based on memory availability
+
 ### Storage Utilities (`storage/__init__.py`)
 
 - `collect_dataframe_chunks(paths) -> polars.DataFrame` - Combine multiple parquet files
