@@ -6,7 +6,7 @@ repo_url: https://github.com/civictechdc/mango-tango-cli
 copyright: Copyright &copy; 2025 CIB Mango Tree
 nav:
   - "Home":
-      - "Overview": "index.md"
+      - "About": "index.md"
       - "License": "license.md"
   - "Guides":
       - "Getting Started":
