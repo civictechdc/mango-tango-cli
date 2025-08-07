@@ -66,5 +66,6 @@ class AnalysisOutputContext(BaseModel):
                     self.analysis_context.model,
                     self.secondary_spec.id,
                     self.output_spec.id,
+                    analyzer_suite=self.app_context.suite,
                 )
             )

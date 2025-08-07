@@ -42,6 +42,7 @@ interface = SecondaryAnalyzerInterface(
         AnalyzerOutput(
             id=OUTPUT_NGRAM_FULL,
             name="N-gram full report",
+            uses_multi_file_dataset=True,
             columns=[
                 OutputColumn(
                     name=COL_NGRAM_ID,

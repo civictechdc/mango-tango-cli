@@ -1,8 +1,13 @@
+import os
 from pathlib import Path
 
-from testing import ParquetTestData, test_secondary_analyzer
+import polars as pl
 
-from .ngram_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS, interface
+# Import the actual smart reader implementation from storage
+from storage import Storage
+from testing import ParquetTestData
+
+from .ngram_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS
 from .ngram_stats.main import main
 from .ngrams_base.interface import (
     OUTPUT_MESSAGE,
@@ -79,9 +84,13 @@ def test_ngram_stats():
         # Run the analyzer
         main(context)
 
-        # Load actual outputs
+        # Load actual outputs (use storage's smart reader for multi-file dataset support)
         actual_ngram_stats = pl.read_parquet(context.output_path(OUTPUT_NGRAM_STATS))
-        actual_ngram_full = pl.read_parquet(context.output_path(OUTPUT_NGRAM_FULL))
+        # Create temporary storage instance to use its smart reader
+        temp_storage = Storage(app_name="Test", app_author="Test")
+        actual_ngram_full = temp_storage._read_parquet_smart(
+            context.output_path(OUTPUT_NGRAM_FULL)
+        )
 
         # Compare ngram_stats with content-based sorting
         # Sort both by words, n, total_reps, distinct_posters to normalize for comparison
@@ -156,8 +165,6 @@ def test_ngram_stats_with_progress_manager():
     import tempfile
     from unittest.mock import Mock
 
-    import polars as pl
-
     from terminal_tools.progress import RichProgressManager
     from testing.testers import TestSecondaryAnalyzerContext
 
@@ -224,6 +231,141 @@ def test_ngram_stats_with_progress_manager():
         assert os.path.exists(
             context.output_path(OUTPUT_NGRAM_STATS)
         ), "ngram_stats output should exist"
-        assert os.path.exists(
-            context.output_path(OUTPUT_NGRAM_FULL)
-        ), "ngram_full output should exist"
+
+        # For ngram_full, check if it exists as either file or directory (multi-file dataset)
+        ngram_full_path = context.output_path(OUTPUT_NGRAM_FULL)
+        ngram_full_exists = os.path.exists(ngram_full_path)
+        if not ngram_full_exists and ngram_full_path.endswith(".parquet"):
+            # Check for multi-file dataset version
+            base_path = ngram_full_path[:-8]
+            dataset_path = f"{base_path}_dataset"
+            ngram_full_exists = os.path.exists(dataset_path)
+
+        assert (
+            ngram_full_exists
+        ), "ngram_full output should exist (as file or dataset directory)"
+
+
+def test_ngram_full_multi_file_dataset():
+    """
+    Test that the ngram_full output is correctly created as a multi-file dataset.
+
+    This test verifies that:
+    1. The output is created as a directory (not a single file)
+    2. The directory contains multiple chunk files
+    3. Reading the multi-file dataset produces the same result as the expected output
+    """
+    import os
+    import tempfile
+
+    import polars as pl
+
+    from testing.testers import TestSecondaryAnalyzerContext
+
+    # Set up test data
+    primary_outputs = {
+        OUTPUT_MESSAGE_NGRAMS: ParquetTestData(
+            filepath=str(Path(test_data_dir, OUTPUT_MESSAGE_NGRAMS + ".parquet"))
+        ),
+        OUTPUT_NGRAM_DEFS: ParquetTestData(
+            filepath=str(Path(test_data_dir, OUTPUT_NGRAM_DEFS + ".parquet"))
+        ),
+        OUTPUT_MESSAGE: ParquetTestData(
+            filepath=str(Path(test_data_dir, OUTPUT_MESSAGE + ".parquet"))
+        ),
+    }
+
+    # Load expected output for comparison
+    expected_ngram_full = pl.read_parquet(
+        str(Path(test_data_dir, OUTPUT_NGRAM_FULL + ".parquet"))
+    )
+
+    # Run the analyzer
+    with tempfile.TemporaryDirectory(
+        delete=True
+    ) as temp_dir, tempfile.TemporaryDirectory(
+        delete=True
+    ) as actual_output_dir, tempfile.TemporaryDirectory(
+        delete=True
+    ) as actual_base_output_dir:
+
+        # Convert primary outputs to parquet files
+        for output_id, output_data in primary_outputs.items():
+            output_data.convert_to_parquet(
+                os.path.join(actual_base_output_dir, f"{output_id}.parquet")
+            )
+
+        # Create test context
+        context = TestSecondaryAnalyzerContext(
+            temp_dir=temp_dir,
+            primary_param_values={},
+            primary_output_parquet_paths={
+                output_id: os.path.join(actual_base_output_dir, f"{output_id}.parquet")
+                for output_id in primary_outputs.keys()
+            },
+            dependency_output_parquet_paths={},
+            output_parquet_root_path=actual_output_dir,
+        )
+
+        # Run the analyzer
+        main(context)
+
+        # Check that the output path is a directory (multi-file dataset)
+        output_path = context.output_path(OUTPUT_NGRAM_FULL)
+
+        # The analyzer creates a directory at the expected file path
+        # because it calls os.makedirs(output_path, exist_ok=True)
+        assert os.path.isdir(
+            output_path
+        ), f"Expected {output_path} to be a directory (multi-file dataset)"
+
+        # Check that the directory contains chunk files
+        chunk_files = [
+            f
+            for f in os.listdir(output_path)
+            if f.startswith("chunk_") and f.endswith(".parquet")
+        ]
+        assert (
+            len(chunk_files) > 0
+        ), "Multi-file dataset directory should contain chunk files"
+        assert any(
+            f.startswith("chunk_0001") for f in chunk_files
+        ), "Should contain chunk_0001.parquet"
+
+        # Verify we can read the multi-file dataset using storage's smart reader
+        temp_storage = Storage(app_name="Test", app_author="Test")
+        actual_ngram_full = temp_storage._read_parquet_smart(output_path)
+
+        # Verify the data is equivalent (using same grouping approach as main test)
+        expected_full_grouped = (
+            expected_ngram_full.group_by("words")
+            .agg(
+                [
+                    pl.col("n").first(),
+                    pl.col("total_reps").first(),
+                    pl.col("distinct_posters").first(),
+                    pl.col("user_id").count().alias("user_count"),
+                    pl.col("message_surrogate_id").n_unique().alias("unique_messages"),
+                ]
+            )
+            .sort("words")
+        )
+
+        actual_full_grouped = (
+            actual_ngram_full.group_by("words")
+            .agg(
+                [
+                    pl.col("n").first(),
+                    pl.col("total_reps").first(),
+                    pl.col("distinct_posters").first(),
+                    pl.col("user_id").count().alias("user_count"),
+                    pl.col("message_surrogate_id").n_unique().alias("unique_messages"),
+                ]
+            )
+            .sort("words")
+        )
+
+        # Verify the multi-file dataset produces the same result
+        assert actual_full_grouped.equals(
+            expected_full_grouped
+        ), "Multi-file dataset content should match expected output"

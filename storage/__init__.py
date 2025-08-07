@@ -208,15 +208,63 @@ class Storage:
         output_path = self.get_secondary_output_parquet_path(
             analysis, secondary_id, output_id
         )
-        return pl.read_parquet(output_path)
+        return self._read_parquet_smart(output_path)
+
+    def _read_parquet_smart(self, path: str):
+        """
+        Smart parquet reader that handles both single files and multi-file datasets.
+
+        - If path is a file, reads it directly
+        - If path is a directory, reads all parquet files within it as a dataset
+        - If path doesn't exist as file, try as directory with /*.parquet pattern
+        """
+        import os
+
+        if os.path.isfile(path):
+            # Single file case
+            return pl.read_parquet(path)
+        elif os.path.isdir(path):
+            # Multi-file dataset case - read all parquet files in directory
+            return pl.read_parquet(os.path.join(path, "*.parquet"))
+        else:
+            # Path doesn't exist as file, try multi-file pattern
+            # This handles transition cases where path might be file.parquet vs directory
+            if path.endswith(".parquet"):
+                # Try directory version: replace file.parquet with file_dataset/*.parquet
+                base_path = path[:-8]  # Remove .parquet
+                dataset_path = f"{base_path}_dataset"
+                if os.path.isdir(dataset_path):
+                    return pl.read_parquet(os.path.join(dataset_path, "*.parquet"))
+
+            # Fallback to original path (will raise appropriate error if not found)
+            return pl.read_parquet(path)
 
     def get_secondary_output_parquet_path(
-        self, analysis: AnalysisModel, secondary_id: str, output_id: str
+        self,
+        analysis: AnalysisModel,
+        secondary_id: str,
+        output_id: str,
+        analyzer_suite=None,
     ):
-        return os.path.join(
-            self._get_project_secondary_output_root_path(analysis, secondary_id),
-            f"{output_id}.parquet",
-        )
+        base_path = self._get_project_secondary_output_root_path(analysis, secondary_id)
+
+        # Check if this output should use multi-file dataset
+        if analyzer_suite:
+            try:
+                # Look up the analyzer interface
+                analyzer = analyzer_suite.get_secondary_analyzer_by_id(secondary_id)
+                if analyzer:
+                    # Find the specific output in the interface
+                    for output in analyzer.interface.outputs:
+                        if output.id == output_id and output.uses_multi_file_dataset:
+                            # Return directory path for multi-file datasets
+                            return os.path.join(base_path, f"{output_id}_dataset")
+            except (AttributeError, KeyError):
+                # Fallback to single file if interface lookup fails
+                pass
+
+        # Default single file behavior
+        return os.path.join(base_path, f"{output_id}.parquet")
 
     def export_project_primary_output(
         self,

@@ -1,8 +1,6 @@
 import os
 
 import polars as pl
-import pyarrow as pa
-import pyarrow.parquet as pq
 
 from analyzer_interface.context import SecondaryAnalyzerContext
 from app.logger import get_logger
@@ -69,11 +67,13 @@ def main(context: SecondaryAnalyzerContext):
     )
     ldf_ngrams = pl.scan_parquet(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path)
     ldf_messages = pl.scan_parquet(context.base.table(OUTPUT_MESSAGE).parquet_path)
-    
+
     logger.debug(
         "Input data sources loaded as LazyFrames",
         extra={
-            "message_ngrams_path": str(context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path),
+            "message_ngrams_path": str(
+                context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
+            ),
             "ngram_defs_path": str(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path),
             "messages_path": str(context.base.table(OUTPUT_MESSAGE).parquet_path),
             "loading_method": "lazy_polars_scan_parquet",
@@ -91,7 +91,7 @@ def main(context: SecondaryAnalyzerContext):
         )
         progress_manager = existing_progress_manager
         use_context_manager = False
-        
+
         logger.debug(
             "Progress manager context analysis",
             extra={
@@ -104,7 +104,7 @@ def main(context: SecondaryAnalyzerContext):
     else:
         logger.info("Creating new progress manager for standalone execution")
         use_context_manager = True
-        
+
         logger.debug(
             "Progress manager context analysis",
             extra={
@@ -138,15 +138,17 @@ def main(context: SecondaryAnalyzerContext):
             message_count = ldf_messages.select(pl.len()).collect().item()
 
             # Calculate estimated processing requirements for full report
-            # This helps us determine if we need chunked processing and what the total will be
+            # Multi-file dataset optimization allows larger chunk sizes for better performance
             estimated_chunk_size = max(
-                5_000,
-                min(50_000, 500_000 // max(1, message_ngram_count // ngram_count)),
+                10_000,  # Increased min from 5k to 10k
+                min(
+                    200_000, 2_000_000 // max(1, message_ngram_count // ngram_count)
+                ),  # Increased max from 50k to 200k, divisor from 500k to 2M
             )
             estimated_full_report_chunks = (
                 ngram_count + estimated_chunk_size - 1
             ) // estimated_chunk_size
-            
+
             logger.debug(
                 "Full report processing strategy calculated",
                 extra={
@@ -155,8 +157,14 @@ def main(context: SecondaryAnalyzerContext):
                     "message_count": message_count,
                     "calculated_chunk_size": estimated_chunk_size,
                     "estimated_chunks": estimated_full_report_chunks,
-                    "ngram_to_message_ratio": message_ngram_count / ngram_count if ngram_count > 0 else "N/A",
-                    "processing_intensity": "high" if estimated_full_report_chunks > 10 else "moderate" if estimated_full_report_chunks > 3 else "low",
+                    "ngram_to_message_ratio": (
+                        message_ngram_count / ngram_count if ngram_count > 0 else "N/A"
+                    ),
+                    "processing_intensity": (
+                        "high"
+                        if estimated_full_report_chunks > 10
+                        else "moderate" if estimated_full_report_chunks > 3 else "low"
+                    ),
                 },
             )
 
@@ -211,12 +219,15 @@ def main(context: SecondaryAnalyzerContext):
             # Sub-step 1: Calculate total repetitions and basic aggregations per n-gram
             progress_manager.start_substep("compute_stats", "calculate_reps")
             logger.info("Starting repetition count calculation")
-            
+
             logger.debug(
                 "Repetition calculation phase initialized",
                 extra={
                     "aggregation_method": "polars_group_by",
-                    "aggregation_columns": [COL_MESSAGE_NGRAM_COUNT, COL_MESSAGE_SURROGATE_ID],
+                    "aggregation_columns": [
+                        COL_MESSAGE_NGRAM_COUNT,
+                        COL_MESSAGE_SURROGATE_ID,
+                    ],
                     "group_by_column": COL_NGRAM_ID,
                     "filter_criteria": "total_reps > 1",
                 },
@@ -236,11 +247,14 @@ def main(context: SecondaryAnalyzerContext):
                 )
                 .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
             )
-            
+
             logger.debug(
                 "Basic statistics aggregation query constructed",
                 extra={
-                    "aggregation_operations": ["sum_message_ngram_count", "n_unique_message_surrogate_id"],
+                    "aggregation_operations": [
+                        "sum_message_ngram_count",
+                        "n_unique_message_surrogate_id",
+                    ],
                     "post_filter": "total_reps > 1",
                     "lazy_evaluation": True,
                 },
@@ -252,7 +266,7 @@ def main(context: SecondaryAnalyzerContext):
             # Sub-step 2: Count distinct posters per n-gram through message joins
             progress_manager.start_substep("compute_stats", "count_posters")
             logger.info("Starting distinct poster count calculation")
-            
+
             logger.debug(
                 "Poster count calculation phase initialized",
                 extra={
@@ -290,13 +304,17 @@ def main(context: SecondaryAnalyzerContext):
                     COL_NGRAM_DISTINCT_POSTER_COUNT,
                 ]
             )
-            
+
             logger.debug(
                 "Basic stats and poster counts joined",
                 extra={
                     "join_type": "inner",
                     "join_key": COL_NGRAM_ID,
-                    "output_columns": [COL_NGRAM_ID, COL_NGRAM_TOTAL_REPS, COL_NGRAM_DISTINCT_POSTER_COUNT],
+                    "output_columns": [
+                        COL_NGRAM_ID,
+                        COL_NGRAM_TOTAL_REPS,
+                        COL_NGRAM_DISTINCT_POSTER_COUNT,
+                    ],
                     "expected_cardinality": "ngram_level_statistics",
                 },
             )
@@ -307,7 +325,7 @@ def main(context: SecondaryAnalyzerContext):
             # Sub-step 3: Join with n-gram definitions to create summary table
             progress_manager.start_substep("compute_stats", "join_definitions")
             logger.info("Starting join with n-gram definitions")
-            
+
             logger.debug(
                 "Definition join phase initialized",
                 extra={
@@ -329,11 +347,15 @@ def main(context: SecondaryAnalyzerContext):
             # Sub-step 4: Sort results for final output
             progress_manager.start_substep("compute_stats", "sort_results")
             logger.info("Starting final result sorting")
-            
+
             logger.debug(
                 "Final sorting phase initialized",
                 extra={
-                    "sort_columns": [COL_NGRAM_LENGTH, COL_NGRAM_TOTAL_REPS, COL_NGRAM_DISTINCT_POSTER_COUNT],
+                    "sort_columns": [
+                        COL_NGRAM_LENGTH,
+                        COL_NGRAM_TOTAL_REPS,
+                        COL_NGRAM_DISTINCT_POSTER_COUNT,
+                    ],
                     "sort_order": "descending",
                     "collection_engine": "streaming",
                     "purpose": "prioritize_high_impact_ngrams",
@@ -357,9 +379,9 @@ def main(context: SecondaryAnalyzerContext):
                     "lazy_operations_completed": True,
                 },
             )
-            
+
             df_ngram_summary = ldf_ngram_summary.collect(engine="streaming")
-            
+
             logger.debug(
                 "Summary collection completed",
                 extra={
@@ -461,23 +483,31 @@ def main(context: SecondaryAnalyzerContext):
             )
 
             # Process n-grams in chunks to manage memory efficiently
-            # Use the actual counts to refine chunk size
+            # Multi-file dataset optimization allows larger chunk sizes for better performance
             chunk_size = max(
-                5_000,
-                min(50_000, 500_000 // max(1, message_ngram_count // ngram_count)),
+                10_000,  # Increased min from 5k to 10k
+                min(
+                    200_000, 2_000_000 // max(1, message_ngram_count // ngram_count)
+                ),  # Increased max from 50k to 200k, divisor from 500k to 2M
             )
             actual_total_chunks = (
                 total_ngrams_to_process + chunk_size - 1
             ) // chunk_size
-            
+
             logger.debug(
                 "Full report chunking strategy finalized",
                 extra={
                     "total_ngrams_to_process": total_ngrams_to_process,
-                    "base_chunk_constraints": {"min": 5_000, "max": 50_000, "divisor": 500_000},
+                    "base_chunk_constraints": {
+                        "min": 10_000,
+                        "max": 200_000,
+                        "divisor": 2_000_000,
+                    },
                     "calculated_chunk_size": chunk_size,
                     "actual_total_chunks": actual_total_chunks,
-                    "processing_complexity": message_ngram_count // ngram_count if ngram_count > 0 else "N/A",
+                    "processing_complexity": (
+                        message_ngram_count // ngram_count if ngram_count > 0 else "N/A"
+                    ),
                     "memory_efficiency_target": "bounded_memory_usage",
                 },
             )
@@ -492,8 +522,7 @@ def main(context: SecondaryAnalyzerContext):
                 },
             )
 
-            # Initialize output file with schema
-            first_chunk = True
+            # Initialize tracking variables
             processed_count = 0
 
             try:
@@ -502,7 +531,7 @@ def main(context: SecondaryAnalyzerContext):
                     chunk_ngram_summary = df_ngram_summary.slice(
                         chunk_start, chunk_end - chunk_start
                     )
-                    
+
                     current_chunk_num = (chunk_start // chunk_size) + 1
                     logger.debug(
                         "Processing full report chunk",
@@ -512,7 +541,9 @@ def main(context: SecondaryAnalyzerContext):
                             "chunk_start": chunk_start,
                             "chunk_end": chunk_end,
                             "chunk_size": chunk_end - chunk_start,
-                            "progress_percent": round((current_chunk_num / actual_total_chunks) * 100, 1),
+                            "progress_percent": round(
+                                (current_chunk_num / actual_total_chunks) * 100, 1
+                            ),
                         },
                     )
 
@@ -524,53 +555,28 @@ def main(context: SecondaryAnalyzerContext):
                         progress_manager,
                     )
 
-                    # Write chunk output efficiently
-                    if first_chunk:
-                        logger.debug(
-                            "Writing first chunk (creating new file)",
-                            extra={
-                                "chunk_number": current_chunk_num,
-                                "chunk_rows": chunk_output.height,
-                                "write_method": "direct_write_parquet",
-                                "file_creation": True,
-                            },
-                        )
-                        chunk_output.write_parquet(
-                            context.output(OUTPUT_NGRAM_FULL).parquet_path
-                        )
-                        first_chunk = False
-                    else:
-                        logger.debug(
-                            "Appending subsequent chunk",
-                            extra={
-                                "chunk_number": current_chunk_num,
-                                "chunk_rows": chunk_output.height,
-                                "write_method": "pyarrow_concat_append",
-                                "file_creation": False,
-                            },
-                        )
-                        # Use streaming append for better memory efficiency
-                        temp_path = (
-                            f"{context.output(OUTPUT_NGRAM_FULL).parquet_path}.tmp"
-                        )
-                        chunk_output.write_parquet(temp_path)
+                    # Write chunk output using multi-file dataset approach
+                    output_path = context.output(OUTPUT_NGRAM_FULL).parquet_path
 
-                        # Use PyArrow for efficient file concatenation
-                        # Read both files as tables and concatenate
-                        existing_table = pq.read_table(
-                            context.output(OUTPUT_NGRAM_FULL).parquet_path
-                        )
-                        new_table = pq.read_table(temp_path)
-                        combined_table = pa.concat_tables([existing_table, new_table])
+                    # Ensure output directory exists for multi-file dataset
+                    os.makedirs(output_path, exist_ok=True)
 
-                        # Write combined table back
-                        pq.write_table(
-                            combined_table,
-                            context.output(OUTPUT_NGRAM_FULL).parquet_path,
-                        )
+                    # Write each chunk as a separate file in the dataset directory
+                    chunk_filename = f"chunk_{current_chunk_num:04d}.parquet"
+                    chunk_path = os.path.join(output_path, chunk_filename)
 
-                        # Clean up temp file
-                        os.remove(temp_path)
+                    logger.debug(
+                        "Writing chunk to multi-file dataset",
+                        extra={
+                            "chunk_number": current_chunk_num,
+                            "chunk_rows": chunk_output.height,
+                            "write_method": "multi_file_dataset_write",
+                            "chunk_path": chunk_path,
+                        },
+                    )
+
+                    # Direct write to chunk file - no concatenation needed!
+                    chunk_output.write_parquet(chunk_path)
 
                     processed_count += chunk_ngram_summary.height
 
@@ -696,7 +702,7 @@ def _process_ngram_chunk(
     """Process a chunk of n-grams to generate full report data with optional progress reporting."""
     # Get n-gram IDs for this chunk
     ngram_ids = chunk_ngram_summary.get_column(COL_NGRAM_ID).to_list()
-    
+
     logger.debug(
         "Processing n-gram chunk for full report",
         extra={
@@ -716,7 +722,7 @@ def _process_ngram_chunk(
             "collection_engine": "streaming",
         },
     )
-    
+
     # Filter and join data for this chunk of n-grams only
     chunk_output = (
         chunk_ngram_summary.lazy()
@@ -760,14 +766,16 @@ def _process_ngram_chunk(
         )
         .collect(engine="streaming")
     )
-    
+
     logger.debug(
         "Chunk processing completed",
         extra={
             "input_ngram_count": len(ngram_ids),
             "output_rows": chunk_output.height,
             "output_columns": len(chunk_output.columns),
-            "expansion_ratio": chunk_output.height / len(ngram_ids) if len(ngram_ids) > 0 else "N/A",
+            "expansion_ratio": (
+                chunk_output.height / len(ngram_ids) if len(ngram_ids) > 0 else "N/A"
+            ),
         },
     )
 
