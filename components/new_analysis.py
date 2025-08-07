@@ -217,10 +217,9 @@ def new_analysis(
                 )
 
                 if selected_user_column is not None:
-                    draft_column_mapping[
-                        selected_analyzer_column.name
-                    ] = selected_user_column.name
-
+                    draft_column_mapping[selected_analyzer_column.name] = (
+                        selected_user_column.name
+                    )
         param_values = customize_analysis(
             context, project, analyzer, final_column_mapping
         )
