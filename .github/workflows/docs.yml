@@ -1,0 +1,76 @@
+# see: https://github.com/marketplace/actions/deploy-mkdocs
+name: Publish docs via GitHub Pages
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      deploy_to:
+        description: "Deployment destination"
+        type: choice
+        options:
+          - prod
+          - preview
+
+jobs:
+  build:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # ✅ Explicitly checkout the PR branch
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Build
+        uses: Tiryoh/actions-mkdocs@v0.24.0
+        if: github.event.action != 'closed'
+        with:
+          # mkdocs_version: 'latest' # option
+          #mkdocs_version: '1.1' # option
+          requirements: "requirements-mkdocs.txt" # option
+          configfile: "mkdocs.yml" # option
+      - name: Fix site permissions
+        if: github.event.action != 'closed'
+        run: |
+          sudo chown -R runner:runner site/
+          find site/ -type f -exec chmod 644 {} \;
+          find site/ -type d -exec chmod 755 {} \;
+      - uses: rossjrw/pr-preview-action@v1
+        if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.deploy_to == 'preview')
+        with:
+          source-dir: ./site/
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: auto
+      - uses: JamesIves/github-pages-deploy-action@v4
+        if: (github.event_name == 'push' && github.ref_name == 'main') ||  (github.event_name == 'workflow_dispatch' && inputs.deploy_to == 'prod')
+        with:
+          folder: ./site/
+          branch: gh-pages
+          clean-exclude: pr-preview
+          force: false
+
+      # - name: Deploy docs
+      #   uses: mhausenblas/mkdocs-deploy-gh-pages@master
+      #   # Or use mhausenblas/mkdocs-deploy-gh-pages@nomaterial to build without the mkdocs-material theme
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     #CUSTOM_DOMAIN: optionaldomain.com
+      #     CONFIG_FILE: mkdocs.yml
+      #     EXTRA_PACKAGES: build-base
+      #     # GITHUB_DOMAIN: github.myenterprise.com
+      #     REQUIREMENTS: requirements-mkdocs.txt

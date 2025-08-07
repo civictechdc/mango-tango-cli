@@ -1,0 +1,75 @@
+site_name: CIB Mango Tree
+site_author: CIB Mango Tree
+site_description: "An interactive python terminal UI wrapper for Mango Tree analyzers."
+site_url: https://cibmangotree.org
+repo_url: https://github.com/civictechdc/mango-tango-cli
+copyright: Copyright &copy; 2025 CIB Mango Tree
+nav:
+  - "Home":
+      - "About": "index.md"
+      - "License": "license.md"
+  - "Guides":
+      - "Getting Started":
+          - "Overview": "guides/get-started/overview.md"
+          - "Installation": "guides/get-started/installation.md"
+      - "Contributing":
+          - "Contributor Workflow": "guides/contributing/contributing.md"
+          - "Implementing Analyzers": "guides/contributing/analyzers.md"
+          - "Dashboards":
+              - "Shiny": "guides/contributing/dashboards/shiny.md"
+              - "React (WIP)": "guides/contributing/dashboards/react.md"
+          - "Logging": "guides/contributing/logging.md"
+          - "Testing": "guides/contributing/testing.md"
+      - "Design Philosophy":
+          - "Architecture": "guides/design-philosophy/architecture.md"
+          - "Core Domain": "guides/design-philosophy/core-domain.md"
+          - "Edge Domain": "guides/design-philosophy/edge-domain.md"
+          - "Content Domain": "guides/design-philosophy/content-domain.md"
+  - "Reference (CLI)":
+      - "Analyzer Interface": "reference/analyzer_interface.md"
+      - "Components": "reference/components.md"
+      - "App": "reference/app.md"
+      - "Preprocessing": "reference/preprocessing.md"
+      - "Terminal Tools": "reference/terminal_tools.md"
+      - "Importing": "reference/importing.md"
+      - "Meta": "reference/meta.md"
+      - "Storage": "reference/storage.md"
+      - "Testing": "reference/testing.md"
+
+theme:
+  name: material
+  logo: img/favicon.ico
+  features:
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.path
+    - navigation.sections
+    - navigation.top
+    - navigation.tabs
+    - content.code.copy
+    - content.tooltips
+    - toc.follow
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src] # search packages in the src folder
+          options:
+            show_root_heading: true
+            # show_category_heading: true
+            show_root_toc_entry: false
+            show_root_full_path: true
+            heading_level: 2
+            docstring_style: google
+            parameter_headings: true
+            show_symbol_type_heading: True
+            show_symbol_type_toc: True
+  - search
+  - mermaid2
+
+markdown_extensions:
+  - toc:
+      baselevel: 2
+
+  - pymdownx.snippets

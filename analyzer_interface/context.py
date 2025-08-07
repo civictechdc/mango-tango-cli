@@ -166,17 +166,44 @@ ServerCallback = Union[
 
 
 class ShinyContext(BaseModel):
+    """
+    Output interface for Shiny dashboards
+    """
+
     panel: NavPanel = None
+    """
+    UI navigation panel to be added to shiny dashboard
+    """
+
     server_handler: Optional[ServerCallback] = None
+    """
+    Server handler callback to be called by the shiny application instance
+    """
 
     class Config:
         arbitrary_types_allowed = True
 
 
 class FactoryOutputContext(BaseModel):
+    """
+    Output interface for both factory and api_facotry functions for web
+    presenters.
+    """
+
     shiny: Optional[ShinyContext] = None
+    """
+    Factory oputput for shiny dashboards
+    """
+
     api: Optional[dict[str, Any]] = None
+    """
+    API factory output for React dashboard REST API
+    """
+
     data_frames: Optional[dict[str, DataFrame]] = None
+    """
+    API factory dataframe output for React dashboard REST API
+    """
 
     class Config:
         arbitrary_types_allowed = True
