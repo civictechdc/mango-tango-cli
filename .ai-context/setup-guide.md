@@ -79,7 +79,6 @@ Should output: "No-op flag detected. Exiting successfully."
 - `XlsxWriter==3.2.0` - Excel export functionality
 - `rich==14.0.0` - Terminal formatting and progress display
 - `python-json-logger==3.3.0` - Structured JSON logging
-- `tqdm==4.67.1` - Progress bars and monitoring
 - `regex==2025.7.34` - Advanced regex pattern matching
 
 **Development Dependencies** (`requirements-dev.txt`):

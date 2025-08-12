@@ -270,11 +270,10 @@ The application uses a sophisticated hierarchical progress reporting system buil
 
 ### Progress System Components
 
-The progress reporting system consists of three main components:
+The progress reporting system consists of two main components:
 
 - **RichProgressManager**: The primary progress manager with hierarchical step and sub-step support
 - **ProgressReporter**: Basic multiprocess-compatible progress reporting
-- **AdvancedProgressReporter**: tqdm-based progress reporting with ETA calculation
 
 ### RichProgressManager
 

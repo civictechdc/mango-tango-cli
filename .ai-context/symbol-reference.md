@@ -221,7 +221,6 @@ Base interface for data importers
     - `_update_display()` - Rich terminal display with hierarchical visualization
 
 - `ProgressReporter` - `terminal_tools/progress.py` - Basic multiprocess progress reporting
-- `AdvancedProgressReporter` - `terminal_tools/progress.py` - tqdm-based progress with ETA calculation
 - `ChecklistProgressManager` - Backward compatibility alias for `RichProgressManager`
 
 #### Other Terminal Utilities
@@ -315,7 +314,6 @@ logger.info("Message", extra={"context": "value"})
 - `TestRichProgressManagerHierarchical` - Comprehensive hierarchical progress testing
   - 18 test methods covering substep functionality, validation, error handling, performance
 - `TestProgressReporter` - Basic progress reporter tests
-- `TestAdvancedProgressReporter` - Advanced progress reporter with tqdm integration
 
 #### Performance Testing Infrastructure
 
