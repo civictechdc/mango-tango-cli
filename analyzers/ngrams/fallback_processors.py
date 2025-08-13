@@ -15,7 +15,7 @@ import polars as pl
 from analyzers.ngrams.ngrams_base.interface import COL_MESSAGE_SURROGATE_ID
 from app.logger import get_logger
 from app.utils import MemoryManager, MemoryPressureLevel
-from terminal_tools.progress import RichProgressManager
+from terminal_tools.progress import ProgressManager
 
 # Initialize module-level logger
 logger = get_logger(__name__)
@@ -27,7 +27,7 @@ def generate_ngrams_disk_based(
     max_n: int,
     estimated_rows: int,
     memory_manager: Optional[MemoryManager] = None,
-    progress_manager: Optional[RichProgressManager] = None,
+    progress_manager: Optional[ProgressManager] = None,
 ) -> pl.LazyFrame:
     """
     Generate n-grams using disk-based approach for critical memory pressure.
@@ -368,7 +368,7 @@ def _generate_ngrams_minimal_memory(
 def stream_unique_memory_optimized(
     ldf_data: pl.LazyFrame,
     memory_manager: MemoryManager,
-    progress_manager: Optional[RichProgressManager],
+    progress_manager: Optional[ProgressManager],
     column_name: str = "ngram_text",
 ) -> pl.DataFrame:
     """

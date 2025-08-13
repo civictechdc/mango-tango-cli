@@ -5,7 +5,7 @@ This package contains comprehensive tests for validating the performance improve
 introduced in the N-gram analyzer chunking optimization (Phases 1-4).
 
 Test Modules:
-- test_chunking_optimization.py: Core functionality and system configuration tests  
+- test_chunking_optimization.py: Core functionality and system configuration tests
 - test_performance_benchmarks.py: Real performance measurements and stress tests
 
 Usage:

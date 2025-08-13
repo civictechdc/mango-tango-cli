@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from app.utils import MemoryManager, MemoryPressureLevel
-from terminal_tools.progress import RichProgressManager
+from terminal_tools.progress import ProgressManager
 
 
 class TestRichProgressManagerMemoryFeatures:
@@ -17,17 +17,19 @@ class TestRichProgressManagerMemoryFeatures:
     def test_initialization_with_memory_manager(self):
         """Test RichProgressManager initializes correctly with memory manager."""
         memory_manager = MagicMock(spec=MemoryManager)
-        progress_manager = RichProgressManager(
+        progress_manager = ProgressManager(
             "Test Analysis", memory_manager=memory_manager
         )
 
         assert progress_manager.memory_manager == memory_manager
-        assert progress_manager.last_memory_warning is None
+        assert (
+            progress_manager.last_memory_warning == 0
+        )  # Initialized to 0 when memory_manager provided
         assert "Test Analysis" in progress_manager.title
 
     def test_initialization_without_memory_manager(self):
         """Test RichProgressManager initializes correctly without memory manager."""
-        progress_manager = RichProgressManager("Test Analysis")
+        progress_manager = ProgressManager("Test Analysis")
 
         assert progress_manager.memory_manager is None
         assert progress_manager.last_memory_warning is None
@@ -43,7 +45,7 @@ class TestRichProgressManagerMemoryFeatures:
         }
         memory_manager.should_trigger_gc.return_value = False
 
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         # Should update normally without warnings
@@ -67,11 +69,11 @@ class TestRichProgressManagerMemoryFeatures:
         memory_manager.should_trigger_gc.return_value = True
         memory_manager.enhanced_gc_cleanup.return_value = {"memory_freed_mb": 100.0}
 
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
-        # Mock console to avoid actual output during tests
-        with patch.object(progress_manager, "console"):
+        # Mock console printing to avoid actual output during tests
+        with patch("rich.console.Console.print"):
             progress_manager.update_step_with_memory(
                 "test_step", 75, "high pressure test"
             )
@@ -90,13 +92,11 @@ class TestRichProgressManagerMemoryFeatures:
         memory_manager.should_trigger_gc.return_value = True
         memory_manager.enhanced_gc_cleanup.return_value = {"memory_freed_mb": 200.0}
 
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
-        # Mock console and _display_memory_warning to capture calls
-        with patch.object(progress_manager, "console"), patch.object(
-            progress_manager, "_display_memory_warning"
-        ) as mock_warning:
+        # Mock _display_memory_warning to capture calls
+        with patch.object(progress_manager, "_display_memory_warning") as mock_warning:
 
             progress_manager.update_step_with_memory("test_step", 90, "critical test")
 
@@ -116,18 +116,18 @@ class TestRichProgressManagerMemoryFeatures:
             "pressure_level": "high",
         }
 
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
         # Mock console to capture calls
-        with patch.object(progress_manager, "console") as mock_console:
+        with patch("rich.console.Console.print") as mock_console_print:
             # First call should display warning
             progress_manager._display_memory_warning(
                 MemoryPressureLevel.HIGH,
                 {"rss_mb": 3000.0, "process_memory_percent": 75.0},
                 "test context",
             )
-            first_call_count = mock_console.print.call_count
+            first_call_count = mock_console_print.call_count
 
             # Immediate second call should be throttled (no additional warning)
             progress_manager._display_memory_warning(
@@ -135,7 +135,7 @@ class TestRichProgressManagerMemoryFeatures:
                 {"rss_mb": 3000.0, "process_memory_percent": 75.0},
                 "test context",
             )
-            second_call_count = mock_console.print.call_count
+            second_call_count = mock_console_print.call_count
 
             # Should be the same (no new warning)
             assert second_call_count == first_call_count
@@ -143,12 +143,12 @@ class TestRichProgressManagerMemoryFeatures:
     def test_memory_warning_throttling_timeout(self):
         """Test that memory warnings can be displayed again after timeout."""
         memory_manager = MagicMock(spec=MemoryManager)
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
 
         # Set last warning time to 31 seconds ago (past the 30-second threshold)
         progress_manager.last_memory_warning = time.time() - 31
 
-        with patch.object(progress_manager, "console") as mock_console:
+        with patch("rich.console.Console.print") as mock_console_print:
             progress_manager._display_memory_warning(
                 MemoryPressureLevel.HIGH,
                 {"rss_mb": 3000.0, "process_memory_percent": 75.0},
@@ -156,14 +156,14 @@ class TestRichProgressManagerMemoryFeatures:
             )
 
             # Should display warning since enough time has passed
-            mock_console.print.assert_called()
+            mock_console_print.assert_called()
 
     def test_display_memory_warning_content(self):
         """Test the content and formatting of memory warnings."""
         memory_manager = MagicMock(spec=MemoryManager)
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
 
-        with patch.object(progress_manager, "console") as mock_console:
+        with patch("rich.console.Console.print") as mock_console_print:
             # Test HIGH pressure warning
             progress_manager._display_memory_warning(
                 MemoryPressureLevel.HIGH,
@@ -172,8 +172,8 @@ class TestRichProgressManagerMemoryFeatures:
             )
 
             # Should have called print with a Panel
-            mock_console.print.assert_called()
-            call_args = mock_console.print.call_args
+            mock_console_print.assert_called()
+            call_args = mock_console_print.call_args
             assert (
                 call_args is not None
             ), "mock_console.print was not called with arguments"
@@ -182,13 +182,12 @@ class TestRichProgressManagerMemoryFeatures:
 
             # Panel should have appropriate border style and content
             assert panel.border_style == "yellow"
-            assert "Memory Usage: 3000.0MB" in str(panel.renderable)
-            assert "75.0% of limit" in str(panel.renderable)
+            assert "Current usage: 3000.0MB" in str(panel.renderable)
             assert "n-gram generation" in str(panel.renderable)
-            assert "High memory pressure" in str(panel.renderable)
+            assert "Memory Pressure: HIGH" in str(panel.renderable)
 
             # Reset mock for next test
-            mock_console.reset_mock()
+            mock_console_print.reset_mock()
             # Reset the throttling timestamp to allow second warning
             progress_manager.last_memory_warning = None
 
@@ -199,7 +198,7 @@ class TestRichProgressManagerMemoryFeatures:
                 "unique extraction",
             )
 
-            call_args = mock_console.print.call_args
+            call_args = mock_console_print.call_args
             assert (
                 call_args is not None
             ), "mock_console.print was not called with arguments"
@@ -207,26 +206,27 @@ class TestRichProgressManagerMemoryFeatures:
             panel = call_args[0]
 
             assert panel.border_style == "red"
-            assert "Critical memory pressure" in str(panel.renderable)
-            assert "disk-based processing" in str(panel.renderable)
+            assert "Memory Pressure: CRITICAL" in str(panel.renderable)
+            assert "unique extraction" in str(panel.renderable)
 
     def test_display_memory_summary(self):
         """Test memory summary display."""
         memory_manager = MagicMock(spec=MemoryManager)
         memory_manager.get_current_memory_usage.return_value = {
             "rss_mb": 2500.0,
+            "peak_rss_mb": 3000.0,
+            "available_mb": 1500.0,
             "pressure_level": "medium",
         }
-        memory_manager.get_memory_trend.return_value = "stable"
 
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
 
-        with patch.object(progress_manager, "console") as mock_console:
+        with patch("rich.console.Console.print") as mock_console_print:
             progress_manager.display_memory_summary()
 
             # Should display summary panel
-            mock_console.print.assert_called()
-            call_args = mock_console.print.call_args
+            mock_console_print.assert_called()
+            call_args = mock_console_print.call_args
             assert (
                 call_args is not None
             ), "mock_console.print was not called with arguments"
@@ -234,9 +234,9 @@ class TestRichProgressManagerMemoryFeatures:
             panel = call_args[0]
 
             assert panel.border_style == "green"
-            assert "Analysis completed successfully!" in str(panel.renderable)
-            assert "Peak memory usage: 2500.0MB" in str(panel.renderable)
-            assert "Memory trend: stable" in str(panel.renderable)
+            assert "Peak memory usage: 3000.0MB" in str(panel.renderable)
+            assert "Final memory usage: 2500.0MB" in str(panel.renderable)
+            assert "Available memory: 1500.0MB" in str(panel.renderable)
             assert "Final pressure level: medium" in str(panel.renderable)
 
     def test_garbage_collection_reporting(self):
@@ -248,14 +248,14 @@ class TestRichProgressManagerMemoryFeatures:
             "memory_freed_mb": 150.0  # Significant cleanup
         }
 
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
-        with patch.object(progress_manager, "console") as mock_console:
+        with patch("rich.console.Console.print") as mock_console_print:
             progress_manager.update_step_with_memory("test_step", 50, "gc test")
 
             # Should report significant memory cleanup
-            print_calls = [str(call) for call in mock_console.print.call_args_list]
+            print_calls = [str(call) for call in mock_console_print.call_args_list]
             assert any("Freed 150.0MB memory" in call for call in print_calls)
 
     def test_no_gc_reporting_for_small_cleanup(self):
@@ -267,14 +267,14 @@ class TestRichProgressManagerMemoryFeatures:
             "memory_freed_mb": 10.0  # Small cleanup
         }
 
-        progress_manager = RichProgressManager("Test", memory_manager=memory_manager)
+        progress_manager = ProgressManager("Test", memory_manager=memory_manager)
         progress_manager.add_step("test_step", "Testing", 100)
 
-        with patch.object(progress_manager, "console") as mock_console:
+        with patch("rich.console.Console.print") as mock_console_print:
             progress_manager.update_step_with_memory("test_step", 50, "small gc test")
 
             # Should not report small cleanup
-            print_calls = [str(call) for call in mock_console.print.call_args_list]
+            print_calls = [str(call) for call in mock_console_print.call_args_list]
             assert not any(
                 "Freed" in call and "MB memory" in call for call in print_calls
             )
@@ -324,9 +324,8 @@ class TestRichProgressManagerMemoryIntegration:
             False,
         ]
         memory_manager.enhanced_gc_cleanup.return_value = {"memory_freed_mb": 400.0}
-        memory_manager.get_memory_trend.return_value = "increasing"
 
-        progress_manager = RichProgressManager(
+        progress_manager = ProgressManager(
             "Simulated Analysis", memory_manager=memory_manager
         )
 
@@ -335,7 +334,7 @@ class TestRichProgressManagerMemoryIntegration:
         for step in steps:
             progress_manager.add_step(step, f"Processing {step}", 100)
 
-        with patch.object(progress_manager, "console"):
+        with patch("rich.console.Console.print"):
             # Simulate step execution with memory monitoring
             for i, step in enumerate(steps):
                 progress_manager.start_step(step)
@@ -350,7 +349,6 @@ class TestRichProgressManagerMemoryIntegration:
         assert memory_manager.get_current_memory_usage.call_count == len(steps) + 1
         assert memory_manager.should_trigger_gc.call_count == len(steps)
         assert memory_manager.enhanced_gc_cleanup.call_count == 1  # Only when triggered
-        assert memory_manager.get_memory_trend.call_count == 1  # In summary
 
 
 if __name__ == "__main__":

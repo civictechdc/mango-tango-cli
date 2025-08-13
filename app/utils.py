@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict
 from app.logger import get_logger
 
 if TYPE_CHECKING:
-    from terminal_tools.progress import RichProgressManager
+    from terminal_tools.progress import ProgressManager
 
 
 # Initialize module-level logger
@@ -342,7 +342,7 @@ def is_space_separated(text: Union[str, pl.Expr]) -> Union[bool, pl.Expr]:
 def tokenize_text(
     ldf: pl.LazyFrame,
     text_column: str,
-    progress_manager: Optional["RichProgressManager"] = None,
+    progress_manager: Optional["ProgressManager"] = None,
     memory_manager: Optional[MemoryManager] = None,
 ) -> pl.LazyFrame:
     """
@@ -836,7 +836,7 @@ def tokenize_text(
                         # Update progress step total with new estimate
                         if progress_manager:
                             try:
-                                # Note: RichProgressManager might not support updating totals,
+                                # Note: ProgressManager might not support updating totals,
                                 # but we can try or just update current progress
                                 progress_manager.update_substep(
                                     "tokenize", "stream_tokenize", chunk_idx

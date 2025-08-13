@@ -8,9 +8,11 @@ from pydantic import BaseModel, ConfigDict
 from shiny import Inputs, Outputs, Session
 from shiny.ui._navs import NavPanel
 
-# if TYPE_CHECKING:
-#     from terminal_tools.progress import RichProgressManager
-from terminal_tools.progress import RichProgressManager
+if TYPE_CHECKING:
+    from terminal_tools.progress import ProgressManager
+else:
+    # For runtime imports, use the unified ProgressManager
+    from terminal_tools.progress import ProgressManager
 
 from .interface import SecondaryAnalyzerInterface
 from .params import ParamValue
@@ -24,7 +26,7 @@ class PrimaryAnalyzerContext(ABC, BaseModel):
   during its lifetime. This directory will not persist between runs.
   """
 
-    progress_manager: Optional[RichProgressManager] = None
+    progress_manager: Optional[ProgressManager] = None
     """
   Optional progress manager for hierarchical progress reporting.
   When provided, analyzers can use this to report progress with
@@ -69,7 +71,7 @@ class BaseDerivedModuleContext(ABC, BaseModel):
   during its lifetime. This directory will not persist between runs.
   """
 
-    progress_manager: Optional["RichProgressManager"] = None
+    progress_manager: Optional["ProgressManager"] = None
     """
   Optional progress manager shared from primary analyzer for continuous progress reporting.
   Secondary analyzers and web presenters can use this to continue the progress flow
@@ -158,9 +160,9 @@ PolarsDataFrameLike = TypeVar("PolarsDataFrameLike", bound=pl.DataFrame)
 
 class InputTableReader(TableReader):
     @abstractmethod
-    def preprocess[
-        PolarsDataFrameLike
-    ](self, df: PolarsDataFrameLike) -> PolarsDataFrameLike:
+    def preprocess[PolarsDataFrameLike](
+        self, df: PolarsDataFrameLike
+    ) -> PolarsDataFrameLike:
         """
         Given the manually loaded user input dataframe, apply column mapping and
         semantic transformations to give the input dataframe that the analyzer

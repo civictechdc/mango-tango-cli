@@ -12,7 +12,7 @@ from app.logger import get_logger
 
 # from app.memory_aware_progress import MemoryAwareProgressManager  # Not needed for standard display
 from app.utils import MemoryManager, MemoryPressureLevel, tokenize_text
-from terminal_tools.progress import RichProgressManager
+from terminal_tools.progress import ProgressManager
 
 # Initialize module-level logger
 logger = get_logger(__name__)
@@ -939,7 +939,7 @@ def main(context: PrimaryAnalyzerContext):
     total_messages = ldf.select(pl.len()).collect().item()
 
     # Use standard progress manager for better display compatibility
-    with RichProgressManager("N-gram Analysis Progress") as progress_manager:
+    with ProgressManager("N-gram Analysis Progress") as progress_manager:
         # Memory checkpoint: Initial state
         initial_memory = memory_manager.get_current_memory_usage()
         progress_manager.console.print(
@@ -1224,7 +1224,7 @@ def main(context: PrimaryAnalyzerContext):
 
             # Update tokenization total with actual filtered count
             if hasattr(progress_manager, "update_step"):
-                # For RichProgressManager compatibility - update tokenization total based on filtered data
+                # For ProgressManager compatibility - update tokenization total based on filtered data
                 adaptive_chunk_size = memory_manager.calculate_adaptive_chunk_size(
                     50000, "tokenization"
                 )
@@ -2135,7 +2135,7 @@ def _generate_ngrams_vectorized(
     min_n: int,
     max_n: int,
     estimated_rows: int,
-    progress_manager: Optional[RichProgressManager] = None,
+    progress_manager: Optional[ProgressManager] = None,
     memory_manager=None,
 ) -> pl.LazyFrame:
     """

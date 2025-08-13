@@ -165,7 +165,7 @@ def test_ngram_stats_with_progress_manager():
     import tempfile
     from unittest.mock import Mock
 
-    from terminal_tools.progress import RichProgressManager
+    from terminal_tools.progress import ProgressManager
     from testing.testers import TestSecondaryAnalyzerContext
 
     # Set up test data
@@ -209,7 +209,7 @@ def test_ngram_stats_with_progress_manager():
         )
 
         # Add a mock progress manager to the context using setattr to bypass Pydantic validation
-        mock_progress_manager = Mock(spec=RichProgressManager)
+        mock_progress_manager = Mock(spec=ProgressManager)
         object.__setattr__(context, "progress_manager", mock_progress_manager)
 
         # Run the analyzer

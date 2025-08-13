@@ -106,7 +106,7 @@ def test_ngrams():
     """Test n-gram generation using the new vectorized approach."""
     import polars as pl
 
-    from terminal_tools.progress import RichProgressManager
+    from terminal_tools.progress import ProgressManager
 
     # Create test data with tokens
     test_df = pl.DataFrame(
@@ -153,7 +153,7 @@ def test_serialize_ngram():
     """Test that n-grams are properly serialized as space-separated strings."""
     import polars as pl
 
-    from terminal_tools.progress import RichProgressManager
+    from terminal_tools.progress import ProgressManager
 
     NGRAM_SERIALIZED_EXPECTED_FIRST = "mango tree is an open"
 
@@ -253,7 +253,7 @@ def test_ngram_generation_edge_cases():
     """Test n-gram generation with edge cases."""
     import polars as pl
 
-    from terminal_tools.progress import RichProgressManager
+    from terminal_tools.progress import ProgressManager
 
     # Test with empty data
     empty_df = pl.DataFrame({"message_surrogate_id": [], "tokens": []}).lazy()

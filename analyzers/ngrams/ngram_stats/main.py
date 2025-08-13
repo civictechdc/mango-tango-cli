@@ -4,7 +4,7 @@ import polars as pl
 
 from analyzer_interface.context import SecondaryAnalyzerContext
 from app.logger import get_logger
-from terminal_tools.progress import RichProgressManager
+from terminal_tools.progress import ProgressManager
 
 # Initialize module-level logger
 logger = get_logger(__name__)
@@ -37,14 +37,14 @@ def main(context: SecondaryAnalyzerContext):
     Refactored ngram_stats analyzer using streaming architecture for memory efficiency.
 
     Uses lazy evaluation with pl.scan_parquet, chunked processing to avoid cardinality explosion,
-    and RichProgressManager for detailed progress feedback.
+    and ProgressManager for detailed progress feedback.
 
     This analyzer can either use an existing progress manager from the context (continuing
     from primary analyzer progress) or create its own for standalone execution.
 
     Progress Manager Integration:
     - If context.progress_manager exists: Uses the existing manager to continue progress
-    - If context.progress_manager is None: Creates a new RichProgressManager
+    - If context.progress_manager is None: Creates a new ProgressManager
     - This design eliminates the clearing of progress displays when transitioning from
       primary to secondary analyzers, providing a seamless user experience
     """
@@ -640,7 +640,7 @@ def main(context: SecondaryAnalyzerContext):
     try:
         if use_context_manager:
             # Create new progress manager for standalone execution
-            with RichProgressManager("N-gram Statistics Analysis") as progress_manager:
+            with ProgressManager("N-gram Statistics Analysis") as progress_manager:
                 run_analysis(progress_manager)
         else:
             # Use existing progress manager from context

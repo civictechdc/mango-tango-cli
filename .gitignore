@@ -10,3 +10,4 @@ VERSION
 .serena/cache
 *.csv
 .gemini/
+.claude/agents/

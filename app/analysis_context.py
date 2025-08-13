@@ -16,7 +16,7 @@ from context import (
     SecondaryAnalyzerContext,
 )
 from storage import AnalysisModel
-from terminal_tools.progress import RichProgressManager
+from terminal_tools.progress import ProgressManager
 
 from .app_context import AppContext
 from .project_context import ProjectContext
@@ -96,7 +96,7 @@ class AnalysisContext(BaseModel):
 
         # Create a unified progress manager for the entire analysis pipeline
         analysis_title = f"{self.analyzer_spec.name} Analysis"
-        with RichProgressManager(analysis_title) as progress_manager:
+        with ProgressManager(analysis_title) as progress_manager:
             with TemporaryDirectory() as temp_dir:
                 yield AnalysisRunProgressEvent(
                     analyzer=self.analyzer_spec, event="start"
