@@ -1,0 +1,6 @@
+mkdocs
+mkdocstrings[python]
+mkdocs-material
+markdown
+pymdown-extensions
+mkdocs-mermaid2-plugin

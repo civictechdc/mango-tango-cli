@@ -1,4 +1,21 @@
-# mango-tango-cli: A python terminal wrapper for CIB Mango Tree analyzers
+<h2 align="center">mango-tango-cli</h2>
+<h3 align="center">A Python command-line tool for detecting coordinated inauthentic behavior</h3>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG" alt="Mango logo" style="width:200px;"/>
+</p>
+
+<p align="center">
+<a href="https://www.python.org/"><img alt="code" src="https://img.shields.io/badge/code-Python%203.12-blue?logo=Python"></a>
+<a href="https://black.readthedocs.io/en/stable/"><img alt="style: black" src="https://img.shields.io/badge/style-Black-black?logo=Black"></a>
+<a href="https://docs.astral.sh/ruff/"><img alt="style: black" src="https://img.shields.io/badge/tool-Polars-skyblue?logo=Polars"></a>
+</p>
+
+---
+
+## Technical Documentation
+
+For in-depth technical docs related to this repository please visit [https://civictechdc.github.io/mango-tango-cli](https://civictechdc.github.io/mango-tango-cli)
 
 ## Requirements
 

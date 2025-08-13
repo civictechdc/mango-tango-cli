@@ -4,6 +4,7 @@ __private__
 /build
 /dist
 /analysis_outputs
+/site
 VERSION
 *.DS_Store
 .env*
