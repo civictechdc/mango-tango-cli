@@ -1,0 +1,2333 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="An interactive python terminal UI wrapper for Mango Tree analyzers.">
+      
+      
+        <meta name="author" content="CIB Mango Tree">
+      
+      
+        <link rel="canonical" href="https://cibmangotree.org/guides/contributing/analyzers/">
+      
+      
+        <link rel="prev" href="../contributing/">
+      
+      
+        <link rel="next" href="../dashboards/shiny/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Implementing Analyzers - CIB Mango Tree</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#analyzers-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CIB Mango Tree
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Implementing Analyzers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../get-started/overview/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../reference/analyzer_interface/" class="md-tabs__link">
+          
+  
+  
+  Reference (CLI)
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    CIB Mango Tree
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Contributing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributor Workflow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Implementing Analyzers
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Implementing Analyzers
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#analyzers-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analyzers Guide
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Analyzers Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Architecture Overview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Primary Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Primary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#declaration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Declaration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Secondary Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secondary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-presenters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Web Presenters
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web Presenters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shiny-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shiny Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-factory-for-react-dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Factory for React Dashboards
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Factory for React Dashboards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-output-api-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Output API Factory
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Endpoints
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Primary Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Secondary Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Processing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Design
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-to-the-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding to the Suite
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_3" id="__nav_2_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Dashboards
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Dashboards
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboards/shiny/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Shiny
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboards/react/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    React (WIP)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design Philosophy
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Design Philosophy
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/core-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Core Domain
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/edge-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Edge Domain
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/content-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Domain
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference (CLI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference (CLI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/analyzer_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Analyzer Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Components
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    App
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/preprocessing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preprocessing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/terminal_tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terminal Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/importing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Importing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Meta
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Storage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#analyzers-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analyzers Guide
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Analyzers Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Architecture Overview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Primary Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Primary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#declaration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Declaration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Secondary Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secondary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-presenters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Web Presenters
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web Presenters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shiny-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shiny Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-factory-for-react-dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Factory for React Dashboards
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Factory for React Dashboards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-output-api-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Output API Factory
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Endpoints
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Analyzers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Primary Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Secondary Analyzers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Processing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface Design
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-to-the-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding to the Suite
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Implementing Analyzers</h1>
+
+<h2 id="analyzers-guide">Analyzers Guide</h2>
+<p>Analyzers are the core data processing components of the platform. They follow a three-tier architecture that separates data processing, analysis, and presentation concerns.</p>
+<h3 id="architecture-overview">Architecture Overview</h3>
+<p>The analyzer system consists of three types of components:</p>
+<ol>
+<li><strong>Primary Analyzer</strong>: Performs the core data analysis and outputs structured results</li>
+<li><strong>Secondary Analyzer</strong>: Processes primary analyzer outputs for specific use cases or exports</li>
+<li><strong>Web Presenter</strong>: Creates interactive dashboards and visualizations</li>
+</ol>
+<p>This separation allows for:</p>
+<ul>
+<li>Reusable analysis logic</li>
+<li>Multiple presentation formats for the same analysis</li>
+<li>Collaborative development where different contributors can focus on different layers</li>
+</ul>
+<h3 id="primary-analyzers">Primary Analyzers</h3>
+<p>Primary analyzers perform the core data analysis. They read user input data, process it according to their algorithm, and output structured results in parquet format.</p>
+<h4 id="interface-definition">Interface Definition</h4>
+<p>Every primary analyzer must define an interface that specifies:</p>
+<ul>
+<li>Input columns required from the user</li>
+<li>Parameters the analyzer accepts</li>
+<li>Output tables the analyzer produces</li>
+</ul>
+<pre><code class="language-python">from analyzer_interface import (
+    AnalyzerInput,
+    AnalyzerInterface, 
+    AnalyzerOutput,
+    AnalyzerParam,
+    InputColumn,
+    OutputColumn,
+    IntegerParam
+)
+
+interface = AnalyzerInterface(
+    id=&quot;example_analyzer&quot;,  # Must be globally unique
+    version=&quot;0.1.0&quot;,
+    name=&quot;Example Analyzer&quot;,
+    short_description=&quot;Counts characters in messages&quot;,
+    long_description=&quot;&quot;&quot;
+This analyzer demonstrates the basic structure by counting 
+characters in each message and marking long messages.
+    &quot;&quot;&quot;,
+    input=AnalyzerInput(
+        columns=[
+            InputColumn(
+                name=&quot;message_id&quot;,
+                human_readable_name=&quot;Unique Message ID&quot;, 
+                data_type=&quot;identifier&quot;,
+                description=&quot;The unique identifier of the message&quot;,
+                name_hints=[&quot;post&quot;, &quot;message&quot;, &quot;tweet&quot;, &quot;id&quot;]
+            ),
+            InputColumn(
+                name=&quot;message_text&quot;,
+                human_readable_name=&quot;Message Text&quot;,
+                data_type=&quot;text&quot;, 
+                description=&quot;The text content of the message&quot;,
+                name_hints=[&quot;message&quot;, &quot;text&quot;, &quot;content&quot;, &quot;body&quot;]
+            )
+        ]
+    ),
+    params=[
+        AnalyzerParam(
+            id=&quot;fudge_factor&quot;,
+            human_readable_name=&quot;Character Count Adjustment&quot;,
+            description=&quot;Adds to the character count for testing purposes&quot;,
+            type=IntegerParam(min=-1000, max=1000),
+            default=0
+        )
+    ],
+    outputs=[
+        AnalyzerOutput(
+            id=&quot;character_count&quot;,
+            name=&quot;Character Count Per Message&quot;, 
+            internal=True,  # Not shown in export list
+            columns=[
+                OutputColumn(name=&quot;message_id&quot;, data_type=&quot;integer&quot;),
+                OutputColumn(name=&quot;character_count&quot;, data_type=&quot;integer&quot;)
+            ]
+        )
+    ]
+)
+</code></pre>
+<h4 id="implementation">Implementation</h4>
+<p>The main function receives a context object with access to input data and output paths:</p>
+<pre><code class="language-python">import polars as pl
+from analyzer_interface.context import PrimaryAnalyzerContext
+from terminal_tools import ProgressReporter
+
+def main(context: PrimaryAnalyzerContext):
+    # Read and preprocess input data
+    input_reader = context.input()
+    df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
+
+    # Access parameters
+    fudge_factor = context.params.get(&quot;fudge_factor&quot;)
+    assert isinstance(fudge_factor, int), &quot;Fudge factor must be an integer&quot;
+
+    # Perform analysis with progress reporting
+    with ProgressReporter(&quot;Counting characters&quot;) as progress:
+        df_count = df_input.select(
+            pl.col(&quot;message_id&quot;),
+            pl.col(&quot;message_text&quot;)
+            .str.len_chars()
+            .add(fudge_factor)
+            .alias(&quot;character_count&quot;)
+        )
+        progress.update(1.0)
+
+    # Write output to specified path
+    df_count.write_parquet(context.output(&quot;character_count&quot;).parquet_path)
+</code></pre>
+<h4 id="declaration">Declaration</h4>
+<p>Finally, create the analyzer declaration:</p>
+<pre><code class="language-python">from analyzer_interface import AnalyzerDeclaration
+from .interface import interface
+from .main import main
+
+example_analyzer = AnalyzerDeclaration(
+    interface=interface,
+    main=main,
+    is_distributed=False  # Set to True for production analyzers
+)
+</code></pre>
+<h3 id="secondary-analyzers">Secondary Analyzers</h3>
+<p>Secondary analyzers process the output of primary analyzers to create user-friendly exports or perform additional analysis.</p>
+<h4 id="interface-definition_1">Interface Definition</h4>
+<p>Secondary analyzers specify their base primary analyzer and their own outputs:</p>
+<pre><code class="language-python">from analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
+from ..example_base.interface import interface as example_base
+
+interface = SecondaryAnalyzerInterface(
+    id=&quot;example_report&quot;,
+    version=&quot;0.1.0&quot;, 
+    name=&quot;Example Report&quot;,
+    short_description=&quot;Adds 'is_long' flag to character count analysis&quot;,
+    base_analyzer=example_base,  # Reference to primary analyzer
+    outputs=[
+        AnalyzerOutput(
+            id=&quot;example_report&quot;,
+            name=&quot;Example Report&quot;, 
+            columns=[
+                OutputColumn(name=&quot;message_id&quot;, data_type=&quot;integer&quot;),
+                OutputColumn(name=&quot;character_count&quot;, data_type=&quot;integer&quot;),
+                OutputColumn(name=&quot;is_long&quot;, data_type=&quot;boolean&quot;)  # New column
+            ]
+        )
+    ]
+)
+</code></pre>
+<h4 id="implementation_1">Implementation</h4>
+<p>Secondary analyzers read primary outputs and create enhanced results:</p>
+<pre><code class="language-python">import polars as pl
+from analyzer_interface.context import SecondaryAnalyzerContext
+
+def main(context: SecondaryAnalyzerContext):
+    # Read primary analyzer output
+    df_character_count = pl.read_parquet(
+        context.base.table(&quot;character_count&quot;).parquet_path
+    )
+
+    # Add derived columns
+    df_export = df_character_count.with_columns(
+        pl.col(&quot;character_count&quot;).gt(100).alias(&quot;is_long&quot;)
+    )
+
+    # Access primary analyzer parameters if needed
+    fudge_factor = context.base_params.get(&quot;fudge_factor&quot;)
+
+    # Write enhanced output
+    df_export.write_parquet(context.output(&quot;example_report&quot;).parquet_path)
+</code></pre>
+<h3 id="web-presenters">Web Presenters</h3>
+<p>Web presenters create interactive dashboards using either Dash or Shiny frameworks.</p>
+<h4 id="interface-definition_2">Interface Definition</h4>
+<pre><code class="language-python">from analyzer_interface import WebPresenterInterface
+from ..example_base import interface as example_base
+from ..example_report import interface as example_report
+
+interface = WebPresenterInterface(
+    id=&quot;example_web&quot;, 
+    version=&quot;0.1.0&quot;,
+    name=&quot;Message Length Histogram&quot;,
+    short_description=&quot;Shows distribution of message lengths&quot;,
+    base_analyzer=example_base,
+    depends_on=[example_report]  # Secondary analyzers used
+)
+</code></pre>
+<h4 id="shiny-implementation">Shiny Implementation</h4>
+<p>For more interactive dashboards:</p>
+<pre><code class="language-python">from shiny import reactive, render, ui
+from shinywidgets import output_widget, render_widget
+from analyzer_interface.context import WebPresenterContext, FactoryOutputContext, ShinyContext
+
+def factory(context: WebPresenterContext) -&gt; FactoryOutputContext:
+    # Load data
+    df = pl.read_parquet(context.base.table(&quot;character_count&quot;).parquet_path)
+
+    # Define UI components
+    analysis_panel = ui.card(
+        ui.card_header(&quot;Character Count Analysis&quot;),
+        ui.input_checkbox(&quot;show_details&quot;, &quot;Show detailed view&quot;, value=False),
+        output_widget(&quot;histogram&quot;, height=&quot;400px&quot;)
+    )
+
+    def server(input, output, session):
+        @render_widget
+        def histogram():
+            # Create interactive plot based on inputs
+            show_details = input.show_details()
+            # ... create plotly figure ...
+            return fig
+
+        @render.text
+        def summary():
+            return f&quot;Total messages: {len(df)}&quot;
+
+    return FactoryOutputContext(
+        shiny=ShinyContext(
+            server_handler=server,
+            panel=nav_panel(&quot;Dashboard&quot;, analysis_panel)
+        )
+    )
+</code></pre>
+<h4 id="api-factory-for-react-dashboards">API Factory for React Dashboards</h4>
+<p>Web presenters can also implement an <code>api_factory</code> function to provide structured data for React-based frontends through REST API endpoints:</p>
+<pre><code class="language-python">from ..utils.pop import pop_unnecessary_fields
+
+def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
+    &quot;&quot;&quot;
+    Provides structured data for React dashboards via API endpoints.
+
+    Args:
+        context: WebPresenterContext with access to analyzer outputs
+        options: Optional parameters from API requests (filters, etc.)
+
+    Returns:
+        Dict with presenter metadata and processed data arrays
+    &quot;&quot;&quot;
+    # Extract API options/filters
+    filter_value = options.get(&quot;matcher&quot;, &quot;&quot;) if options else &quot;&quot;
+
+    # Load data
+    data_frame = pl.read_parquet(context.base.table(&quot;character_count&quot;).parquet_path)
+
+    # Apply filters if provided
+    if filter_value:
+        # Apply filtering logic based on the filter_value
+        data_frame = data_frame.filter(pl.col(&quot;message_text&quot;).str.contains(filter_value))
+
+    # Build presenter model with metadata
+    presenter_model = context.web_presenter.model_dump()
+
+    # Add visualization configuration
+    presenter_model[&quot;figure_type&quot;] = &quot;histogram&quot;
+    presenter_model[&quot;axis&quot;] = {
+        &quot;x&quot;: {&quot;label&quot;: &quot;Message Character Count&quot;, &quot;value&quot;: &quot;message_character_count&quot;},
+        &quot;y&quot;: {&quot;label&quot;: &quot;Number of Messages&quot;, &quot;value&quot;: &quot;number_of_messages&quot;}
+    }
+
+    # Add data arrays for the frontend
+    presenter_model[&quot;x&quot;] = data_frame[&quot;character_count&quot;].to_list()
+
+    # Remove internal fields not needed by frontend
+    return FactoryOutputContext(
+        api=pop_unnecessary_fields(presenter_model)
+    )
+</code></pre>
+<h5 id="multi-output-api-factory">Multi-Output API Factory</h5>
+<p>For analyzers with multiple outputs, return a dictionary with different data views:</p>
+<pre><code class="language-python">def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
+    filter_value = options.get(&quot;matcher&quot;, &quot;&quot;) if options else &quot;&quot;
+
+    # Load different data sources
+    df_stats = pl.read_parquet(
+        context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
+    )
+    df_full = pl.read_parquet(
+        context.dependency(ngram_stats).table(OUTPUT_NGRAM_FULL).parquet_path
+    )
+
+    # Apply filtering to both datasets
+    if filter_value:
+        matcher = create_word_matcher(filter_value, pl.col(COL_NGRAM_WORDS))
+        if matcher is not None:
+            df_stats = df_stats.filter(matcher)
+            df_full = df_full.filter(matcher)
+
+    # Create separate presenter models for each output
+    stats_model = context.web_presenter.model_dump()
+    full_model = context.web_presenter.model_dump()
+
+    # Configure stats view
+    stats_model.update({
+        &quot;figure_type&quot;: &quot;scatter&quot;,
+        &quot;explanation&quot;: {
+            &quot;total_repetition&quot;: &quot;N-grams to the right are repeated by more users...&quot;,
+            &quot;amplification_factor&quot;: &quot;N-grams higher up are repeated more times...&quot;
+        },
+        &quot;axis&quot;: {
+            &quot;x&quot;: {&quot;label&quot;: &quot;User Count&quot;, &quot;value&quot;: &quot;user_count&quot;},
+            &quot;y&quot;: {&quot;label&quot;: &quot;Total Repetition&quot;, &quot;value&quot;: &quot;total_repetition&quot;}
+        },
+        &quot;x&quot;: df_stats[COL_NGRAM_DISTINCT_POSTER_COUNT].to_list(),
+        &quot;y&quot;: {
+            &quot;total_repetition&quot;: df_stats[COL_NGRAM_TOTAL_REPS].to_list(),
+            &quot;amplification_factor&quot;: (
+                df_stats[COL_NGRAM_TOTAL_REPS] / 
+                df_stats[COL_NGRAM_DISTINCT_POSTER_COUNT]
+            ).to_list()
+        },
+        &quot;ngrams&quot;: df_stats[COL_NGRAM_WORDS].to_list()
+    })
+
+    # Configure full data view  
+    full_model.update({
+        &quot;figure_type&quot;: &quot;scatter&quot;,
+        &quot;ids&quot;: df_full[COL_NGRAM_ID].to_list(),
+        &quot;timestamps&quot;: df_full[COL_MESSAGE_TIMESTAMP].to_list(),
+        &quot;messages&quot;: df_full[COL_MESSAGE_TEXT].to_list(),
+        &quot;users&quot;: df_full[COL_AUTHOR_ID].to_list(),
+        # ... additional fields for detailed view
+    })
+
+    return FactoryOutputContext(
+        api={
+            &quot;default_output&quot;: OUTPUT_NGRAM_STATS,
+            OUTPUT_NGRAM_STATS: pop_unnecessary_fields(stats_model),
+            OUTPUT_NGRAM_FULL: pop_unnecessary_fields(full_model)
+        }
+    )
+</code></pre>
+<h5 id="api-endpoints">API Endpoints</h5>
+<p>The API factory data is automatically exposed through REST endpoints:</p>
+<ul>
+<li><code>GET /api/presenters</code> - List all presenter data</li>
+<li><code>GET /api/presenters/{id}</code> - Get specific presenter data</li>
+<li><code>GET /api/presenters/{id}/download/{format}</code> - Download data as CSV/JSON/Excel</li>
+</ul>
+<p>Query parameters:</p>
+<ul>
+<li><code>output</code> - Specify which output to return (for multi-output presenters)</li>
+<li><code>filter_field</code> &amp; <code>filter_value</code> - Apply filtering</li>
+<li><code>matcher</code> - Text matching filter (passed to api_factory options)</li>
+</ul>
+<p>Example API usage:</p>
+<pre><code class="language-bash"># Get basic presenter data
+curl &quot;/api/presenters/ngram_repetition_by_poster&quot;
+
+# Get filtered data
+curl &quot;/api/presenters/ngram_repetition_by_poster?filter_value=climate&amp;matcher=climate&quot;
+
+# Get specific output
+curl &quot;/api/presenters/ngram_repetition_by_poster?output=ngram_full&quot;
+
+# Download as CSV
+curl &quot;/api/presenters/ngram_repetition_by_poster/download/csv&quot;
+</code></pre>
+<h3 id="testing-analyzers">Testing Analyzers</h3>
+<h4 id="testing-primary-analyzers">Testing Primary Analyzers</h4>
+<pre><code class="language-python">from testing import CsvTestData, test_primary_analyzer
+from .interface import interface
+from .main import main
+
+def test_example_analyzer():
+    test_primary_analyzer(
+        interface=interface,
+        main=main,
+        input=CsvTestData(
+            &quot;test_input.csv&quot;,
+            semantics={&quot;message_id&quot;: identifier}
+        ),
+        params={&quot;fudge_factor&quot;: 10},
+        outputs={
+            &quot;character_count&quot;: CsvTestData(&quot;expected_output.csv&quot;)
+        }
+    )
+</code></pre>
+<h4 id="testing-secondary-analyzers">Testing Secondary Analyzers</h4>
+<pre><code class="language-python">from testing import test_secondary_analyzer, ParquetTestData
+
+def test_example_report():
+    test_secondary_analyzer(
+        interface=interface,
+        main=main,
+        primary_params={&quot;fudge_factor&quot;: 10},
+        primary_outputs={
+            &quot;character_count&quot;: ParquetTestData(&quot;primary_output.parquet&quot;)
+        },
+        expected_outputs={
+            &quot;example_report&quot;: ParquetTestData(&quot;expected_report.parquet&quot;)
+        }
+    )
+</code></pre>
+<h3 id="best-practices">Best Practices</h3>
+<h4 id="data-processing">Data Processing</h4>
+<ul>
+<li>Always call <code>input_reader.preprocess()</code> on input data in primary analyzers</li>
+<li>Use <code>ProgressReporter</code> for long-running operations</li>
+<li>Handle missing or null data gracefully</li>
+<li>Use appropriate data types (avoid defaulting to small integer types)</li>
+</ul>
+<h4 id="interface-design">Interface Design</h4>
+<ul>
+<li>Choose descriptive, globally unique IDs</li>
+<li>Provide comprehensive <code>name_hints</code> for better column matching</li>
+<li>Mark internal outputs that users shouldn't see directly</li>
+<li>Include helpful parameter descriptions and validation</li>
+</ul>
+<h4 id="performance">Performance</h4>
+<ul>
+<li>Use lazy evaluation with Polars when possible</li>
+<li>Process data in chunks for large datasets</li>
+<li>Consider memory usage when designing algorithms</li>
+<li>Use appropriate file formats (parquet for structured data)</li>
+</ul>
+<h4 id="error-handling">Error Handling</h4>
+<ul>
+<li>Validate parameters and input data</li>
+<li>Provide meaningful error messages</li>
+<li>Handle edge cases (empty datasets, missing columns)</li>
+<li>Use assertions for internal consistency checks</li>
+</ul>
+<h3 id="adding-to-the-suite">Adding to the Suite</h3>
+<p>Register all analyzers in <code>analyzers/__init__.py</code>:</p>
+<pre><code class="language-python">from analyzer_interface import AnalyzerSuite
+from .example.example_base import example_base
+from .example.example_report import example_report  
+from .example.example_web import example_web
+
+suite = AnalyzerSuite(
+    all_analyzers=[
+        example_base,
+        example_report, 
+        example_web,
+        # ... other analyzers
+    ]
+)
+</code></pre>
+<p>This creates a complete analysis pipeline that users can run through the application interface, from data input through interactive visualization.</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this it would be a good idea to review the sections for each domain. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="./domains/core-domain.md">Core Domain</a></li>
+<li><a href="./domains/edge-domain.md">Edge Domain</a></li>
+<li><a href="./domains/content-domain.md">Content Domain</a></li>
+<li><a href="../dashboards/shiny/">Shiny Dashboards</a></li>
+<li><a href="../dashboards/react/">React Dashboards</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 CIB Mango Tree
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>
