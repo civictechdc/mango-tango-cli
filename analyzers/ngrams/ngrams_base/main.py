@@ -944,36 +944,60 @@ def main(context: PrimaryAnalyzerContext):
         progress_manager = context.progress_manager
         # Run analysis without creating a new context manager (already managed by caller)
         _run_ngram_analysis_with_progress_manager(
-            progress_manager, context, input_reader, ldf, total_messages, min_n, max_n, memory_manager, logger
+            progress_manager,
+            context,
+            input_reader,
+            ldf,
+            total_messages,
+            min_n,
+            max_n,
+            memory_manager,
+            logger,
         )
     else:
         # Fall back to creating our own progress manager for backward compatibility
         with ProgressManager("N-gram Analysis Progress") as progress_manager:
             _run_ngram_analysis_with_progress_manager(
-                progress_manager, context, input_reader, ldf, total_messages, min_n, max_n, memory_manager, logger
+                progress_manager,
+                context,
+                input_reader,
+                ldf,
+                total_messages,
+                min_n,
+                max_n,
+                memory_manager,
+                logger,
             )
 
 
 def _run_ngram_analysis_with_progress_manager(
-    progress_manager, context, input_reader, ldf, total_messages, min_n, max_n, memory_manager, logger
+    progress_manager,
+    context,
+    input_reader,
+    ldf,
+    total_messages,
+    min_n,
+    max_n,
+    memory_manager,
+    logger,
 ):
     # Memory checkpoint: Initial state
     initial_memory = memory_manager.get_current_memory_usage()
     logger.info(
         "Analysis started with initial memory state",
         extra={
-            "initial_memory_mb": initial_memory['rss_mb'],
-            "available_memory_mb": initial_memory.get('available_mb', 'unknown')
-        }
+            "initial_memory_mb": initial_memory["rss_mb"],
+            "available_memory_mb": initial_memory.get("available_mb", "unknown"),
+        },
     )
     logger.debug(
-    "Initial memory state captured",
-    extra={
-        "rss_mb": initial_memory["rss_mb"],
-        "vms_mb": initial_memory["vms_mb"],
-        "available_mb": initial_memory.get("available_mb", "unknown"),
-        "total_messages": total_messages,
-    },
+        "Initial memory state captured",
+        extra={
+            "rss_mb": initial_memory["rss_mb"],
+            "vms_mb": initial_memory["vms_mb"],
+            "available_mb": initial_memory.get("available_mb", "unknown"),
+            "total_messages": total_messages,
+        },
     )
 
     # Add ALL steps upfront for better UX with the enhanced progress system
@@ -1000,14 +1024,11 @@ def _run_ngram_analysis_with_progress_manager(
             "total_messages": total_messages,
             "will_use_chunking": total_messages > adaptive_chunk_size,
             "tokenization_total": tokenization_total,
-            "chunk_size_adjustment_factor": adaptive_chunk_size
-            / initial_chunk_size,
+            "chunk_size_adjustment_factor": adaptive_chunk_size / initial_chunk_size,
         },
     )
 
-    progress_manager.add_step(
-        "tokenize", "Tokenizing text data", tokenization_total
-    )
+    progress_manager.add_step("tokenize", "Tokenizing text data", tokenization_total)
 
     # Enhanced n-gram generation step calculation
     n_gram_lengths = list(range(min_n, max_n + 1))
@@ -1133,19 +1154,13 @@ def _run_ngram_analysis_with_progress_manager(
     progress_manager.add_substep(
         "process_ngrams", "sort_ngrams", "Sorting n-grams alphabetically"
     )
-    progress_manager.add_substep(
-        "process_ngrams", "create_ids", "Creating n-gram IDs"
-    )
-    progress_manager.add_substep(
-        "process_ngrams", "assign_ids", "Assigning n-gram IDs"
-    )
+    progress_manager.add_substep("process_ngrams", "create_ids", "Creating n-gram IDs")
+    progress_manager.add_substep("process_ngrams", "assign_ids", "Assigning n-gram IDs")
     progress_manager.add_step(
         "write_message_ngrams", "Writing message n-grams output", 1
     )
     progress_manager.add_step("write_ngram_defs", "Writing n-gram definitions", 1)
-    progress_manager.add_step(
-        "write_message_metadata", "Writing message metadata", 1
-    )
+    progress_manager.add_step("write_message_metadata", "Writing message metadata", 1)
 
     # Step 1: Enhanced preprocessing with memory monitoring
 
@@ -1172,9 +1187,7 @@ def _run_ngram_analysis_with_progress_manager(
                 "memory_before_rss_mb": memory_before_preprocess["rss_mb"],
                 "memory_before_vms_mb": memory_before_preprocess["vms_mb"],
                 "pressure_level": pressure_level.value,
-                "available_mb": memory_before_preprocess.get(
-                    "available_mb", "unknown"
-                ),
+                "available_mb": memory_before_preprocess.get("available_mb", "unknown"),
                 "will_use_critical_fallback": pressure_level
                 == MemoryPressureLevel.CRITICAL,
             },
@@ -1192,7 +1205,7 @@ def _run_ngram_analysis_with_progress_manager(
             )
             logger.warning(
                 "Critical memory pressure detected, using disk-based preprocessing",
-                extra={"fallback_strategy": "disk_based_preprocessing"}
+                extra={"fallback_strategy": "disk_based_preprocessing"},
             )
             # For now, proceed with regular preprocessing but with enhanced cleanup
             full_df = ldf.collect()
@@ -1260,9 +1273,7 @@ def _run_ngram_analysis_with_progress_manager(
 
             # Try to update the tokenization step total if supported
             try:
-                progress_manager.update_step(
-                    "tokenize", 0, updated_tokenization_total
-                )
+                progress_manager.update_step("tokenize", 0, updated_tokenization_total)
                 logger.debug(
                     "Updated tokenization total after preprocessing",
                     extra={
@@ -1357,9 +1368,7 @@ def _run_ngram_analysis_with_progress_manager(
                 "error_type": type(e).__name__,
             },
         )
-        progress_manager.fail_step(
-            "tokenize", f"Failed during tokenization: {str(e)}"
-        )
+        progress_manager.fail_step("tokenize", f"Failed during tokenization: {str(e)}")
         raise
 
     # Step 3: Enhanced n-gram generation with memory pressure handling
@@ -1424,10 +1433,7 @@ def _run_ngram_analysis_with_progress_manager(
             },
         )
 
-        if (
-            should_use_disk_fallback
-            or current_pressure == MemoryPressureLevel.CRITICAL
-        ):
+        if should_use_disk_fallback or current_pressure == MemoryPressureLevel.CRITICAL:
             # Import and use disk-based fallback
             fallback_reason = (
                 "dataset_size" if should_use_disk_fallback else "memory_pressure"
@@ -1454,13 +1460,13 @@ def _run_ngram_analysis_with_progress_manager(
                     "Large dataset detected, using disk-based n-gram generation",
                     extra={
                         "row_count": filtered_count,
-                        "strategy": "disk_based_generation_large_dataset"
-                    }
+                        "strategy": "disk_based_generation_large_dataset",
+                    },
                 )
             else:
                 logger.warning(
-                    "Critical memory pressure, using disk-based n-gram generation", 
-                    extra={"strategy": "disk_based_generation_memory_pressure"}
+                    "Critical memory pressure, using disk-based n-gram generation",
+                    extra={"strategy": "disk_based_generation_memory_pressure"},
                 )
             ldf_ngrams = generate_ngrams_disk_based(
                 ldf_tokenized,
@@ -1540,15 +1546,11 @@ def _run_ngram_analysis_with_progress_manager(
 
     # Step 4: Process n-grams for output (hierarchical step with 5 sub-steps)
     progress_manager.start_step("process_ngrams")
-    logger.info(
-        "Starting n-gram processing phase", extra={"step": "process_ngrams"}
-    )
+    logger.info("Starting n-gram processing phase", extra={"step": "process_ngrams"})
 
     # Sub-step 1: Determine processing approach based on dataset size and memory
     progress_manager.start_substep("process_ngrams", "analyze_approach")
-    logger.info(
-        "Starting approach analysis step", extra={"step": "analyze_approach"}
-    )
+    logger.info("Starting approach analysis step", extra={"step": "analyze_approach"})
 
     try:
         total_ngrams = ldf_ngrams.select(pl.len()).collect().item()
@@ -1565,15 +1567,9 @@ def _run_ngram_analysis_with_progress_manager(
                 )
 
                 # Other operations are also single logical operations
-                progress_manager.update_substep(
-                    "process_ngrams", "sort_ngrams", 0, 1
-                )
-                progress_manager.update_substep(
-                    "process_ngrams", "create_ids", 0, 1
-                )
-                progress_manager.update_substep(
-                    "process_ngrams", "assign_ids", 0, 1
-                )
+                progress_manager.update_substep("process_ngrams", "sort_ngrams", 0, 1)
+                progress_manager.update_substep("process_ngrams", "create_ids", 0, 1)
+                progress_manager.update_substep("process_ngrams", "assign_ids", 0, 1)
 
                 logger.debug(
                     "Set processing substep totals using operation counts",
@@ -1592,9 +1588,7 @@ def _run_ngram_analysis_with_progress_manager(
             MemoryPressureLevel.HIGH,
             MemoryPressureLevel.CRITICAL,
         ]:
-            use_chunked_approach = (
-                True  # Force chunked approach under memory pressure
-            )
+            use_chunked_approach = True  # Force chunked approach under memory pressure
 
         progress_manager.complete_substep("process_ngrams", "analyze_approach")
 
@@ -1672,7 +1666,7 @@ def _run_ngram_analysis_with_progress_manager(
 
             logger.warning(
                 "Critical memory pressure detected, using external sorting",
-                extra={"fallback_strategy": "external_sorting"}
+                extra={"fallback_strategy": "external_sorting"},
             )
             unique_ngram_texts = extract_unique_external_sort(
                 ldf_ngrams, memory_manager, progress_manager
@@ -1685,7 +1679,7 @@ def _run_ngram_analysis_with_progress_manager(
 
             logger.info(
                 "High memory pressure detected, using optimized streaming",
-                extra={"strategy": "optimized_streaming"}
+                extra={"strategy": "optimized_streaming"},
             )
             unique_ngram_texts = stream_unique_memory_optimized(
                 ldf_ngrams, memory_manager, progress_manager
@@ -1804,9 +1798,7 @@ def _run_ngram_analysis_with_progress_manager(
                     "sort_ngrams"
                 ]
                 total = substep_info.get("total", 1)
-                progress_manager.update_substep(
-                    "process_ngrams", "sort_ngrams", total
-                )
+                progress_manager.update_substep("process_ngrams", "sort_ngrams", total)
             except:
                 pass
 
@@ -1835,9 +1827,7 @@ def _run_ngram_analysis_with_progress_manager(
         # Update progress to show ID creation is happening (mid-operation)
         if hasattr(progress_manager, "update_substep"):
             try:
-                substep_info = progress_manager.substeps["process_ngrams"][
-                    "create_ids"
-                ]
+                substep_info = progress_manager.substeps["process_ngrams"]["create_ids"]
                 total = substep_info.get("total", 1)
                 progress_manager.update_substep(
                     "process_ngrams", "create_ids", max(1, total // 2)
@@ -1852,13 +1842,9 @@ def _run_ngram_analysis_with_progress_manager(
         # Complete the progress (operation complete)
         if hasattr(progress_manager, "update_substep"):
             try:
-                substep_info = progress_manager.substeps["process_ngrams"][
-                    "create_ids"
-                ]
+                substep_info = progress_manager.substeps["process_ngrams"]["create_ids"]
                 total = substep_info.get("total", 1)
-                progress_manager.update_substep(
-                    "process_ngrams", "create_ids", total
-                )
+                progress_manager.update_substep("process_ngrams", "create_ids", total)
             except:
                 pass
 
@@ -1887,9 +1873,7 @@ def _run_ngram_analysis_with_progress_manager(
         # Update progress to show ID assignment is happening (mid-operation)
         if hasattr(progress_manager, "update_substep"):
             try:
-                substep_info = progress_manager.substeps["process_ngrams"][
-                    "assign_ids"
-                ]
+                substep_info = progress_manager.substeps["process_ngrams"]["assign_ids"]
                 total = substep_info.get("total", 1)
                 progress_manager.update_substep(
                     "process_ngrams", "assign_ids", max(1, total // 2)
@@ -1907,13 +1891,9 @@ def _run_ngram_analysis_with_progress_manager(
         # Complete the progress (operation complete)
         if hasattr(progress_manager, "update_substep"):
             try:
-                substep_info = progress_manager.substeps["process_ngrams"][
-                    "assign_ids"
-                ]
+                substep_info = progress_manager.substeps["process_ngrams"]["assign_ids"]
                 total = substep_info.get("total", 1)
-                progress_manager.update_substep(
-                    "process_ngrams", "assign_ids", total
-                )
+                progress_manager.update_substep("process_ngrams", "assign_ids", total)
             except:
                 pass
 
@@ -2036,10 +2016,10 @@ def _run_ngram_analysis_with_progress_manager(
     logger.info(
         "N-gram analysis completed successfully",
         extra={
-            "final_memory_mb": final_memory['rss_mb'],
-            "available_memory_mb": final_memory.get('available_mb', 'unknown'),
-            "analysis_status": "completed"
-        }
+            "final_memory_mb": final_memory["rss_mb"],
+            "available_memory_mb": final_memory.get("available_mb", "unknown"),
+            "analysis_status": "completed",
+        },
     )
     logger.info(
         "N-gram analysis completed successfully",

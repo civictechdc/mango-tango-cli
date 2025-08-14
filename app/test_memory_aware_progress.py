@@ -92,7 +92,7 @@ class TestProgressManagerMemoryFeatures:
 
         with patch.object(progress_manager, "_display_memory_warning") as mock_warning:
             progress_manager.update_step_with_memory("test_step", 90, "critical test")
-            
+
             mock_warning.assert_called_once()
             call_args = mock_warning.call_args[0]
             assert call_args[0] == MemoryPressureLevel.CRITICAL
@@ -157,7 +157,9 @@ class TestProgressManagerMemoryFeatures:
 
             mock_console_print.assert_called()
             call_args = mock_console_print.call_args
-            assert call_args is not None, "mock_console.print was not called with arguments"
+            assert (
+                call_args is not None
+            ), "mock_console.print was not called with arguments"
             call_args = call_args[0]
             panel = call_args[0]
 
@@ -175,7 +177,9 @@ class TestProgressManagerMemoryFeatures:
             )
 
             call_args = mock_console_print.call_args
-            assert call_args is not None, "mock_console.print was not called with arguments"
+            assert (
+                call_args is not None
+            ), "mock_console.print was not called with arguments"
             call_args = call_args[0]
             panel = call_args[0]
 
@@ -200,7 +204,9 @@ class TestProgressManagerMemoryFeatures:
 
             mock_console_print.assert_called()
             call_args = mock_console_print.call_args
-            assert call_args is not None, "mock_console.print was not called with arguments"
+            assert (
+                call_args is not None
+            ), "mock_console.print was not called with arguments"
             call_args = call_args[0]
             panel = call_args[0]
 

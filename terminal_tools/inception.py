@@ -28,7 +28,7 @@ class TerminalContext:
             clear_terminal()
         for scope in self.scopes:
             scope.print()
-    
+
     def suppress_clear(self, suppress: bool = True):
         """Suppress terminal clearing to avoid conflicts with Textual displays."""
         self._suppress_clear = suppress

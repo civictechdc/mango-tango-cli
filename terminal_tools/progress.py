@@ -12,7 +12,7 @@ Provides hierarchical progress tracking with real-time terminal display:
 import queue
 import threading
 import time
-from typing import Dict, List, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 if TYPE_CHECKING:
     from app.utils import MemoryPressureLevel, MemoryManager
@@ -27,6 +27,7 @@ try:
     from textual.app import App, ComposeResult
     from textual.containers import Vertical
     from textual.widgets import Static
+
     TEXTUAL_AVAILABLE = True
 except ImportError:
     TEXTUAL_AVAILABLE = False
@@ -61,7 +62,7 @@ class ProgressReporter:
 
 class ProgressStateManager:
     """Core progress state management with validation and tracking.
-    
+
     Manages hierarchical progress tracking with steps and substeps,
     including state transitions, validation, and Rich table generation.
     """
@@ -501,7 +502,7 @@ class ProgressStateManager:
 
 class RichProgressDisplay:
     """Rich Live-based progress display for hierarchical progress tracking.
-    
+
     Provides smooth progress updates using Rich Live display
     with table rendering for hierarchical progress visualization.
     """
@@ -522,10 +523,12 @@ class RichProgressDisplay:
         if not self._running:
             self._running = True
             # Create initial empty table
-            initial_table = Table(show_header=False, show_edge=False, pad_edge=False, box=None)
+            initial_table = Table(
+                show_header=False, show_edge=False, pad_edge=False, box=None
+            )
             initial_table.add_column("Status", style="bold", width=3, justify="center")
             initial_table.add_column("Task", ratio=1)
-            
+
             panel = Panel(initial_table, title=self.title, border_style="blue")
             self.live = Live(panel, console=self.console, refresh_per_second=10)
             self.live.start()
@@ -545,9 +548,10 @@ class RichProgressDisplay:
 
 
 if TEXTUAL_AVAILABLE:
+
     class SimpleProgressApp(App):
         """Minimal Textual app for displaying progress inline.
-        
+
         Uses inline=True mode to display progress below inquirer prompts
         without terminal conflicts. Provides hierarchical progress display
         with symbols and progress bars.
@@ -614,7 +618,7 @@ if TEXTUAL_AVAILABLE:
 
     class TextualInlineProgressDisplay:
         """Textual-based inline progress display for hierarchical progress tracking.
-        
+
         Uses Rich Live display with reduced refresh rate to provide smooth updates
         while being compatible with inquirer prompts. This approach provides
         non-conflicting progress display that appears inline.
@@ -637,16 +641,20 @@ if TEXTUAL_AVAILABLE:
             if not self._running:
                 self._running = True
                 # Create initial empty table
-                initial_table = Table(show_header=False, show_edge=False, pad_edge=False, box=None)
-                initial_table.add_column("Status", style="bold", width=3, justify="center")
+                initial_table = Table(
+                    show_header=False, show_edge=False, pad_edge=False, box=None
+                )
+                initial_table.add_column(
+                    "Status", style="bold", width=3, justify="center"
+                )
                 initial_table.add_column("Task", ratio=1)
-                
+
                 # Use Live display with very low refresh rate to avoid conflicts
                 self.live = Live(
                     Panel(initial_table, title=f"📊 {self.title}", border_style="blue"),
                     console=self.console,
                     refresh_per_second=2,  # Low refresh rate to avoid conflicts
-                    auto_refresh=True
+                    auto_refresh=True,
                 )
                 self.live.start()
 
@@ -685,12 +693,13 @@ else:
     # If Textual is not available, create stub classes that fall back to Rich
     class SimpleProgressApp:
         """Stub class when Textual is not available."""
+
         def __init__(self, *args, **kwargs):
             pass
 
     class TextualInlineProgressDisplay:
         """Fallback to Rich display when Textual is not available."""
-        
+
         def __init__(self, title: str):
             self.rich_display = RichProgressDisplay(title)
 
@@ -706,7 +715,7 @@ else:
 
 class ProgressManager:
     """Full-featured progress manager with hierarchical tracking and memory monitoring.
-    
+
     Features:
     - Hierarchical progress (steps with optional substeps)
     - Real-time terminal display with 60fps updates
@@ -840,7 +849,6 @@ class ProgressManager:
 
         time.sleep(0.1)
 
-
     def __enter__(self):
         """Context manager entry."""
         self.start()
@@ -920,6 +928,7 @@ class ProgressManager:
             return self.display.console
         if not hasattr(self, "_console"):
             from rich.console import Console
+
             self._console = Console()
         return self._console
 
@@ -1082,5 +1091,3 @@ class ProgressManager:
 
             logger = get_logger(__name__)
             logger.warning("Failed to display memory summary", extra={"error": str(e)})
-
-

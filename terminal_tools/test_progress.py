@@ -214,7 +214,7 @@ class TestProgressManager(unittest.TestCase):
     def test_display_properties(self):
         """Test display-related properties."""
         self.progress_manager.add_step("step1", "Test Step")
-        
+
         with self.progress_manager:
             self.assertIsNone(self.progress_manager.live)
 
