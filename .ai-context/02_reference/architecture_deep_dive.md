@@ -1,4 +1,22 @@
-# Architecture Overview
+# Mango Tango CLI - Architecture Overview
+
+## Repository Overview
+
+**Mango Tango CLI** is a Python terminal-based tool for social media data analysis and visualization. It provides a modular, extensible architecture that separates core application logic from analysis modules, ensuring consistent UX while allowing easy contribution of new analyzers.
+
+### Purpose & Domain
+
+- **Social Media Analytics**: Hashtag analysis, n-gram analysis, temporal patterns, user coordination
+- **Modular Architecture**: Clear separation between data import/export, analysis, and presentation
+- **Interactive Workflows**: Terminal-based UI with web dashboard capabilities
+- **Extensible Design**: Plugin-like analyzer system for easy expansion
+
+### Tech Stack
+
+- **Core**: Python 3.12, Inquirer (CLI), TinyDB (metadata)
+- **Data**: Polars/Pandas, PyArrow, Parquet files
+- **Web**: Dash, Shiny for Python, Plotly
+- **Dev Tools**: Black, isort, pytest, PyInstaller
 
 ## High-Level Component Diagram
 
@@ -137,38 +155,31 @@ class AnalysisWebServerContext:
 
 ### Progress Reporting Architecture
 
-The application uses a hierarchical progress reporting system built on the Rich library for terminal display:
+The application uses a Textual-based progress reporting system with direct integration for terminal display:
 
 ```python
-# Hierarchical Progress Manager
-class RichProgressManager:
+# Progress Manager
+class ProgressManager:
     # Main step management
     def add_step(step_id: str, title: str, total: int = None)
     def start_step(step_id: str)
     def update_step(step_id: str, progress: int)
     def complete_step(step_id: str)
-    
-    # Sub-step management for detailed progress tracking
-    def add_substep(parent_step_id: str, substep_id: str, description: str, total: int = None)
-    def start_substep(parent_step_id: str, substep_id: str)
-    def update_substep(parent_step_id: str, substep_id: str, progress: int)
-    def complete_substep(parent_step_id: str, substep_id: str)
 ```
 
 **Enhanced N-gram Analysis Progress Flow**:
 
-- Steps 1-8: Data processing with traditional progress reporting
-- Steps 9-11: Final write operations with hierarchical sub-step progress
-  - Each write operation broken into 4 sub-steps (prepare, transform, sort, write)
-  - Eliminates silent processing periods during final 20-30% of analysis time
-  - Memory-aware progress calculation based on dataset size
+- Steps 1-8: Data processing with streamlined progress tracking
+- Steps 9-11: Final write operations with efficient progress updates
+  - Each write operation tracked with precise progress indicators
+  - Eliminates silent processing periods
+  - Provides real-time feedback during analysis
 
 **Integration Points**:
 
 - `AnalysisContext.progress_callback` provides progress manager to analyzers
-- Enhanced write functions use sub-step progress for granular feedback
-- Rich terminal display with hierarchical progress visualization
-- Thread-safe progress updates with display locks
+- Textual-based terminal display with clean, modern visualization
+- Thread-safe progress updates for multi-stage analyses
 
 ## Core Domain Patterns
 
@@ -268,7 +279,7 @@ class MemoryManager:
 **System-Specific Scaling**:
 
 - **≥32GB systems**: 2.0x chunk size multiplier (200K-400K rows)
-- **≥16GB systems**: 1.5x chunk size multiplier (150K-300K rows)  
+- **≥16GB systems**: 1.5x chunk size multiplier (150K-300K rows)
 - **≥8GB systems**: 1.0x baseline chunks (100K-200K rows)
 - **<8GB systems**: 0.5x conservative chunks (50K-100K rows)
 
@@ -298,32 +309,88 @@ class MemoryManager:
 - **CSV Export**: Standard comma-separated values
 - **Parquet Export**: Native format for data interchange
 
-## Key Architectural Decisions
+## Development Patterns and Architectural Decisions
 
-### Parquet-Centric Data Flow
+### Analysis Context-Based Dependency Injection
 
-- All analysis data stored as Parquet files
-- Enables efficient columnar operations with Polars
-- Provides schema validation and compression
-- Facilitates data sharing between analysis stages
+The application uses a sophisticated context pattern for dependency injection and decoupling:
 
-### Context Pattern for Decoupling
+```python
+class AnalysisContext:
+    input_path: Path           # Input parquet file
+    output_path: Path          # Where to write results
+    preprocessing: Callable    # Column mapping function
+    progress_callback: Callable # Progress reporting
+    parameters: dict           # User-configured parameters
+
+class AnalysisWebServerContext:
+    primary_output_path: Path
+    secondary_output_paths: list[Path]
+    dash_app: dash.Dash        # For dashboard creation
+    server_config: dict
+```
+
+Key benefits of the context pattern:
 
 - Eliminates direct dependencies between layers
 - Enables testing with mock contexts
-- Allows analyzer development without application knowledge
+- Allows analyzer development without full application knowledge
 - Supports different execution environments (CLI, web, testing)
+
+### Parquet-Centric Data Flow
+
+All analysis data is stored and processed using Parquet files:
+
+- Enables efficient columnar operations with Polars
+- Provides schema validation and compression
+- Facilitates data sharing between analysis stages
+- Supports cross-analyzer data interoperability
 
 ### Domain-Driven Module Organization
 
-- Clear boundaries between core, edge, and content domains
-- Enables independent development of analyzers
-- Supports plugin-like extensibility
-- Facilitates maintenance and testing
+The application uses a clear, layered architecture:
+
+- **Core Domain**: Application, Terminal Components, Storage IO
+- **Edge Domain**: Data import/export, preprocessing
+- **Content Domain**: Analyzers, web presenters
+
+Benefits include:
+
+- Clear boundaries between components
+- Independent development of analyzers
+- Plugin-like extensibility
+- Simplified maintenance and testing
 
 ### Semantic Type System
 
-- Guides users in column selection for analyses
+A declarative type system guides data analysis:
+
+- Maps user data columns to precise analyzer requirements
 - Enables automatic data validation and preprocessing
-- Supports analyzer input requirements
-- Provides consistent UX across different data sources
+- Provides consistent user experience across data sources
+- Supports complex input schema definitions
+
+Example Type Definition:
+
+```python
+AnalyzerInterface(
+    input=AnalyzerInput(
+        columns=[
+            AnalyzerInputColumn(
+                name='author_id',
+                semantic_type=ColumnSemantic.USER_ID,
+                required=True
+            )
+        ]
+    )
+)
+```
+
+### Performance and Memory Management
+
+The system includes adaptive processing strategies:
+
+- Memory-aware chunk size optimization
+- Tiered processing (in-memory, chunked, disk-based)
+- System-specific allocation strategies
+- Fallback mechanisms for constrained environments

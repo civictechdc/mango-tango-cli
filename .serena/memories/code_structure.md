@@ -44,9 +44,9 @@ Terminal UI components using inquirer for interactive flows:
 
 Enhanced terminal utilities and **sophisticated progress reporting system**:
 
-- `progress.py` - **Hierarchical progress reporting system** 
+- `progress.py` - **Hierarchical progress reporting system**
   - See `progress_reporting_architecture` memory for detailed documentation
-  - `RichProgressManager` - Main progress manager with sub-step support
+  - `ProgressManager` - Main progress manager with sub-step support
   - `ProgressReporter` - Basic multiprocess progress reporting
   - `AdvancedProgressReporter` - tqdm-based progress with ETA
 - `prompts.py` - Interactive terminal prompts and file selection
@@ -58,6 +58,7 @@ Enhanced terminal utilities and **sophisticated progress reporting system**:
 **Reorganized modular analysis system:**
 
 #### Core Analyzers
+
 - `__init__.py` - Main analyzer suite registration
 - `example/` - Example analyzer implementation
 - `hashtags/` - Hashtag analysis (primary analyzer)
@@ -67,11 +68,12 @@ Enhanced terminal utilities and **sophisticated progress reporting system**:
 - `time_coordination/` - Time coordination analysis
 
 #### N-gram Analysis Hierarchy
+
 - `ngrams/` - **Hierarchically organized n-gram analysis system**
   - `ngrams_base/` - **Primary analyzer with enhanced progress reporting**
     - `main.py` - Enhanced with streaming optimization and hierarchical progress
     - `interface.py` - Input/output schema definitions
-    - **Progress Integration**: Uses RichProgressManager with hierarchical sub-steps for write operations
+    - **Progress Integration**: Uses ProgressManager with hierarchical sub-steps for write operations
   - `ngram_stats/` - **Secondary analyzer**
     - `main.py` - Statistics calculation with chunked processing
     - `interface.py` - Statistics interface definition
@@ -106,16 +108,19 @@ Enhanced terminal utilities and **sophisticated progress reporting system**:
 ## Key Architectural Patterns
 
 ### Domain Separation
+
 - **Core**: App, Components, Storage, Terminal Tools
 - **Edge**: Importers, Testing framework
 - **Content**: Analyzers (primary, secondary, web presenters)
 
 ### Hierarchical Organization
+
 - **N-gram analyzers** organized into logical hierarchy
 - **Testing framework** provides comprehensive mock contexts
 - **Progress reporting** supports nested sub-steps (see `progress_reporting_architecture` memory)
 
 ### Enhanced Features
+
 - **Streaming optimization** for large dataset processing
 - **Hierarchical progress reporting** eliminates silent processing periods
 - **Comprehensive testing** with standardized frameworks

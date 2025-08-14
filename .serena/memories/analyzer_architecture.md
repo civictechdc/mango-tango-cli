@@ -12,7 +12,7 @@ The analyzer system is the core content domain of Mango Tango CLI, designed for 
 - **Input**: Raw imported data (CSV/Excel → Parquet)
 - **Output**: Normalized, non-duplicated analysis results
 - **Context**: Receives input file path, preprocessing method, output path, **progress manager**
-- **Examples**: 
+- **Examples**:
   - `hashtags` - Hashtag extraction and analysis
   - `ngrams_base` - N-gram generation with enhanced progress reporting and streaming optimization
   - `temporal` - Time-based aggregation
@@ -24,7 +24,7 @@ The analyzer system is the core content domain of Mango Tango CLI, designed for 
 - **Input**: Primary analyzer outputs
 - **Output**: User-consumable tables/reports
 - **Context**: Receives primary output path, provides secondary output path
-- **Examples**: 
+- **Examples**:
   - `ngram_stats` - N-gram statistics with chunked processing
   - `hashtags_web/analysis.py:secondary_analyzer()` - Hashtag summary statistics
 
@@ -34,7 +34,7 @@ The analyzer system is the core content domain of Mango Tango CLI, designed for 
 - **Input**: Primary + Secondary analyzer outputs
 - **Framework**: Dash or Shiny for Python
 - **Context**: Receives all relevant output paths + Dash/Shiny app object
-- **Examples**: 
+- **Examples**:
   - `hashtags_web` - Hashtag dashboard
   - `ngram_web` - N-gram exploration dashboard with word matching
   - `temporal_barplot` - Temporal visualization
@@ -43,12 +43,12 @@ The analyzer system is the core content domain of Mango Tango CLI, designed for 
 
 ### Hierarchical Progress System
 
-Analyzers now support hierarchical progress reporting through `RichProgressManager`:
+Analyzers now support streamlined progress reporting through `ProgressManager`:
 
 - **Main steps**: High-level analysis phases (preprocess, tokenize, generate, write)
-- **Sub-steps**: Granular operations within each phase (group, aggregate, sort, write)
-- **Progress callbacks**: Real-time feedback during long operations
-- **Error isolation**: Failures isolated to specific sub-steps
+- **Progress tracking**: Clean, efficient real-time feedback
+- **Textual-native design**: Direct, performant progress updates
+- **Error handling**: Immediate visibility into operation status
 
 ### N-gram Analyzer Enhancements
 
@@ -95,7 +95,7 @@ All analyzers receive context objects providing:
 
 ### N-gram Analyzer Hierarchy
 
-```
+```bash
 analyzers/ngrams/
 ├── ngrams_base/         # Primary analyzer
 │   ├── main.py         # Enhanced with progress reporting

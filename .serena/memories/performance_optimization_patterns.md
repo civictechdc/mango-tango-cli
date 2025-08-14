@@ -110,7 +110,7 @@ def enhanced_processing_function(context, memory_manager=None):
 ### Progress Reporting Integration
 
 ```python
-with RichProgressManager("Analysis Progress") as progress:
+with ProgressManager("Analysis Progress") as progress:
     # Add main steps with calculated chunk counts
     total_chunks = math.ceil(len(dataset) / chunk_size)
     progress.add_step("process", f"Processing {len(dataset)} rows", total=total_chunks)

@@ -206,6 +206,7 @@ pytest testing/performance/test_integration_validation.py -v
 ```
 
 **Performance Test Categories**:
+
 - **Memory detection tests**: Validate auto-detection of system RAM
 - **Adaptive chunking tests**: Verify chunk size optimization
 - **System configuration tests**: Test behavior on different system configs

@@ -184,7 +184,7 @@ find . -name "*.py" -type f -mtime -1
 
 # Search for patterns in code
 grep -r "MemoryManager" --include="*.py" .
-grep -r "RichProgressManager" --include="*.py" .
+grep -r "ProgressManager" --include="*.py" .
 
 # Count lines of code by category
 find . -name "*.py" -path "./analyzers/*" | xargs wc -l | tail -1
