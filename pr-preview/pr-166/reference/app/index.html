@@ -6171,7 +6171,13 @@
 <span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
-<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestProgressManagerMemoryFeatures</span><span class="p">:</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestProgressManagerMemoryFeatures</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test ProgressManager memory monitoring functionality.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">test_initialization_with_memory_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -6317,7 +6323,9 @@
 
             <span class="n">mock_console_print</span><span class="o">.</span><span class="n">assert_called</span><span class="p">()</span>
             <span class="n">call_args</span> <span class="o">=</span> <span class="n">mock_console_print</span><span class="o">.</span><span class="n">call_args</span>
-            <span class="k">assert</span> <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">),</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
             <span class="n">call_args</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">panel</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -6335,7 +6343,9 @@
             <span class="p">)</span>
 
             <span class="n">call_args</span> <span class="o">=</span> <span class="n">mock_console_print</span><span class="o">.</span><span class="n">call_args</span>
-            <span class="k">assert</span> <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">),</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
             <span class="n">call_args</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">panel</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -6360,7 +6370,9 @@
 
             <span class="n">mock_console_print</span><span class="o">.</span><span class="n">assert_called</span><span class="p">()</span>
             <span class="n">call_args</span> <span class="o">=</span> <span class="n">mock_console_print</span><span class="o">.</span><span class="n">call_args</span>
-            <span class="k">assert</span> <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">),</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
             <span class="n">call_args</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">panel</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -6438,11 +6450,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app/test_memory_aware_progress.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">190</span>
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
@@ -6463,7 +6471,13 @@
 <span class="normal">208</span>
 <span class="normal">209</span>
 <span class="normal">210</span>
-<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_display_memory_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_display_memory_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test memory summary display.&quot;&quot;&quot;</span>
     <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">MemoryManager</span><span class="p">)</span>
     <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_current_memory_usage</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">{</span>
@@ -6480,7 +6494,9 @@
 
         <span class="n">mock_console_print</span><span class="o">.</span><span class="n">assert_called</span><span class="p">()</span>
         <span class="n">call_args</span> <span class="o">=</span> <span class="n">mock_console_print</span><span class="o">.</span><span class="n">call_args</span>
-        <span class="k">assert</span> <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">),</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
         <span class="n">call_args</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">panel</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -6550,7 +6566,11 @@
 <span class="normal">181</span>
 <span class="normal">182</span>
 <span class="normal">183</span>
-<span class="normal">184</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_display_memory_warning_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_display_memory_warning_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test the content and formatting of memory warnings.&quot;&quot;&quot;</span>
     <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">MemoryManager</span><span class="p">)</span>
     <span class="n">progress_manager</span> <span class="o">=</span> <span class="n">ProgressManager</span><span class="p">(</span><span class="s2">&quot;Test&quot;</span><span class="p">,</span> <span class="n">memory_manager</span><span class="o">=</span><span class="n">memory_manager</span><span class="p">)</span>
@@ -6565,7 +6585,9 @@
 
         <span class="n">mock_console_print</span><span class="o">.</span><span class="n">assert_called</span><span class="p">()</span>
         <span class="n">call_args</span> <span class="o">=</span> <span class="n">mock_console_print</span><span class="o">.</span><span class="n">call_args</span>
-        <span class="k">assert</span> <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">),</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
         <span class="n">call_args</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">panel</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -6583,7 +6605,9 @@
         <span class="p">)</span>
 
         <span class="n">call_args</span> <span class="o">=</span> <span class="n">mock_console_print</span><span class="o">.</span><span class="n">call_args</span>
-        <span class="k">assert</span> <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">call_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">),</span> <span class="s2">&quot;mock_console.print was not called with arguments&quot;</span>
         <span class="n">call_args</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">panel</span> <span class="o">=</span> <span class="n">call_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -6612,13 +6636,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app/test_memory_aware_progress.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
@@ -6628,7 +6646,13 @@
 <span class="normal">226</span>
 <span class="normal">227</span>
 <span class="normal">228</span>
-<span class="normal">229</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_garbage_collection_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_garbage_collection_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test garbage collection effectiveness reporting.&quot;&quot;&quot;</span>
     <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">MemoryManager</span><span class="p">)</span>
     <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_current_memory_usage</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pressure_level&quot;</span><span class="p">:</span> <span class="s2">&quot;low&quot;</span><span class="p">}</span>
@@ -6871,13 +6895,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app/test_memory_aware_progress.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span>
 <span class="normal">240</span>
@@ -6889,7 +6907,13 @@
 <span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
-<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_no_gc_reporting_for_small_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_no_gc_reporting_for_small_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that small GC cleanups are not reported to avoid noise.&quot;&quot;&quot;</span>
     <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">MemoryManager</span><span class="p">)</span>
     <span class="n">memory_manager</span><span class="o">.</span><span class="n">get_current_memory_usage</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pressure_level&quot;</span><span class="p">:</span> <span class="s2">&quot;low&quot;</span><span class="p">}</span>
@@ -7131,13 +7155,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>app/test_memory_aware_progress.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
 <span class="normal">261</span>
@@ -7193,7 +7211,13 @@
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestProgressManagerMemoryIntegration</span><span class="p">:</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestProgressManagerMemoryIntegration</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Integration tests for ProgressManager memory features.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">test_full_analysis_simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -7287,13 +7311,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app/test_memory_aware_progress.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
@@ -7346,7 +7364,13 @@
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_full_analysis_simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_full_analysis_simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulate a full analysis workflow with memory monitoring.&quot;&quot;&quot;</span>
     <span class="n">memory_manager</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="n">MemoryManager</span><span class="p">)</span>
 
