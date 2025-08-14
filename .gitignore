@@ -9,3 +9,6 @@ VERSION
 *.DS_Store
 .env*
 .serena/cache
+*.csv
+.gemini/
+.claude/agents/

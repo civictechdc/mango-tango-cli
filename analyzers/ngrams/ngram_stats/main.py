@@ -1,9 +1,13 @@
+import os
+
 import polars as pl
-import pyarrow as pa
-import pyarrow.parquet as pq
 
 from analyzer_interface.context import SecondaryAnalyzerContext
-from terminal_tools import ProgressReporter
+from app.logger import get_logger
+from terminal_tools.progress import ProgressManager
+
+# Initialize module-level logger
+logger = get_logger(__name__)
 
 from ..ngrams_base.interface import (
     COL_AUTHOR_ID,
@@ -29,123 +33,750 @@ from .interface import (
 
 
 def main(context: SecondaryAnalyzerContext):
-    df_message_ngrams = pl.read_parquet(
+    """
+    Refactored ngram_stats analyzer using streaming architecture for memory efficiency.
+
+    Uses lazy evaluation with pl.scan_parquet, chunked processing to avoid cardinality explosion,
+    and ProgressManager for detailed progress feedback.
+
+    This analyzer can either use an existing progress manager from the context (continuing
+    from primary analyzer progress) or create its own for standalone execution.
+
+    Progress Manager Integration:
+    - If context.progress_manager exists: Uses the existing manager to continue progress
+    - If context.progress_manager is None: Creates a new ProgressManager
+    - This design eliminates the clearing of progress displays when transitioning from
+      primary to secondary analyzers, providing a seamless user experience
+    """
+    logger.info(
+        "Starting n-gram statistics analysis",
+        extra={
+            "input_message_ngrams": str(
+                context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
+            ),
+            "input_ngram_defs": str(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path),
+            "input_messages": str(context.base.table(OUTPUT_MESSAGE).parquet_path),
+            "output_stats": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+            "output_full": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+            "analyzer_version": "streaming_memory_managed",
+        },
+    )
+    # 1. Load inputs as LazyFrames for memory efficiency
+    ldf_message_ngrams = pl.scan_parquet(
         context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
     )
-    df_ngrams = pl.read_parquet(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path)
-    df_messages = pl.read_parquet(context.base.table(OUTPUT_MESSAGE).parquet_path)
+    ldf_ngrams = pl.scan_parquet(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path)
+    ldf_messages = pl.scan_parquet(context.base.table(OUTPUT_MESSAGE).parquet_path)
 
-    dict_authors_by_message = {
-        row[COL_MESSAGE_SURROGATE_ID]: row[COL_AUTHOR_ID]
-        for row in df_messages.iter_rows(named=True)
-    }
-
-    with ProgressReporter("Computing ngram statistics"):
-        df_ngram_stats = (
-            df_message_ngrams.with_columns(
-                pl.col(COL_MESSAGE_NGRAM_COUNT)
-                .sum()
-                .over([COL_NGRAM_ID])
-                .alias(COL_NGRAM_TOTAL_REPS)
-            )
-            .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
-            .group_by(COL_NGRAM_ID)
-            .agg(
-                pl.first(COL_NGRAM_TOTAL_REPS).alias(COL_NGRAM_TOTAL_REPS),
-                pl.col(COL_MESSAGE_SURROGATE_ID)
-                .replace_strict(dict_authors_by_message)
-                .n_unique()
-                .alias(COL_NGRAM_DISTINCT_POSTER_COUNT),
-            )
-        )
-
-    with ProgressReporter("Creating the summary table"):
-        df_ngram_summary = df_ngrams.join(
-            df_ngram_stats, on=COL_NGRAM_ID, how="inner"
-        ).sort(
-            [COL_NGRAM_LENGTH, COL_NGRAM_TOTAL_REPS, COL_NGRAM_DISTINCT_POSTER_COUNT],
-            descending=True,
-        )
-
-        df_ngram_summary.write_parquet(context.output(OUTPUT_NGRAM_STATS).parquet_path)
-
-    df_messages_schema = df_messages.to_arrow().schema
-    df_message_ngrams_schema = df_message_ngrams.to_arrow().schema
-    df_ngram_summary_schema = df_ngram_summary.to_arrow().schema
-
-    average_cardinality_explosion_factor = df_message_ngrams.height // df_ngrams.height
-
-    with ProgressReporter("Writing full report") as progress:
-        with pq.ParquetWriter(
-            context.output(OUTPUT_NGRAM_FULL).parquet_path,
-            schema=pa.schema(
-                [
-                    df_message_ngrams_schema.field(COL_NGRAM_ID),
-                    df_ngram_summary_schema.field(COL_NGRAM_LENGTH),
-                    df_ngram_summary_schema.field(COL_NGRAM_WORDS),
-                    df_ngram_summary_schema.field(COL_NGRAM_TOTAL_REPS),
-                    df_ngram_summary_schema.field(COL_NGRAM_DISTINCT_POSTER_COUNT),
-                    df_messages_schema.field(COL_AUTHOR_ID),
-                    pa.field(COL_NGRAM_REPS_PER_USER, pa.int32()),
-                    df_messages_schema.field(COL_MESSAGE_SURROGATE_ID),
-                    df_messages_schema.field(COL_MESSAGE_ID),
-                    df_messages_schema.field(COL_MESSAGE_TEXT),
-                    df_messages_schema.field(COL_MESSAGE_TIMESTAMP),
-                ]
+    logger.debug(
+        "Input data sources loaded as LazyFrames",
+        extra={
+            "message_ngrams_path": str(
+                context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
             ),
-        ) as writer:
-            report_slice_size = max(1, 100_000 // average_cardinality_explosion_factor)
-            report_total_processed = 0
-            for df_ngram_summary_slice in df_ngram_summary.iter_slices(
-                report_slice_size
-            ):
-                print(
-                    f"Writing report "
-                    f"{report_total_processed}/{df_ngram_summary.height}",
-                    end="\r",
-                )
-                report_total_processed += df_ngram_summary_slice.height
+            "ngram_defs_path": str(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path),
+            "messages_path": str(context.base.table(OUTPUT_MESSAGE).parquet_path),
+            "loading_method": "lazy_polars_scan_parquet",
+        },
+    )
 
-                df_output = (
-                    (
-                        df_ngram_summary_slice.join(
-                            df_message_ngrams, on=COL_NGRAM_ID
-                        ).join(df_messages, on=COL_MESSAGE_SURROGATE_ID)
-                    )
-                    .with_columns(
+    # Check if context has an existing progress manager, otherwise create a new one
+    # This allows the secondary analyzer to continue progress from the primary analyzer
+    # instead of clearing the progress display and starting fresh
+    existing_progress_manager = getattr(context, "progress_manager", None)
+
+    if existing_progress_manager is not None:
+        logger.info(
+            "Using existing progress manager from context - continuing from primary analyzer"
+        )
+        progress_manager = existing_progress_manager
+        use_context_manager = False
+
+        logger.debug(
+            "Progress manager context analysis",
+            extra={
+                "progress_manager_source": "inherited_from_primary",
+                "use_context_manager": False,
+                "existing_manager_type": type(existing_progress_manager).__name__,
+                "seamless_transition": True,
+            },
+        )
+    else:
+        logger.info("Creating new progress manager for standalone execution")
+        use_context_manager = True
+
+        logger.debug(
+            "Progress manager context analysis",
+            extra={
+                "progress_manager_source": "new_standalone",
+                "use_context_manager": True,
+                "existing_manager_type": "None",
+                "seamless_transition": False,
+            },
+        )
+
+    def run_analysis(progress_manager):
+        """Inner function containing the analysis logic."""
+        # Add ALL steps upfront for better UX with the enhanced progress system
+        # This provides users with a complete view of the entire analysis process
+        progress_manager.add_step("analyze_structure", "Analyzing data structure")
+        progress_manager.add_step("compute_stats", "Computing n-gram statistics")
+        progress_manager.add_step("write_summary", "Writing summary output")
+
+        # Refresh display after all steps are added to ensure they are visible from the start
+        progress_manager.refresh_display()
+
+        # We'll add the full report step after determining its parameters during structure analysis
+        # This is needed because we need the data structure info to calculate accurate totals
+
+        # Step 1: Get counts for progress reporting and to determine full report processing approach
+        progress_manager.start_step("analyze_structure")
+
+        try:
+            ngram_count = ldf_ngrams.select(pl.len()).collect().item()
+            message_ngram_count = ldf_message_ngrams.select(pl.len()).collect().item()
+            message_count = ldf_messages.select(pl.len()).collect().item()
+
+            # Calculate estimated processing requirements for full report
+            # Multi-file dataset optimization allows larger chunk sizes for better performance
+            estimated_chunk_size = max(
+                10_000,  # Increased min from 5k to 10k
+                min(
+                    200_000, 2_000_000 // max(1, message_ngram_count // ngram_count)
+                ),  # Increased max from 50k to 200k, divisor from 500k to 2M
+            )
+            estimated_full_report_chunks = (
+                ngram_count + estimated_chunk_size - 1
+            ) // estimated_chunk_size
+
+            logger.debug(
+                "Full report processing strategy calculated",
+                extra={
+                    "ngram_count": ngram_count,
+                    "message_ngram_count": message_ngram_count,
+                    "message_count": message_count,
+                    "calculated_chunk_size": estimated_chunk_size,
+                    "estimated_chunks": estimated_full_report_chunks,
+                    "ngram_to_message_ratio": (
+                        message_ngram_count / ngram_count if ngram_count > 0 else "N/A"
+                    ),
+                    "processing_intensity": (
+                        "high"
+                        if estimated_full_report_chunks > 10
+                        else "moderate" if estimated_full_report_chunks > 3 else "low"
+                    ),
+                },
+            )
+
+            logger.info(
+                "Data structure analysis completed",
+                extra={
+                    "ngram_count": ngram_count,
+                    "message_ngram_count": message_ngram_count,
+                    "message_count": message_count,
+                    "estimated_chunk_size": estimated_chunk_size,
+                    "estimated_full_report_chunks": estimated_full_report_chunks,
+                },
+            )
+
+            # Now add the full report step with calculated total
+            progress_manager.add_step(
+                "write_full_report", "Writing full report", estimated_full_report_chunks
+            )
+
+            progress_manager.complete_step("analyze_structure")
+        except Exception as e:
+            logger.error(
+                "Structure analysis failed",
+                extra={"error": str(e), "error_type": type(e).__name__},
+                exc_info=True,
+            )
+            progress_manager.fail_step(
+                "analyze_structure", f"Failed during structure analysis: {str(e)}"
+            )
+            raise
+
+        # Step 2: Calculate initial statistics using streaming-friendly aggregations with hierarchical progress
+        progress_manager.start_step("compute_stats")
+
+        # Add hierarchical sub-steps for detailed progress feedback during complex operations
+        progress_manager.add_substep(
+            "compute_stats",
+            "calculate_reps",
+            "Calculating total repetitions per n-gram",
+        )
+        progress_manager.add_substep(
+            "compute_stats", "count_posters", "Counting distinct posters per n-gram"
+        )
+        progress_manager.add_substep(
+            "compute_stats", "join_definitions", "Joining with n-gram definitions"
+        )
+        progress_manager.add_substep(
+            "compute_stats", "sort_results", "Sorting final results"
+        )
+
+        try:
+            # Sub-step 1: Calculate total repetitions and basic aggregations per n-gram
+            progress_manager.start_substep("compute_stats", "calculate_reps")
+            logger.info("Starting repetition count calculation")
+
+            logger.debug(
+                "Repetition calculation phase initialized",
+                extra={
+                    "aggregation_method": "polars_group_by",
+                    "aggregation_columns": [
+                        COL_MESSAGE_NGRAM_COUNT,
+                        COL_MESSAGE_SURROGATE_ID,
+                    ],
+                    "group_by_column": COL_NGRAM_ID,
+                    "filter_criteria": "total_reps > 1",
+                },
+            )
+
+            ldf_basic_stats = (
+                ldf_message_ngrams.group_by(COL_NGRAM_ID)
+                .agg(
+                    [
                         pl.col(COL_MESSAGE_NGRAM_COUNT)
                         .sum()
-                        .over([COL_NGRAM_ID, COL_AUTHOR_ID])
-                        .alias(COL_NGRAM_REPS_PER_USER)
-                        .cast(pl.Int32)
-                    )
-                    .select(
-                        [
-                            COL_NGRAM_ID,
-                            COL_NGRAM_LENGTH,
-                            COL_NGRAM_WORDS,
-                            COL_NGRAM_TOTAL_REPS,
-                            COL_NGRAM_DISTINCT_POSTER_COUNT,
-                            COL_AUTHOR_ID,
-                            COL_NGRAM_REPS_PER_USER,
-                            COL_MESSAGE_SURROGATE_ID,
-                            COL_MESSAGE_ID,
-                            COL_MESSAGE_TEXT,
-                            COL_MESSAGE_TIMESTAMP,
-                        ]
-                    )
-                    .sort(
-                        [
-                            COL_NGRAM_LENGTH,
-                            COL_NGRAM_TOTAL_REPS,
-                            COL_NGRAM_DISTINCT_POSTER_COUNT,
-                            COL_NGRAM_REPS_PER_USER,
-                            COL_AUTHOR_ID,
-                            COL_MESSAGE_SURROGATE_ID,
-                        ],
-                        descending=[True, True, True, True, False, False],
-                    )
+                        .alias(COL_NGRAM_TOTAL_REPS),
+                        pl.col(COL_MESSAGE_SURROGATE_ID)
+                        .n_unique()
+                        .alias("temp_message_count"),
+                    ]
                 )
-                writer.write_table(df_output.to_arrow())
-                report_total_processed += df_ngram_summary_slice.height
-                progress.update(report_total_processed / df_ngram_summary.height)
+                .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
+            )
+
+            logger.debug(
+                "Basic statistics aggregation query constructed",
+                extra={
+                    "aggregation_operations": [
+                        "sum_message_ngram_count",
+                        "n_unique_message_surrogate_id",
+                    ],
+                    "post_filter": "total_reps > 1",
+                    "lazy_evaluation": True,
+                },
+            )
+
+            logger.info("Repetition count calculation completed")
+            progress_manager.complete_substep("compute_stats", "calculate_reps")
+
+            # Sub-step 2: Count distinct posters per n-gram through message joins
+            progress_manager.start_substep("compute_stats", "count_posters")
+            logger.info("Starting distinct poster count calculation")
+
+            logger.debug(
+                "Poster count calculation phase initialized",
+                extra={
+                    "join_method": "inner_join",
+                    "join_key": COL_MESSAGE_SURROGATE_ID,
+                    "aggregation_column": COL_AUTHOR_ID,
+                    "aggregation_function": "n_unique",
+                    "expected_result": "distinct_author_count_per_ngram",
+                },
+            )
+
+            # Create the poster count aggregation with optimized joins
+            ldf_poster_counts = (
+                ldf_message_ngrams.join(
+                    ldf_messages.select([COL_MESSAGE_SURROGATE_ID, COL_AUTHOR_ID]),
+                    on=COL_MESSAGE_SURROGATE_ID,
+                )
+                .group_by(COL_NGRAM_ID)
+                .agg(
+                    pl.col(COL_AUTHOR_ID)
+                    .n_unique()
+                    .alias(COL_NGRAM_DISTINCT_POSTER_COUNT)
+                )
+            )
+
+            # Join basic stats with poster counts
+            ldf_ngram_stats = ldf_basic_stats.join(
+                ldf_poster_counts,
+                on=COL_NGRAM_ID,
+                how="inner",
+            ).select(
+                [
+                    COL_NGRAM_ID,
+                    COL_NGRAM_TOTAL_REPS,
+                    COL_NGRAM_DISTINCT_POSTER_COUNT,
+                ]
+            )
+
+            logger.debug(
+                "Basic stats and poster counts joined",
+                extra={
+                    "join_type": "inner",
+                    "join_key": COL_NGRAM_ID,
+                    "output_columns": [
+                        COL_NGRAM_ID,
+                        COL_NGRAM_TOTAL_REPS,
+                        COL_NGRAM_DISTINCT_POSTER_COUNT,
+                    ],
+                    "expected_cardinality": "ngram_level_statistics",
+                },
+            )
+
+            logger.info("Distinct poster count calculation completed")
+            progress_manager.complete_substep("compute_stats", "count_posters")
+
+            # Sub-step 3: Join with n-gram definitions to create summary table
+            progress_manager.start_substep("compute_stats", "join_definitions")
+            logger.info("Starting join with n-gram definitions")
+
+            logger.debug(
+                "Definition join phase initialized",
+                extra={
+                    "join_left": "ngram_definitions",
+                    "join_right": "ngram_statistics",
+                    "join_key": COL_NGRAM_ID,
+                    "join_type": "inner",
+                    "expected_enrichment": "add_ngram_text_and_length_to_stats",
+                },
+            )
+
+            ldf_ngram_summary = ldf_ngrams.join(
+                ldf_ngram_stats, on=COL_NGRAM_ID, how="inner"
+            )
+
+            logger.info("Join with n-gram definitions completed")
+            progress_manager.complete_substep("compute_stats", "join_definitions")
+
+            # Sub-step 4: Sort results for final output
+            progress_manager.start_substep("compute_stats", "sort_results")
+            logger.info("Starting final result sorting")
+
+            logger.debug(
+                "Final sorting phase initialized",
+                extra={
+                    "sort_columns": [
+                        COL_NGRAM_LENGTH,
+                        COL_NGRAM_TOTAL_REPS,
+                        COL_NGRAM_DISTINCT_POSTER_COUNT,
+                    ],
+                    "sort_order": "descending",
+                    "collection_engine": "streaming",
+                    "purpose": "prioritize_high_impact_ngrams",
+                },
+            )
+
+            ldf_ngram_summary = ldf_ngram_summary.sort(
+                [
+                    COL_NGRAM_LENGTH,
+                    COL_NGRAM_TOTAL_REPS,
+                    COL_NGRAM_DISTINCT_POSTER_COUNT,
+                ],
+                descending=True,
+            )
+
+            # Collect the final result using streaming engine
+            logger.debug(
+                "Collecting final summary result",
+                extra={
+                    "collection_method": "streaming",
+                    "lazy_operations_completed": True,
+                },
+            )
+
+            df_ngram_summary = ldf_ngram_summary.collect(engine="streaming")
+
+            logger.debug(
+                "Summary collection completed",
+                extra={
+                    "final_summary_rows": df_ngram_summary.height,
+                    "summary_columns": df_ngram_summary.columns,
+                    "collection_engine": "streaming",
+                    "memory_efficient": True,
+                },
+            )
+
+            logger.info(
+                "Final result sorting and collection completed",
+                extra={
+                    "summary_record_count": df_ngram_summary.height,
+                    "processing_engine": "streaming",
+                },
+            )
+            progress_manager.complete_substep("compute_stats", "sort_results")
+
+            logger.info(
+                "Statistics computation completed",
+                extra={
+                    "summary_record_count": df_ngram_summary.height,
+                    "processing_engine": "streaming",
+                },
+            )
+            progress_manager.complete_step("compute_stats")
+        except Exception as e:
+            logger.error(
+                "Statistics computation failed",
+                extra={"error": str(e), "error_type": type(e).__name__},
+                exc_info=True,
+            )
+            # Determine which substep failed and provide specific error context
+            error_context = f"Failed during statistics computation: {str(e)}"
+            try:
+                # Try to identify which substep was active when the error occurred
+                substep_context = {
+                    "calculate_reps": "repetition calculation",
+                    "count_posters": "poster counting",
+                    "join_definitions": "definition joining",
+                    "sort_results": "result sorting",
+                }
+
+                # Log the specific phase that failed for better debugging
+                logger.error(
+                    "Detailed error context for statistics computation",
+                    extra={
+                        "possible_failure_points": list(substep_context.keys()),
+                        "error_location": "compute_stats_step",
+                    },
+                )
+            except Exception:
+                # Don't let error reporting failures crash the main error handling
+                pass
+
+            progress_manager.fail_step("compute_stats", error_context)
+            raise
+
+        # Step 3: Write summary output
+        progress_manager.start_step("write_summary")
+
+        try:
+            df_ngram_summary.write_parquet(
+                context.output(OUTPUT_NGRAM_STATS).parquet_path
+            )
+            logger.info(
+                "Summary output written successfully",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+                    "record_count": df_ngram_summary.height,
+                },
+            )
+            progress_manager.complete_step("write_summary")
+        except Exception as e:
+            logger.error(
+                "Summary output write failed",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+                exc_info=True,
+            )
+            progress_manager.fail_step(
+                "write_summary", f"Failed writing summary output: {str(e)}"
+            )
+            raise
+
+        # Step 4: Generate the full report in chunks to avoid cardinality explosion
+        progress_manager.start_step("write_full_report")
+
+        try:
+            total_ngrams_to_process = df_ngram_summary.height
+
+            # Get schema information for the output file
+            sample_full_report = _create_sample_full_report_row(
+                ldf_message_ngrams, ldf_ngrams, ldf_messages, df_ngram_summary
+            )
+
+            # Process n-grams in chunks to manage memory efficiently
+            # Multi-file dataset optimization allows larger chunk sizes for better performance
+            chunk_size = max(
+                10_000,  # Increased min from 5k to 10k
+                min(
+                    200_000, 2_000_000 // max(1, message_ngram_count // ngram_count)
+                ),  # Increased max from 50k to 200k, divisor from 500k to 2M
+            )
+            actual_total_chunks = (
+                total_ngrams_to_process + chunk_size - 1
+            ) // chunk_size
+
+            logger.debug(
+                "Full report chunking strategy finalized",
+                extra={
+                    "total_ngrams_to_process": total_ngrams_to_process,
+                    "base_chunk_constraints": {
+                        "min": 10_000,
+                        "max": 200_000,
+                        "divisor": 2_000_000,
+                    },
+                    "calculated_chunk_size": chunk_size,
+                    "actual_total_chunks": actual_total_chunks,
+                    "processing_complexity": (
+                        message_ngram_count // ngram_count if ngram_count > 0 else "N/A"
+                    ),
+                    "memory_efficiency_target": "bounded_memory_usage",
+                },
+            )
+
+            logger.info(
+                "Starting full report generation",
+                extra={
+                    "total_ngrams_to_process": total_ngrams_to_process,
+                    "chunk_size": chunk_size,
+                    "actual_total_chunks": actual_total_chunks,
+                    "processing_mode": "chunked_streaming",
+                },
+            )
+
+            # Initialize tracking variables
+            processed_count = 0
+
+            try:
+                for chunk_start in range(0, total_ngrams_to_process, chunk_size):
+                    chunk_end = min(chunk_start + chunk_size, total_ngrams_to_process)
+                    chunk_ngram_summary = df_ngram_summary.slice(
+                        chunk_start, chunk_end - chunk_start
+                    )
+
+                    current_chunk_num = (chunk_start // chunk_size) + 1
+                    logger.debug(
+                        "Processing full report chunk",
+                        extra={
+                            "chunk_number": current_chunk_num,
+                            "total_chunks": actual_total_chunks,
+                            "chunk_start": chunk_start,
+                            "chunk_end": chunk_end,
+                            "chunk_size": chunk_end - chunk_start,
+                            "progress_percent": round(
+                                (current_chunk_num / actual_total_chunks) * 100, 1
+                            ),
+                        },
+                    )
+
+                    # Process this chunk of n-grams
+                    chunk_output = _process_ngram_chunk(
+                        chunk_ngram_summary,
+                        ldf_message_ngrams,
+                        ldf_messages,
+                        progress_manager,
+                    )
+
+                    # Write chunk output using multi-file dataset approach
+                    output_path = context.output(OUTPUT_NGRAM_FULL).parquet_path
+
+                    # Ensure output directory exists for multi-file dataset
+                    os.makedirs(output_path, exist_ok=True)
+
+                    # Write each chunk as a separate file in the dataset directory
+                    chunk_filename = f"chunk_{current_chunk_num:04d}.parquet"
+                    chunk_path = os.path.join(output_path, chunk_filename)
+
+                    logger.debug(
+                        "Writing chunk to multi-file dataset",
+                        extra={
+                            "chunk_number": current_chunk_num,
+                            "chunk_rows": chunk_output.height,
+                            "write_method": "multi_file_dataset_write",
+                            "chunk_path": chunk_path,
+                        },
+                    )
+
+                    # Direct write to chunk file - no concatenation needed!
+                    chunk_output.write_parquet(chunk_path)
+
+                    processed_count += chunk_ngram_summary.height
+
+                    # Update progress with error handling
+                    try:
+                        # Calculate current chunk number for progress
+                        current_chunk = (chunk_start // chunk_size) + 1
+                        progress_manager.update_step("write_full_report", current_chunk)
+                    except Exception as e:
+                        # Don't let progress reporting failures crash the analysis
+                        logger.warning(
+                            "Progress update failed for full report chunk",
+                            extra={
+                                "current_chunk": current_chunk,
+                                "error": str(e),
+                                "error_type": type(e).__name__,
+                            },
+                        )
+
+            except Exception as e:
+                logger.error(
+                    "Full report chunk processing failed",
+                    extra={
+                        "processed_count": processed_count,
+                        "total_ngrams_to_process": total_ngrams_to_process,
+                        "error": str(e),
+                        "error_type": type(e).__name__,
+                    },
+                    exc_info=True,
+                )
+                progress_manager.fail_step(
+                    "write_full_report", f"Failed during chunk processing: {str(e)}"
+                )
+                raise
+
+            logger.info(
+                "Full report generation completed successfully",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+                    "processed_count": processed_count,
+                    "total_chunks": actual_total_chunks,
+                },
+            )
+            progress_manager.complete_step("write_full_report")
+        except Exception as e:
+            logger.error(
+                "Full report generation failed",
+                extra={
+                    "output_path": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
+                exc_info=True,
+            )
+            progress_manager.fail_step(
+                "write_full_report", f"Failed during full report generation: {str(e)}"
+            )
+            raise
+
+    # Execute analysis with appropriate progress manager setup
+    try:
+        if use_context_manager:
+            # Create new progress manager for standalone execution
+            with ProgressManager("N-gram Statistics Analysis") as progress_manager:
+                run_analysis(progress_manager)
+        else:
+            # Use existing progress manager from context
+            run_analysis(progress_manager)
+    except Exception as e:
+        logger.error(
+            "N-gram statistics analysis failed",
+            extra={
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "progress_manager_source": (
+                    "existing" if existing_progress_manager else "new"
+                ),
+            },
+            exc_info=True,
+        )
+        raise
+
+    logger.info(
+        "N-gram statistics analysis completed successfully",
+        extra={
+            "output_stats_path": str(context.output(OUTPUT_NGRAM_STATS).parquet_path),
+            "output_full_path": str(context.output(OUTPUT_NGRAM_FULL).parquet_path),
+        },
+    )
+
+
+def _create_sample_full_report_row(
+    ldf_message_ngrams, ldf_ngrams, ldf_messages, df_ngram_summary
+):
+    """Create a sample row to establish the schema for the full report."""
+    if df_ngram_summary.height == 0:
+        # Return empty DataFrame with correct schema
+        return pl.DataFrame(
+            {
+                COL_NGRAM_ID: [],
+                COL_NGRAM_LENGTH: [],
+                COL_NGRAM_WORDS: [],
+                COL_NGRAM_TOTAL_REPS: [],
+                COL_NGRAM_DISTINCT_POSTER_COUNT: [],
+                COL_AUTHOR_ID: [],
+                COL_NGRAM_REPS_PER_USER: [],
+                COL_MESSAGE_SURROGATE_ID: [],
+                COL_MESSAGE_ID: [],
+                COL_MESSAGE_TEXT: [],
+                COL_MESSAGE_TIMESTAMP: [],
+            }
+        ).cast({COL_NGRAM_REPS_PER_USER: pl.Int32})
+
+    # Get one n-gram to establish schema
+    sample_ngram = df_ngram_summary.head(1)
+    sample_output = _process_ngram_chunk(sample_ngram, ldf_message_ngrams, ldf_messages)
+    return sample_output.head(0)  # Return empty DataFrame with correct schema
+
+
+def _process_ngram_chunk(
+    chunk_ngram_summary, ldf_message_ngrams, ldf_messages, progress_manager=None
+):
+    """Process a chunk of n-grams to generate full report data with optional progress reporting."""
+    # Get n-gram IDs for this chunk
+    ngram_ids = chunk_ngram_summary.get_column(COL_NGRAM_ID).to_list()
+
+    logger.debug(
+        "Processing n-gram chunk for full report",
+        extra={
+            "chunk_ngram_count": len(ngram_ids),
+            "chunk_summary_rows": chunk_ngram_summary.height,
+            "ngram_ids_sample": ngram_ids[:5] if len(ngram_ids) >= 5 else ngram_ids,
+            "processing_method": "lazy_join_aggregation",
+        },
+    )
+
+    logger.debug(
+        "Constructing chunk processing query",
+        extra={
+            "join_sequence": ["chunk_summary -> message_ngrams", "result -> messages"],
+            "filter_condition": f"ngram_id in {len(ngram_ids)} values",
+            "aggregation_over": [COL_NGRAM_ID, COL_AUTHOR_ID],
+            "collection_engine": "streaming",
+        },
+    )
+
+    # Filter and join data for this chunk of n-grams only
+    chunk_output = (
+        chunk_ngram_summary.lazy()
+        .join(
+            ldf_message_ngrams.filter(pl.col(COL_NGRAM_ID).is_in(ngram_ids)),
+            on=COL_NGRAM_ID,
+        )
+        .join(ldf_messages, on=COL_MESSAGE_SURROGATE_ID)
+        .with_columns(
+            pl.col(COL_MESSAGE_NGRAM_COUNT)
+            .sum()
+            .over([COL_NGRAM_ID, COL_AUTHOR_ID])
+            .alias(COL_NGRAM_REPS_PER_USER)
+            .cast(pl.Int32)
+        )
+        .select(
+            [
+                COL_NGRAM_ID,
+                COL_NGRAM_LENGTH,
+                COL_NGRAM_WORDS,
+                COL_NGRAM_TOTAL_REPS,
+                COL_NGRAM_DISTINCT_POSTER_COUNT,
+                COL_AUTHOR_ID,
+                COL_NGRAM_REPS_PER_USER,
+                COL_MESSAGE_SURROGATE_ID,
+                COL_MESSAGE_ID,
+                COL_MESSAGE_TEXT,
+                COL_MESSAGE_TIMESTAMP,
+            ]
+        )
+        .sort(
+            [
+                COL_NGRAM_LENGTH,
+                COL_NGRAM_TOTAL_REPS,
+                COL_NGRAM_DISTINCT_POSTER_COUNT,
+                COL_NGRAM_REPS_PER_USER,
+                COL_AUTHOR_ID,
+                COL_MESSAGE_SURROGATE_ID,
+            ],
+            descending=[True, True, True, True, False, False],
+        )
+        .collect(engine="streaming")
+    )
+
+    logger.debug(
+        "Chunk processing completed",
+        extra={
+            "input_ngram_count": len(ngram_ids),
+            "output_rows": chunk_output.height,
+            "output_columns": len(chunk_output.columns),
+            "expansion_ratio": (
+                chunk_output.height / len(ngram_ids) if len(ngram_ids) > 0 else "N/A"
+            ),
+        },
+    )
+
+    return chunk_output

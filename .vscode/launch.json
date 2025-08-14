@@ -5,10 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug",
+      "name": "Debug Application",
       "type": "debugpy",
       "request": "launch",
-      "module": "mangotango"
+      "module": "mangotango",
+      "args": ["--log-level", "DEBUG"]
     }
   ]
 }

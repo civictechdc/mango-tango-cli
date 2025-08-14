@@ -1,4 +1,6 @@
-from .progress import ProgressReporter
+from .progress import ProgressManager, ProgressReporter
+
+__all__ = ["ProgressReporter", "ProgressManager"]
 from .utils import (
     clear_printed_lines,
     clear_terminal,

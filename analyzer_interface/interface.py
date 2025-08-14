@@ -98,6 +98,14 @@ class AnalyzerOutput(BaseModel):
 
     internal: bool = False
 
+    uses_multi_file_dataset: bool = False
+    """
+    When True, this output will be stored as a multi-file dataset (directory with 
+    multiple parquet files) instead of a single parquet file. This enables better 
+    performance for large datasets by avoiding memory-intensive concatenation operations.
+    Defaults to False for backward compatibility.
+    """
+
     def get_column_by_name(self, name: str):
         for column in self.columns:
             if column.name == name:

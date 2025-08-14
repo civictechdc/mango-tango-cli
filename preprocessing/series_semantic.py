@@ -1,10 +1,23 @@
 from datetime import datetime
+from enum import Enum
 from typing import Callable, Type, Union
 
 import polars as pl
 from pydantic import BaseModel
 
 from analyzer_interface import DataType
+
+
+class ColumnSemantic(Enum):
+    USER_ID = "identifier"
+    MESSAGE_ID = "identifier"
+    TEXT = "text"
+    DATETIME = "datetime"
+    URL = "url"
+    INTEGER = "integer"
+    FLOAT = "float"
+    BOOLEAN = "boolean"
+    FREE_TEXT = "free_text"
 
 
 class SeriesSemantic(BaseModel):

@@ -1,25 +1,50 @@
 import os
 from functools import cached_property
 from tempfile import TemporaryDirectory
+from typing import TYPE_CHECKING, Any, Optional
 
 import polars as pl
 from pydantic import BaseModel
 
 from analyzer_interface import ParamValue, SecondaryAnalyzerInterface
-from analyzer_interface.context import AssetsReader, InputTableReader
+from analyzer_interface.context import (
+    AssetsReader,
+    InputTableReader,
+)
 from analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
 )
 from analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
-from analyzer_interface.context import TableReader, TableWriter
+from analyzer_interface.context import (
+    TableReader,
+    TableWriter,
+)
+from preprocessing.series_semantic import SeriesSemantic
+
+if TYPE_CHECKING:
+    from terminal_tools.progress import ProgressManager
+
+
+class TestInputColumnProvider:
+    """Simple test version of InputColumnProvider."""
+
+    def __init__(self, user_column_name: str, semantic: SeriesSemantic):
+        self.user_column_name = user_column_name
+        self.semantic = semantic
 
 
 class TestPrimaryAnalyzerContext(BasePrimaryAnalyzerContext):
     input_parquet_path: str
     output_parquet_root_path: str
     param_values: dict[str, ParamValue]
+    input_columns: dict[str, TestInputColumnProvider]
+    temp_dir: str = TemporaryDirectory().name
+    progress_manager: Optional[Any] = None
+
+    class Config:
+        arbitrary_types_allowed = True
 
     def input(self) -> InputTableReader:
         return TestTableReader(parquet_path=self.input_parquet_path)
@@ -67,6 +92,8 @@ class TestSecondaryAnalyzerContext(BaseSecondaryAnalyzerContext):
     dependency_output_parquet_paths: dict[str, dict[str, str]] = dict()
     output_parquet_root_path: str
     primary_param_values: dict[str, ParamValue]
+    temp_dir: str = TemporaryDirectory().name
+    progress_manager: Optional[Any] = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -111,3 +138,6 @@ class TestOutputReaderGroupContext(AssetsReader, BaseModel):
 
     def table(self, output_id: str) -> TableReader:
         return TestTableReader(parquet_path=self.output_parquet_paths[output_id])
+
+
+# Note: model_rebuild() is called automatically when needed for forward references

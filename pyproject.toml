@@ -3,3 +3,19 @@ profile = "black"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+markers = [
+    "performance: marks tests as performance benchmarks (deselect with '-m \"not performance\"')",
+    "slow: marks tests as slow running (deselect with '-m \"not slow\"')",
+    "benchmark: marks tests as benchmarks using pytest-benchmark",
+]
+addopts = [
+    "-m", "not performance",
+    "--benchmark-disable",  # Disable by default for regular test runs
+]
+
+[tool.pytest_benchmark]
+min_time = 0.1
+max_time = 2.0
+min_rounds = 5
+warmup = true
+save_data = true

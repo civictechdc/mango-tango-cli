@@ -206,15 +206,18 @@ def new_analysis(
         )
 
         with terminal.nest("Analysis") as run_scope:
+            # Suppress terminal clearing to avoid conflicts with Textual progress displays
+            terminal.suppress_clear(True)
             is_export_started = False
             try:
                 for event in analysis.run():
                     if event.event == "start":
-                        run_scope.refresh()
+                        # Skip scope refresh and output during Textual progress displays
+                        # The ProgressManager will handle all status updates
                         if event.analyzer.kind == "primary":
-                            print("Starting base analysis for the test...")
+                            pass  # ProgressManager will show detailed progress
                         else:
-                            print("Running post-analysis: ", event.analyzer.name)
+                            pass  # Let ProgressManager handle secondary analyzer status
 
                 run_scope.refresh()
                 print("<<Hit Ctrl+C at any time to exit a menu>>")
@@ -258,5 +261,7 @@ def new_analysis(
                 return None
 
             finally:
+                # Restore terminal clearing behavior
+                terminal.suppress_clear(False)
                 if analysis.is_draft:
                     analysis.delete()

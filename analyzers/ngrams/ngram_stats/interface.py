@@ -24,7 +24,7 @@ OUTPUT_NGRAM_FULL = "ngram_full"
 interface = SecondaryAnalyzerInterface(
     id="ngram_stats",
     version="0.1.0",
-    name="Copy-Pasta Detector",
+    name="N-gram Statistics Analysis",
     short_description="",
     base_analyzer=ngrams_interface,
     outputs=[
@@ -42,6 +42,7 @@ interface = SecondaryAnalyzerInterface(
         AnalyzerOutput(
             id=OUTPUT_NGRAM_FULL,
             name="N-gram full report",
+            uses_multi_file_dataset=True,
             columns=[
                 OutputColumn(
                     name=COL_NGRAM_ID,

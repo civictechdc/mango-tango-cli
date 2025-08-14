@@ -59,7 +59,7 @@ def setup_logging(
         "disable_existing_loggers": False,
         "formatters": {
             "json": {
-                "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+                "()": "pythonjsonlogger.json.JsonFormatter",
                 "format": "%(asctime)s %(name)s %(levelname)s %(message)s %(process_id)s %(thread_id)s %(app_version)s",
                 "rename_fields": {"levelname": "level", "asctime": "timestamp"},
             }
