@@ -5,16 +5,16 @@ platformdirs==4.3.6
 tinydb==4.8.0
 XlsxWriter==3.2.0
 filelock==3.16.1
-plotly==5.24.1
-pandas==2.2.3 # needed by plotly
-pyarrow==17.0.0
-dash==2.18.1
+plotly==6.3.0
+pandas==2.3.1 # needed by plotly
+pyarrow==21.0.0
+dash==3.2.0
 colorama==0.4.6
-fastexcel==0.13.0
+fastexcel==0.14.0
 shiny==1.4.0
-shinywidgets==0.6.2
+shinywidgets==0.7.0
 starlette==0.47.1
-uvicorn==0.34.3
+uvicorn==0.35.0
 a2wsgi==1.10.10
 rich==14.1.0
 textual==5.3.0

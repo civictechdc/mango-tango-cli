@@ -11,6 +11,7 @@ from .utils import clear_terminal
 class TerminalContext:
     def __init__(self):
         self.scopes: list[Scope] = []
+        self._suppress_clear = False
 
     def nest(self, text: str):
         scope = Scope(context=self, text=text)
@@ -23,9 +24,14 @@ class TerminalContext:
         self.scopes.remove(block)
 
     def _refresh(self):
-        clear_terminal()
+        if not self._suppress_clear:
+            clear_terminal()
         for scope in self.scopes:
             scope.print()
+    
+    def suppress_clear(self, suppress: bool = True):
+        """Suppress terminal clearing to avoid conflicts with Textual displays."""
+        self._suppress_clear = suppress
 
 
 class Scope:

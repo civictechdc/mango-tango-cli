@@ -1,8 +1,9 @@
 -r requirements.txt
 
-pyarrow-stubs==17.13
-black==24.10.0
-isort==5.13.2
+pyarrow-stubs==20.0.0.20250716
+black==25.1.0
+isort==6.0.1
 pytest==8.3.4
+pytest-asyncio==1.1.0
 pytest-benchmark==5.1.0
 pyinstaller==6.14.1
