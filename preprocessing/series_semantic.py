@@ -34,13 +34,53 @@ class SeriesSemantic(BaseModel):
         return self.column_type(series.dtype)
 
 
-datetime_string = SeriesSemantic(
-    semantic_name="datetime",
-    column_type=pl.String,
-    try_convert=lambda s: s.str.strptime(pl.Datetime, strict=False),
+def parse_datetime_with_tz(s: pl.Series) -> pl.Series:
+    """Remove timezone substring (e.g. UTC) in pl.Series and conver it to datetime"""
+    # find a timezone code
+    tz_code_regex = r" ([A-Z]{3,4})$"  # UTC, ET, ...
+
+    return s.str.replace(tz_code_regex, "").str.strptime(pl.Datetime(), strict=False)
+
+
+native_date = SeriesSemantic(
+    semantic_name="native_date",
+    column_type=pl.Date,  # Matches native Date columns
+    try_convert=lambda s: s,  # No conversion needed
+    validate_result=lambda s: constant_series(s, True),  # Always valid
     data_type="datetime",
 )
 
+native_datetime = SeriesSemantic(
+    semantic_name="native_datetime",
+    column_type=pl.Datetime,  # Matches native DateTime columns
+    try_convert=lambda s: s,  # No conversion needed
+    validate_result=lambda s: constant_series(s, True),  # Always valid
+    data_type="datetime",
+)
+
+datetime_string = SeriesSemantic(
+    semantic_name="datetime",
+    column_type=pl.String,
+    try_convert=parse_datetime_with_tz,
+    validate_result=lambda s: s.is_not_null(),
+    data_type="datetime",
+)
+
+date_string = SeriesSemantic(
+    semantic_name="date",
+    column_type=pl.String,
+    try_convert=lambda s: s.str.strptime(pl.Date, strict=False),  # Convert to pl.Date
+    validate_result=lambda s: s.is_not_null(),
+    data_type="datetime",  # Still maps to datetime for analyzer compatibility
+)
+
+time_string = SeriesSemantic(
+    semantic_name="time",
+    column_type=pl.String,
+    try_convert=lambda s: s.str.strptime(pl.Time, strict=False),  # Convert to pl.Time
+    validate_result=lambda s: s.is_not_null(),
+    data_type="time",
+)
 
 timestamp_seconds = SeriesSemantic(
     semantic_name="timestamp_seconds",
@@ -107,7 +147,11 @@ boolean_catch_all = SeriesSemantic(
 )
 
 all_semantics = [
+    native_datetime,
+    native_date,
     datetime_string,
+    date_string,
+    time_string,
     timestamp_seconds,
     timestamp_milliseconds,
     url,
