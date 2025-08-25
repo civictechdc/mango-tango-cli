@@ -131,6 +131,61 @@ def test_parse_datetime_with_tz_no_timezone():
     assert result.is_not_null().all()
 
 
+def test_parse_datetime_with_tz_offset():
+    """Test datetime parsing with timezone offset format"""
+    series = pl.Series(
+        ["2025-01-27 00:07:12.056000-05:00", "2025-01-27 00:07:16.126000-05:00"]
+    )
+    result = parse_datetime_with_tz(series)
+
+    assert result.dtype == pl.Datetime
+    assert result.is_not_null().all()
+
+
+def test_datetime_with_timezone_offset_parsing():
+    """Test timezone offset datetime strings get recognized as datetime semantic"""
+    series = pl.Series(
+        ["2025-01-27 00:07:12.056000-05:00", "2025-01-27 00:07:16.126000-05:00"]
+    )
+    assert datetime_string.check(series)
+
+    # Test conversion
+    result = datetime_string.try_convert(series)
+    assert result.dtype == pl.Datetime
+    assert result.is_not_null().all()
+
+
+def test_parse_datetime_mixed_timezones_warning():
+    """Test that mixed timezones trigger a warning"""
+    import warnings
+
+    # Series with mixed timezone abbreviations and offsets
+    series = pl.Series(
+        [
+            "2025-01-27 00:07:12 UTC",
+            "2025-01-27 00:07:16-05:00",
+            "2025-01-27 00:07:20 EST",
+        ]
+    )
+
+    # Capture warnings
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        result = parse_datetime_with_tz(series)
+
+        # Should have issued a warning
+        assert len(w) == 1
+        assert issubclass(w[0].category, UserWarning)
+        assert "Multiple timezones found" in str(w[0].message)
+        assert "UTC" in str(w[0].message)
+        assert "-05:00" in str(w[0].message)
+        assert "EST" in str(w[0].message)
+
+    # But parsing should still work
+    assert result.dtype == pl.Datetime
+    assert result.is_not_null().all()
+
+
 # Edge cases
 def test_all_none_series():
     """Test series with all null values"""
