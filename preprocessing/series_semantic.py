@@ -35,11 +35,50 @@ class SeriesSemantic(BaseModel):
 
 
 def parse_datetime_with_tz(s: pl.Series) -> pl.Series:
-    """Remove timezone substring (e.g. UTC) in pl.Series and conver it to datetime"""
-    # find a timezone code
-    tz_code_regex = r" ([A-Z]{3,4})$"  # UTC, ET, ...
+    """Parse datetime strings with timezone info (both abbreviations and offsets)"""
+    import warnings
 
-    return s.str.replace(tz_code_regex, "").str.strptime(pl.Datetime(), strict=False)
+    # Handle timezone abbreviations like "UTC", "EST"
+    tz_abbrev_regex = r" ([A-Z]{3,4})$"  # UTC, EST, etc.
+
+    # Handle timezone offsets like "-05:00", "+00:00"
+    tz_offset_regex = r"[+-]\d{2}:\d{2}$"  # -05:00, +00:00, etc.
+
+    # Check for multiple different timezones
+    abbrev_matches = s.str.extract_all(tz_abbrev_regex)
+    offset_matches = s.str.extract_all(tz_offset_regex)
+
+    # Get unique timezone abbreviations
+    unique_abbrevs = set()
+    if not abbrev_matches.is_empty():
+        for match_list in abbrev_matches.to_list():
+            if match_list:  # Not empty
+                unique_abbrevs.update(match_list)
+
+    # Get unique timezone offsets
+    unique_offsets = set()
+    if not offset_matches.is_empty():
+        for match_list in offset_matches.to_list():
+            if match_list:  # Not empty
+                unique_offsets.update(match_list)
+
+    # Warn if multiple different timezones found
+    total_unique_tz = len(unique_abbrevs) + len(unique_offsets)
+    if total_unique_tz > 1:
+        all_tz = list(unique_abbrevs) + list(unique_offsets)
+        warnings.warn(
+            f"Multiple timezones found in datetime column: {all_tz}. "
+            f"Assuming all timestamps represent the same timezone for analysis purposes.",
+            UserWarning,
+        )
+
+    # Try to remove timezone abbreviations first
+    result = s.str.replace(tz_abbrev_regex, "")
+
+    # Then remove timezone offsets
+    result = result.str.replace(tz_offset_regex, "")
+
+    return result.str.strptime(pl.Datetime(), strict=False)
 
 
 native_date = SeriesSemantic(
