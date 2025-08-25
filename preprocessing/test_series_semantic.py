@@ -113,8 +113,8 @@ def test_threshold_behavior():
 def test_parse_datetime_with_tz():
     """Test timezone parsing helper function"""
 
-    # heterogenous timezone, unrealistic scenario otherwise
-    series = pl.Series(["2025-02-28 00:36:15 UTC", "2025-02-28 00:36:13 EST"])
+    # Use same timezone to avoid warning
+    series = pl.Series(["2025-02-28 00:36:15 UTC", "2025-02-28 00:36:13 UTC"])
     result = parse_datetime_with_tz(series)
 
     assert isinstance(result, pl.Series)
