@@ -275,39 +275,43 @@ def print_data_frame(data_frame, title: str, apply_color: str):
     # Convert non-string columns to strings for display
     data_frame = data_frame.with_columns(pl.exclude(pl.String).cast(str))
 
-    # Smart table sizing based on terminal width and column count
-    terminal_width = console.size.width
-    n_cols = len(data_frame.columns)
-
-    # Set table max width to leave some breathing room
-    table_max_width = max(60, terminal_width - 4)
-
-    # Calculate smart column width limits
-    base_col_width = max(8, table_max_width // max(n_cols, 1))  # At least 8 chars
-    max_col_width = min(25, base_col_width)  # Cap at 25 chars for readability
-
-    table = Table(title=title, width=table_max_width)
+    table = Table(title=title)
 
     # Add columns with appropriate coloring and width limits
     for i, col in enumerate(data_frame.columns):
         if apply_color == "column-wise":
             # Cycle through colors for each column
             col_color = CYCLE_COLORS[i % len(CYCLE_COLORS)]
+            table.add_column(
+                col,
+                style=col_color,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
         elif apply_color == "column_data_type":
             # Color based on ORIGINAL data type (before string conversion)
             original_dtype = original_dtypes[col]
             col_color = get_column_color(original_dtype)
+            table.add_column(
+                col,
+                style=col_color,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
+        elif apply_color is None:
+            # No coloring at all - omit style parameter entirely
+            table.add_column(
+                col,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
         else:
-            # No column coloring
-            col_color = None
-
-        table.add_column(
-            col,
-            style=col_color,
-            max_width=max_col_width,
-            overflow="ellipsis",
-            no_wrap=True,
-        )
+            # No column coloring - omit style parameter entirely
+            table.add_column(
+                col,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
 
     # Add rows with appropriate coloring based on mode
     if apply_color == "row-wise":
@@ -315,17 +319,25 @@ def print_data_frame(data_frame, title: str, apply_color: str):
         for i, row in enumerate(data_frame.iter_rows()):
             row_color = CYCLE_COLORS[i % len(CYCLE_COLORS)]
             table.add_row(*row, style=row_color)
+    elif apply_color is None:
+        # No row coloring at all
+        for row in data_frame.iter_rows():
+            table.add_row(*row)
     else:
-        # No row coloring
+        # No row coloring (column coloring only)
         for row in data_frame.iter_rows():
             table.add_row(*row)
 
     console.print(table)
 
 
-def print_data_frame_summary(data_frame, title: str):
+def print_data_frame_summary(
+    data_frame, title: str, apply_color: str = "column_data_type"
+):
     """Print a summary table for dataframes with many columns"""
     from preprocessing.series_semantic import infer_series_semantic
+
+    MAX_ROW_CHAR = 25
 
     # Create summary data
     summary_data = []
@@ -343,8 +355,8 @@ def print_data_frame_summary(data_frame, title: str):
             example_val = "null"
 
         # Truncate long examples
-        if len(example_val) > 20:
-            example_val = example_val[:17] + "..."
+        if len(example_val) > MAX_ROW_CHAR:
+            example_val = example_val[:MAX_ROW_CHAR] + "..."
 
         # Get semantic analysis type
         try:
@@ -365,8 +377,8 @@ def print_data_frame_summary(data_frame, title: str):
         }
     )
 
-    # Print with column data type coloring
-    print_data_frame(summary_df, title, "column_data_type")
+    # Print with specified coloring mode
+    print_data_frame(summary_df, title, apply_color)
 
 
 def smart_print_data_frame(
@@ -398,7 +410,11 @@ def smart_print_data_frame(
 
     # Use summary if too many columns or columns would be too narrow
     if n_cols > 8 or estimated_col_width < min_readable_width:
-        print_data_frame_summary(data_frame, title + " (Summary)")
+        print_data_frame_summary(
+            data_frame,
+            title + " (Dataset has a large nr. of columns, showing summary instead)",
+            apply_color,
+        )
     else:
         print_data_frame(data_frame, title, apply_color)
 
