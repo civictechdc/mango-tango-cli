@@ -198,7 +198,7 @@ def print_ascii_table(
 console = Console()
 
 
-def print_data_frame(data_frame, title: str, apply_color: str):
+def print_data_frame(data_frame, title: str, apply_color: str, caption: str = None):
     # Mapping Polars data types to Rich colors (medium brightness)
     # see: https://rich.readthedocs.io/en/stable/appendix/colors.html
     POLARS_TYPE_COLORS = {
@@ -275,7 +275,7 @@ def print_data_frame(data_frame, title: str, apply_color: str):
     # Convert non-string columns to strings for display
     data_frame = data_frame.with_columns(pl.exclude(pl.String).cast(str))
 
-    table = Table(title=title)
+    table = Table(title=title, caption=caption)
 
     # Add columns with appropriate coloring and width limits
     for i, col in enumerate(data_frame.columns):
@@ -332,7 +332,7 @@ def print_data_frame(data_frame, title: str, apply_color: str):
 
 
 def print_data_frame_summary(
-    data_frame, title: str, apply_color: str = "column_data_type"
+    data_frame, title: str, apply_color: str = "column_data_type", caption: str = None
 ):
     """Print a summary table for dataframes with many columns"""
     from preprocessing.series_semantic import infer_series_semantic
@@ -378,7 +378,7 @@ def print_data_frame_summary(
     )
 
     # Print with specified coloring mode
-    print_data_frame(summary_df, title, apply_color)
+    print_data_frame(summary_df, title, apply_color, caption)
 
 
 def smart_print_data_frame(
@@ -386,6 +386,7 @@ def smart_print_data_frame(
     title: str,
     apply_color: str = "column_data_type",
     smart_print: bool = True,
+    caption: str = None,
 ):
     """Smart dataframe printing - uses summary for wide tables, full display for narrow ones
 
@@ -394,10 +395,11 @@ def smart_print_data_frame(
         title: Title for the table
         apply_color: Color mode ("column_data_type", "column-wise", "row-wise", or None)
         smart_print: If True, uses adaptive display (summary vs full). If False, always uses full display.
+        caption: Optional caption text to display below the table
     """
     if not smart_print:
         # Always use full dataframe display when smart_print is disabled
-        print_data_frame(data_frame, title, apply_color)
+        print_data_frame(data_frame, title, apply_color, caption)
         return
 
     # Smart adaptive logic
@@ -414,9 +416,10 @@ def smart_print_data_frame(
             data_frame,
             title + " (Dataset has a large nr. of columns, showing summary instead)",
             apply_color,
+            caption,
         )
     else:
-        print_data_frame(data_frame, title, apply_color)
+        print_data_frame(data_frame, title, apply_color, caption)
 
 
 def print_dialog_section_title(print_str):

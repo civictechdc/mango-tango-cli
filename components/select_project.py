@@ -34,9 +34,8 @@ def select_project(ctx: ViewContext):
                 data_frame=df.head(5),
                 title="Input data preview",
                 apply_color=None,
+                caption=f"Total rows: {project.data_row_count:,}",
             )
-
-            print(f"(Total {project.data_row_count} rows)")
 
             confirm_load = prompts.confirm("Load this project?", default=True)
             if confirm_load:
