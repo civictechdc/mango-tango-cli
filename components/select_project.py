@@ -1,7 +1,15 @@
 from typing import Optional
 
+import polars as pl
+
 from app import ProjectContext
-from terminal_tools import draw_box, print_ascii_table, prompts, wait_for_key
+from terminal_tools import (
+    draw_box,
+    print_ascii_table,
+    prompts,
+    smart_print_data_frame,
+    wait_for_key,
+)
 
 from .context import ViewContext
 
@@ -30,22 +38,41 @@ def select_project(ctx: ViewContext):
             draw_box(f"Project: {project.display_name}", padding_lines=0)
         ):
             df = project.preview_data
-            print_ascii_table(
-                [
-                    [preview_value(cell) for cell in row]
-                    for row in df.head(10).iter_rows()
-                ],
-                header=df.columns,
-            )
-            print(f"(Total {project.data_row_count} rows)")
-            print("Inferred column semantics:")
-            print_ascii_table(
-                rows=[
-                    [col.name, col.semantic.semantic_name] for col in project.columns
-                ],
-                header=["Column", "Semantic"],
-            )
+            # print_ascii_table(
+            #    [
+            #        [preview_value(cell) for cell in row]
+            #        for row in df.head(10).iter_rows()
+            #    ],
+            #    header=df.columns,
+            # )
 
+            smart_print_data_frame(
+                data_frame=df.head(5),
+                title="Input data preview",
+                apply_color="column_data_type",
+            )
+            # print(df.head(5))
+
+            print(f"(Total {project.data_row_count} rows)")
+            # print("Inferred column semantics:")
+            # print_ascii_table(
+            #    rows=[
+            #        [col.name, col.semantic.semantic_name] for col in project.columns
+            #    ],
+            #    header=["Column", "Semantic"],
+            # )
+            smart_print_data_frame(
+                data_frame=pl.DataFrame(
+                    {
+                        "Column": [col.name for col in project.columns],
+                        "Data Type": [
+                            col.semantic.semantic_name for col in project.columns
+                        ],
+                    }
+                ),
+                title="Inferred data types",
+                apply_color=None,
+            )
             confirm_load = prompts.confirm("Load this project?", default=True)
             if confirm_load:
                 return project

@@ -323,6 +323,86 @@ def print_data_frame(data_frame, title: str, apply_color: str):
     console.print(table)
 
 
+def print_data_frame_summary(data_frame, title: str):
+    """Print a summary table for dataframes with many columns"""
+    from preprocessing.series_semantic import infer_series_semantic
+
+    # Create summary data
+    summary_data = []
+    for col in data_frame.columns:
+        dtype = data_frame.select(col).dtypes[0]
+
+        # Get example value (first non-null if possible)
+        example_series = data_frame.select(col).to_series()
+        example_val = None
+        for val in example_series:
+            if val is not None:
+                example_val = str(val)
+                break
+        if example_val is None:
+            example_val = "null"
+
+        # Truncate long examples
+        if len(example_val) > 20:
+            example_val = example_val[:17] + "..."
+
+        # Get semantic analysis type
+        try:
+            semantic = infer_series_semantic(data_frame.select(col).to_series())
+            analysis_type = semantic.data_type if semantic else "unknown"
+        except Exception:
+            analysis_type = "unknown"
+
+        summary_data.append([col, str(dtype), example_val, analysis_type])
+
+    # Create summary dataframe
+    summary_df = pl.DataFrame(
+        {
+            "Column Name": [row[0] for row in summary_data],
+            "Data Type": [row[1] for row in summary_data],
+            "Example Value": [row[2] for row in summary_data],
+            "Inferred Analyzer Input Type": [row[3] for row in summary_data],
+        }
+    )
+
+    # Print with column data type coloring
+    print_data_frame(summary_df, title, "column_data_type")
+
+
+def smart_print_data_frame(
+    data_frame,
+    title: str,
+    apply_color: str = "column_data_type",
+    smart_print: bool = True,
+):
+    """Smart dataframe printing - uses summary for wide tables, full display for narrow ones
+
+    Args:
+        data_frame: Polars DataFrame to display
+        title: Title for the table
+        apply_color: Color mode ("column_data_type", "column-wise", "row-wise", or None)
+        smart_print: If True, uses adaptive display (summary vs full). If False, always uses full display.
+    """
+    if not smart_print:
+        # Always use full dataframe display when smart_print is disabled
+        print_data_frame(data_frame, title, apply_color)
+        return
+
+    # Smart adaptive logic
+    terminal_width = console.size.width
+    n_cols = len(data_frame.columns)
+
+    # Calculate if columns will be too narrow for readability
+    estimated_col_width = max(60, terminal_width - 4) // max(n_cols, 1)
+    min_readable_width = 12  # Minimum width for readable columns
+
+    # Use summary if too many columns or columns would be too narrow
+    if n_cols > 8 or estimated_col_width < min_readable_width:
+        print_data_frame_summary(data_frame, title + " (Summary)")
+    else:
+        print_data_frame(data_frame, title, apply_color)
+
+
 def print_dialog_section_title(print_str):
     mango_style = Style(color="#F3921E", bold=True)
 

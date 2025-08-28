@@ -16,9 +16,9 @@ from app import ProjectContext
 from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
 from terminal_tools import (
     draw_box,
-    print_data_frame,
     print_dialog_section_title,
     prompts,
+    smart_print_data_frame,
     wait_for_key,
 )
 
@@ -64,7 +64,7 @@ def new_analysis(
                 )
                 required_cols_dict["Description"].append(input_column.description)
 
-            print_data_frame(
+            smart_print_data_frame(
                 data_frame=pl.DataFrame(required_cols_dict),
                 title=None,
                 apply_color="row-wise",
@@ -125,8 +125,11 @@ def new_analysis(
                     }
                 )
 
-                print_data_frame(
-                    data_frame=mapping_df, title=None, apply_color="row-wise"
+                smart_print_data_frame(
+                    data_frame=mapping_df,
+                    title=None,
+                    apply_color="row-wise",
+                    smart_print=False,
                 )
 
                 sample_input_df = pl.DataFrame(
@@ -140,10 +143,11 @@ def new_analysis(
                     }
                 )
                 print("Your test data would look like this:")
-                print_data_frame(
+                smart_print_data_frame(
                     data_frame=sample_input_df,
                     title="Sample input data",
                     apply_color="column-wise",
+                    smart_print=False,
                 )
 
                 mapping_ok = prompts.confirm(
