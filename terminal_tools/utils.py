@@ -199,34 +199,126 @@ console = Console()
 
 
 def print_data_frame(data_frame, title: str, apply_color: str):
+    # Mapping Polars data types to Rich colors (medium brightness)
     # see: https://rich.readthedocs.io/en/stable/appendix/colors.html
-    DF_COLORS = [
+    POLARS_TYPE_COLORS = {
+        # String types
+        pl.String: "dodger_blue2",
+        pl.Categorical: "light_blue3",
+        # Numeric types
+        pl.Int8: "green3",
+        pl.Int16: "green3",
+        pl.Int32: "green3",
+        pl.Int64: "green3",
+        pl.UInt8: "dark_green",
+        pl.UInt16: "dark_green",
+        pl.UInt32: "dark_green",
+        pl.UInt64: "dark_green",
+        pl.Float32: "orange3",
+        pl.Float64: "orange3",
+        # Temporal types
+        pl.Date: "medium_purple2",
+        pl.Datetime: "medium_purple3",
+        pl.Time: "purple3",
+        pl.Duration: "orchid3",
+        # Boolean
+        pl.Boolean: "gold3",
+        # Complex types
+        pl.List: "dark_cyan",
+        pl.Struct: "cyan3",
+        pl.Array: "steel_blue3",
+        # Binary/Other
+        pl.Binary: "grey62",
+        pl.Null: "grey50",
+        pl.Object: "deep_pink3",
+        pl.Unknown: "indian_red3",
+    }
+
+    # Color cycle for column/row-wise coloring
+    CYCLE_COLORS = [
         "orange3",
         "dodger_blue1",
         "dark_cyan",
         "medium_purple1",
         "deep_pink4",
-        "bright_yellow",
+        "gold1",
         "grey66",
+        "steel_blue1",
     ]
 
-    # make sure ints atr strings
+    # Get colors based on column data types
+    def get_column_color(dtype):
+        # Handle parameterized types like Datetime(time_unit, time_zone)
+        if hasattr(dtype, "base_type"):
+            base_type = dtype.base_type()
+            if base_type in POLARS_TYPE_COLORS:
+                return POLARS_TYPE_COLORS[base_type]
+
+        # Direct type mapping
+        dtype_class = type(dtype)
+        if dtype_class in POLARS_TYPE_COLORS:
+            return POLARS_TYPE_COLORS[dtype_class]
+
+        # Check if it's a subclass of known types
+        for polars_type, color in POLARS_TYPE_COLORS.items():
+            if isinstance(dtype, polars_type):
+                return color
+
+        # Fallback to index-based coloring
+        return CYCLE_COLORS[hash(str(dtype)) % len(CYCLE_COLORS)]
+
+    # Capture original data types BEFORE string conversion
+    original_dtypes = {
+        col: data_frame.select(col).dtypes[0] for col in data_frame.columns
+    }
+
+    # Convert non-string columns to strings for display
     data_frame = data_frame.with_columns(pl.exclude(pl.String).cast(str))
 
-    table = Table(title=title)
+    # Smart table sizing based on terminal width and column count
+    terminal_width = console.size.width
+    n_cols = len(data_frame.columns)
 
-    n_col = len(data_frame.columns)
+    # Set table max width to leave some breathing room
+    table_max_width = max(60, terminal_width - 4)
 
-    if n_col > len(DF_COLORS):
-        DF_COLORS = DF_COLORS * 2
+    # Calculate smart column width limits
+    base_col_width = max(8, table_max_width // max(n_cols, 1))  # At least 8 chars
+    max_col_width = min(25, base_col_width)  # Cap at 25 chars for readability
 
-    for col, col_clr in zip(data_frame.columns, DF_COLORS[0:n_col]):
-        clr = col_clr if apply_color == "column-wise" else None
-        table.add_column(col, style=clr)
+    table = Table(title=title, width=table_max_width)
 
-    for row, row_clr in zip(data_frame.iter_rows(), DF_COLORS):
-        clr = row_clr if apply_color == "row-wise" else None
-        table.add_row(*row, style=clr)
+    # Add columns with appropriate coloring and width limits
+    for i, col in enumerate(data_frame.columns):
+        if apply_color == "column-wise":
+            # Cycle through colors for each column
+            col_color = CYCLE_COLORS[i % len(CYCLE_COLORS)]
+        elif apply_color == "column_data_type":
+            # Color based on ORIGINAL data type (before string conversion)
+            original_dtype = original_dtypes[col]
+            col_color = get_column_color(original_dtype)
+        else:
+            # No column coloring
+            col_color = None
+
+        table.add_column(
+            col,
+            style=col_color,
+            max_width=max_col_width,
+            overflow="ellipsis",
+            no_wrap=True,
+        )
+
+    # Add rows with appropriate coloring based on mode
+    if apply_color == "row-wise":
+        # Cycle through colors for each row
+        for i, row in enumerate(data_frame.iter_rows()):
+            row_color = CYCLE_COLORS[i % len(CYCLE_COLORS)]
+            table.add_row(*row, style=row_color)
+    else:
+        # No row coloring
+        for row in data_frame.iter_rows():
+            table.add_row(*row)
 
     console.print(table)
 
