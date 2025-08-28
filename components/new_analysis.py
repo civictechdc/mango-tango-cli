@@ -1,4 +1,3 @@
-from tempfile import TemporaryDirectory
 from traceback import format_exc
 from typing import Optional
 
@@ -7,20 +6,12 @@ import polars as pl
 from analyzer_interface import (
     AnalyzerInterface,
     InputColumn,
-    ParamValue,
     UserInputColumn,
     column_automap,
     get_data_type_compatibility_score,
 )
 from app import ProjectContext
-from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
-from terminal_tools import (
-    draw_box,
-    print_dialog_section_title,
-    prompts,
-    smart_print_data_frame,
-    wait_for_key,
-)
+from terminal_tools import draw_box, prompts, smart_print_data_frame, wait_for_key
 
 from .analysis_params import customize_analysis
 from .context import ViewContext
@@ -53,7 +44,7 @@ def new_analysis(
             print("")
             print(analyzer.long_description or analyzer.short_description)
             print("")
-            print_dialog_section_title("◆◆ Required Input ◆◆")
+            print("◆◆ Required Input ◆◆")
             print("The test requires these columns in the input data:")
             print("")
 
