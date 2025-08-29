@@ -382,20 +382,40 @@ def print_data_frame_summary(
 
 
 def smart_print_data_frame(
-    data_frame,
+    data_frame: pl.DataFrame,
     title: str,
-    apply_color: str = "column_data_type",
+    apply_color: str | None = "column_data_type",
     smart_print: bool = True,
-    caption: str = None,
-):
-    """Smart dataframe printing - uses summary for wide tables, full display for narrow ones
+    caption: str | None = None,
+) -> None:
+    """Smart dataframe printing with adaptive display based on terminal width.
+
+    Automatically chooses between full table display and summary view based on terminal
+    width and number of columns. Provides Rich-styled tables with configurable coloring.
 
     Args:
         data_frame: Polars DataFrame to display
-        title: Title for the table
-        apply_color: Color mode ("column_data_type", "column-wise", "row-wise", or None)
-        smart_print: If True, uses adaptive display (summary vs full). If False, always uses full display.
-        caption: Optional caption text to display below the table
+        title: Title text to display above the table
+        apply_color: Color mode for the table display:
+            - "column_data_type": Colors columns based on their Polars data types
+            - "column-wise": Cycles through colors for each column
+            - "row-wise": Cycles through colors for each row
+            - None: No coloring (plain black and white display)
+        smart_print: Controls adaptive display behavior:
+            - True: Uses summary view for wide tables (>8 cols or narrow terminal)
+            - False: Always uses full table display regardless of width
+        caption: Optional caption text displayed below the table
+
+    Display Logic:
+        - If smart_print=False: Always shows full table
+        - If smart_print=True and (>8 columns OR estimated column width <12):
+          Shows summary with column info, data types, and examples
+        - Otherwise: Shows full table with all data
+
+    Examples:
+        >>> smart_print_data_frame(df, "My Data", apply_color=None)
+        >>> smart_print_data_frame(df, "Analysis Results", caption="Processing complete")
+        >>> smart_print_data_frame(df, "Wide Dataset", smart_print=False)
     """
     if not smart_print:
         # Always use full dataframe display when smart_print is disabled
