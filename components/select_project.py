@@ -1,7 +1,7 @@
 from typing import Optional
 
 from app import ProjectContext
-from terminal_tools import draw_box, print_ascii_table, prompts, wait_for_key
+from terminal_tools import draw_box, prompts, smart_print_data_frame, wait_for_key
 
 from .context import ViewContext
 
@@ -30,20 +30,11 @@ def select_project(ctx: ViewContext):
             draw_box(f"Project: {project.display_name}", padding_lines=0)
         ):
             df = project.preview_data
-            print_ascii_table(
-                [
-                    [preview_value(cell) for cell in row]
-                    for row in df.head(10).iter_rows()
-                ],
-                header=df.columns,
-            )
-            print(f"(Total {project.data_row_count} rows)")
-            print("Inferred column semantics:")
-            print_ascii_table(
-                rows=[
-                    [col.name, col.semantic.semantic_name] for col in project.columns
-                ],
-                header=["Column", "Semantic"],
+            smart_print_data_frame(
+                data_frame=df.head(5),
+                title="Input data preview",
+                apply_color=None,
+                caption=f"Total rows: {project.data_row_count:,}",
             )
 
             confirm_load = prompts.confirm("Load this project?", default=True)

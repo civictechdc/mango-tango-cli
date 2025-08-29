@@ -2,6 +2,11 @@ import os
 import subprocess
 import sys
 
+import polars as pl
+from rich.console import Console
+from rich.style import Style
+from rich.table import Table
+
 
 def clear_terminal():
     """Clears the terminal"""
@@ -188,3 +193,256 @@ def print_ascii_table(
 
     # bottom border
     print(border_row("└─", "─┴─", "─┘"))
+
+
+console = Console()
+
+
+def print_data_frame(data_frame, title: str, apply_color: str, caption: str = None):
+    # Mapping Polars data types to Rich colors (medium brightness)
+    # see: https://rich.readthedocs.io/en/stable/appendix/colors.html
+    POLARS_TYPE_COLORS = {
+        # String types
+        pl.String: "dodger_blue2",
+        pl.Categorical: "light_blue3",
+        # Numeric types
+        pl.Int8: "green3",
+        pl.Int16: "green3",
+        pl.Int32: "green3",
+        pl.Int64: "green3",
+        pl.UInt8: "dark_green",
+        pl.UInt16: "dark_green",
+        pl.UInt32: "dark_green",
+        pl.UInt64: "dark_green",
+        pl.Float32: "orange3",
+        pl.Float64: "orange3",
+        # Temporal types
+        pl.Date: "medium_purple2",
+        pl.Datetime: "medium_purple3",
+        pl.Time: "purple3",
+        pl.Duration: "orchid3",
+        # Boolean
+        pl.Boolean: "gold3",
+        # Complex types
+        pl.List: "dark_cyan",
+        pl.Struct: "cyan3",
+        pl.Array: "steel_blue3",
+        # Binary/Other
+        pl.Binary: "grey62",
+        pl.Null: "grey50",
+        pl.Object: "deep_pink3",
+        pl.Unknown: "indian_red3",
+    }
+
+    # Color cycle for column/row-wise coloring
+    CYCLE_COLORS = [
+        "orange3",
+        "dodger_blue1",
+        "dark_cyan",
+        "medium_purple1",
+        "deep_pink4",
+        "gold1",
+        "grey66",
+        "steel_blue1",
+    ]
+
+    # Get colors based on column data types
+    def get_column_color(dtype):
+        # Handle parameterized types like Datetime(time_unit, time_zone)
+        if hasattr(dtype, "base_type"):
+            base_type = dtype.base_type()
+            if base_type in POLARS_TYPE_COLORS:
+                return POLARS_TYPE_COLORS[base_type]
+
+        # Direct type mapping
+        dtype_class = type(dtype)
+        if dtype_class in POLARS_TYPE_COLORS:
+            return POLARS_TYPE_COLORS[dtype_class]
+
+        # Check if it's a subclass of known types
+        for polars_type, color in POLARS_TYPE_COLORS.items():
+            if isinstance(dtype, polars_type):
+                return color
+
+        # Fallback to index-based coloring
+        return CYCLE_COLORS[hash(str(dtype)) % len(CYCLE_COLORS)]
+
+    # Capture original data types BEFORE string conversion
+    original_dtypes = {
+        col: data_frame.select(col).dtypes[0] for col in data_frame.columns
+    }
+
+    # Convert non-string columns to strings for display
+    data_frame = data_frame.with_columns(pl.exclude(pl.String).cast(str))
+
+    table = Table(title=title, caption=caption)
+
+    # Add columns with appropriate coloring and width limits
+    for i, col in enumerate(data_frame.columns):
+        if apply_color == "column-wise":
+            # Cycle through colors for each column
+            col_color = CYCLE_COLORS[i % len(CYCLE_COLORS)]
+            table.add_column(
+                col,
+                style=col_color,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
+        elif apply_color == "column_data_type":
+            # Color based on ORIGINAL data type (before string conversion)
+            original_dtype = original_dtypes[col]
+            col_color = get_column_color(original_dtype)
+            table.add_column(
+                col,
+                style=col_color,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
+        elif apply_color is None:
+            # No coloring at all - omit style parameter entirely
+            table.add_column(
+                col,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
+        else:
+            # No column coloring - omit style parameter entirely
+            table.add_column(
+                col,
+                overflow="ellipsis",
+                no_wrap=True,
+            )
+
+    # Add rows with appropriate coloring based on mode
+    if apply_color == "row-wise":
+        # Cycle through colors for each row
+        for i, row in enumerate(data_frame.iter_rows()):
+            row_color = CYCLE_COLORS[i % len(CYCLE_COLORS)]
+            table.add_row(*row, style=row_color)
+    elif apply_color is None:
+        # No row coloring at all
+        for row in data_frame.iter_rows():
+            table.add_row(*row)
+    else:
+        # No row coloring (column coloring only)
+        for row in data_frame.iter_rows():
+            table.add_row(*row)
+
+    console.print(table)
+
+
+def print_data_frame_summary(
+    data_frame, title: str, apply_color: str = "column_data_type", caption: str = None
+):
+    """Print a summary table for dataframes with many columns"""
+    from preprocessing.series_semantic import infer_series_semantic
+
+    MAX_ROW_CHAR = 25
+
+    # Create summary data
+    summary_data = []
+    for col in data_frame.columns:
+        dtype = data_frame.select(col).dtypes[0]
+
+        # Get example value (first non-null if possible)
+        example_series = data_frame.select(col).to_series()
+        example_val = None
+        for val in example_series:
+            if val is not None:
+                example_val = str(val)
+                break
+        if example_val is None:
+            example_val = "null"
+
+        # Truncate long examples
+        if len(example_val) > MAX_ROW_CHAR:
+            example_val = example_val[:MAX_ROW_CHAR] + "..."
+
+        # Get semantic analysis type
+        try:
+            semantic = infer_series_semantic(data_frame.select(col).to_series())
+            analysis_type = semantic.data_type if semantic else "unknown"
+        except Exception:
+            analysis_type = "unknown"
+
+        summary_data.append([col, str(dtype), example_val, analysis_type])
+
+    # Create summary dataframe
+    summary_df = pl.DataFrame(
+        {
+            "Column Name": [row[0] for row in summary_data],
+            "Data Type": [row[1] for row in summary_data],
+            "Example Value": [row[2] for row in summary_data],
+            "Inferred Analyzer Input Type": [row[3] for row in summary_data],
+        }
+    )
+
+    # Print with specified coloring mode
+    print_data_frame(summary_df, title, apply_color, caption)
+
+
+def smart_print_data_frame(
+    data_frame: pl.DataFrame,
+    title: str,
+    apply_color: str | None = "column_data_type",
+    smart_print: bool = True,
+    caption: str | None = None,
+) -> None:
+    """Smart dataframe printing with adaptive display based on terminal width.
+
+    Automatically chooses between full table display and summary view based on terminal
+    width and number of columns. Provides Rich-styled tables with configurable coloring.
+
+    Args:
+        data_frame: Polars DataFrame to display
+        title: Title text to display above the table
+        apply_color: Color mode for the table display:
+            - "column_data_type": Colors columns based on their Polars data types
+            - "column-wise": Cycles through colors for each column
+            - "row-wise": Cycles through colors for each row
+            - None: No coloring (plain black and white display)
+        smart_print: Controls adaptive display behavior:
+            - True: Uses summary view for wide tables (>8 cols or narrow terminal)
+            - False: Always uses full table display regardless of width
+        caption: Optional caption text displayed below the table
+
+    Display Logic:
+        - If smart_print=False: Always shows full table
+        - If smart_print=True and (>8 columns OR estimated column width <12):
+          Shows summary with column info, data types, and examples
+        - Otherwise: Shows full table with all data
+
+    Examples:
+        >>> smart_print_data_frame(df, "My Data", apply_color=None)
+        >>> smart_print_data_frame(df, "Analysis Results", caption="Processing complete")
+        >>> smart_print_data_frame(df, "Wide Dataset", smart_print=False)
+    """
+    if not smart_print:
+        # Always use full dataframe display when smart_print is disabled
+        print_data_frame(data_frame, title, apply_color, caption)
+        return
+
+    # Smart adaptive logic
+    terminal_width = console.size.width
+    n_cols = len(data_frame.columns)
+
+    # Calculate if columns will be too narrow for readability
+    estimated_col_width = max(60, terminal_width - 4) // max(n_cols, 1)
+    min_readable_width = 12  # Minimum width for readable columns
+
+    # Use summary if too many columns or columns would be too narrow
+    if n_cols > 8 or estimated_col_width < min_readable_width:
+        print_data_frame_summary(
+            data_frame,
+            title + " (Dataset has a large nr. of columns, showing summary instead)",
+            apply_color,
+            caption,
+        )
+    else:
+        print_data_frame(data_frame, title, apply_color, caption)
+
+
+def print_dialog_section_title(print_str):
+    mango_style = Style(color="#F3921E", bold=True)
+
+    console.print(print_str, style=mango_style)

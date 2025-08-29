@@ -5,6 +5,8 @@ instances. Each `Scope` instance represents a block of text that are buffered
 in memory and printed to the terminal at each refresh.
 """
 
+# from terminal_tools import print_dialog_section_title
+
 from .utils import clear_terminal
 
 
