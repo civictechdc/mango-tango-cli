@@ -1,5 +1,6 @@
 from tempfile import TemporaryDirectory
 
+import polars as pl
 from pydantic import BaseModel
 
 from analyzer_interface import (
@@ -11,7 +12,7 @@ from analyzer_interface import (
 )
 from app import ProjectContext
 from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
-from terminal_tools import print_ascii_table, prompts
+from terminal_tools import prompts, smart_print_data_frame
 
 from .context import ViewContext
 
@@ -58,7 +59,7 @@ def customize_analysis(
         }
 
     while True:
-        with context.terminal.nest("Customization"):
+        with context.terminal.nest("◆◆ Parameter customization ◆◆"):
             param_states = [
                 ParamState(
                     param_spec=param_spec,
@@ -67,15 +68,21 @@ def customize_analysis(
                 for param_spec in analyzer.params
             ]
 
-            print_ascii_table(
-                [
-                    [
-                        param_state.param_spec.print_name,
-                        print_param_value(param_state.value),
-                    ]
-                    for param_state in param_states
-                ],
-                header=["parameter name", "parameter value"],
+            smart_print_data_frame(
+                data_frame=pl.DataFrame(
+                    {
+                        "parameter name": [
+                            param_state.param_spec.print_name
+                            for param_state in param_states
+                        ],
+                        "parameter value": [
+                            print_param_value(param_state.value)
+                            for param_state in param_states
+                        ],
+                    }
+                ),
+                title="Analysis Parameters",
+                apply_color=None,
             )
 
             has_all_params = all(
