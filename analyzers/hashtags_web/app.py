@@ -2,6 +2,7 @@ from functools import lru_cache
 
 import plotly.graph_objects as go
 import polars as pl
+from dateutil import parser as dateutil_parser
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
@@ -26,12 +27,17 @@ question_circle_fill = ui.HTML(
 df_global = None
 context_global = None
 df_raw = None
+TZ_UTC = "UTC"  # normalizing to UTC, before stripping
 
 
 def set_df_global_state(df_input, df_output):
     global df_global, df_raw
     df_global = df_output
-    df_raw = df_input  # Will be loaded from context when needed
+    df_raw = df_input.with_columns(
+        pl.col(COL_TIME)
+        .dt.convert_time_zone(TZ_UTC)  # normalize to UTC
+        .dt.replace_time_zone(None)  # strip to tz naive format
+    )  # Will be loaded from context when needed
 
 
 @lru_cache(maxsize=32)
@@ -192,34 +198,28 @@ def server(input, output, session):
             session=session,
         )
 
-    @lru_cache(maxsize=100)
-    def get_selected_datetime_cached(selected_formatted):
-        """Convert selected formatted date back to datetime with caching"""
+    def get_midpoint_datetime():
+        """Default - middle of dataset instead of first point"""
         df = get_df()
-        # Find the datetime that matches the formatted string
-        for dt in df["timewindow_start"].to_list():
-            if dt.strftime("%Y-%m-%d %H:%M") == selected_formatted:
-                return dt
-        return df["timewindow_start"].to_list()[0]  # fallback
+        middle_index = len(df) // 2
+        return df["timewindow_start"][middle_index]
 
     # this will store line plot values when clicked
     clicked_data = reactive.value(None)
 
     def get_selected_datetime():
-        """Get date value from when a line plot is clicked on"""
+        """Get datetime from plot click, converting string to datetime"""
         click_data = clicked_data.get()
         if click_data and hasattr(click_data, "xs") and len(click_data.xs) > 0:
-            # Convert the clicked datetime to the format expected by get_selected_datetime_cached
-            clicked_datetime = click_data.xs[0]
-            if hasattr(clicked_datetime, "strftime"):
-                formatted_datetime = clicked_datetime.strftime("%Y-%m-%d %H:%M")
-                return get_selected_datetime_cached(formatted_datetime)
+            clicked_value = click_data.xs[0]
+
+            # If it's a string, parse it to datetime
+            if isinstance(clicked_value, str):
+                return dateutil_parser.parse(clicked_value)
             else:
-                # If it's already a string, use it directly
-                return get_selected_datetime_cached(clicked_datetime)
+                return clicked_value  # Already datetime
         else:
-            # Return the first datetime as default
-            return get_df()["timewindow_start"][0]
+            return get_midpoint_datetime()
 
     @reactive.calc
     def secondary_analysis():

@@ -7,9 +7,10 @@ from analyzer_interface.context import (
     ShinyContext,
     WebPresenterContext,
 )
+from app.project_context import _get_columns_with_semantic
 from app.shiny import page_dependencies
 
-from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME, OUTPUT_GINI
+from ..hashtags.interface import COL_TIME, OUTPUT_GINI
 from .app import (
     analysis_panel,
     hashtag_plot_panel,
@@ -20,28 +21,60 @@ from .app import (
 )
 
 
+def load_and_transform_input_data(
+    web_context: WebPresenterContext, column_names: list[str]
+) -> pl.DataFrame:
+    """Load input dataset and apply analysis preprocessing to specified columns"""
+    project_id = web_context.base.analysis.project_id
+    df_raw = web_context.store.load_project_input(project_id)
+
+    # Get semantic info for all columns
+    columns_with_semantic = _get_columns_with_semantic(df_raw)
+    semantic_dict = {col.name: col for col in columns_with_semantic}
+
+    # Apply transformations to selected columns
+    transformed_columns = {}
+    for col_name in column_names:
+        if col_name in semantic_dict:
+            # Apply semantic transformation
+            transformed_columns[col_name] = semantic_dict[
+                col_name
+            ].apply_semantic_transform()
+        else:
+            # Keep original if no semantic transformation
+            transformed_columns[col_name] = df_raw[col_name]
+
+    return df_raw.with_columns(
+        [transformed_columns[col_name].alias(col_name) for col_name in column_names]
+    )
+
+
 def factory(
     web_context: WebPresenterContext,
 ) -> FactoryOutputContext:
     # Load the primary output associated with this project
     df_hashtags = pl.read_parquet(web_context.base.table(OUTPUT_GINI).parquet_path)
 
-    # load the raw input data used for this project
-    project_id = web_context.base.analysis.project_id
-    df_raw = web_context.store.load_project_input(project_id)
-
-    # flip mapping to point from raw data to analyzer input schema
-    column_mapping_inv = {
+    # Get user-selected column names
+    orig2inputschema = {
         v: k for k, v in web_context.base.analysis.column_mapping.items()
     }
-    df_raw = df_raw.rename(mapping=column_mapping_inv)
+    orig_schema_names = [v for v in orig2inputschema.keys()]
 
-    if not isinstance(df_raw.schema[COL_TIME], pl.Datetime):
-        df_raw = df_raw.with_columns(pl.col(COL_TIME).str.to_datetime().alias(COL_TIME))
-
-    df_raw = df_raw.select(pl.col([COL_AUTHOR_ID, COL_TIME, COL_POST])).sort(
-        pl.col(COL_TIME)
+    # Load and apply semantic transformations to
+    # input data frame
+    df_raw = load_and_transform_input_data(
+        web_context=web_context, column_names=orig_schema_names
     )
+
+    # Rename columns to follow input schema names and select
+    column_mapping = web_context.base.analysis.column_mapping
+    df_raw = df_raw.select(
+        [
+            pl.col(orig_col).alias(schema_col)
+            for schema_col, orig_col in column_mapping.items()
+        ]
+    ).sort(pl.col(COL_TIME))
 
     set_df_global_state(
         df_input=df_raw,

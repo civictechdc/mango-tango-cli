@@ -34,13 +34,92 @@ class SeriesSemantic(BaseModel):
         return self.column_type(series.dtype)
 
 
-datetime_string = SeriesSemantic(
-    semantic_name="datetime",
-    column_type=pl.String,
-    try_convert=lambda s: s.str.strptime(pl.Datetime, strict=False),
+def parse_datetime_with_tz(s: pl.Series) -> pl.Series:
+    """Parse datetime strings with timezone info (both abbreviations and offsets)"""
+    import warnings
+
+    # Handle timezone abbreviations like "UTC", "EST"
+    tz_abbrev_regex = r" ([A-Z]{3,4})$"  # UTC, EST, etc.
+
+    # Handle timezone offsets like "-05:00", "+00:00"
+    tz_offset_regex = r"[+-]\d{2}:\d{2}$"  # -05:00, +00:00, etc.
+
+    # Check for multiple different timezones
+    abbrev_matches = s.str.extract_all(tz_abbrev_regex)
+    offset_matches = s.str.extract_all(tz_offset_regex)
+
+    # Get unique timezone abbreviations
+    unique_abbrevs = set()
+    if not abbrev_matches.is_empty():
+        for match_list in abbrev_matches.to_list():
+            if match_list:  # Not empty
+                unique_abbrevs.update(match_list)
+
+    # Get unique timezone offsets
+    unique_offsets = set()
+    if not offset_matches.is_empty():
+        for match_list in offset_matches.to_list():
+            if match_list:  # Not empty
+                unique_offsets.update(match_list)
+
+    # Warn if multiple different timezones found
+    total_unique_tz = len(unique_abbrevs) + len(unique_offsets)
+    if total_unique_tz > 1:
+        all_tz = list(unique_abbrevs) + list(unique_offsets)
+        warnings.warn(
+            f"Multiple timezones found in datetime column: {all_tz}. "
+            f"Assuming all timestamps represent the same timezone for analysis purposes.",
+            UserWarning,
+        )
+
+    # Try to remove timezone abbreviations first
+    result = s.str.replace(tz_abbrev_regex, "")
+
+    # Then remove timezone offsets
+    result = result.str.replace(tz_offset_regex, "")
+
+    return result.str.strptime(pl.Datetime(), strict=False)
+
+
+native_date = SeriesSemantic(
+    semantic_name="native_date",
+    column_type=pl.Date,  # Matches native Date columns
+    try_convert=lambda s: s,  # No conversion needed
+    validate_result=lambda s: constant_series(s, True),  # Always valid
     data_type="datetime",
 )
 
+native_datetime = SeriesSemantic(
+    semantic_name="native_datetime",
+    column_type=pl.Datetime,  # Matches native DateTime columns
+    try_convert=lambda s: s,  # No conversion needed
+    validate_result=lambda s: constant_series(s, True),  # Always valid
+    data_type="datetime",
+)
+
+datetime_string = SeriesSemantic(
+    semantic_name="datetime",
+    column_type=pl.String,
+    try_convert=parse_datetime_with_tz,
+    validate_result=lambda s: s.is_not_null(),
+    data_type="datetime",
+)
+
+date_string = SeriesSemantic(
+    semantic_name="date",
+    column_type=pl.String,
+    try_convert=lambda s: s.str.strptime(pl.Date, strict=False),  # Convert to pl.Date
+    validate_result=lambda s: s.is_not_null(),
+    data_type="datetime",  # Still maps to datetime for analyzer compatibility
+)
+
+time_string = SeriesSemantic(
+    semantic_name="time",
+    column_type=pl.String,
+    try_convert=lambda s: s.str.strptime(pl.Time, strict=False),  # Convert to pl.Time
+    validate_result=lambda s: s.is_not_null(),
+    data_type="time",
+)
 
 timestamp_seconds = SeriesSemantic(
     semantic_name="timestamp_seconds",
@@ -107,7 +186,11 @@ boolean_catch_all = SeriesSemantic(
 )
 
 all_semantics = [
+    native_datetime,
+    native_date,
     datetime_string,
+    date_string,
+    time_string,
     timestamp_seconds,
     timestamp_milliseconds,
     url,
