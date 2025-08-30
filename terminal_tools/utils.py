@@ -275,26 +275,47 @@ def print_data_frame(data_frame, title: str, apply_color: str, caption: str = No
     # Convert non-string columns to strings for display
     data_frame = data_frame.with_columns(pl.exclude(pl.String).cast(str))
 
+    def get_column_display_width(col, original_dtype):
+        """Calculate appropriate display width for a column based on content"""
+
+        if original_dtype in [pl.String, pl.Categorical]:
+            # Sample first few values to estimate content length
+            sample_values = data_frame.select(col).head(10).to_series()
+            max_sample_length = max(
+                (len(str(val)) for val in sample_values if val is not None), default=0
+            )
+
+            if max_sample_length > 30:  # Long text content
+                return 50
+            elif max_sample_length > 15:  # Medium text content
+                return 30
+
+        return 25  # Standard width for non-text or short text
+
     table = Table(title=title, caption=caption)
 
     # Add columns with appropriate coloring and width limits
     for i, col in enumerate(data_frame.columns):
+        original_dtype = original_dtypes[col]
+        col_width = get_column_display_width(col, original_dtype)
+
         if apply_color == "column-wise":
             # Cycle through colors for each column
             col_color = CYCLE_COLORS[i % len(CYCLE_COLORS)]
             table.add_column(
                 col,
                 style=col_color,
+                max_width=col_width,
                 overflow="ellipsis",
                 no_wrap=True,
             )
         elif apply_color == "column_data_type":
             # Color based on ORIGINAL data type (before string conversion)
-            original_dtype = original_dtypes[col]
             col_color = get_column_color(original_dtype)
             table.add_column(
                 col,
                 style=col_color,
+                max_width=col_width,
                 overflow="ellipsis",
                 no_wrap=True,
             )
@@ -302,6 +323,7 @@ def print_data_frame(data_frame, title: str, apply_color: str, caption: str = No
             # No coloring at all - omit style parameter entirely
             table.add_column(
                 col,
+                max_width=col_width,
                 overflow="ellipsis",
                 no_wrap=True,
             )
@@ -309,6 +331,7 @@ def print_data_frame(data_frame, title: str, apply_color: str, caption: str = No
             # No column coloring - omit style parameter entirely
             table.add_column(
                 col,
+                max_width=col_width,
                 overflow="ellipsis",
                 no_wrap=True,
             )
