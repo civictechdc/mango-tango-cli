@@ -71,6 +71,8 @@ a = Analysis(
         'mdit_py_plugins',
         'mdurl',
         'uc_micro',
+        'pythonjsonlogger',
+        'pythonjsonlogger.jsonlogger',
     ],  # Include any imports that PyInstaller might miss
     hookspath=[],
     runtime_hooks=[],
