@@ -4,14 +4,10 @@ import sys
 from multiprocessing import freeze_support
 from pathlib import Path
 
-from analyzers import suite
-from app import App, AppContext
-from app.logger import setup_logging
-from components import ViewContext, main_menu, splash
-from meta import get_version
-from storage import Storage
+from rich.console import Console
+from rich.text import Text
+
 from terminal_tools import enable_windows_ansi_support
-from terminal_tools.inception import TerminalContext
 
 if __name__ == "__main__":
     freeze_support()
@@ -38,6 +34,21 @@ if __name__ == "__main__":
         print("No-op flag detected. Exiting successfully.")
         sys.exit(0)
 
+    # Show loading message early
+    console = Console()
+    loading_msg = Text("🥭 CIB Mango Tree is starting", style="orange1 bold")
+    loading_msg.append("... This may take a moment.", style="dim")
+    console.print(loading_msg)
+
+    # Import heavy modules after loading message
+    from analyzers import suite
+    from app import App, AppContext
+    from app.logger import setup_logging
+    from components import ViewContext, main_menu, splash
+    from meta import get_version
+    from storage import Storage
+    from terminal_tools.inception import TerminalContext
+
     # Initialize storage
     storage = Storage(app_name="MangoTango", app_author="Civic Tech DC")
 
@@ -50,7 +61,7 @@ if __name__ == "__main__":
     # Get logger for main module
     logger = logging.getLogger(__name__)
     logger.info(
-        "Starting Mango Tango CLI application",
+        "Starting CIB Mango Tree application",
         extra={"log_level": args.log_level, "log_file": str(log_file_path)},
     )
 

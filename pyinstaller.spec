@@ -2,7 +2,7 @@
 # main.spec
 # This file tells PyInstaller how to bundle your application
 from PyInstaller.utils.hooks import copy_metadata
-from PyInstaller.building.api import EXE,PYZ
+from PyInstaller.building.api import EXE, PYZ
 from PyInstaller.building.build_main import Analysis
 import sys
 import os
@@ -21,7 +21,7 @@ if site_packages_path is None:
   raise RuntimeError("The site-packages directory could not be found. Please setup the python envrionment correctly and try again...")
 
 a = Analysis(
-    ['mangotango.py'],  # Entry point
+    ['cibmangotree.py'],  # Entry point
     pathex=['.'],    # Ensure all paths are correctly included
     binaries=[],
     datas=[
@@ -88,10 +88,10 @@ if sys.platform == "darwin":
         a.binaries,
         a.zipfiles,
         a.datas,
-        name='mangotango',  # The name of the executable
+        name='cibmangotree',  # The name of the executable
         debug=False,
         strip=True,
-        upx=True,  # You can set this to False if you don’t want UPX compression
+        upx=True,  # You can set this to False if you don't want UPX compression
         console=True,  # Set to False if you don't want a console window
         entitlements_file="./mango.entitlements",
         codesign_identity=os.getenv('APPLE_APP_CERT_ID'),
@@ -103,9 +103,9 @@ else:
         a.binaries,
         a.zipfiles,
         a.datas,
-        name='mangotango',  # The name of the executable
+        name='cibmangotree',  # The name of the executable
         debug=False,
         strip=False,
-        upx=True,  # You can set this to False if you don’t want UPX compression
-        console=True  # Set to False if you don't want a console window
+        upx=True,  # You can set this to False if you don't want UPX compression
+        console=True,  # Set to False if you don't want a console window
     )
