@@ -1,5 +1,7 @@
+from asyncio import CancelledError, Event, create_task
 from os import path
 from pathlib import Path
+from signal import SIGINT, default_int_handler, signal
 from tempfile import TemporaryDirectory
 
 from a2wsgi import WSGIMiddleware
@@ -11,8 +13,7 @@ from starlette.applications import Starlette
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
 from uvicorn import Config, Server
-from asyncio import create_task, Event, CancelledError
-from signal import signal, SIGINT, default_int_handler
+
 from context import WebPresenterContext
 
 from .analysis_context import AnalysisContext
@@ -44,8 +45,7 @@ class AnalysisWebServerContext(BaseModel):
         def index():
             return render_template(
                 "index.html",
-                panels=[(presenter.id, presenter.name)
-                        for presenter in web_presenters],
+                panels=[(presenter.id, presenter.name) for presenter in web_presenters],
                 project_name=project_name,
                 analyzer_name=analyzer_name,
             )
