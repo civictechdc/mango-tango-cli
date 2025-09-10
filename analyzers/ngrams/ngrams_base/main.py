@@ -119,17 +119,6 @@ def main(context: PrimaryAnalyzerContext):
         )
 
 
-def tokenize(input: str) -> list[str]:
-    """
-    Backward-compatible tokenize function for tests.
-
-    This function maintains the exact original behavior expected by the test suite.
-    The main analyzer uses the new tokenizer service with enhanced capabilities.
-    """
-    import re
-
-    # Use the exact same logic as the original tokenize function
-    return re.split(" +", input.lower())
 
 
 def ngrams(tokens: list[str], min: int, max: int):
