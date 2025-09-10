@@ -108,7 +108,6 @@ class AnalysisWebServerContext(BaseModel):
             uvi_server.should_exit = True
 
         def signal_handler(sig, frame):
-            print("test...")
             create_task(shutdown_handler())
 
         signal(SIGINT, signal_handler)
