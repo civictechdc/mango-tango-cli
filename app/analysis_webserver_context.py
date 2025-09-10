@@ -103,8 +103,5 @@ class AnalysisWebServerContext(BaseModel):
         except exceptions.CancelledError:
             print("Shutting down server...")
 
-        except Exception as err:
-            print(err)
-
         for temp_dir in temp_dirs:
             temp_dir.cleanup()
