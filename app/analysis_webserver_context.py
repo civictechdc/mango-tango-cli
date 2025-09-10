@@ -101,6 +101,7 @@ class AnalysisWebServerContext(BaseModel):
             uvi_server.run()
 
         except KeyboardInterrupt:
+            uvi_server.shutdown()
             print("test...")
 
         except Exception as err:
