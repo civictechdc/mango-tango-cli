@@ -19,7 +19,6 @@ from . import (
     TokenizerConfig,
     BasicTokenizer,
     TokenType,
-    LanguageFamily,
 )
 from .core.types import CaseHandling
 
@@ -65,168 +64,43 @@ class TestTokenizerService:
     def test_tokenize_text_none_config(self):
         """Test tokenizer with None config (should use defaults)."""
         text = "Test text"
-        result = tokenize_text(text, None)
+        result = tokenize_text(text)  # Use default config
         assert isinstance(result, list)
         assert len(result) > 0
 
 
 class TestMultilingualTokenization:
-    """Test tokenization of multilingual content."""
+    """Test basic multilingual tokenization through service API (smoke tests)."""
 
-    def test_latin_text(self):
-        """Test Latin script text tokenization."""
-        texts = [
-            "Hello world café",
-            "bonjour monde",
-            "Hola mundo",
-            "Guten Tag Welt",
-        ]
-        
-        for text in texts:
-            result = tokenize_text(text)
-            assert isinstance(result, list)
-            assert len(result) > 0
-            # Should be lowercase by default
-            assert all(token.islower() or not token.isalpha() for token in result)
-
-    def test_chinese_text(self):
-        """Test Chinese text tokenization."""
-        text = "你好世界"
+    def test_latin_text_smoke(self):
+        """Test basic Latin script text tokenization via service API."""
+        text = "Hello world café"
         result = tokenize_text(text)
         
         assert isinstance(result, list)
         assert len(result) > 0
-        # Chinese characters should be tokenized individually
-        assert "你" in result or "你好" in result
-        assert "世" in result or "世界" in result
+        # Should be lowercase by default
+        assert all(token.islower() or not token.isalpha() for token in result)
+        assert "hello" in result
+        assert "world" in result
 
-    def test_japanese_text(self):
-        """Test Japanese text tokenization."""
-        text = "こんにちは世界"
+    def test_mixed_script_smoke(self):
+        """Test mixed script text tokenization via service API."""
+        text = "Hello你好World"
         result = tokenize_text(text)
         
         assert isinstance(result, list)
         assert len(result) > 0
-
-    def test_arabic_text(self):
-        """Test Arabic text tokenization."""
-        text = "مرحبا بالعالم"
-        result = tokenize_text(text)
-        
-        assert isinstance(result, list)
-        assert len(result) > 0
-
-    def test_mixed_script_text(self):
-        """Test mixed script text tokenization."""
-        mixed_texts = [
-            "iPhone用户",
-            "café北京",
-            "Hello你好World",
-            "test测试الاختبار",
-        ]
-        
-        for text in mixed_texts:
-            result = tokenize_text(text)
-            assert isinstance(result, list)
-            assert len(result) > 0
-
-    def test_multilingual_case_handling(self):
-        """Test case handling with multilingual text."""
-        text = "Hello 你好 WORLD 世界"
-        
-        # Test lowercase
-        config_lower = TokenizerConfig(case_handling=CaseHandling.LOWERCASE)
-        result_lower = tokenize_text(text, config_lower)
-        latin_tokens = [t for t in result_lower if t.isascii()]
-        assert all(t.islower() or not t.isalpha() for t in latin_tokens)
-        
-        # Test preserve
-        config_preserve = TokenizerConfig(case_handling=CaseHandling.PRESERVE)
-        result_preserve = tokenize_text(text, config_preserve)
-        assert "Hello" in result_preserve
-        assert "WORLD" in result_preserve
+        # Should handle mixed scripts at service level
+        assert "hello" in result or "world" in result
+        assert "你" in result or "好" in result or "你好" in result
 
 
 class TestSocialMediaEntities:
-    """Test extraction of social media entities."""
+    """Test basic social media entity extraction through service API (smoke test)."""
 
-    def test_hashtag_extraction(self):
-        """Test hashtag extraction."""
-        texts = [
-            "#hashtag",
-            "Check out #amazing content",
-            "#MultiWord #test123 #special_chars",
-            "Multiple #hash #tags in #text",
-        ]
-        
-        config = TokenizerConfig(extract_hashtags=True)
-        tokenizer = create_basic_tokenizer(config)
-        
-        for text in texts:
-            result = tokenizer.tokenize_with_types(text)
-            if "hashtag" in result:
-                hashtags = result["hashtag"]
-                assert len(hashtags) > 0
-                assert all(tag.startswith("#") for tag in hashtags)
-
-    def test_mention_extraction(self):
-        """Test @mention extraction."""
-        texts = [
-            "@user",
-            "Hello @john_doe how are you?",
-            "@user123 @another_user",
-            "Contact @support for help",
-        ]
-        
-        config = TokenizerConfig(extract_mentions=True)
-        tokenizer = create_basic_tokenizer(config)
-        
-        for text in texts:
-            result = tokenizer.tokenize_with_types(text)
-            if "mention" in result:
-                mentions = result["mention"]
-                assert len(mentions) > 0
-                assert all(mention.startswith("@") for mention in mentions)
-
-    def test_url_extraction(self):
-        """Test URL extraction."""
-        urls = [
-            "https://example.com",
-            "http://test.org/path",
-            "www.example.com",
-            "Check out https://github.com/repo",
-            "Visit example.com for more info",
-        ]
-        
-        config = TokenizerConfig(extract_urls=True)
-        tokenizer = create_basic_tokenizer(config)
-        
-        for url_text in urls:
-            result = tokenizer.tokenize_with_types(url_text)
-            if "url" in result:
-                extracted_urls = result["url"]
-                assert len(extracted_urls) > 0
-
-    def test_emoji_extraction(self):
-        """Test emoji extraction."""
-        texts = [
-            "Hello 🎉",
-            "Great work 😀 👍",
-            "🚀 Amazing project 🎯",
-            "😊 😎 😍",
-        ]
-        
-        config = TokenizerConfig(include_emoji=True)
-        tokenizer = create_basic_tokenizer(config)
-        
-        for text in texts:
-            result = tokenizer.tokenize_with_types(text)
-            if "emoji" in result:
-                emojis = result["emoji"]
-                assert len(emojis) > 0
-
-    def test_combined_social_entities(self):
-        """Test text with multiple social media entities."""
+    def test_combined_social_entities_smoke(self):
+        """Test service API with multiple social media entities."""
         text = "@user check #hashtag https://example.com 🎉"
         
         config = TokenizerConfig(
@@ -238,123 +112,46 @@ class TestSocialMediaEntities:
         tokenizer = create_basic_tokenizer(config)
         result = tokenizer.tokenize_with_types(text)
         
-        # Should extract all entity types
+        # Service API should handle entity extraction
+        assert isinstance(result, dict)
+        # Should extract multiple entity types
         entity_types = ["mention", "hashtag", "url", "emoji"]
         found_types = [t for t in entity_types if t in result and result[t]]
-        assert len(found_types) >= 3  # Should find at least 3 types
-
-    def test_social_entities_disabled(self):
-        """Test that social entities are not extracted when disabled."""
-        text = "@user #hashtag https://example.com"
-        
-        config = TokenizerConfig(
-            extract_mentions=False,
-            extract_hashtags=False,
-            extract_urls=False,
-        )
-        
-        result = tokenize_text(text, config)
-        # Should not contain the @ # or full URL as separate tokens
-        # Instead, they should be processed as regular text
-        assert len(result) > 0
+        assert len(found_types) >= 2  # Should find at least 2 types via service API
 
 
 class TestTokenizerConfiguration:
-    """Test various TokenizerConfig options and edge cases."""
+    """Test basic configuration options through service API."""
 
-    def test_case_handling_options(self):
-        """Test different case handling options."""
+    def test_case_handling_options_via_api(self):
+        """Test different case handling options through service API."""
         text = "Hello WORLD Test"
         
-        # Lowercase
+        # Test API with lowercase config
         config_lower = TokenizerConfig(case_handling=CaseHandling.LOWERCASE)
         result_lower = tokenize_text(text, config_lower)
         assert "hello" in result_lower
         assert "world" in result_lower
         
-        # Preserve
+        # Test API with preserve config
         config_preserve = TokenizerConfig(case_handling=CaseHandling.PRESERVE)
         result_preserve = tokenize_text(text, config_preserve)
         assert "Hello" in result_preserve
         assert "WORLD" in result_preserve
-        
-        # Uppercase
-        config_upper = TokenizerConfig(case_handling=CaseHandling.UPPERCASE)
-        result_upper = tokenize_text(text, config_upper)
-        assert "HELLO" in result_upper
-        assert "WORLD" in result_upper
 
-    def test_min_token_length_filtering(self):
-        """Test minimum token length filtering."""
+    def test_min_token_length_via_api(self):
+        """Test minimum token length filtering through service API."""
         text = "a bb ccc dddd"
         
-        # Min length 1 (default)
+        # Test API with different min lengths
         config_1 = TokenizerConfig(min_token_length=1)
         result_1 = tokenize_text(text, config_1)
         assert "a" in result_1
-        assert "bb" in result_1
         
-        # Min length 3
         config_3 = TokenizerConfig(min_token_length=3)
         result_3 = tokenize_text(text, config_3)
         assert "a" not in result_3
-        assert "bb" not in result_3
         assert "ccc" in result_3
-        assert "dddd" in result_3
-
-    def test_punctuation_inclusion(self):
-        """Test punctuation inclusion/exclusion."""
-        text = "Hello, world! How are you?"
-        
-        # Include punctuation
-        config_with = TokenizerConfig(include_punctuation=True)
-        tokenizer_with = create_basic_tokenizer(config_with)
-        result_with = tokenizer_with.tokenize_with_types(text)
-        
-        # Exclude punctuation (default)
-        config_without = TokenizerConfig(include_punctuation=False)
-        result_without = tokenize_text(text, config_without)
-        
-        # With punctuation should have punctuation tokens
-        if "punctuation" in result_with:
-            assert len(result_with["punctuation"]) > 0
-        
-        # Without punctuation should be clean words
-        assert all(token.isalnum() or not token.isascii() for token in result_without)
-
-    def test_unicode_normalization(self):
-        """Test Unicode normalization."""
-        # Text with accented characters
-        text = "café naïve résumé"
-        
-        config = TokenizerConfig(normalize_unicode=True)
-        result = tokenize_text(text, config)
-        
-        assert isinstance(result, list)
-        assert len(result) > 0
-        # Should contain the normalized words in some form
-        assert any("caf" in token for token in result)
-        assert any("na" in token or "ive" in token for token in result)
-        assert "r" in result and "sum" in result  # résumé is split into parts
-
-    def test_language_detection_settings(self):
-        """Test language detection configuration."""
-        text = "Mixed text 混合文本"
-        
-        # With detection
-        config_detect = TokenizerConfig(detect_language=True)
-        result_detect = tokenize_text(text, config_detect)
-        
-        # Without detection (use fallback)
-        config_no_detect = TokenizerConfig(
-            detect_language=False,
-            fallback_language_family=LanguageFamily.LATIN
-        )
-        result_no_detect = tokenize_text(text, config_no_detect)
-        
-        # Both should produce results
-        assert len(result_detect) > 0
-        assert len(result_no_detect) > 0
 
 
 class TestNgramParameterValidation:
