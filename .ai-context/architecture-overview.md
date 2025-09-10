@@ -11,10 +11,15 @@ flowchart TD
     App --> Importers[Data Importers]
     App --> Preprocessing[Semantic Preprocessor]
     App --> Analyzers[Analyzer System]
+    App --> Services[Tokenizer Service]
 
     Importers --> Parquet[(Parquet Files)]
     Preprocessing --> Parquet
     Analyzers --> Parquet
+
+    Services --> Analyzers
+    Services --> TokenizerCore[Core Types & Base]
+    Services --> BasicTokenizer[BasicTokenizer]
 
     Analyzers --> Primary[Primary Analyzers]
     Analyzers --> Secondary[Secondary Analyzers]
@@ -67,6 +72,19 @@ Key Classes:
 - `SettingsModel` - User preferences and application settings
 - `FileSelectionState` - File picker state management
 - `TableStats` - Data statistics and preview information
+
+### Service Layer (`services/`)
+
+Reusable services that support analyzers and data processing
+
+Key Services:
+
+- **Tokenizer Service** (`services/tokenizer/`) - Unicode-aware text tokenization
+  - `AbstractTokenizer` - Base interface for tokenizer implementations
+  - `TokenizerConfig` - Configuration for tokenization behavior
+  - `BasicTokenizer` - Core implementation with multilingual support
+  - `TokenType`, `LanguageFamily` - Type definitions for tokenization
+  - Language detection and social media entity preservation
 
 ## Data Flow Architecture
 

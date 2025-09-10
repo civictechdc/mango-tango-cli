@@ -158,6 +158,87 @@ Base interface for data importers
 - `python -m mangotango` - Standard execution command
 - `python -m mangotango --noop` - No-operation mode for testing
 
+## Service Layer
+
+### Tokenizer Service (`services/tokenizer/`)
+
+Unicode-aware text tokenization with multilingual support and social media entity preservation.
+
+#### Core Interface - `services/tokenizer/core/base.py`
+
+**`AbstractTokenizer` class**
+
+Base interface for all tokenizer implementations:
+
+- `__init__(config: TokenizerConfig = None)` - Initialize with configuration
+- `tokenize(text: str) -> list[str]` - Basic tokenization into token list
+- `tokenize_with_types(text: str) -> dict[str, list[str]]` - Tokenize with type classification
+- `detect_language_family(text: str) -> LanguageFamily` - Detect script/language family
+- `is_space_separated(text: str) -> bool` - Check if text uses space separation
+- `preprocess_text(text: str) -> str` - Apply preprocessing (case, normalization)
+- `postprocess_tokens(tokens: list[str]) -> list[str]` - Filter and clean tokens
+
+#### Configuration Types - `services/tokenizer/core/types.py`
+
+**`TokenizerConfig` dataclass**
+
+Comprehensive tokenization configuration:
+
+- Language detection: `detect_language`, `fallback_language_family`
+- Space handling: `space_type`, `custom_spaces`
+- Token filtering: `include_punctuation`, `include_numeric`, `include_emoji`
+- Text preprocessing: `case_handling`, `normalize_unicode`
+- Social media: `extract_hashtags`, `extract_mentions`, `extract_urls`
+- Output control: `min_token_length`, `max_token_length`, `strip_whitespace`
+
+**Core Enums:**
+
+- `LanguageFamily` - Language script families (LATIN, CJK, ARABIC, MIXED, UNKNOWN)
+- `TokenType` - Token classifications (WORD, HASHTAG, MENTION, URL, EMOJI, etc.)
+- `SpaceType` - Space character handling (WHITESPACE, UNICODE_SPACES, CUSTOM)
+- `CaseHandling` - Case transformation options (PRESERVE, LOWERCASE, UPPERCASE, NORMALIZE)
+
+#### Basic Implementation - `services/tokenizer/basic/tokenizer.py`
+
+**`BasicTokenizer` class**
+
+Core tokenizer implementation with Unicode awareness:
+
+- Multilingual tokenization with automatic language detection
+- Social media entity preservation (hashtags, mentions, URLs)
+- Unicode normalization and proper space handling
+- Configurable preprocessing and postprocessing
+- Support for Latin, CJK, and Arabic script families
+
+#### Language Detection - `services/tokenizer/basic/language_detection.py`
+
+**Core Functions:**
+
+- `detect_language_family(text: str) -> LanguageFamily` - Script-based language detection
+- `is_space_separated(text: str) -> bool` - Check for space-separated languages
+- Character range analysis for script identification
+
+#### Pattern Matching - `services/tokenizer/basic/patterns.py`
+
+**Pattern Functions:**
+
+- `get_patterns(language_family: LanguageFamily) -> dict` - Get tokenization patterns
+- `get_pattern(name: str, language_family: LanguageFamily) -> str` - Get specific pattern
+- Unicode-aware regex patterns for different script families
+
+#### Service API - `services/tokenizer/__init__.py`
+
+**Convenience Functions:**
+
+- `tokenize_text(text: str, config: TokenizerConfig = None) -> list[str]` - Simple tokenization
+- `create_basic_tokenizer(config: TokenizerConfig = None) -> BasicTokenizer` - Factory function
+
+**Public Exports:**
+
+- Core types: `AbstractTokenizer`, `TokenizerConfig`, `TokenType`, `LanguageFamily`
+- Implementation: `BasicTokenizer`
+- Factory functions: `create_basic_tokenizer`, `tokenize_text`
+
 ## Integration Points
 
 ### External Libraries Integration
@@ -191,13 +272,15 @@ Application-wide structured JSON logging with configurable levels and automatic 
 - `get_logger(name: str) -> logging.Logger` - Get logger instance for module
 
 **Features:**
-- Dual handlers: console (ERROR+) and file (INFO+) 
+
+- Dual handlers: console (ERROR+) and file (INFO+)
 - JSON-formatted structured logs with timestamps and context
 - Automatic log rotation (10MB files, 5 backups)
 - CLI-configurable log levels via `--log-level` flag
 - Log location: `~/.local/share/MangoTango/logs/mangotango.log`
 
 **Usage Pattern:**
+
 ```python
 from app.logger import get_logger
 logger = get_logger(__name__)
