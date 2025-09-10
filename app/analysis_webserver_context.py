@@ -100,8 +100,11 @@ class AnalysisWebServerContext(BaseModel):
 
             uvi_server.run()
 
-        except exceptions.CancelledError:
-            print("Shutting down server...")
+        except KeyboardInterrupt:
+            print("test...")
+
+        except Exception as err:
+            print(err)
 
         for temp_dir in temp_dirs:
             temp_dir.cleanup()
