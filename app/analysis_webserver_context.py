@@ -11,7 +11,7 @@ from starlette.applications import Starlette
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
 from uvicorn import Config, Server
-
+from asyncio import exceptions
 from context import WebPresenterContext
 
 from .analysis_context import AnalysisContext
@@ -43,7 +43,8 @@ class AnalysisWebServerContext(BaseModel):
         def index():
             return render_template(
                 "index.html",
-                panels=[(presenter.id, presenter.name) for presenter in web_presenters],
+                panels=[(presenter.id, presenter.name)
+                        for presenter in web_presenters],
                 project_name=project_name,
                 analyzer_name=analyzer_name,
             )
@@ -99,8 +100,8 @@ class AnalysisWebServerContext(BaseModel):
 
             uvi_server.run()
 
-        except KeyboardInterrupt:
-            pass
+        except exceptions.CancelledError:
+            print("Shutting down server...")
 
         except Exception as err:
             print(err)
