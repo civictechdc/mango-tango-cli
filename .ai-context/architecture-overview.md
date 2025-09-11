@@ -84,7 +84,7 @@ Key Services:
   - `TokenizerConfig` - Configuration for tokenization behavior
   - `BasicTokenizer` - Core implementation with multilingual support
   - `TokenType`, `LanguageFamily` - Type definitions for tokenization
-  - Language detection and social media entity preservation
+  - Comprehensive regex patterns and social media entity preservation
 
 ## Data Flow Architecture
 
