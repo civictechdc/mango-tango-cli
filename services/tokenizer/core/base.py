@@ -75,38 +75,6 @@ class AbstractTokenizer(ABC):
         """
         pass
 
-    @abstractmethod
-    def detect_language_family(self, text: str) -> LanguageFamily:
-        """
-        Detect the language family of input text.
-
-        This method should analyze the text and determine which language family
-        it belongs to, which affects tokenization strategy.
-
-        Args:
-            text: Input text to analyze
-
-        Returns:
-            Detected language family
-        """
-        pass
-
-    def is_space_separated(self, text: str) -> bool:
-        """
-        Determine if the text uses space-separated tokens.
-
-        This is a convenience method that uses language detection to determine
-        if the text uses spaces to separate words.
-
-        Args:
-            text: Input text to analyze
-
-        Returns:
-            True if the text appears to use space separation, False otherwise
-        """
-        family = self.detect_language_family(text)
-        return family in (LanguageFamily.LATIN, LanguageFamily.ARABIC)
-
     def preprocess_text(self, text: str) -> str:
         """
         Apply preprocessing to text before tokenization.
@@ -191,29 +159,29 @@ class AbstractTokenizer(ABC):
     def _is_emoji(self, token: str) -> bool:
         """
         Check if a token is an emoji character.
-        
+
         Args:
             token: Token to check
-            
+
         Returns:
             True if the token is an emoji, False otherwise
         """
         if not token:
             return False
-            
+
         # Check if the token consists entirely of emoji characters
         for char in token:
             code_point = ord(char)
             # Check common emoji Unicode ranges
             if not (
-                (0x1F600 <= code_point <= 0x1F64F) or  # Emoticons
-                (0x1F300 <= code_point <= 0x1F5FF) or  # Misc Symbols
-                (0x1F680 <= code_point <= 0x1F6FF) or  # Transport
-                (0x1F1E0 <= code_point <= 0x1F1FF) or  # Flags
-                (0x2700 <= code_point <= 0x27BF) or    # Dingbats
-                (0x1F900 <= code_point <= 0x1F9FF) or  # Supplemental Symbols
-                (0x2600 <= code_point <= 0x26FF)       # Misc symbols
+                (0x1F600 <= code_point <= 0x1F64F)  # Emoticons
+                or (0x1F300 <= code_point <= 0x1F5FF)  # Misc Symbols
+                or (0x1F680 <= code_point <= 0x1F6FF)  # Transport
+                or (0x1F1E0 <= code_point <= 0x1F1FF)  # Flags
+                or (0x2700 <= code_point <= 0x27BF)  # Dingbats
+                or (0x1F900 <= code_point <= 0x1F9FF)  # Supplemental Symbols
+                or (0x2600 <= code_point <= 0x26FF)  # Misc symbols
             ):
                 return False
-        
+
         return True
