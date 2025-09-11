@@ -66,7 +66,7 @@ class TokenizerConfig:
     # Token type filtering
     include_punctuation: bool = False
     include_numeric: bool = True
-    include_emoji: bool = True
+    include_emoji: bool = False
     include_whitespace: bool = False
 
     # Text preprocessing

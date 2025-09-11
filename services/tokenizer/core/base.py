@@ -170,6 +170,10 @@ class AbstractTokenizer(ABC):
             if not token:
                 continue
 
+            # Filter emojis if not included
+            if not self._config.include_emoji and self._is_emoji(token):
+                continue
+
             # Apply length filtering
             if len(token) < self._config.min_token_length:
                 continue
@@ -183,3 +187,33 @@ class AbstractTokenizer(ABC):
             processed_tokens.append(token)
 
         return processed_tokens
+
+    def _is_emoji(self, token: str) -> bool:
+        """
+        Check if a token is an emoji character.
+        
+        Args:
+            token: Token to check
+            
+        Returns:
+            True if the token is an emoji, False otherwise
+        """
+        if not token:
+            return False
+            
+        # Check if the token consists entirely of emoji characters
+        for char in token:
+            code_point = ord(char)
+            # Check common emoji Unicode ranges
+            if not (
+                (0x1F600 <= code_point <= 0x1F64F) or  # Emoticons
+                (0x1F300 <= code_point <= 0x1F5FF) or  # Misc Symbols
+                (0x1F680 <= code_point <= 0x1F6FF) or  # Transport
+                (0x1F1E0 <= code_point <= 0x1F1FF) or  # Flags
+                (0x2700 <= code_point <= 0x27BF) or    # Dingbats
+                (0x1F900 <= code_point <= 0x1F9FF) or  # Supplemental Symbols
+                (0x2600 <= code_point <= 0x26FF)       # Misc symbols
+            ):
+                return False
+        
+        return True

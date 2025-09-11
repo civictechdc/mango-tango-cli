@@ -81,8 +81,8 @@ class TokenizerPatterns:
         email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
         # Social media mentions and hashtags
-        mention_pattern = r'@\w+'
-        hashtag_pattern = r'#\w+'
+        mention_pattern = r'@[A-Za-z0-9_]+'
+        hashtag_pattern = r'#[A-Za-z0-9_]+'
 
         # Numeric patterns (including decimals, percentages, etc.)
         numeric_pattern = (

@@ -119,31 +119,16 @@ class BasicTokenizer(AbstractTokenizer):
     def _extract_tokens(self, text: str, language_family: LanguageFamily) -> TokenList:
         """
         Extract tokens using the appropriate strategy for the language family.
+        Preserves the original order of tokens as they appear in the input text.
 
         Args:
             text: Preprocessed text to tokenize
             language_family: Detected language family
 
         Returns:
-            List of extracted tokens
+            List of extracted tokens in their original order
         """
-        tokens = []
-
-        # First, extract and preserve social media entities
-        social_entities, cleaned_text = self._extract_social_entities(text)
-        tokens.extend(social_entities)
-
-        # Apply language-specific tokenization to remaining text
-        if language_family == LanguageFamily.CJK:
-            tokens.extend(self._tokenize_cjk(cleaned_text))
-        elif language_family == LanguageFamily.ARABIC:
-            tokens.extend(self._tokenize_arabic(cleaned_text))
-        elif language_family == LanguageFamily.MIXED:
-            tokens.extend(self._tokenize_mixed_script(cleaned_text))
-        else:  # LATIN or UNKNOWN
-            tokens.extend(self._tokenize_latin(cleaned_text))
-
-        return tokens
+        return self._extract_tokens_ordered(text, language_family)
 
     def _extract_and_classify_tokens(self, text: str) -> Dict[TokenType, TokenList]:
         """
@@ -344,7 +329,11 @@ class BasicTokenizer(AbstractTokenizer):
         for char in text:
             if char.isspace():
                 if current_token:
-                    tokens.append(current_token)
+                    # For mixed script, break down CJK tokens character-by-character
+                    if current_script == "cjk":
+                        tokens.extend(list(current_token))
+                    else:
+                        tokens.append(current_token)
                     current_token = ""
                     current_script = None
             else:
@@ -358,13 +347,21 @@ class BasicTokenizer(AbstractTokenizer):
                 else:
                     # Script change - start new token
                     if current_token:
-                        tokens.append(current_token)
+                        # For mixed script, break down CJK tokens character-by-character
+                        if current_script == "cjk":
+                            tokens.extend(list(current_token))
+                        else:
+                            tokens.append(current_token)
                     current_token = char
                     current_script = char_script
 
         # Add final token
         if current_token:
-            tokens.append(current_token)
+            # For mixed script, break down CJK tokens character-by-character
+            if current_script == "cjk":
+                tokens.extend(list(current_token))
+            else:
+                tokens.append(current_token)
 
         return [token for token in tokens if token.strip()]
 
@@ -434,3 +431,200 @@ class BasicTokenizer(AbstractTokenizer):
         
         else:
             return "other"
+
+    def _extract_tokens_ordered(self, text: str, language_family: LanguageFamily) -> TokenList:
+        """
+        Extract tokens preserving their original order in the text.
+        
+        Uses a position-based approach to maintain the relative order of
+        social entities and regular text tokens.
+
+        Args:
+            text: Preprocessed text to tokenize
+            language_family: Detected language family for the full text
+
+        Returns:
+            List of extracted tokens in their original order
+        """
+        # Find all social entities with their positions
+        social_matches = list(self._find_social_entities_with_positions(text))
+        
+        # Create ordered segments (text segments + social entities)
+        segments = self._create_ordered_segments(text, social_matches)
+        
+        # Process segments and merge in order
+        tokens = []
+        for segment_type, content, position in segments:
+            if segment_type == 'entity':
+                tokens.append(content)
+            else:
+                # Detect language family per segment for more accurate tokenization
+                segment_language_family = self.detect_language_family(content)
+                segment_tokens = self._tokenize_by_language(content, segment_language_family)
+                tokens.extend(segment_tokens)
+        
+        return tokens
+
+    def _find_social_entities_with_positions(self, text: str):
+        """
+        Find all social media entities with their positions in the text.
+        
+        Yields tuples of (start_pos, end_pos, entity_text, entity_type).
+        
+        Args:
+            text: Input text to scan for entities
+            
+        Yields:
+            Tuples of (start_pos, end_pos, entity_text, entity_type)
+        """
+        # Import regex module (using the same pattern as patterns.py)
+        try:
+            import regex
+            regex_module = regex
+        except ImportError:
+            import re
+            regex_module = re
+            
+        # Define entity types and their patterns in order of precedence
+        entity_configs = []
+        
+        if self._config.extract_urls:
+            entity_configs.append(('url', 'url'))
+        if self._config.extract_emails:
+            entity_configs.append(('email', 'email'))
+        if self._config.extract_mentions:
+            entity_configs.append(('mention', 'mention'))
+        if self._config.extract_hashtags:
+            entity_configs.append(('hashtag', 'hashtag'))
+            
+        # Find all matches for each entity type
+        all_matches = []
+        for entity_type, pattern_name in entity_configs:
+            pattern = self._patterns.get_pattern(pattern_name)
+            for match in pattern.finditer(text):
+                match_text = match.group()
+                start = match.start()
+                end = match.end()
+                
+                # Post-process URLs to strip trailing punctuation that shouldn't be part of the URL
+                if entity_type == 'url':
+                    match_text, end = self._clean_url_punctuation(match_text, start, end)
+                
+                all_matches.append((start, end, match_text, entity_type))
+        
+        # Sort by position and resolve overlaps
+        all_matches.sort(key=lambda x: (x[0], -x[1]))  # Sort by start position, then by length (longest first)
+        
+        # Remove overlapping matches (keep the first one found at each position)
+        resolved_matches = []
+        last_end = 0
+        for start, end, match_text, entity_type in all_matches:
+            if start >= last_end:  # No overlap with previous match
+                resolved_matches.append((start, end, match_text, entity_type))
+                last_end = end
+                
+        return resolved_matches
+
+    def _create_ordered_segments(self, text: str, social_matches):
+        """
+        Create ordered segments alternating between text and social entities.
+        
+        Args:
+            text: Original input text
+            social_matches: List of (start_pos, end_pos, entity_text, entity_type) tuples
+            
+        Returns:
+            List of (segment_type, content, position) tuples in order
+        """
+        segments = []
+        current_pos = 0
+        
+        for start, end, entity_text, entity_type in social_matches:
+            # Add text segment before the entity (if any)
+            if start > current_pos:
+                text_segment = text[current_pos:start]
+                if self._is_meaningful_text_segment(text_segment):
+                    segments.append(('text', text_segment, current_pos))
+            
+            # Add the entity
+            segments.append(('entity', entity_text, start))
+            current_pos = end
+        
+        # Add any remaining text after the last entity
+        if current_pos < len(text):
+            remaining_text = text[current_pos:]
+            if self._is_meaningful_text_segment(remaining_text):
+                segments.append(('text', remaining_text, current_pos))
+        
+        return segments
+
+    def _tokenize_by_language(self, text: str, language_family: LanguageFamily) -> TokenList:
+        """
+        Apply language-specific tokenization to a text segment.
+        
+        Args:
+            text: Text segment to tokenize
+            language_family: Detected language family
+            
+        Returns:
+            List of tokens from the text segment
+        """
+        if language_family == LanguageFamily.CJK:
+            return self._tokenize_cjk(text)
+        elif language_family == LanguageFamily.ARABIC:
+            return self._tokenize_arabic(text)
+        elif language_family == LanguageFamily.MIXED:
+            return self._tokenize_mixed_script(text)
+        else:  # LATIN or UNKNOWN
+            return self._tokenize_latin(text)
+
+    def _clean_url_punctuation(self, url_text: str, start: int, end: int) -> tuple[str, int]:
+        """
+        Clean trailing punctuation from URLs that shouldn't be part of the URL.
+        
+        Args:
+            url_text: The matched URL text
+            start: Start position of the match
+            end: End position of the match
+            
+        Returns:
+            Tuple of (cleaned_url_text, new_end_position)
+        """
+        # Common punctuation that often appears after URLs but shouldn't be part of them
+        trailing_punctuation = '.!?;:,)]}"\''
+        
+        # Strip trailing punctuation
+        cleaned_url = url_text.rstrip(trailing_punctuation)
+        
+        # Calculate new end position
+        new_end = start + len(cleaned_url)
+        
+        return cleaned_url, new_end
+
+    def _is_meaningful_text_segment(self, text_segment: str) -> bool:
+        """
+        Check if a text segment contains meaningful content that should be tokenized.
+        
+        Args:
+            text_segment: The text segment to check
+            
+        Returns:
+            True if the segment contains meaningful content, False otherwise
+        """
+        # Strip whitespace
+        stripped = text_segment.strip()
+        
+        # Empty segments are not meaningful
+        if not stripped:
+            return False
+        
+        # If the configuration includes punctuation, keep all segments
+        if self._config.include_punctuation:
+            return True
+        
+        # Check if the segment contains any non-punctuation characters
+        punctuation_chars = '.!?;:,()[]{}"\'-'
+        has_non_punctuation = any(char not in punctuation_chars and not char.isspace() 
+                                  for char in stripped)
+        
+        return has_non_punctuation

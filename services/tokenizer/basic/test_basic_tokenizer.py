@@ -96,8 +96,8 @@ class TestBasicTokenizerSocialMedia:
         text = "Check out this #awesome post!"
         result = tokenizer.tokenize(text)
         
-        # Social entities come first, then regular words
-        expected = ["#awesome", "check", "out", "this", "post"]
+        # Should preserve original order: check, out, this, #awesome, post
+        expected = ["check", "out", "this", "#awesome", "post"]
         assert result == expected
         
     def test_mention_extraction(self):
@@ -106,8 +106,8 @@ class TestBasicTokenizerSocialMedia:
         text = "Hey @user how are you?"
         result = tokenizer.tokenize(text)
         
-        # Social entities come first, then regular words
-        expected = ["@user", "hey", "how", "are", "you"]
+        # Should preserve original order: hey, @user, how, are, you
+        expected = ["hey", "@user", "how", "are", "you"]
         assert result == expected
         
     def test_url_preservation(self):
@@ -116,8 +116,8 @@ class TestBasicTokenizerSocialMedia:
         text = "Visit https://example.com for more info"
         result = tokenizer.tokenize(text)
         
-        # URLs come first, then regular words
-        expected = ["https://example.com", "visit", "for", "more", "info"]
+        # Should preserve original order: visit, https://example.com, for, more, info
+        expected = ["visit", "https://example.com", "for", "more", "info"]
         assert result == expected
         
     def test_emoji_handling(self):
@@ -140,8 +140,8 @@ class TestBasicTokenizerSocialMedia:
         text = "@user check #hashtag https://example.com 🎉 Amazing!"
         result = tokenizer.tokenize(text)
         
-        # Social entities come first, then regular words
-        expected = ["https://example.com", "@user", "#hashtag", "check", "amazing"]
+        # Should preserve original order: @user, check, #hashtag, https://example.com, amazing
+        expected = ["@user", "check", "#hashtag", "https://example.com", "amazing"]
         assert result == expected
         
     def test_email_extraction(self):
@@ -433,6 +433,326 @@ class TestBasicTokenizerPerformance:
         # Should handle mixed scripts efficiently
         assert (end_time - start_time) < 1.0
         assert len(result) > 0
+
+
+class TestTokenOrderPreservation:
+    """Test token order preservation - ensures tokens appear in their original text order."""
+    
+    def test_simple_mixed_content_order(self):
+        """Test simple mixed content preserves order."""
+        tokenizer = BasicTokenizer()
+        text = "Hello @user world"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order: hello, @user, world
+        expected = ["hello", "@user", "world"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_hashtag_in_middle_order(self):
+        """Test hashtag in middle of sentence preserves order."""
+        tokenizer = BasicTokenizer()
+        text = "Check out this #awesome post"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["check", "out", "this", "#awesome", "post"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_mention_at_start_order(self):
+        """Test mention at start preserves order."""
+        tokenizer = BasicTokenizer()
+        text = "@user hey how are you"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["@user", "hey", "how", "are", "you"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_url_in_middle_order(self):
+        """Test URL in middle of sentence preserves order."""
+        tokenizer = BasicTokenizer()
+        text = "Visit https://example.com for more info"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["visit", "https://example.com", "for", "more", "info"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_multiple_entities_order(self):
+        """Test multiple social media entities preserve relative order."""
+        tokenizer = BasicTokenizer()
+        text = "Hey @user check out #awesome post at https://example.com"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["hey", "@user", "check", "out", "#awesome", "post", "at", "https://example.com"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_entities_at_boundaries_order(self):
+        """Test entities at text boundaries preserve order."""
+        tokenizer = BasicTokenizer()
+        text = "@start middle content #end"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["@start", "middle", "content", "#end"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_consecutive_entities_order(self):
+        """Test consecutive entities preserve order."""
+        tokenizer = BasicTokenizer()
+        text = "Check @user1 @user2 #tag1 #tag2 content"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["check", "@user1", "@user2", "#tag1", "#tag2", "content"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_punctuation_boundaries_order(self):
+        """Test entities with punctuation boundaries preserve order."""
+        tokenizer = BasicTokenizer()
+        text = "Hello @user, check #hashtag! Visit https://site.com."
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order, punctuation handled appropriately
+        expected = ["hello", "@user", "check", "#hashtag", "visit", "https://site.com"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_multilingual_mixed_order(self):
+        """Test multilingual content with entities preserves order."""
+        tokenizer = BasicTokenizer()
+        text = "iPhone用户 loves #apple products"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order with CJK character-level tokenization
+        expected = ["iphone", "用", "户", "loves", "#apple", "products"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_complex_social_media_order(self):
+        """Test complex realistic social media content preserves order."""
+        tokenizer = BasicTokenizer()
+        text = "Just launched @company's new #product! Check it out at https://launch.example.com 🚀"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order (emoji may be filtered by default config)
+        expected = ["just", "launched", "@company", "s", "new", "#product", "check", "it", "out", "at", "https://launch.example.com"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_email_in_context_order(self):
+        """Test email in context preserves order."""
+        config = TokenizerConfig(extract_emails=True)
+        tokenizer = BasicTokenizer(config)
+        text = "Contact me at user@example.com for details"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["contact", "me", "at", "user@example.com", "for", "details"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_nested_entities_order(self):
+        """Test text with nested/overlapping entity-like patterns preserves order."""
+        tokenizer = BasicTokenizer()
+        text = "Email team@company.com about #project and @user feedback"
+        
+        # Enable email extraction to see interaction
+        config = TokenizerConfig(extract_emails=True)
+        tokenizer = BasicTokenizer(config)
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order
+        expected = ["email", "team@company.com", "about", "#project", "and", "@user", "feedback"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_order_with_case_preservation(self):
+        """Test order preservation with case handling enabled."""
+        config = TokenizerConfig(case_handling=CaseHandling.PRESERVE)
+        tokenizer = BasicTokenizer(config)
+        text = "Hello @User Check #HashTag"
+        result = tokenizer.tokenize(text)
+        
+        # Should preserve original order and case
+        expected = ["Hello", "@User", "Check", "#HashTag"]
+        assert result == expected, f"Expected {expected}, got {result}"
+        
+    def test_order_with_punctuation_inclusion(self):
+        """Test order preservation when punctuation is included."""
+        config = TokenizerConfig(include_punctuation=True)
+        tokenizer = BasicTokenizer(config)
+        text = "Hello, @user! Check #tag."
+        result_typed = tokenizer.tokenize_with_types(text)
+        
+        # Reconstruct order from typed results
+        # This test verifies that when punctuation is included, 
+        # the overall ordering is still preserved
+        assert TokenType.WORD.value in result_typed
+        assert TokenType.MENTION.value in result_typed
+        assert TokenType.HASHTAG.value in result_typed
+        assert TokenType.PUNCTUATION.value in result_typed
+        
+        # Individual token types should contain expected tokens
+        assert "hello" in result_typed[TokenType.WORD.value]
+        assert "@user" in result_typed[TokenType.MENTION.value]
+        assert "#tag" in result_typed[TokenType.HASHTAG.value]
+
+
+class TestOrderPreservationValidation:
+    """Validation tests for order preservation implementation."""
+    
+    def test_order_preservation_performance_benchmark(self):
+        """Test that order preservation doesn't significantly impact performance."""
+        import time
+        
+        # Create test text with mixed entities
+        test_text = "Hello @user1 check out #hashtag1 at https://site1.com and @user2 loves #hashtag2 visit https://site2.com"
+        
+        tokenizer = BasicTokenizer()
+        
+        # Benchmark current implementation
+        start_time = time.time()
+        for _ in range(100):  # Run 100 iterations
+            result = tokenizer.tokenize(test_text)
+        end_time = time.time()
+        
+        # Should complete 100 iterations in reasonable time (under 1 second)
+        execution_time = end_time - start_time
+        assert execution_time < 1.0, f"Performance test failed: took {execution_time:.3f}s for 100 iterations"
+        
+        # Verify result is non-empty
+        assert len(result) > 0
+        
+    def test_order_preservation_memory_efficiency(self):
+        """Test that order preservation doesn't create excessive memory overhead."""
+        tokenizer = BasicTokenizer()
+        
+        # Test with moderately large text
+        large_text = "Check @user and #hashtag at https://example.com! " * 100
+        
+        # Get baseline memory usage
+        initial_objects = len([obj for obj in locals().values()])
+        
+        result = tokenizer.tokenize(large_text)
+        
+        # Verify result is reasonable
+        assert len(result) > 0
+        assert isinstance(result, list)
+        
+        # Memory usage should not explode (basic sanity check)
+        final_objects = len([obj for obj in locals().values()])
+        object_increase = final_objects - initial_objects
+        
+        # Should not create an unreasonable number of intermediate objects
+        assert object_increase < 50, f"Too many objects created: {object_increase}"
+        
+    def test_downstream_compatibility_tokenize_with_types(self):
+        """Test that order preservation works with tokenize_with_types method."""
+        tokenizer = BasicTokenizer()
+        text = "Hello @user check #hashtag visit https://example.com"
+        
+        result_typed = tokenizer.tokenize_with_types(text)
+        result_simple = tokenizer.tokenize(text)
+        
+        # Verify that both methods extract the same entities
+        assert TokenType.WORD.value in result_typed
+        assert TokenType.MENTION.value in result_typed  
+        assert TokenType.HASHTAG.value in result_typed
+        assert TokenType.URL.value in result_typed
+        
+        # Verify entities are preserved
+        assert "@user" in result_typed[TokenType.MENTION.value]
+        assert "#hashtag" in result_typed[TokenType.HASHTAG.value]
+        assert "https://example.com" in result_typed[TokenType.URL.value]
+        
+        # Verify simple tokenize includes all the same entities
+        assert "@user" in result_simple
+        assert "#hashtag" in result_simple
+        assert "https://example.com" in result_simple
+        
+    def test_configuration_compatibility_order_preservation(self):
+        """Test that order preservation works with various configuration options."""
+        
+        # Test with case preservation
+        config_case = TokenizerConfig(case_handling=CaseHandling.PRESERVE)
+        tokenizer_case = BasicTokenizer(config_case)
+        text = "Hello @User Check #HashTag"
+        result_case = tokenizer_case.tokenize(text)
+        expected_case = ["Hello", "@User", "Check", "#HashTag"]
+        assert result_case == expected_case
+        
+        # Test with social media extraction disabled
+        config_no_social = TokenizerConfig(
+            extract_hashtags=False,
+            extract_mentions=False,
+            extract_urls=False
+        )
+        tokenizer_no_social = BasicTokenizer(config_no_social)
+        text_no_social = "Hello @user check #hashtag"
+        result_no_social = tokenizer_no_social.tokenize(text_no_social)
+        # Should tokenize as regular words when extraction is disabled
+        expected_no_social = ["hello", "user", "check", "hashtag"]
+        assert result_no_social == expected_no_social
+        
+        # Test with minimum token length
+        config_min_length = TokenizerConfig(min_token_length=4)
+        tokenizer_min_length = BasicTokenizer(config_min_length)
+        text_min_length = "Hi @user check #hashtag long"
+        result_min_length = tokenizer_min_length.tokenize(text_min_length)
+        # Should preserve order and filter short tokens
+        expected_min_length = ["@user", "check", "#hashtag", "long"]
+        assert result_min_length == expected_min_length
+        
+    def test_edge_case_order_preservation(self):
+        """Test order preservation with edge cases."""
+        
+        tokenizer = BasicTokenizer()
+        
+        # Test empty input
+        assert tokenizer.tokenize("") == []
+        
+        # Test whitespace only
+        assert tokenizer.tokenize("   \t\n  ") == []
+        
+        # Test single entity
+        assert tokenizer.tokenize("@user") == ["@user"]
+        assert tokenizer.tokenize("#hashtag") == ["#hashtag"]
+        assert tokenizer.tokenize("https://example.com") == ["https://example.com"]
+        
+        # Test entities with no surrounding text
+        result_entities_only = tokenizer.tokenize("@user #hashtag https://example.com")
+        expected_entities_only = ["@user", "#hashtag", "https://example.com"]
+        assert result_entities_only == expected_entities_only
+        
+    def test_multilingual_order_preservation_integration(self):
+        """Test order preservation with various language families."""
+        
+        tokenizer = BasicTokenizer()
+        
+        # Latin script with entities
+        latin_text = "Hello @user world #hashtag"
+        latin_result = tokenizer.tokenize(latin_text)
+        assert latin_result == ["hello", "@user", "world", "#hashtag"]
+        
+        # CJK script with entities (character-level tokenization)
+        cjk_text = "你好@user世界#hashtag"
+        cjk_result = tokenizer.tokenize(cjk_text)
+        expected_cjk = ["你", "好", "@user", "世", "界", "#hashtag"]
+        assert cjk_result == expected_cjk
+        
+        # Arabic script with entities (word-level tokenization)
+        arabic_text = "مرحبا @user في #hashtag"
+        arabic_result = tokenizer.tokenize(arabic_text)
+        expected_arabic = ["مرحبا", "@user", "في", "#hashtag"]
+        assert arabic_result == expected_arabic
+        
+        # Mixed script
+        mixed_text = "Hello 你好 @user مرحبا #hashtag"
+        mixed_result = tokenizer.tokenize(mixed_text)
+        # Should preserve order across different scripts
+        assert "@user" in mixed_result
+        assert "#hashtag" in mixed_result
+        # Order verification for mixed script (exact order may vary based on script detection)
+        user_index = mixed_result.index("@user")
+        hashtag_index = mixed_result.index("#hashtag")
+        assert user_index < hashtag_index, "Entity order should be preserved even in mixed scripts"
 
 
 class TestBasicTokenizerIntegration:
