@@ -469,50 +469,51 @@ class BasicTokenizer(AbstractTokenizer):
         """
         Find all social media entities with their positions in the text.
         
-        Yields tuples of (start_pos, end_pos, entity_text, entity_type).
+        Optimized implementation using combined regex pattern for single-pass detection.
         
         Args:
             text: Input text to scan for entities
             
-        Yields:
-            Tuples of (start_pos, end_pos, entity_text, entity_type)
+        Returns:
+            List of tuples (start_pos, end_pos, entity_text, entity_type)
         """
-        # Import regex module (using the same pattern as patterns.py)
-        try:
-            import regex
-            regex_module = regex
-        except ImportError:
-            import re
-            regex_module = re
-            
-        # Define entity types and their patterns in order of precedence
-        entity_configs = []
+        # Check if any entity extraction is enabled
+        if not any([self._config.extract_urls, self._config.extract_emails, 
+                   self._config.extract_mentions, self._config.extract_hashtags]):
+            return []
         
-        if self._config.extract_urls:
-            entity_configs.append(('url', 'url'))
-        if self._config.extract_emails:
-            entity_configs.append(('email', 'email'))
-        if self._config.extract_mentions:
-            entity_configs.append(('mention', 'mention'))
-        if self._config.extract_hashtags:
-            entity_configs.append(('hashtag', 'hashtag'))
-            
-        # Find all matches for each entity type
+        # Get the combined pattern for single-pass detection
+        combined_pattern = self._patterns.get_combined_social_entities_pattern()
+        
+        # Find all matches in a single pass
         all_matches = []
-        for entity_type, pattern_name in entity_configs:
-            pattern = self._patterns.get_pattern(pattern_name)
-            for match in pattern.finditer(text):
-                match_text = match.group()
-                start = match.start()
-                end = match.end()
-                
-                # Post-process URLs to strip trailing punctuation that shouldn't be part of the URL
-                if entity_type == 'url':
-                    match_text, end = self._clean_url_punctuation(match_text, start, end)
-                
-                all_matches.append((start, end, match_text, entity_type))
+        for match in combined_pattern.finditer(text):
+            # Use match.lastgroup to identify which named group matched
+            entity_type = match.lastgroup
+            
+            # Skip if this entity type is disabled in config
+            if entity_type == 'url' and not self._config.extract_urls:
+                continue
+            elif entity_type == 'email' and not self._config.extract_emails:
+                continue  
+            elif entity_type == 'mention' and not self._config.extract_mentions:
+                continue
+            elif entity_type == 'hashtag' and not self._config.extract_hashtags:
+                continue
+            
+            match_text = match.group()
+            start = match.start()
+            end = match.end()
+            
+            # Post-process URLs to strip trailing punctuation that shouldn't be part of the URL
+            if entity_type == 'url':
+                match_text, end = self._clean_url_punctuation(match_text, start, end)
+            
+            all_matches.append((start, end, match_text, entity_type))
         
         # Sort by position and resolve overlaps
+        # Note: With combined pattern, overlaps should be minimal, but we maintain this logic
+        # for consistency and edge cases
         all_matches.sort(key=lambda x: (x[0], -x[1]))  # Sort by start position, then by length (longest first)
         
         # Remove overlapping matches (keep the first one found at each position)

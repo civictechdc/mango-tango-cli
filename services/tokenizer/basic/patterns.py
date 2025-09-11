@@ -61,6 +61,10 @@ class TokenizerPatterns:
         """Get the CJK character tokenization pattern."""
         return self.get_pattern("cjk_chars")
 
+    def get_combined_social_entities_pattern(self) -> Any:
+        """Get the combined social media entities pattern for single-pass detection."""
+        return self.get_pattern("combined_social_entities")
+
     def list_patterns(self) -> List[str]:
         """Get list of available pattern names."""
         return list(self._patterns.keys())
@@ -151,6 +155,14 @@ class TokenizerPatterns:
         # Word boundary pattern for space-separated languages
         word_boundary_pattern = r'\S+'
 
+        # Combined social media entity pattern with named groups for single-pass detection
+        combined_social_entities_pattern = (
+            f'(?P<url>{url_pattern})|'
+            f'(?P<email>{email_pattern})|'
+            f'(?P<mention>{mention_pattern})|'
+            f'(?P<hashtag>{hashtag_pattern})'
+        )
+
         # Compile patterns with fallback handling
         patterns_to_compile = {
             'url': url_pattern,
@@ -166,6 +178,7 @@ class TokenizerPatterns:
             'punctuation': punctuation_pattern,
             'social_media': social_media_pattern,
             'word_boundary': word_boundary_pattern,
+            'combined_social_entities': combined_social_entities_pattern,
         }
 
         for name, pattern in patterns_to_compile.items():
