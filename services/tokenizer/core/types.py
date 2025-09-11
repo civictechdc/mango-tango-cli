@@ -56,8 +56,8 @@ class TokenizerConfig:
     """Configuration for tokenizer behavior."""
 
     # Language detection settings
-    detect_language: bool = True
-    fallback_language_family: LanguageFamily = LanguageFamily.LATIN
+    detect_language: bool = False
+    fallback_language_family: LanguageFamily = LanguageFamily.MIXED
 
     # Token type filtering
     include_punctuation: bool = False
