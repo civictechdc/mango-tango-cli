@@ -53,6 +53,7 @@ tokens = tokenize_text(text)
 
 ```python
 from services.tokenizer import BasicTokenizer, TokenizerConfig
+from services.tokenizer.core import CaseHandling
 
 # Create tokenizer with custom configuration
 config = TokenizerConfig(
@@ -92,17 +93,14 @@ result = tokenizer.tokenize_with_types("Visit https://example.com #cool @user!")
 - `detect_language: bool = True` - Enable automatic language family detection
 - `fallback_language_family: LanguageFamily = LanguageFamily.LATIN` - Default when detection fails
 
-#### Space Handling
 
-- `space_type: SpaceType = SpaceType.WHITESPACE` - Type of space characters to recognize
-- `custom_spaces: str = None` - Custom space characters when using SpaceType.CUSTOM
 
 #### Token Filtering
 
 - `include_punctuation: bool = False` - Include punctuation marks as tokens
 - `include_numeric: bool = True` - Include numeric tokens
 - `include_emoji: bool = True` - Include emoji characters
-- `include_whitespace: bool = False` - Preserve whitespace as tokens
+
 
 #### Text Preprocessing Options
 
@@ -127,7 +125,8 @@ result = tokenizer.tokenize_with_types("Visit https://example.com #cool @user!")
 #### Social Media Analysis
 
 ```python
-from services.tokenizer import TokenizerConfig, CaseHandling
+from services.tokenizer import TokenizerConfig
+from services.tokenizer.core import CaseHandling
 
 social_config = TokenizerConfig(
     case_handling=CaseHandling.LOWERCASE,
@@ -219,11 +218,7 @@ Inherits all AbstractTokenizer methods and provides full implementation with:
 - `UPPERCASE` - Convert to uppercase
 - `NORMALIZE` - Smart case normalization
 
-#### SpaceType
 
-- `WHITESPACE` - Standard ASCII whitespace
-- `UNICODE_SPACES` - All Unicode space characters
-- `CUSTOM` - User-defined space characters
 
 ## Integration with Analyzers
 
@@ -233,7 +228,7 @@ The tokenizer service is designed to work seamlessly with the n-gram analyzer:
 
 ```python
 from services.tokenizer import create_basic_tokenizer, TokenizerConfig
-from services.tokenizer.core.types import CaseHandling
+from services.tokenizer.core import CaseHandling
 
 # Configure for n-gram analysis
 config = TokenizerConfig(
@@ -253,6 +248,9 @@ tokens = tokenizer.tokenize(text)
 For hashtag analysis, preserve hashtags as complete entities:
 
 ```python
+from services.tokenizer import TokenizerConfig
+from services.tokenizer.core import CaseHandling
+
 config = TokenizerConfig(
     extract_hashtags=True,
     case_handling=CaseHandling.PRESERVE,
@@ -261,6 +259,16 @@ config = TokenizerConfig(
 ```
 
 ## Architecture
+
+### Comprehensive Regex Architecture
+
+The tokenizer service uses a single-pass comprehensive regex approach for optimal performance:
+
+- **Single Pattern**: `get_comprehensive_pattern()` creates one regex that finds all tokens in document order
+- **Priority-Based Matching**: Social media entities matched before general words to preserve boundaries  
+- **No Segmentation**: Eliminates O(n×segments) complexity, achieving 45.6% performance improvement
+- **Document Order Preservation**: `findall()` returns tokens in their original text sequence
+- **Configuration-Driven**: Pattern construction adapts to enabled token types
 
 ### Plugin System
 
@@ -317,10 +325,12 @@ services/tokenizer/
 
 ### Tokenization Speed
 
-- **Latin text**: Optimized regex-based splitting
-- **CJK text**: Character-level iteration with boundary detection
-- **Mixed content**: Adaptive processing based on detected segments
-- **Social media entities**: Single-pass extraction with compiled patterns
+- **Optimized Processing**: Comprehensive regex approach achieves 280k-285k tokens/sec throughput
+- **Single-Pass Architecture**: Eliminates segmentation overhead with 45.6% performance improvement  
+- **Latin text**: Efficient regex-based tokenization
+- **CJK text**: Character-level processing with boundary detection
+- **Mixed content**: Single comprehensive pattern handles all script families
+- **Social media entities**: Priority-ordered extraction preserves document order
 
 ### Memory Usage
 

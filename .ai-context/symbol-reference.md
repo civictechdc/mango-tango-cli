@@ -185,17 +185,15 @@ Base interface for all tokenizer implementations:
 Comprehensive tokenization configuration:
 
 - Language detection: `detect_language`, `fallback_language_family`
-- Space handling: `space_type`, `custom_spaces`
 - Token filtering: `include_punctuation`, `include_numeric`, `include_emoji`
 - Text preprocessing: `case_handling`, `normalize_unicode`
-- Social media: `extract_hashtags`, `extract_mentions`, `extract_urls`
+- Social media: `extract_hashtags`, `extract_mentions`, `extract_urls`, `extract_emails`
 - Output control: `min_token_length`, `max_token_length`, `strip_whitespace`
 
 **Core Enums:**
 
 - `LanguageFamily` - Language script families (LATIN, CJK, ARABIC, MIXED, UNKNOWN)
 - `TokenType` - Token classifications (WORD, HASHTAG, MENTION, URL, EMOJI, etc.)
-- `SpaceType` - Space character handling (WHITESPACE, UNICODE_SPACES, CUSTOM)
 - `CaseHandling` - Case transformation options (PRESERVE, LOWERCASE, UPPERCASE, NORMALIZE)
 
 #### Basic Implementation - `services/tokenizer/basic/tokenizer.py`
@@ -224,6 +222,7 @@ Core tokenizer implementation with Unicode awareness:
 
 - `get_patterns(language_family: LanguageFamily) -> dict` - Get tokenization patterns
 - `get_pattern(name: str, language_family: LanguageFamily) -> str` - Get specific pattern
+- `get_comprehensive_pattern(config: TokenizerConfig) -> Pattern` - Build single comprehensive regex for all token types
 - Unicode-aware regex patterns for different script families
 
 #### Service API - `services/tokenizer/__init__.py`
