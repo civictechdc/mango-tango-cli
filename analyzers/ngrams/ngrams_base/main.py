@@ -31,7 +31,6 @@ def main(context: PrimaryAnalyzerContext):
 
     # Configure tokenizer for social media text processing
     tokenizer_config = TokenizerConfig(
-        detect_language=True,
         case_handling=CaseHandling.LOWERCASE,
         normalize_unicode=True,
         extract_hashtags=True,

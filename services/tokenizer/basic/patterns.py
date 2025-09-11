@@ -50,21 +50,7 @@ class TokenizerPatterns:
             raise KeyError(f"Pattern '{pattern_name}' not found")
         return self._patterns[pattern_name]
 
-    def get_social_media_pattern(self) -> Any:
-        """Get the main social media tokenization pattern."""
-        return self.get_pattern("social_media")
 
-    def get_word_boundary_pattern(self) -> Any:
-        """Get the word boundary pattern for space-separated languages."""
-        return self.get_pattern("word_boundary")
-
-    def get_cjk_pattern(self) -> Any:
-        """Get the CJK character tokenization pattern."""
-        return self.get_pattern("cjk_chars")
-
-    def get_combined_social_entities_pattern(self) -> Any:
-        """Get the combined social media entities pattern for single-pass detection."""
-        return self.get_pattern("combined_social_entities")
 
     def get_comprehensive_pattern(self, config) -> Any:
         """
@@ -288,17 +274,7 @@ def get_patterns() -> TokenizerPatterns:
     return _global_patterns
 
 
-def get_pattern(pattern_name: str) -> Any:
-    """
-    Get compiled pattern by name (convenience function).
 
-    Args:
-        pattern_name: Name of the pattern to retrieve
-
-    Returns:
-        Compiled regex pattern
-    """
-    return get_patterns().get_pattern(pattern_name)
 
 
 # Pattern categories for easy access

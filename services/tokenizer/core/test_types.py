@@ -15,8 +15,6 @@ import pytest
 from .types import (
     CaseHandling,
     LanguageFamily,
-    SpaceType,
-    TokenizedResult,
     TokenizerConfig,
     TokenList,
     TokenType,
@@ -31,7 +29,6 @@ class TestTokenizerConfig:
         config = TokenizerConfig()
 
         # Language detection defaults (optimized for performance)
-        assert config.detect_language is False
         assert config.fallback_language_family == LanguageFamily.MIXED
 
         # Space handling defaults
@@ -59,8 +56,7 @@ class TestTokenizerConfig:
     def test_custom_config(self):
         """Test custom configuration values."""
         config = TokenizerConfig(
-            detect_language=False,
-            fallback_language_family=LanguageFamily.CJK,
+            fallback_language_family=LanguageFamily.ARABIC,
             include_punctuation=True,
             include_numeric=False,
             include_emoji=False,
@@ -76,8 +72,7 @@ class TestTokenizerConfig:
         )
 
         # Verify all custom values are set correctly
-        assert config.detect_language is False
-        assert config.fallback_language_family == LanguageFamily.CJK
+        assert config.fallback_language_family == LanguageFamily.ARABIC
         assert config.include_punctuation is True
         assert config.include_numeric is False
         assert config.include_emoji is False
@@ -106,7 +101,6 @@ class TestTokenizerConfig:
         config = TokenizerConfig()
 
         # Test boolean fields
-        assert isinstance(config.detect_language, bool)
         assert isinstance(config.include_punctuation, bool)
         assert isinstance(config.normalize_unicode, bool)
 
@@ -166,20 +160,18 @@ class TestEnumTypes:
         """Test LanguageFamily enum values."""
         # Test all enum values exist
         assert hasattr(LanguageFamily, "LATIN")
-        assert hasattr(LanguageFamily, "CJK")
         assert hasattr(LanguageFamily, "ARABIC")
         assert hasattr(LanguageFamily, "MIXED")
         assert hasattr(LanguageFamily, "UNKNOWN")
 
         # Test enum values
         assert LanguageFamily.LATIN.value == "latin"
-        assert LanguageFamily.CJK.value == "cjk"
         assert LanguageFamily.ARABIC.value == "arabic"
         assert LanguageFamily.MIXED.value == "mixed"
         assert LanguageFamily.UNKNOWN.value == "unknown"
 
         # Test enum comparison
-        assert LanguageFamily.LATIN != LanguageFamily.CJK
+        assert LanguageFamily.LATIN != LanguageFamily.ARABIC
         assert LanguageFamily.LATIN == LanguageFamily.LATIN
 
     def test_token_type_enum(self):
@@ -220,18 +212,6 @@ class TestEnumTypes:
         assert CaseHandling.UPPERCASE.value == "uppercase"
         assert CaseHandling.NORMALIZE.value == "normalize"
 
-    def test_space_type_enum(self):
-        """Test SpaceType enum values."""
-        expected_spaces = ["WHITESPACE", "UNICODE_SPACES", "CUSTOM"]
-
-        for space_name in expected_spaces:
-            assert hasattr(SpaceType, space_name)
-
-        # Test values
-        assert SpaceType.WHITESPACE.value == "whitespace"
-        assert SpaceType.UNICODE_SPACES.value == "unicode_spaces"
-        assert SpaceType.CUSTOM.value == "custom"
-
 
 class TestTypeAliases:
     """Test type aliases and their usage."""
@@ -248,27 +228,6 @@ class TestTypeAliases:
         empty_list: TokenList = []
         assert isinstance(empty_list, list)
 
-    def test_tokenized_result_type(self):
-        """Test TokenizedResult type alias."""
-        # TokenizedResult should be equivalent to dict[str, TokenList]
-        result: TokenizedResult = {
-            "word": ["hello", "world"],
-            "hashtag": ["#test"],
-            "mention": ["@user"],
-        }
-
-        assert isinstance(result, dict)
-        assert all(isinstance(key, str) for key in result.keys())
-        assert all(isinstance(value, list) for value in result.values())
-        assert all(
-            isinstance(token, str)
-            for token_list in result.values()
-            for token in token_list
-        )
-
-        # Empty dict should be valid
-        empty_result: TokenizedResult = {}
-        assert isinstance(empty_result, dict)
 
 
 class TestConfigurationValidation:
@@ -365,8 +324,6 @@ class TestConfigurationUseCases:
             normalize_unicode=True,
             # Filter very short tokens
             min_token_length=2,
-            # Language detection for mixed content
-            detect_language=True,
         )
 
         # Verify research-friendly settings
@@ -375,7 +332,6 @@ class TestConfigurationUseCases:
         assert not config.include_emoji
         assert config.case_handling == CaseHandling.LOWERCASE
         assert config.min_token_length >= 2
-        assert config.detect_language
 
     def test_social_media_monitoring_config(self):
         """Test configuration for social media monitoring."""
@@ -392,7 +348,6 @@ class TestConfigurationUseCases:
             # Include very short tokens (acronyms, etc.)
             min_token_length=1,
             # Handle multilingual content
-            detect_language=True,
             normalize_unicode=True,
         )
 
@@ -420,8 +375,6 @@ class TestConfigurationUseCases:
             # Standard filtering
             min_token_length=1,
             include_numeric=True,
-            # Language detection
-            detect_language=True,
         )
 
         # Verify content analysis settings

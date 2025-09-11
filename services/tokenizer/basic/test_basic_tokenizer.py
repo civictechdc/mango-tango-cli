@@ -182,28 +182,28 @@ class TestBasicTokenizerConfig:
         config = TokenizerConfig(include_punctuation=True)
         tokenizer = BasicTokenizer(config)
         text = "Hello, world!"
-        result = tokenizer.tokenize_with_types(text)
+        result = tokenizer.tokenize(text)
 
-        assert TokenType.WORD.value in result
-        assert TokenType.PUNCTUATION.value in result
-        assert "hello" in result[TokenType.WORD.value]
-        assert (
-            "," in result[TokenType.PUNCTUATION.value]
-            or "!" in result[TokenType.PUNCTUATION.value]
-        )
+        # With punctuation inclusion, punctuation should be preserved as tokens
+        assert "hello" in result
+        assert "world" in result
+        # Should include punctuation marks
+        assert any("," in token or "!" in token for token in result)
 
     def test_numeric_inclusion(self):
         """Test numeric token handling."""
         config = TokenizerConfig(include_numeric=True)
         tokenizer = BasicTokenizer(config)
         text = "I have 123 apples and 45.67 oranges"
-        result = tokenizer.tokenize_with_types(text)
+        result = tokenizer.tokenize(text)
 
-        assert TokenType.NUMERIC.value in result
+        # Should include numeric tokens
+        assert "i" in result
+        assert "have" in result
+        assert "apples" in result
         # Should extract numeric tokens
-        numeric_tokens = result[TokenType.NUMERIC.value]
-        assert any("123" in token for token in numeric_tokens) or any(
-            "45" in token for token in numeric_tokens
+        assert any("123" in token for token in result) or any(
+            "45" in token for token in result
         )
 
     def test_emoji_inclusion_disabled(self):
@@ -268,9 +268,6 @@ class TestBasicTokenizerEdgeCases:
         tokenizer = BasicTokenizer()
         result = tokenizer.tokenize("")
         assert result == []
-
-        result_typed = tokenizer.tokenize_with_types("")
-        assert result_typed == {}
 
     def test_whitespace_only(self):
         """Test whitespace-only input."""
@@ -339,36 +336,6 @@ class TestBasicTokenizerMethods:
 
         assert isinstance(result, list)
         assert all(isinstance(token, str) for token in result)
-
-    def test_tokenize_with_types_method(self):
-        """Test tokenize_with_types method."""
-        tokenizer = BasicTokenizer()
-        text = "@user Hello #world https://example.com 123"
-        result = tokenizer.tokenize_with_types(text)
-
-        assert isinstance(result, dict)
-        # Should have different token types
-        assert TokenType.WORD.value in result
-        assert TokenType.MENTION.value in result
-        assert TokenType.HASHTAG.value in result
-        assert TokenType.URL.value in result
-
-    def test_config_update(self):
-        """Test configuration updates."""
-        tokenizer = BasicTokenizer()
-        original_min_length = tokenizer.config.min_token_length
-
-        # Update configuration
-        tokenizer.update_config(min_token_length=5)
-        assert tokenizer.config.min_token_length == 5
-        assert tokenizer.config.min_token_length != original_min_length
-
-    def test_invalid_config_update(self):
-        """Test invalid configuration parameter update."""
-        tokenizer = BasicTokenizer()
-
-        with pytest.raises(ValueError, match="Unknown configuration parameter"):
-            tokenizer.update_config(invalid_param="value")
 
 
 class TestBasicTokenizerPerformance:
@@ -504,7 +471,7 @@ class TestTokenOrderPreservation:
         text = "iPhone用户 loves #apple products"
         result = tokenizer.tokenize(text)
 
-        # Should preserve original order with CJK character-level tokenization
+        # Should preserve original order with character-level CJK tokenization
         expected = ["iphone", "用", "户", "loves", "#apple", "products"]
         assert result == expected, f"Expected {expected}, got {result}"
 
@@ -579,20 +546,16 @@ class TestTokenOrderPreservation:
         config = TokenizerConfig(include_punctuation=True)
         tokenizer = BasicTokenizer(config)
         text = "Hello, @user! Check #tag."
-        result_typed = tokenizer.tokenize_with_types(text)
+        result = tokenizer.tokenize(text)
 
-        # Reconstruct order from typed results
         # This test verifies that when punctuation is included,
         # the overall ordering is still preserved
-        assert TokenType.WORD.value in result_typed
-        assert TokenType.MENTION.value in result_typed
-        assert TokenType.HASHTAG.value in result_typed
-        assert TokenType.PUNCTUATION.value in result_typed
-
-        # Individual token types should contain expected tokens
-        assert "hello" in result_typed[TokenType.WORD.value]
-        assert "@user" in result_typed[TokenType.MENTION.value]
-        assert "#tag" in result_typed[TokenType.HASHTAG.value]
+        assert "hello" in result
+        assert "@user" in result
+        assert "#tag" in result
+        assert "check" in result
+        # Should include punctuation when configured
+        assert any("," in token or "!" in token or "." in token for token in result)
 
 
 class TestOrderPreservationValidation:
@@ -645,29 +608,29 @@ class TestOrderPreservationValidation:
         # Should not create an unreasonable number of intermediate objects
         assert object_increase < 50, f"Too many objects created: {object_increase}"
 
-    def test_downstream_compatibility_tokenize_with_types(self):
-        """Test that order preservation works with tokenize_with_types method."""
+    def test_downstream_compatibility(self):
+        """Test that order preservation works consistently."""
         tokenizer = BasicTokenizer()
         text = "Hello @user check #hashtag visit https://example.com"
 
-        result_typed = tokenizer.tokenize_with_types(text)
-        result_simple = tokenizer.tokenize(text)
+        result = tokenizer.tokenize(text)
 
-        # Verify that both methods extract the same entities
-        assert TokenType.WORD.value in result_typed
-        assert TokenType.MENTION.value in result_typed
-        assert TokenType.HASHTAG.value in result_typed
-        assert TokenType.URL.value in result_typed
+        # Verify entities are preserved in correct order
+        assert "hello" in result
+        assert "@user" in result
+        assert "check" in result
+        assert "#hashtag" in result
+        assert "visit" in result
+        assert "https://example.com" in result
 
-        # Verify entities are preserved
-        assert "@user" in result_typed[TokenType.MENTION.value]
-        assert "#hashtag" in result_typed[TokenType.HASHTAG.value]
-        assert "https://example.com" in result_typed[TokenType.URL.value]
+        # Verify order is preserved
+        hello_idx = result.index("hello")
+        user_idx = result.index("@user")
+        check_idx = result.index("check")
+        hashtag_idx = result.index("#hashtag")
+        visit_idx = result.index("visit")
 
-        # Verify simple tokenize includes all the same entities
-        assert "@user" in result_simple
-        assert "#hashtag" in result_simple
-        assert "https://example.com" in result_simple
+        assert hello_idx < user_idx < check_idx < hashtag_idx < visit_idx
 
     def test_configuration_compatibility_order_preservation(self):
         """Test that order preservation works with various configuration options."""
@@ -780,8 +743,8 @@ class TestBasicTokenizerIntegration:
         """Test Facebook-like content with longer text."""
         tokenizer = BasicTokenizer()
         text = """
-        Had an amazing day at the conference! 
-        Learned so much about AI and machine learning. 
+        Had an amazing day at the conference!
+        Learned so much about AI and machine learning.
         Special thanks to @keynote_speaker for the inspiring talk.
         #AIConf2024 #MachineLearning #TechConference
         Photos: https://photos.example.com/album123

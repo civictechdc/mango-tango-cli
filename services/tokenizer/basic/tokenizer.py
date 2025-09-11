@@ -6,12 +6,11 @@ Unicode-aware tokenization for social media text with entity preservation.
 """
 
 import re
-from typing import Dict, Optional
+from typing import Optional
 
 from ..core.base import AbstractTokenizer
 from ..core.types import (
     LanguageFamily,
-    TokenizedResult,
     TokenizerConfig,
     TokenList,
     TokenType,
@@ -55,7 +54,7 @@ class BasicTokenizer(AbstractTokenizer):
             return []
 
         # Apply preprocessing
-        processed_text = self.preprocess_text(text)
+        processed_text = self._preprocess_text(text)
         if not processed_text:
             return []
 
@@ -63,39 +62,8 @@ class BasicTokenizer(AbstractTokenizer):
         tokens = self._extract_tokens(processed_text)
 
         # Apply post-processing
-        return self.postprocess_tokens(tokens)
+        return self._postprocess_tokens(tokens)
 
-    def tokenize_with_types(self, text: str) -> TokenizedResult:
-        """
-        Tokenize input text and return tokens grouped by type.
-
-        Args:
-            text: Input text to tokenize
-
-        Returns:
-            Dictionary mapping token types to lists of tokens
-        """
-        if not text:
-            return {}
-
-        processed_text = self.preprocess_text(text)
-        if not processed_text:
-            return {}
-
-        # Initialize result dictionary
-        result: TokenizedResult = {}
-
-        # Extract and classify tokens
-        classified_tokens = self._extract_and_classify_tokens(processed_text)
-
-        # Group tokens by type
-        for token_type, tokens in classified_tokens.items():
-            if tokens:  # Only include non-empty token lists
-                processed_tokens = self.postprocess_tokens(tokens)
-                if processed_tokens:
-                    result[token_type.value] = processed_tokens
-
-        return result
 
     def _extract_tokens(self, text: str) -> TokenList:
         """
@@ -110,50 +78,6 @@ class BasicTokenizer(AbstractTokenizer):
         """
         return self._extract_tokens_ordered(text, LanguageFamily.MIXED)
 
-    def _extract_and_classify_tokens(self, text: str) -> Dict[TokenType, TokenList]:
-        """
-        Extract tokens and classify them by type using comprehensive regex.
-
-        Args:
-            text: Preprocessed text to tokenize
-
-        Returns:
-            Dictionary mapping token types to token lists
-        """
-        result: Dict[TokenType, TokenList] = {}
-
-        # Initialize token type lists
-        for token_type in TokenType:
-            result[token_type] = []
-
-        # Get all tokens using comprehensive pattern
-        comprehensive_pattern = self._patterns.get_comprehensive_pattern(self._config)
-        all_tokens = comprehensive_pattern.findall(text)
-
-        # Classify each token by type
-        for token in all_tokens:
-            if not token.strip():
-                continue
-
-            # Classify token by its characteristics
-            if token.startswith("http") or "://" in token:
-                result[TokenType.URL].append(self._clean_url_token(token))
-            elif "@" in token and "." in token and token.count("@") == 1:
-                result[TokenType.EMAIL].append(token)
-            elif token.startswith("@"):
-                result[TokenType.MENTION].append(token)
-            elif token.startswith("#"):
-                result[TokenType.HASHTAG].append(token)
-            elif self._is_emoji_only(token):
-                result[TokenType.EMOJI].append(token)
-            elif self._is_numeric_only(token):
-                result[TokenType.NUMERIC].append(token)
-            elif self._is_punctuation_only(token):
-                result[TokenType.PUNCTUATION].append(token)
-            else:
-                result[TokenType.WORD].append(token)
-
-        return result
 
     def _is_cjk_char(self, char: str) -> bool:
         """Check if character is CJK."""
@@ -278,23 +202,6 @@ class BasicTokenizer(AbstractTokenizer):
             .replace("$", "")
             .isdigit()
         )
-
-    def _is_emoji_only(self, token: str) -> bool:
-        """Check if token contains only emoji characters."""
-        # Basic emoji ranges
-        for char in token:
-            code_point = ord(char)
-            if not (
-                (0x1F600 <= code_point <= 0x1F64F)  # Emoticons
-                or (0x1F300 <= code_point <= 0x1F5FF)  # Misc Symbols
-                or (0x1F680 <= code_point <= 0x1F6FF)  # Transport
-                or (0x1F1E0 <= code_point <= 0x1F1FF)  # Flags
-                or (0x2700 <= code_point <= 0x27BF)  # Dingbats
-                or (0x1F900 <= code_point <= 0x1F9FF)  # Supplemental Symbols
-                or (0x2600 <= code_point <= 0x26FF)
-            ):  # Misc symbols
-                return False
-        return True
 
     def _is_url_like(self, token: str) -> bool:
         """Check if token looks like a URL."""

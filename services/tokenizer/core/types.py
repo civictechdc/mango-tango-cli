@@ -10,14 +10,6 @@ from enum import Enum
 from typing import Optional
 
 
-class SpaceType(Enum):
-    """Types of Unicode space characters for tokenization."""
-
-    WHITESPACE = "whitespace"  # Standard ASCII whitespace
-    UNICODE_SPACES = "unicode_spaces"  # All Unicode space characters
-    CUSTOM = "custom"  # User-defined space characters
-
-
 class LanguageFamily(Enum):
     """Language families that affect tokenization strategies."""
 
@@ -56,7 +48,6 @@ class TokenizerConfig:
     """Configuration for tokenizer behavior."""
 
     # Language detection settings
-    detect_language: bool = False
     fallback_language_family: LanguageFamily = LanguageFamily.MIXED
 
     # Token type filtering
@@ -82,4 +73,3 @@ class TokenizerConfig:
 
 # Type aliases for common use cases
 TokenList = list[str]
-TokenizedResult = dict[str, TokenList]

@@ -8,7 +8,7 @@ the interface for all tokenizer implementations.
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from .types import LanguageFamily, TokenizedResult, TokenizerConfig, TokenList
+from .types import TokenizerConfig, TokenList
 
 
 class AbstractTokenizer(ABC):
@@ -34,19 +34,6 @@ class AbstractTokenizer(ABC):
         """Get the current tokenizer configuration."""
         return self._config
 
-    def update_config(self, **kwargs) -> None:
-        """
-        Update configuration parameters.
-
-        Args:
-            **kwargs: Configuration parameters to update
-        """
-        for key, value in kwargs.items():
-            if hasattr(self._config, key):
-                setattr(self._config, key, value)
-            else:
-                raise ValueError(f"Unknown configuration parameter: {key}")
-
     @abstractmethod
     def tokenize(self, text: str) -> TokenList:
         """
@@ -62,20 +49,7 @@ class AbstractTokenizer(ABC):
         """
         pass
 
-    @abstractmethod
-    def tokenize_with_types(self, text: str) -> TokenizedResult:
-        """
-        Tokenize input text and return tokens grouped by type.
-
-        Args:
-            text: Input text to tokenize
-
-        Returns:
-            Dictionary mapping token types to lists of tokens
-        """
-        pass
-
-    def preprocess_text(self, text: str) -> str:
+    def _preprocess_text(self, text: str) -> str:
         """
         Apply preprocessing to text before tokenization.
 
@@ -111,7 +85,7 @@ class AbstractTokenizer(ABC):
 
         return text
 
-    def postprocess_tokens(self, tokens: TokenList) -> TokenList:
+    def _postprocess_tokens(self, tokens: TokenList) -> TokenList:
         """
         Apply post-processing to extracted tokens.
 

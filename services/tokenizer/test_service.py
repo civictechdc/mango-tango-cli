@@ -108,14 +108,15 @@ class TestSocialMediaEntities:
             include_emoji=True,
         )
         tokenizer = create_basic_tokenizer(config)
-        result = tokenizer.tokenize_with_types(text)
+        result = tokenizer.tokenize(text)
 
         # Service API should handle entity extraction
-        assert isinstance(result, dict)
-        # Should extract multiple entity types
-        entity_types = ["mention", "hashtag", "url", "emoji"]
-        found_types = [t for t in entity_types if t in result and result[t]]
-        assert len(found_types) >= 2  # Should find at least 2 types via service API
+        assert isinstance(result, list)
+        # Should extract social media entities
+        assert "@user" in result
+        assert "#hashtag" in result
+        assert "https://example.com" in result
+        assert "check" in result
 
 
 class TestTokenizerConfiguration:

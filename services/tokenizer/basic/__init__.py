@@ -6,7 +6,7 @@ fundamental Unicode-aware tokenization capabilities for social media text.
 """
 
 from ..core.types import TokenizerConfig
-from .patterns import get_pattern, get_patterns
+from .patterns import get_patterns
 from .tokenizer import BasicTokenizer
 
 
@@ -28,7 +28,6 @@ __all__ = [
     "BasicTokenizer",
     "TokenizerConfig",
     "get_patterns",
-    "get_pattern",
     "create_basic_tokenizer",
     "tokenize_text",
 ]

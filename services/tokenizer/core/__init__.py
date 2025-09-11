@@ -9,8 +9,6 @@ from .base import AbstractTokenizer
 from .types import (
     CaseHandling,
     LanguageFamily,
-    SpaceType,
-    TokenizedResult,
     TokenizerConfig,
     TokenList,
     TokenType,
@@ -22,10 +20,8 @@ __all__ = [
     "TokenizerConfig",
     # Type definitions
     "TokenList",
-    "TokenizedResult",
     # Enumerations
     "LanguageFamily",
-    "SpaceType",
     "TokenType",
     "CaseHandling",
 ]
