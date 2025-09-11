@@ -59,15 +59,10 @@ class TokenizerConfig:
     detect_language: bool = True
     fallback_language_family: LanguageFamily = LanguageFamily.LATIN
 
-    # Space handling
-    space_type: SpaceType = SpaceType.WHITESPACE
-    custom_spaces: Optional[str] = None  # Used when space_type is CUSTOM
-
     # Token type filtering
     include_punctuation: bool = False
     include_numeric: bool = True
     include_emoji: bool = False
-    include_whitespace: bool = False
 
     # Text preprocessing
     case_handling: CaseHandling = CaseHandling.LOWERCASE
