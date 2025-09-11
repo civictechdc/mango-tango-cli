@@ -14,13 +14,10 @@ from typing import Dict, List
 
 import pytest
 
-from . import (
-    BasicTokenizer,
-    TokenizerConfig,
-    TokenType,
-    create_basic_tokenizer,
-    tokenize_text,
-)
+from .basic import BasicTokenizer, create_basic_tokenizer, tokenize_text
+
+# Core interfaces and types
+from .core import AbstractTokenizer, LanguageFamily, TokenizerConfig, TokenType
 from .core.types import CaseHandling
 
 

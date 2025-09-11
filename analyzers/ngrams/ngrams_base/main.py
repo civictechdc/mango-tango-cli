@@ -1,7 +1,7 @@
 import polars as pl
 
 from analyzer_interface.context import PrimaryAnalyzerContext
-from services.tokenizer import TokenizerConfig, tokenize_text
+from services.tokenizer.basic import TokenizerConfig, tokenize_text
 from services.tokenizer.core.types import CaseHandling
 from terminal_tools import ProgressReporter
 
@@ -117,8 +117,6 @@ def main(context: PrimaryAnalyzerContext):
                 ]
             ).write_parquet(context.output(OUTPUT_MESSAGE).parquet_path)
         )
-
-
 
 
 def ngrams(tokens: list[str], min: int, max: int):

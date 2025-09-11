@@ -2,6 +2,8 @@ import types
 from pathlib import Path
 
 from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
+from services.tokenizer.basic import TokenizerConfig, tokenize_text
+from services.tokenizer.core.types import CaseHandling
 from testing import CsvTestData, ParquetTestData, test_primary_analyzer
 
 from .ngrams_base.interface import (
@@ -15,8 +17,6 @@ from .ngrams_base.interface import (
     interface,
 )
 from .ngrams_base.main import main, ngrams, serialize_ngram
-from services.tokenizer import tokenize_text, TokenizerConfig
-from services.tokenizer.core.types import CaseHandling
 from .test_data import test_data_dir
 
 TEST_CSV_FILENAME = "ngrams_test_input.csv"
