@@ -25,7 +25,7 @@ from .interface import (
 
 def main(context: PrimaryAnalyzerContext):
     # Get parameters with defaults
-    parameters = context.parameters()
+    parameters = context.params
     min_n = parameters.get(PARAM_MIN_N, 3)
     max_n = parameters.get(PARAM_MAX_N, 5)
 
