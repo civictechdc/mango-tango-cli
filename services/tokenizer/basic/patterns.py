@@ -65,6 +65,64 @@ class TokenizerPatterns:
         """Get the combined social media entities pattern for single-pass detection."""
         return self.get_pattern("combined_social_entities")
 
+    def get_comprehensive_pattern(self, config) -> Any:
+        """
+        Build comprehensive tokenization pattern based on configuration.
+        
+        This creates a single regex pattern that finds ALL tokens in document order,
+        eliminating the need for segmentation and reassembly.
+        
+        Args:
+            config: TokenizerConfig specifying which token types to include
+            
+        Returns:
+            Compiled regex pattern that matches all desired token types in priority order
+        """
+        pattern_parts = []
+        
+        # Add patterns in priority order (most specific first)
+        if config.extract_urls:
+            pattern_parts.append(self.get_pattern('url').pattern)
+            
+        if config.extract_emails:
+            pattern_parts.append(self.get_pattern('email').pattern)
+            
+        if config.extract_mentions:
+            pattern_parts.append(self.get_pattern('mention').pattern)
+            
+        if config.extract_hashtags:
+            pattern_parts.append(self.get_pattern('hashtag').pattern)
+            
+        if config.include_emoji:
+            pattern_parts.append(self.get_pattern('emoji').pattern)
+            
+        if config.include_numeric:
+            pattern_parts.append(self.get_pattern('numeric').pattern)
+            
+        # Always include word pattern (this is the core tokenization)
+        pattern_parts.append(self.get_pattern('word').pattern)
+        
+        if config.include_punctuation:
+            pattern_parts.append(self.get_pattern('punctuation').pattern)
+        
+        # Don't add the greedy fallback - let configuration control what gets captured
+        
+        # Combine patterns with alternation (| operator)
+        comprehensive_pattern = '(?:' + '|'.join(pattern_parts) + ')'
+        
+        try:
+            return REGEX_MODULE.compile(comprehensive_pattern, REGEX_MODULE.IGNORECASE)
+        except Exception:
+            # Fallback to standard re module
+            if REGEX_AVAILABLE and REGEX_MODULE is not re:
+                try:
+                    return re.compile(comprehensive_pattern, re.IGNORECASE)
+                except Exception:
+                    # Ultimate fallback - just match words
+                    return re.compile(r'\S+', re.IGNORECASE)
+            else:
+                return re.compile(r'\S+', re.IGNORECASE)
+
     def list_patterns(self) -> List[str]:
         """Get list of available pattern names."""
         return list(self._patterns.keys())
@@ -131,9 +189,22 @@ class TokenizerPatterns:
             r')'
         )
 
+        # Thai script pattern
+        thai_pattern = r'[\u0e00-\u0e7f]+'  # Thai script range
+        
+        # Other Southeast Asian scripts (common in social media)
+        sea_pattern = (
+            r'(?:'
+            r'[\u1780-\u17ff]|'      # Khmer
+            r'[\u1000-\u109f]|'      # Myanmar
+            r'[\u1a00-\u1a1f]|'      # Buginese  
+            r'[\u1b00-\u1b7f]'       # Balinese
+            r')'
+        )
+
         # Word patterns for different script types
         latin_word_pattern = r'[a-zA-Z]+(?:\'[a-zA-Z]+)*'  # Handle contractions
-        word_pattern = f'(?:{latin_word_pattern}|{cjk_pattern}+|{arabic_pattern}+)'
+        word_pattern = f'(?:{latin_word_pattern}|{cjk_pattern}+|{arabic_pattern}+|{thai_pattern}|{sea_pattern}+)'
 
         # Punctuation (preserve some, group others)
         punctuation_pattern = r'[.!?;:,\-\(\)\[\]{}"\']'

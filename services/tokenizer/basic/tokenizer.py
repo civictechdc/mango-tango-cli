@@ -132,7 +132,7 @@ class BasicTokenizer(AbstractTokenizer):
 
     def _extract_and_classify_tokens(self, text: str) -> Dict[TokenType, TokenList]:
         """
-        Extract tokens and classify them by type.
+        Extract tokens and classify them by type using comprehensive regex.
 
         Args:
             text: Preprocessed text to tokenize
@@ -146,249 +146,41 @@ class BasicTokenizer(AbstractTokenizer):
         for token_type in TokenType:
             result[token_type] = []
 
-        # Extract social media entities first
-        if self._config.extract_urls:
-            result[TokenType.URL].extend(self._extract_pattern_tokens(text, 'url'))
-        if self._config.extract_emails:
-            result[TokenType.EMAIL].extend(self._extract_pattern_tokens(text, 'email'))
-        if self._config.extract_mentions:
-            result[TokenType.MENTION].extend(self._extract_pattern_tokens(text, 'mention'))
-        if self._config.extract_hashtags:
-            result[TokenType.HASHTAG].extend(self._extract_pattern_tokens(text, 'hashtag'))
-
-        # Remove social entities from text for further processing
-        cleaned_text = text
-        for pattern_name in ['url', 'email', 'mention', 'hashtag']:
-            if hasattr(self._config, f'extract_{pattern_name}s') or pattern_name in ['url', 'email', 'mention', 'hashtag']:
-                pattern = self._patterns.get_pattern(pattern_name)
-                cleaned_text = pattern.sub(' ', cleaned_text)
-
-        # Extract other token types
-        if self._config.include_emoji:
-            result[TokenType.EMOJI].extend(self._extract_pattern_tokens(cleaned_text, 'emoji'))
-        if self._config.include_numeric:
-            result[TokenType.NUMERIC].extend(self._extract_pattern_tokens(cleaned_text, 'numeric'))
-        if self._config.include_punctuation:
-            result[TokenType.PUNCTUATION].extend(self._extract_pattern_tokens(cleaned_text, 'punctuation'))
-
-        # Extract words (remaining after removing other entities)
-        words = self._extract_words_from_cleaned_text(cleaned_text)
-        result[TokenType.WORD].extend(words)
+        # Get all tokens using comprehensive pattern
+        comprehensive_pattern = self._patterns.get_comprehensive_pattern(self._config)
+        all_tokens = comprehensive_pattern.findall(text)
+        
+        # Classify each token by type
+        for token in all_tokens:
+            if not token.strip():
+                continue
+                
+            # Classify token by its characteristics
+            if token.startswith('http') or '://' in token:
+                result[TokenType.URL].append(self._clean_url_token(token))
+            elif '@' in token and '.' in token and token.count('@') == 1:
+                result[TokenType.EMAIL].append(token)
+            elif token.startswith('@'):
+                result[TokenType.MENTION].append(token)
+            elif token.startswith('#'):
+                result[TokenType.HASHTAG].append(token)
+            elif self._is_emoji_only(token):
+                result[TokenType.EMOJI].append(token)
+            elif self._is_numeric_only(token):
+                result[TokenType.NUMERIC].append(token)
+            elif self._is_punctuation_only(token):
+                result[TokenType.PUNCTUATION].append(token)
+            else:
+                result[TokenType.WORD].append(token)
 
         return result
 
-    def _extract_social_entities(self, text: str) -> tuple[TokenList, str]:
-        """
-        Extract social media entities and return them with cleaned text.
 
-        Args:
-            text: Input text
 
-        Returns:
-            Tuple of (social_entities, cleaned_text)
-        """
-        entities = []
-        cleaned_text = text
 
-        # Extract entities based on configuration
-        if self._config.extract_urls:
-            entities.extend(self._extract_pattern_tokens(text, 'url'))
-            cleaned_text = self._patterns.get_pattern('url').sub(' ', cleaned_text)
 
-        if self._config.extract_emails:
-            entities.extend(self._extract_pattern_tokens(text, 'email'))
-            cleaned_text = self._patterns.get_pattern('email').sub(' ', cleaned_text)
 
-        if self._config.extract_mentions:
-            entities.extend(self._extract_pattern_tokens(text, 'mention'))
-            cleaned_text = self._patterns.get_pattern('mention').sub(' ', cleaned_text)
 
-        if self._config.extract_hashtags:
-            entities.extend(self._extract_pattern_tokens(text, 'hashtag'))
-            cleaned_text = self._patterns.get_pattern('hashtag').sub(' ', cleaned_text)
-
-        # Clean up multiple spaces
-        cleaned_text = re.sub(r'\s+', ' ', cleaned_text).strip()
-
-        return entities, cleaned_text
-
-    def _extract_pattern_tokens(self, text: str, pattern_name: str) -> TokenList:
-        """
-        Extract tokens matching a specific pattern.
-
-        Args:
-            text: Input text
-            pattern_name: Name of the pattern to use
-
-        Returns:
-            List of tokens matching the pattern
-        """
-        try:
-            pattern = self._patterns.get_pattern(pattern_name)
-            return pattern.findall(text)
-        except KeyError:
-            return []
-
-    def _tokenize_latin(self, text: str) -> TokenList:
-        """
-        Tokenize Latin script text (space-separated).
-
-        Args:
-            text: Text to tokenize
-
-        Returns:
-            List of tokens
-        """
-        if not text.strip():
-            return []
-
-        # Use word pattern for Latin script
-        pattern = self._patterns.get_pattern('latin_word')
-        tokens = pattern.findall(text)
-        
-        # If no matches, fall back to simple space splitting
-        if not tokens:
-            tokens = text.split()
-        
-        return [token for token in tokens if token.strip()]
-
-    def _tokenize_cjk(self, text: str) -> TokenList:
-        """
-        Tokenize CJK (Chinese, Japanese, Korean) text.
-
-        Args:
-            text: Text to tokenize
-
-        Returns:
-            List of tokens (individual characters or grouped sequences)
-        """
-        if not text.strip():
-            return []
-
-        tokens = []
-        current_token = ""
-        
-        for char in text:
-            if char.isspace():
-                if current_token:
-                    tokens.append(current_token)
-                    current_token = ""
-            elif self._is_cjk_char(char):
-                # Add current token if it exists
-                if current_token:
-                    tokens.append(current_token)
-                    current_token = ""
-                # Add CJK character as individual token
-                tokens.append(char)
-            else:
-                # Accumulate non-CJK characters
-                current_token += char
-
-        # Add final token if exists
-        if current_token:
-            tokens.append(current_token)
-
-        return [token for token in tokens if token.strip()]
-
-    def _tokenize_arabic(self, text: str) -> TokenList:
-        """
-        Tokenize Arabic script text.
-
-        Args:
-            text: Text to tokenize
-
-        Returns:
-            List of tokens
-        """
-        if not text.strip():
-            return []
-
-        # Arabic is generally space-separated, but handle connected text
-        tokens = text.split()
-        
-        # Filter out empty tokens
-        return [token for token in tokens if token.strip()]
-
-    def _tokenize_mixed_script(self, text: str) -> TokenList:
-        """
-        Tokenize mixed-script text (e.g., "iPhone用户").
-
-        Args:
-            text: Text to tokenize
-
-        Returns:
-            List of tokens
-        """
-        if not text.strip():
-            return []
-
-        tokens = []
-        current_token = ""
-        current_script = None
-        
-        for char in text:
-            if char.isspace():
-                if current_token:
-                    # For mixed script, break down CJK tokens character-by-character
-                    if current_script == "cjk":
-                        tokens.extend(list(current_token))
-                    else:
-                        tokens.append(current_token)
-                    current_token = ""
-                    current_script = None
-            else:
-                char_script = self._get_char_script(char)
-                
-                if current_script is None:
-                    current_script = char_script
-                    current_token = char
-                elif char_script == current_script or char_script == "other":
-                    current_token += char
-                else:
-                    # Script change - start new token
-                    if current_token:
-                        # For mixed script, break down CJK tokens character-by-character
-                        if current_script == "cjk":
-                            tokens.extend(list(current_token))
-                        else:
-                            tokens.append(current_token)
-                    current_token = char
-                    current_script = char_script
-
-        # Add final token
-        if current_token:
-            # For mixed script, break down CJK tokens character-by-character
-            if current_script == "cjk":
-                tokens.extend(list(current_token))
-            else:
-                tokens.append(current_token)
-
-        return [token for token in tokens if token.strip()]
-
-    def _extract_words_from_cleaned_text(self, text: str) -> TokenList:
-        """
-        Extract word tokens from text that has social entities removed.
-
-        Args:
-            text: Cleaned text
-
-        Returns:
-            List of word tokens
-        """
-        if not text.strip():
-            return []
-
-        # Detect language family for appropriate word extraction
-        language_family = self.detect_language_family(text)
-        
-        if language_family == LanguageFamily.CJK:
-            return self._tokenize_cjk(text)
-        elif language_family == LanguageFamily.ARABIC:
-            return self._tokenize_arabic(text)
-        elif language_family == LanguageFamily.MIXED:
-            return self._tokenize_mixed_script(text)
-        else:  # LATIN or UNKNOWN
-            return self._tokenize_latin(text)
 
     def _is_cjk_char(self, char: str) -> bool:
         """Check if character is CJK."""
@@ -436,8 +228,9 @@ class BasicTokenizer(AbstractTokenizer):
         """
         Extract tokens preserving their original order in the text.
         
-        Uses a position-based approach to maintain the relative order of
-        social entities and regular text tokens.
+        Uses a single comprehensive regex pattern to find ALL tokens in document order,
+        eliminating the need for complex segmentation and reassembly logic.
+        This is the Phase 2 optimization that removes O(n×segments) complexity.
 
         Args:
             text: Preprocessed text to tokenize
@@ -446,186 +239,127 @@ class BasicTokenizer(AbstractTokenizer):
         Returns:
             List of extracted tokens in their original order
         """
-        # Find all social entities with their positions
-        social_matches = list(self._find_social_entities_with_positions(text))
-        
-        # Create ordered segments (text segments + social entities)
-        segments = self._create_ordered_segments(text, social_matches)
-        
-        # Process segments and merge in order
-        tokens = []
-        for segment_type, content, position in segments:
-            if segment_type == 'entity':
-                tokens.append(content)
-            else:
-                # Detect language family per segment for more accurate tokenization
-                segment_language_family = self.detect_language_family(content)
-                segment_tokens = self._tokenize_by_language(content, segment_language_family)
-                tokens.extend(segment_tokens)
-        
-        return tokens
-
-    def _find_social_entities_with_positions(self, text: str):
-        """
-        Find all social media entities with their positions in the text.
-        
-        Optimized implementation using combined regex pattern for single-pass detection.
-        
-        Args:
-            text: Input text to scan for entities
-            
-        Returns:
-            List of tuples (start_pos, end_pos, entity_text, entity_type)
-        """
-        # Check if any entity extraction is enabled
-        if not any([self._config.extract_urls, self._config.extract_emails, 
-                   self._config.extract_mentions, self._config.extract_hashtags]):
+        if not text.strip():
             return []
         
-        # Get the combined pattern for single-pass detection
-        combined_pattern = self._patterns.get_combined_social_entities_pattern()
+        # Get comprehensive pattern based on configuration
+        # This single pattern finds ALL tokens in document order
+        comprehensive_pattern = self._patterns.get_comprehensive_pattern(self._config)
         
-        # Find all matches in a single pass
-        all_matches = []
-        for match in combined_pattern.finditer(text):
-            # Use match.lastgroup to identify which named group matched
-            entity_type = match.lastgroup
-            
-            # Skip if this entity type is disabled in config
-            if entity_type == 'url' and not self._config.extract_urls:
-                continue
-            elif entity_type == 'email' and not self._config.extract_emails:
-                continue  
-            elif entity_type == 'mention' and not self._config.extract_mentions:
-                continue
-            elif entity_type == 'hashtag' and not self._config.extract_hashtags:
-                continue
-            
-            match_text = match.group()
-            start = match.start()
-            end = match.end()
-            
-            # Post-process URLs to strip trailing punctuation that shouldn't be part of the URL
-            if entity_type == 'url':
-                match_text, end = self._clean_url_punctuation(match_text, start, end)
-            
-            all_matches.append((start, end, match_text, entity_type))
+        # Single regex call gets all tokens in order - this is the key optimization!
+        raw_tokens = comprehensive_pattern.findall(text)
         
-        # Sort by position and resolve overlaps
-        # Note: With combined pattern, overlaps should be minimal, but we maintain this logic
-        # for consistency and edge cases
-        all_matches.sort(key=lambda x: (x[0], -x[1]))  # Sort by start position, then by length (longest first)
+        # If no tokens were found but input has content, use fallback for edge cases
+        if not raw_tokens and text.strip():
+            # For pure punctuation or unrecognized content, return as single token
+            # This maintains compatibility with old tokenizer behavior for edge cases
+            return [text.strip()]
         
-        # Remove overlapping matches (keep the first one found at each position)
-        resolved_matches = []
-        last_end = 0
-        for start, end, match_text, entity_type in all_matches:
-            if start >= last_end:  # No overlap with previous match
-                resolved_matches.append((start, end, match_text, entity_type))
-                last_end = end
+        # Apply postprocessing for language-specific behavior and configuration filtering
+        tokens = []
+        for token in raw_tokens:
+            if not token.strip():
+                continue
                 
-        return resolved_matches
-
-    def _create_ordered_segments(self, text: str, social_matches):
-        """
-        Create ordered segments alternating between text and social entities.
+            # Clean URLs by removing trailing punctuation
+            if self._is_url_like(token):
+                token = self._clean_url_token(token)
+                
+            # For CJK languages, break down multi-character tokens into individual characters
+            # This maintains compatibility with existing test expectations
+            if language_family == LanguageFamily.CJK and self._contains_cjk_chars(token):
+                # Only break down pure CJK tokens, not mixed tokens
+                if self._is_pure_cjk_token(token):
+                    tokens.extend(list(token))
+                else:
+                    # Mixed token - keep as is but process CJK parts
+                    tokens.append(token)
+            elif language_family == LanguageFamily.MIXED:
+                # For mixed script, break down CJK parts but keep Latin parts whole
+                processed_tokens = self._process_mixed_script_token(token)
+                tokens.extend(processed_tokens)
+            else:
+                tokens.append(token)
         
-        Args:
-            text: Original input text
-            social_matches: List of (start_pos, end_pos, entity_text, entity_type) tuples
-            
-        Returns:
-            List of (segment_type, content, position) tuples in order
-        """
-        segments = []
-        current_pos = 0
-        
-        for start, end, entity_text, entity_type in social_matches:
-            # Add text segment before the entity (if any)
-            if start > current_pos:
-                text_segment = text[current_pos:start]
-                if self._is_meaningful_text_segment(text_segment):
-                    segments.append(('text', text_segment, current_pos))
-            
-            # Add the entity
-            segments.append(('entity', entity_text, start))
-            current_pos = end
-        
-        # Add any remaining text after the last entity
-        if current_pos < len(text):
-            remaining_text = text[current_pos:]
-            if self._is_meaningful_text_segment(remaining_text):
-                segments.append(('text', remaining_text, current_pos))
-        
-        return segments
-
-    def _tokenize_by_language(self, text: str, language_family: LanguageFamily) -> TokenList:
-        """
-        Apply language-specific tokenization to a text segment.
-        
-        Args:
-            text: Text segment to tokenize
-            language_family: Detected language family
-            
-        Returns:
-            List of tokens from the text segment
-        """
-        if language_family == LanguageFamily.CJK:
-            return self._tokenize_cjk(text)
-        elif language_family == LanguageFamily.ARABIC:
-            return self._tokenize_arabic(text)
-        elif language_family == LanguageFamily.MIXED:
-            return self._tokenize_mixed_script(text)
-        else:  # LATIN or UNKNOWN
-            return self._tokenize_latin(text)
-
-    def _clean_url_punctuation(self, url_text: str, start: int, end: int) -> tuple[str, int]:
-        """
-        Clean trailing punctuation from URLs that shouldn't be part of the URL.
-        
-        Args:
-            url_text: The matched URL text
-            start: Start position of the match
-            end: End position of the match
-            
-        Returns:
-            Tuple of (cleaned_url_text, new_end_position)
-        """
-        # Common punctuation that often appears after URLs but shouldn't be part of them
+        return [token for token in tokens if token.strip()]
+    
+    
+    def _is_punctuation_only(self, token: str) -> bool:
+        """Check if token contains only punctuation."""
+        punctuation_chars = '.!?;:,()[]{}"\'-~`@#$%^&*+=<>/|\\'
+        return all(c in punctuation_chars for c in token)
+    
+    def _is_numeric_only(self, token: str) -> bool:
+        """Check if token is purely numeric."""
+        return token.replace('.', '').replace(',', '').replace('%', '').replace('$', '').isdigit()
+    
+    def _is_emoji_only(self, token: str) -> bool:
+        """Check if token contains only emoji characters."""
+        # Basic emoji ranges
+        for char in token:
+            code_point = ord(char)
+            if not ((0x1F600 <= code_point <= 0x1F64F) or  # Emoticons
+                   (0x1F300 <= code_point <= 0x1F5FF) or  # Misc Symbols
+                   (0x1F680 <= code_point <= 0x1F6FF) or  # Transport
+                   (0x1F1E0 <= code_point <= 0x1F1FF) or  # Flags
+                   (0x2700 <= code_point <= 0x27BF) or    # Dingbats
+                   (0x1F900 <= code_point <= 0x1F9FF) or  # Supplemental Symbols
+                   (0x2600 <= code_point <= 0x26FF)):     # Misc symbols
+                return False
+        return True
+    
+    def _is_url_like(self, token: str) -> bool:
+        """Check if token looks like a URL."""
+        return (token.startswith(('http://', 'https://', 'www.')) or 
+                '://' in token or 
+                (token.count('.') >= 1 and any(c.isalpha() for c in token)))
+    
+    def _clean_url_token(self, url_token: str) -> str:
+        """Remove trailing punctuation from URL tokens."""
         trailing_punctuation = '.!?;:,)]}"\''
+        return url_token.rstrip(trailing_punctuation)
+    
+    def _contains_cjk_chars(self, token: str) -> bool:
+        """Check if token contains any CJK characters."""
+        return any(self._is_cjk_char(char) for char in token)
+    
+    def _is_pure_cjk_token(self, token: str) -> bool:
+        """Check if token contains only CJK characters."""
+        return all(self._is_cjk_char(char) or char.isspace() for char in token)
+    
+    def _process_mixed_script_token(self, token: str) -> TokenList:
+        """Process mixed script tokens by breaking down CJK parts."""
+        if not self._contains_cjk_chars(token):
+            return [token]
         
-        # Strip trailing punctuation
-        cleaned_url = url_text.rstrip(trailing_punctuation)
+        result = []
+        current_token = ""
+        current_is_cjk = None
         
-        # Calculate new end position
-        new_end = start + len(cleaned_url)
-        
-        return cleaned_url, new_end
-
-    def _is_meaningful_text_segment(self, text_segment: str) -> bool:
-        """
-        Check if a text segment contains meaningful content that should be tokenized.
-        
-        Args:
-            text_segment: The text segment to check
+        for char in token:
+            char_is_cjk = self._is_cjk_char(char)
             
-        Returns:
-            True if the segment contains meaningful content, False otherwise
-        """
-        # Strip whitespace
-        stripped = text_segment.strip()
+            if current_is_cjk is None:
+                current_is_cjk = char_is_cjk
+                current_token = char
+            elif char_is_cjk == current_is_cjk:
+                current_token += char
+            else:
+                # Script change
+                if current_token.strip():
+                    if current_is_cjk and len(current_token) > 1:
+                        # Break CJK into individual characters
+                        result.extend(list(current_token))
+                    else:
+                        result.append(current_token)
+                current_token = char
+                current_is_cjk = char_is_cjk
         
-        # Empty segments are not meaningful
-        if not stripped:
-            return False
+        # Handle final token
+        if current_token.strip():
+            if current_is_cjk and len(current_token) > 1:
+                result.extend(list(current_token))
+            else:
+                result.append(current_token)
         
-        # If the configuration includes punctuation, keep all segments
-        if self._config.include_punctuation:
-            return True
-        
-        # Check if the segment contains any non-punctuation characters
-        punctuation_chars = '.!?;:,()[]{}"\'-'
-        has_non_punctuation = any(char not in punctuation_chars and not char.isspace() 
-                                  for char in stripped)
-        
-        return has_non_punctuation
+        return result
