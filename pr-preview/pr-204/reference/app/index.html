@@ -82,7 +82,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
@@ -170,14 +172,8 @@
     
   </nav>
   
-</header>
     
-    <div class="md-container" data-md-component="container">
       
-      
-        
-          
-            
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
@@ -257,7 +253,13 @@
     </ul>
   </div>
 </nav>
-          
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
         
       
       <main class="md-main" data-md-component="main">
@@ -1081,6 +1083,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#app-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#app.logger" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;logger
@@ -1091,9 +1103,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#app.logger-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#app.logger.ContextEnrichmentFilter" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ContextEnrichmentFilter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#app.logger-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
     </span>
   </a>
   
@@ -1106,256 +1136,12 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_logger">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.get_logger(name)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;name
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
   <a href="#app.logger.setup_logging" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;setup_logging
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" setup_logging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.setup_logging(log_file_path)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;log_file_path
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.setup_logging(level)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;level
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.setup_logging(app_version)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;app_version
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;test_logger
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" test_logger">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestContextEnrichment
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestContextEnrichment">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_cli_level_controls_file_handler" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_cli_level_controls_file_handler
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_context_filter_adds_metadata" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_context_filter_adds_metadata
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_global_exception_handler_setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_global_exception_handler_setup
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_third_party_logger_levels" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_third_party_logger_levels
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestGetLogger
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestGetLogger">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger.test_get_logger_returns_logger_instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_get_logger_returns_logger_instance
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger.test_get_logger_with_different_names" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_get_logger_with_different_names
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger.test_get_logger_with_same_name_returns_same_instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_get_logger_with_same_name_returns_same_instance
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestIntegration" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestIntegration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestIntegration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestIntegration.test_full_logging_workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_full_logging_workflow
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestSetupLogging
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestSetupLogging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_console_handler_only_shows_errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_console_handler_only_shows_errors
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_file_handler_logs_info_and_above" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_file_handler_logs_info_and_above
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_log_format_is_json" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_log_format_is_json
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_setup_logging_configures_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_setup_logging_configures_handlers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_setup_logging_configures_root_logger" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_setup_logging_configures_root_logger
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_setup_logging_creates_log_directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_setup_logging_creates_log_directory
     </span>
   </a>
   
@@ -1523,6 +1309,83 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Services
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
+            <span class="md-nav__icon md-icon"></span>
+            Services
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/tokenizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tokenizer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1565,6 +1428,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#app-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#app.logger" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;logger
@@ -1575,9 +1448,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#app.logger-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#app.logger.ContextEnrichmentFilter" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ContextEnrichmentFilter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#app.logger-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
     </span>
   </a>
   
@@ -1590,256 +1481,12 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_logger">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.get_logger(name)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;name
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
   <a href="#app.logger.setup_logging" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;setup_logging
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" setup_logging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.setup_logging(log_file_path)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;log_file_path
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.setup_logging(level)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;level
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.logger.setup_logging(app_version)" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;app_version
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;test_logger
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" test_logger">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestContextEnrichment
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestContextEnrichment">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_cli_level_controls_file_handler" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_cli_level_controls_file_handler
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_context_filter_adds_metadata" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_context_filter_adds_metadata
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_global_exception_handler_setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_global_exception_handler_setup
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestContextEnrichment.test_third_party_logger_levels" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_third_party_logger_levels
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestGetLogger
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestGetLogger">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger.test_get_logger_returns_logger_instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_get_logger_returns_logger_instance
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger.test_get_logger_with_different_names" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_get_logger_with_different_names
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestGetLogger.test_get_logger_with_same_name_returns_same_instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_get_logger_with_same_name_returns_same_instance
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestIntegration" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestIntegration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestIntegration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestIntegration.test_full_logging_workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_full_logging_workflow
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TestSetupLogging
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" TestSetupLogging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_console_handler_only_shows_errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_console_handler_only_shows_errors
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_file_handler_logs_info_and_above" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_file_handler_logs_info_and_above
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_log_format_is_json" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_log_format_is_json
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_setup_logging_configures_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_setup_logging_configures_handlers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_setup_logging_configures_root_logger" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_setup_logging_configures_root_logger
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#app.test_logger.TestSetupLogging.test_setup_logging_creates_log_directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;test_setup_logging_creates_log_directory
     </span>
   </a>
   
@@ -1898,6 +1545,32 @@
 
 
 
+<p><span class="doc-section-title">Modules:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-module&quot;&gt;&lt;/code&gt;            &lt;code&gt;logger&lt;/code&gt; (&lt;code&gt;app.logger&lt;/code&gt;)" href="#app.logger">logger</a></code></td>
+            <td>
+              <div class="doc-md-description">
+                <p>Application-wide logging system for Mango Tango CLI.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
 
 
 
@@ -1912,17 +1585,17 @@
 
 
 
-
+<h3 id="app-modules">Modules</h3>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h3 id="app.logger" class="doc doc-heading">
+<h4 id="app.logger" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <code>logger</code>
 
 
-</h3>
+</h4>
 
     <div class="doc doc-contents ">
 
@@ -1941,6 +1614,61 @@
 
 
 
+<p><span class="doc-section-title">Classes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;code&gt;ContextEnrichmentFilter&lt;/code&gt; (&lt;code&gt;app.logger.ContextEnrichmentFilter&lt;/code&gt;)" href="#app.logger.ContextEnrichmentFilter">ContextEnrichmentFilter</a></code></td>
+            <td>
+              <div class="doc-md-description">
+                <p>Filter that enriches log records with contextual information.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+<p><span class="doc-section-title">Functions:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;get_logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt; (&lt;code&gt;app.logger.get_logger&lt;/code&gt;)" href="#app.logger.get_logger">get_logger</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Get a logger instance for the specified module.</p>
+                </div>
+              </td>
+            </tr>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;setup_logging&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;log_file_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;level&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;logging&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INFO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;app_version&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;unknown&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt; (&lt;code&gt;app.logger.setup_logging&lt;/code&gt;)" href="#app.logger.setup_logging">setup_logging</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Configure application-wide logging with structured JSON output.</p>
+                </div>
+              </td>
+            </tr>
+      </tbody>
+    </table>
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1949,17 +1677,17 @@
 
 
 
-
+<h5 id="app.logger-classes">Classes</h5>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h4 id="app.logger.ContextEnrichmentFilter" class="doc doc-heading">
+<h6 id="app.logger.ContextEnrichmentFilter" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>ContextEnrichmentFilter</code>
 
 
-</h4>
+</h6>
 
 
     <div class="doc doc-contents ">
@@ -1972,6 +1700,11 @@
 - process_id: Current process ID
 - thread_id: Current thread ID
 - app_version: Application version (if available)</p>
+
+
+
+
+
 
 
 
@@ -2046,15 +1779,15 @@
     </div>
 
 </div>
-
+<h5 id="app.logger-functions">Functions</h5>
 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="app.logger.get_logger" class="doc doc-heading">
+<h6 id="app.logger.get_logger" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">get_logger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
-</h4>
+</h6>
 
 
     <div class="doc doc-contents ">
@@ -2075,8 +1808,8 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-<h5 id="app.logger.get_logger(name)" class="doc doc-heading doc-heading-parameter">                  <code>name</code>
-</h5>            </td>
+<h7 id="app.logger.get_logger(name)" class="doc doc-heading doc-heading-parameter">                  <code>name</code>
+</h7>            </td>
             <td>
                   <code><span title="str">str</span></code>
             </td>
@@ -2148,10 +1881,10 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="app.logger.setup_logging" class="doc doc-heading">
+<h6 id="app.logger.setup_logging" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">app_version</span><span class="o">=</span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span></code>
 
-</h4>
+</h6>
 
 
     <div class="doc doc-contents ">
@@ -2172,8 +1905,8 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-<h5 id="app.logger.setup_logging(log_file_path)" class="doc doc-heading doc-heading-parameter">                  <code>log_file_path</code>
-</h5>            </td>
+<h7 id="app.logger.setup_logging(log_file_path)" class="doc doc-heading doc-heading-parameter">                  <code>log_file_path</code>
+</h7>            </td>
             <td>
                   <code><span title="pathlib.Path">Path</span></code>
             </td>
@@ -2188,8 +1921,8 @@
           </tr>
           <tr class="doc-section-item">
             <td>
-<h5 id="app.logger.setup_logging(level)" class="doc doc-heading doc-heading-parameter">                  <code>level</code>
-</h5>            </td>
+<h7 id="app.logger.setup_logging(level)" class="doc doc-heading doc-heading-parameter">                  <code>level</code>
+</h7>            </td>
             <td>
                   <code><span title="int">int</span></code>
             </td>
@@ -2204,8 +1937,8 @@
           </tr>
           <tr class="doc-section-item">
             <td>
-<h5 id="app.logger.setup_logging(app_version)" class="doc doc-heading doc-heading-parameter">                  <code>app_version</code>
-</h5>            </td>
+<h7 id="app.logger.setup_logging(app_version)" class="doc doc-heading doc-heading-parameter">                  <code>app_version</code>
+</h7>            </td>
             <td>
                   <code><span title="str">str</span></code>
             </td>
@@ -2423,1746 +2156,6 @@
 
 </div>
 
-<div class="doc doc-object doc-module">
-
-
-
-<h3 id="app.test_logger" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <code>test_logger</code>
-
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-        <p>Unit tests for the logging configuration module.</p>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h4 id="app.test_logger.TestContextEnrichment" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>TestContextEnrichment</code>
-
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-
-        <p>Test cases for context enrichment features.</p>
-
-
-
-
-
-
-
-
-              <details class="quote">
-                <summary>Source code in <code>app/test_logger.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestContextEnrichment</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test cases for context enrichment features.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">test_context_filter_adds_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that context filter adds process_id, thread_id, and app_version.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;context_test_version&quot;</span><span class="p">)</span>
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;context_test&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Test context enrichment&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Force flush</span>
-            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-            <span class="c1"># Read and verify log contains enriched context</span>
-            <span class="k">if</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">log_content</span><span class="p">:</span>
-                    <span class="n">log_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">log_content</span><span class="p">)</span>
-                    <span class="k">assert</span> <span class="s2">&quot;process_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                    <span class="k">assert</span> <span class="s2">&quot;thread_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                    <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;app_version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;context_test_version&quot;</span>
-                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;process_id&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
-                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">test_third_party_logger_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that third-party loggers are set to WARNING level.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;hierarchy_test&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Test third-party loggers</span>
-            <span class="n">urllib3_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;urllib3&quot;</span><span class="p">)</span>
-            <span class="n">requests_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;requests&quot;</span><span class="p">)</span>
-            <span class="n">dash_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;dash&quot;</span><span class="p">)</span>
-
-            <span class="c1"># They should be set to WARNING level</span>
-            <span class="k">assert</span> <span class="n">urllib3_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-            <span class="k">assert</span> <span class="n">requests_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-            <span class="k">assert</span> <span class="n">dash_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-
-            <span class="c1"># Application loggers should inherit root level (DEBUG)</span>
-            <span class="n">app_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="n">app_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-
-    <span class="k">def</span> <span class="nf">test_cli_level_controls_file_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that CLI log level properly controls file handler level.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="c1"># Set up with DEBUG level</span>
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;cli_test&quot;</span><span class="p">)</span>
-
-            <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-            <span class="n">file_handler</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="c1"># Find the file handler</span>
-            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s2">&quot;baseFilename&quot;</span><span class="p">):</span>
-                    <span class="n">file_handler</span> <span class="o">=</span> <span class="n">handler</span>
-                    <span class="k">break</span>
-
-            <span class="k">assert</span> <span class="n">file_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="c1"># File handler level should match the CLI level</span>
-            <span class="k">assert</span> <span class="n">file_handler</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-
-    <span class="k">def</span> <span class="nf">test_global_exception_handler_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that global exception handler is installed.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="c1"># Store original exception handler</span>
-            <span class="n">original_excepthook</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;exception_test&quot;</span><span class="p">)</span>
-
-                <span class="c1"># Exception handler should be modified</span>
-                <span class="k">assert</span> <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span> <span class="o">!=</span> <span class="n">original_excepthook</span>
-
-            <span class="k">finally</span><span class="p">:</span>
-                <span class="c1"># Restore original handler</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span> <span class="o">=</span> <span class="n">original_excepthook</span>
-</code></pre></div></td></tr></table></div>
-              </details>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestContextEnrichment.test_cli_level_controls_file_handler" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_cli_level_controls_file_handler</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that CLI log level properly controls file handler level.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_cli_level_controls_file_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that CLI log level properly controls file handler level.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="c1"># Set up with DEBUG level</span>
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;cli_test&quot;</span><span class="p">)</span>
-
-        <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-        <span class="n">file_handler</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># Find the file handler</span>
-        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s2">&quot;baseFilename&quot;</span><span class="p">):</span>
-                <span class="n">file_handler</span> <span class="o">=</span> <span class="n">handler</span>
-                <span class="k">break</span>
-
-        <span class="k">assert</span> <span class="n">file_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="c1"># File handler level should match the CLI level</span>
-        <span class="k">assert</span> <span class="n">file_handler</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestContextEnrichment.test_context_filter_adds_metadata" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_context_filter_adds_metadata</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that context filter adds process_id, thread_id, and app_version.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_context_filter_adds_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that context filter adds process_id, thread_id, and app_version.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;context_test_version&quot;</span><span class="p">)</span>
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;context_test&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Test context enrichment&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Force flush</span>
-        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-        <span class="c1"># Read and verify log contains enriched context</span>
-        <span class="k">if</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">log_content</span><span class="p">:</span>
-                <span class="n">log_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">log_content</span><span class="p">)</span>
-                <span class="k">assert</span> <span class="s2">&quot;process_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                <span class="k">assert</span> <span class="s2">&quot;thread_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;app_version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;context_test_version&quot;</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;process_id&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestContextEnrichment.test_global_exception_handler_setup" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_global_exception_handler_setup</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that global exception handler is installed.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_global_exception_handler_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that global exception handler is installed.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="c1"># Store original exception handler</span>
-        <span class="n">original_excepthook</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;exception_test&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Exception handler should be modified</span>
-            <span class="k">assert</span> <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span> <span class="o">!=</span> <span class="n">original_excepthook</span>
-
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="c1"># Restore original handler</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">excepthook</span> <span class="o">=</span> <span class="n">original_excepthook</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestContextEnrichment.test_third_party_logger_levels" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_third_party_logger_levels</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that third-party loggers are set to WARNING level.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_third_party_logger_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that third-party loggers are set to WARNING level.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;hierarchy_test&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Test third-party loggers</span>
-        <span class="n">urllib3_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;urllib3&quot;</span><span class="p">)</span>
-        <span class="n">requests_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;requests&quot;</span><span class="p">)</span>
-        <span class="n">dash_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;dash&quot;</span><span class="p">)</span>
-
-        <span class="c1"># They should be set to WARNING level</span>
-        <span class="k">assert</span> <span class="n">urllib3_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-        <span class="k">assert</span> <span class="n">requests_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-        <span class="k">assert</span> <span class="n">dash_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-
-        <span class="c1"># Application loggers should inherit root level (DEBUG)</span>
-        <span class="n">app_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">app_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h4 id="app.test_logger.TestGetLogger" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>TestGetLogger</code>
-
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-
-        <p>Test cases for the get_logger function.</p>
-
-
-
-
-
-
-
-
-              <details class="quote">
-                <summary>Source code in <code>app/test_logger.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestGetLogger</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test cases for the get_logger function.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">test_get_logger_returns_logger_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that get_logger returns a logging.Logger instance.&quot;&quot;&quot;</span>
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">test_get_logger_with_different_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that get_logger returns different loggers for different names.&quot;&quot;&quot;</span>
-        <span class="n">logger1</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test1&quot;</span><span class="p">)</span>
-        <span class="n">logger2</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test2&quot;</span><span class="p">)</span>
-
-        <span class="k">assert</span> <span class="n">logger1</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;test1&quot;</span>
-        <span class="k">assert</span> <span class="n">logger2</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;test2&quot;</span>
-        <span class="k">assert</span> <span class="n">logger1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">logger2</span>
-
-    <span class="k">def</span> <span class="nf">test_get_logger_with_same_name_returns_same_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that get_logger returns the same instance for the same name.&quot;&quot;&quot;</span>
-        <span class="n">logger1</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-        <span class="n">logger2</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-
-        <span class="k">assert</span> <span class="n">logger1</span> <span class="ow">is</span> <span class="n">logger2</span>
-</code></pre></div></td></tr></table></div>
-              </details>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestGetLogger.test_get_logger_returns_logger_instance" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_get_logger_returns_logger_instance</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that get_logger returns a logging.Logger instance.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_get_logger_returns_logger_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that get_logger returns a logging.Logger instance.&quot;&quot;&quot;</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestGetLogger.test_get_logger_with_different_names" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_get_logger_with_different_names</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that get_logger returns different loggers for different names.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_get_logger_with_different_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that get_logger returns different loggers for different names.&quot;&quot;&quot;</span>
-    <span class="n">logger1</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test1&quot;</span><span class="p">)</span>
-    <span class="n">logger2</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test2&quot;</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="n">logger1</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;test1&quot;</span>
-    <span class="k">assert</span> <span class="n">logger2</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;test2&quot;</span>
-    <span class="k">assert</span> <span class="n">logger1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">logger2</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestGetLogger.test_get_logger_with_same_name_returns_same_instance" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_get_logger_with_same_name_returns_same_instance</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that get_logger returns the same instance for the same name.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_get_logger_with_same_name_returns_same_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that get_logger returns the same instance for the same name.&quot;&quot;&quot;</span>
-    <span class="n">logger1</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-    <span class="n">logger2</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="n">logger1</span> <span class="ow">is</span> <span class="n">logger2</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h4 id="app.test_logger.TestIntegration" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>TestIntegration</code>
-
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-
-        <p>Integration tests for the logging system.</p>
-
-
-
-
-
-
-
-
-              <details class="quote">
-                <summary>Source code in <code>app/test_logger.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestIntegration</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Integration tests for the logging system.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">test_full_logging_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test the complete logging workflow.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;integration_test.log&quot;</span>
-
-            <span class="c1"># Setup logging</span>
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;integration_test_version&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Get logger and log messages</span>
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;integration_test&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Integration test started&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This is a warning&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;This is an error&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Force flush</span>
-            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-            <span class="c1"># Verify log file exists and contains expected content</span>
-            <span class="k">assert</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-            <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
-            <span class="k">assert</span> <span class="s2">&quot;Integration test started&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-            <span class="k">assert</span> <span class="s2">&quot;This is a warning&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-            <span class="k">assert</span> <span class="s2">&quot;This is an error&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-
-            <span class="c1"># Verify JSON format</span>
-            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">log_content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                    <span class="n">log_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-                    <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;integration_test&quot;</span>
-                    <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;level&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span>
-                        <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
-                    <span class="p">]</span>  <span class="c1"># renamed field</span>
-                    <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;app_version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;integration_test_version&quot;</span>
-</code></pre></div></td></tr></table></div>
-              </details>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestIntegration.test_full_logging_workflow" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_full_logging_workflow</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test the complete logging workflow.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_full_logging_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test the complete logging workflow.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;integration_test.log&quot;</span>
-
-        <span class="c1"># Setup logging</span>
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;integration_test_version&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Get logger and log messages</span>
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;integration_test&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Integration test started&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;This is a warning&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;This is an error&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Force flush</span>
-        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-        <span class="c1"># Verify log file exists and contains expected content</span>
-        <span class="k">assert</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-        <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="s2">&quot;Integration test started&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-        <span class="k">assert</span> <span class="s2">&quot;This is a warning&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-        <span class="k">assert</span> <span class="s2">&quot;This is an error&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-
-        <span class="c1"># Verify JSON format</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">log_content</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                <span class="n">log_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-                <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;integration_test&quot;</span>
-                <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;level&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span>
-                    <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
-                <span class="p">]</span>  <span class="c1"># renamed field</span>
-                <span class="k">assert</span> <span class="n">log_entry</span><span class="p">[</span><span class="s2">&quot;app_version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;integration_test_version&quot;</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h4 id="app.test_logger.TestSetupLogging" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>TestSetupLogging</code>
-
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-
-        <p>Test cases for the setup_logging function.</p>
-
-
-
-
-
-
-
-
-              <details class="quote">
-                <summary>Source code in <code>app/test_logger.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 17</span>
-<span class="normal"> 18</span>
-<span class="normal"> 19</span>
-<span class="normal"> 20</span>
-<span class="normal"> 21</span>
-<span class="normal"> 22</span>
-<span class="normal"> 23</span>
-<span class="normal"> 24</span>
-<span class="normal"> 25</span>
-<span class="normal"> 26</span>
-<span class="normal"> 27</span>
-<span class="normal"> 28</span>
-<span class="normal"> 29</span>
-<span class="normal"> 30</span>
-<span class="normal"> 31</span>
-<span class="normal"> 32</span>
-<span class="normal"> 33</span>
-<span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
-<span class="normal"> 44</span>
-<span class="normal"> 45</span>
-<span class="normal"> 46</span>
-<span class="normal"> 47</span>
-<span class="normal"> 48</span>
-<span class="normal"> 49</span>
-<span class="normal"> 50</span>
-<span class="normal"> 51</span>
-<span class="normal"> 52</span>
-<span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
-<span class="normal"> 57</span>
-<span class="normal"> 58</span>
-<span class="normal"> 59</span>
-<span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TestSetupLogging</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test cases for the setup_logging function.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">test_setup_logging_creates_log_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that setup_logging creates the log directory if it doesn&#39;t exist.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="c1"># Directory shouldn&#39;t exist initially</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">)</span>
-
-            <span class="c1"># Directory should be created</span>
-            <span class="k">assert</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">test_setup_logging_configures_root_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that setup_logging configures the root logger with correct level.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-            <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-            <span class="k">assert</span> <span class="n">root_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-
-    <span class="k">def</span> <span class="nf">test_setup_logging_configures_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that setup_logging configures both console and file handlers.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-            <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-
-            <span class="c1"># Should have 2 handlers (console and file)</span>
-            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span>
-
-            <span class="c1"># Find console and file handlers</span>
-            <span class="n">console_handler</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">file_handler</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="n">handler</span><span class="o">.</span><span class="n">stream</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
-                <span class="p">):</span>
-                    <span class="n">console_handler</span> <span class="o">=</span> <span class="n">handler</span>
-                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s2">&quot;baseFilename&quot;</span><span class="p">):</span>
-                    <span class="n">file_handler</span> <span class="o">=</span> <span class="n">handler</span>
-
-            <span class="c1"># Console handler should exist and be set to ERROR level</span>
-            <span class="k">assert</span> <span class="n">console_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="k">assert</span> <span class="n">console_handler</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
-
-            <span class="c1"># File handler should exist and be set to INFO level</span>
-            <span class="k">assert</span> <span class="n">file_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="k">assert</span> <span class="n">file_handler</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
-
-    <span class="k">def</span> <span class="nf">test_console_handler_only_shows_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that console handler only shows ERROR and CRITICAL messages.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="c1"># Use StringIO to capture stderr output</span>
-            <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
-
-            <span class="n">captured_stderr</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
-
-            <span class="c1"># Temporarily replace sys.stderr before setting up logging</span>
-            <span class="n">original_stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">captured_stderr</span>
-
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-                <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-
-                <span class="c1"># Log messages at different levels</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Debug message&quot;</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Info message&quot;</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning message&quot;</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error message&quot;</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Critical message&quot;</span><span class="p">)</span>
-
-                <span class="c1"># Force handlers to flush</span>
-                <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                    <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-                <span class="c1"># Get captured output</span>
-                <span class="n">stderr_output</span> <span class="o">=</span> <span class="n">captured_stderr</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
-
-                <span class="c1"># Only ERROR and CRITICAL should appear on console</span>
-                <span class="k">assert</span> <span class="s2">&quot;Error message&quot;</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-                <span class="k">assert</span> <span class="s2">&quot;Critical message&quot;</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-                <span class="k">assert</span> <span class="s2">&quot;Debug message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-                <span class="k">assert</span> <span class="s2">&quot;Info message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-                <span class="k">assert</span> <span class="s2">&quot;Warning message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-
-            <span class="k">finally</span><span class="p">:</span>
-                <span class="c1"># Restore original stderr</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">original_stderr</span>
-
-    <span class="k">def</span> <span class="nf">test_file_handler_logs_info_and_above</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that file handler logs INFO and above messages when set to INFO level.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="c1"># Set logging to INFO level (not DEBUG) to test INFO+ filtering</span>
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Log messages at different levels</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Debug message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Info message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Critical message&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Force handlers to flush</span>
-            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-            <span class="c1"># Read log file content</span>
-            <span class="k">if</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
-
-                <span class="c1"># Should contain INFO, WARNING, ERROR, CRITICAL but not DEBUG</span>
-                <span class="k">assert</span> <span class="s2">&quot;Info message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-                <span class="k">assert</span> <span class="s2">&quot;Warning message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-                <span class="k">assert</span> <span class="s2">&quot;Error message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-                <span class="k">assert</span> <span class="s2">&quot;Critical message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-                <span class="k">assert</span> <span class="s2">&quot;Debug message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_content</span>
-
-    <span class="k">def</span> <span class="nf">test_log_format_is_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that log messages are formatted as JSON.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-            <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Test JSON format&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Force handlers to flush</span>
-            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-            <span class="c1"># Read log file and verify JSON format</span>
-            <span class="k">if</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">log_content</span><span class="p">:</span>
-                    <span class="c1"># Each line should be valid JSON</span>
-                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">log_content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                            <span class="k">try</span><span class="p">:</span>
-                                <span class="n">log_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-                                <span class="k">assert</span> <span class="s2">&quot;timestamp&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>  <span class="c1"># renamed from asctime</span>
-                                <span class="k">assert</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                                <span class="k">assert</span> <span class="s2">&quot;level&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>  <span class="c1"># renamed from levelname</span>
-                                <span class="k">assert</span> <span class="s2">&quot;message&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                                <span class="k">assert</span> <span class="s2">&quot;process_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                                <span class="k">assert</span> <span class="s2">&quot;thread_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                                <span class="k">assert</span> <span class="s2">&quot;app_version&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
-                                <span class="n">pytest</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log line is not valid JSON: </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-              </details>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestSetupLogging.test_console_handler_only_shows_errors" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_console_handler_only_shows_errors</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that console handler only shows ERROR and CRITICAL messages.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_console_handler_only_shows_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that console handler only shows ERROR and CRITICAL messages.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="c1"># Use StringIO to capture stderr output</span>
-        <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
-
-        <span class="n">captured_stderr</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
-
-        <span class="c1"># Temporarily replace sys.stderr before setting up logging</span>
-        <span class="n">original_stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">captured_stderr</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Log messages at different levels</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Debug message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Info message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error message&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Critical message&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Force handlers to flush</span>
-            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-                <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-            <span class="c1"># Get captured output</span>
-            <span class="n">stderr_output</span> <span class="o">=</span> <span class="n">captured_stderr</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
-
-            <span class="c1"># Only ERROR and CRITICAL should appear on console</span>
-            <span class="k">assert</span> <span class="s2">&quot;Error message&quot;</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-            <span class="k">assert</span> <span class="s2">&quot;Critical message&quot;</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-            <span class="k">assert</span> <span class="s2">&quot;Debug message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-            <span class="k">assert</span> <span class="s2">&quot;Info message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-            <span class="k">assert</span> <span class="s2">&quot;Warning message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stderr_output</span>
-
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="c1"># Restore original stderr</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">original_stderr</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestSetupLogging.test_file_handler_logs_info_and_above" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_file_handler_logs_info_and_above</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that file handler logs INFO and above messages when set to INFO level.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_file_handler_logs_info_and_above</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that file handler logs INFO and above messages when set to INFO level.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="c1"># Set logging to INFO level (not DEBUG) to test INFO+ filtering</span>
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Log messages at different levels</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Debug message&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Info message&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning message&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error message&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Critical message&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Force handlers to flush</span>
-        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-        <span class="c1"># Read log file content</span>
-        <span class="k">if</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
-
-            <span class="c1"># Should contain INFO, WARNING, ERROR, CRITICAL but not DEBUG</span>
-            <span class="k">assert</span> <span class="s2">&quot;Info message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-            <span class="k">assert</span> <span class="s2">&quot;Warning message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-            <span class="k">assert</span> <span class="s2">&quot;Error message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-            <span class="k">assert</span> <span class="s2">&quot;Critical message&quot;</span> <span class="ow">in</span> <span class="n">log_content</span>
-            <span class="k">assert</span> <span class="s2">&quot;Debug message&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_content</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestSetupLogging.test_log_format_is_json" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_log_format_is_json</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that log messages are formatted as JSON.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_log_format_is_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that log messages are formatted as JSON.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Test JSON format&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Force handlers to flush</span>
-        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-        <span class="c1"># Read log file and verify JSON format</span>
-        <span class="k">if</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="n">log_content</span> <span class="o">=</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">log_content</span><span class="p">:</span>
-                <span class="c1"># Each line should be valid JSON</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">log_content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                        <span class="k">try</span><span class="p">:</span>
-                            <span class="n">log_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-                            <span class="k">assert</span> <span class="s2">&quot;timestamp&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>  <span class="c1"># renamed from asctime</span>
-                            <span class="k">assert</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                            <span class="k">assert</span> <span class="s2">&quot;level&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>  <span class="c1"># renamed from levelname</span>
-                            <span class="k">assert</span> <span class="s2">&quot;message&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                            <span class="k">assert</span> <span class="s2">&quot;process_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                            <span class="k">assert</span> <span class="s2">&quot;thread_id&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                            <span class="k">assert</span> <span class="s2">&quot;app_version&quot;</span> <span class="ow">in</span> <span class="n">log_entry</span>
-                        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
-                            <span class="n">pytest</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log line is not valid JSON: </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestSetupLogging.test_setup_logging_configures_handlers" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_setup_logging_configures_handlers</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that setup_logging configures both console and file handlers.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_setup_logging_configures_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that setup_logging configures both console and file handlers.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-        <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-
-        <span class="c1"># Should have 2 handlers (console and file)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span>
-
-        <span class="c1"># Find console and file handlers</span>
-        <span class="n">console_handler</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">file_handler</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span>
-                <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">handler</span><span class="o">.</span><span class="n">stream</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
-            <span class="p">):</span>
-                <span class="n">console_handler</span> <span class="o">=</span> <span class="n">handler</span>
-            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s2">&quot;baseFilename&quot;</span><span class="p">):</span>
-                <span class="n">file_handler</span> <span class="o">=</span> <span class="n">handler</span>
-
-        <span class="c1"># Console handler should exist and be set to ERROR level</span>
-        <span class="k">assert</span> <span class="n">console_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">console_handler</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
-
-        <span class="c1"># File handler should exist and be set to INFO level</span>
-        <span class="k">assert</span> <span class="n">file_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">file_handler</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestSetupLogging.test_setup_logging_configures_root_logger" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_setup_logging_configures_root_logger</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that setup_logging configures the root logger with correct level.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_setup_logging_configures_root_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that setup_logging configures the root logger with correct level.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="s2">&quot;test_version&quot;</span><span class="p">)</span>
-
-        <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">root_logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h5 id="app.test_logger.TestSetupLogging.test_setup_logging_creates_log_directory" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="n">test_setup_logging_creates_log_directory</span><span class="p">()</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that setup_logging creates the log directory if it doesn't exist.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>app/test_logger.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_setup_logging_creates_log_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that setup_logging creates the log directory if it doesn&#39;t exist.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-        <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span> <span class="o">/</span> <span class="s2">&quot;test.log&quot;</span>
-
-        <span class="c1"># Directory shouldn&#39;t exist initially</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-
-        <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">)</span>
-
-        <span class="c1"># Directory should be created</span>
-        <span class="k">assert</span> <span class="n">log_file_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
   </div>
 
@@ -4227,7 +2220,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.sections", "navigation.top", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.92b07e13.min.js"></script>

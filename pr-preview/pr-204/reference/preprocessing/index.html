@@ -82,7 +82,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
@@ -170,14 +172,8 @@
     
   </nav>
   
-</header>
     
-    <div class="md-container" data-md-component="container">
       
-      
-        
-          
-            
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
@@ -257,7 +253,13 @@
     </ul>
   </div>
 </nav>
-          
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
         
       
       <main class="md-main" data-md-component="main">
@@ -1104,6 +1106,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#preprocessing-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#preprocessing.series_semantic" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;series_semantic
@@ -1112,6 +1124,24 @@
   
     <nav class="md-nav" aria-label=" series_semantic">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing.series_semantic-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing.series_semantic-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#preprocessing.series_semantic.constant_series" class="md-nav__link">
@@ -1133,160 +1163,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;test_series_semantic
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" test_series_semantic">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_all_none_series" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_all_none_series
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_date_string_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_date_string_parsing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_datetime_timezone_inference" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_datetime_timezone_inference
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_datetime_with_timezone_offset_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_datetime_with_timezone_offset_parsing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_datetime_with_timezone_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_datetime_with_timezone_parsing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_mixed_valid_invalid_dates" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_mixed_valid_invalid_dates
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_native_date_recognition" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_native_date_recognition
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_native_datetime_recognition" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_native_datetime_recognition
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_native_types_inference" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_native_types_inference
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_mixed_timezones_warning" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_mixed_timezones_warning
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_with_tz" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_with_tz
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_with_tz_no_timezone" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_with_tz_no_timezone
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_with_tz_offset" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_with_tz_offset
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_text_catch_all" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_text_catch_all
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_threshold_behavior" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_threshold_behavior
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_time_string_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_time_string_parsing
-    </span>
-  </a>
   
 </li>
         
@@ -1424,6 +1300,83 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Services
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
+            <span class="md-nav__icon md-icon"></span>
+            Services
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/tokenizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tokenizer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1466,6 +1419,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#preprocessing-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#preprocessing.series_semantic" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;series_semantic
@@ -1474,6 +1437,24 @@
   
     <nav class="md-nav" aria-label=" series_semantic">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing.series_semantic-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing.series_semantic-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#preprocessing.series_semantic.constant_series" class="md-nav__link">
@@ -1495,160 +1476,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;test_series_semantic
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" test_series_semantic">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_all_none_series" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_all_none_series
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_date_string_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_date_string_parsing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_datetime_timezone_inference" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_datetime_timezone_inference
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_datetime_with_timezone_offset_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_datetime_with_timezone_offset_parsing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_datetime_with_timezone_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_datetime_with_timezone_parsing
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_mixed_valid_invalid_dates" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_mixed_valid_invalid_dates
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_native_date_recognition" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_native_date_recognition
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_native_datetime_recognition" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_native_datetime_recognition
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_native_types_inference" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_native_types_inference
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_mixed_timezones_warning" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_mixed_timezones_warning
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_with_tz" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_with_tz
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_with_tz_no_timezone" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_with_tz_no_timezone
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_parse_datetime_with_tz_offset" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_parse_datetime_with_tz_offset
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_text_catch_all" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_text_catch_all
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_threshold_behavior" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_threshold_behavior
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preprocessing.test_series_semantic.test_time_string_parsing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;test_time_string_parsing
-    </span>
-  </a>
   
 </li>
         
@@ -1700,6 +1527,32 @@
 
 
 
+<p><span class="doc-section-title">Modules:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-module&quot;&gt;&lt;/code&gt;            &lt;code&gt;series_semantic&lt;/code&gt; (&lt;code&gt;preprocessing.series_semantic&lt;/code&gt;)" href="#preprocessing.series_semantic">series_semantic</a></code></td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
 
 
 
@@ -1714,17 +1567,17 @@
 
 
 
-
+<h3 id="preprocessing-modules">Modules</h3>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h3 id="preprocessing.series_semantic" class="doc doc-heading">
+<h4 id="preprocessing.series_semantic" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <code>series_semantic</code>
 
 
-</h3>
+</h4>
 
     <div class="doc doc-contents ">
 
@@ -1737,24 +1590,58 @@
 
 
 
+
+
+<p><span class="doc-section-title">Functions:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;constant_series&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;series&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt; (&lt;code&gt;preprocessing.series_semantic.constant_series&lt;/code&gt;)" href="#preprocessing.series_semantic.constant_series">constant_series</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Create a series with a constant value for each row of <code>series</code>.</p>
+                </div>
+              </td>
+            </tr>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;parse_datetime_with_tz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt; (&lt;code&gt;preprocessing.series_semantic.parse_datetime_with_tz&lt;/code&gt;)" href="#preprocessing.series_semantic.parse_datetime_with_tz">parse_datetime_with_tz</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Parse datetime strings with timezone info (both abbreviations and offsets)</p>
+                </div>
+              </td>
+            </tr>
+      </tbody>
+    </table>
+
+
+
+
+
   <div class="doc doc-children">
 
 
 
 
 
+<h5 id="preprocessing.series_semantic-attributes">Attributes</h5>
 
 
-
-
+<h5 id="preprocessing.series_semantic-functions">Functions</h5>
 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="preprocessing.series_semantic.constant_series" class="doc doc-heading">
+<h6 id="preprocessing.series_semantic.constant_series" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">constant_series</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></code>
 
-</h4>
+</h6>
 
 
     <div class="doc doc-contents ">
@@ -1778,10 +1665,10 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="preprocessing.series_semantic.parse_datetime_with_tz" class="doc doc-heading">
+<h6 id="preprocessing.series_semantic.parse_datetime_with_tz" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">parse_datetime_with_tz</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></code>
 
-</h4>
+</h6>
 
 
     <div class="doc doc-contents ">
@@ -1894,694 +1781,6 @@
 
 </div>
 
-<div class="doc doc-object doc-module">
-
-
-
-<h3 id="preprocessing.test_series_semantic" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <code>test_series_semantic</code>
-
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_all_none_series" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_all_none_series</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test series with all null values</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
-<span class="normal">193</span>
-<span class="normal">194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_all_none_series</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test series with all null values&quot;&quot;&quot;</span>
-    <span class="n">null_series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">String</span><span class="p">)</span>
-    <span class="n">semantic</span> <span class="o">=</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">null_series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">semantic</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;free_text&quot;</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_date_string_parsing" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_date_string_parsing</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test date-only string parsing</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_date_string_parsing</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test date-only string parsing&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;2025-02-28&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-02-27&quot;</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="n">date_string</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="n">date_string</span><span class="o">.</span><span class="n">try_convert</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Date</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_datetime_timezone_inference" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_datetime_timezone_inference</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test main inference function with timezone datetime</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_datetime_timezone_inference</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test main inference function with timezone datetime&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;2025-02-28 00:36:15 UTC&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
-    <span class="n">semantic</span> <span class="o">=</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="n">semantic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="k">assert</span> <span class="n">semantic</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;datetime&quot;</span>
-    <span class="k">assert</span> <span class="n">semantic</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;datetime&quot;</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_datetime_with_timezone_offset_parsing" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_datetime_with_timezone_offset_parsing</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test timezone offset datetime strings get recognized as datetime semantic</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_datetime_with_timezone_offset_parsing</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test timezone offset datetime strings get recognized as datetime semantic&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-        <span class="p">[</span><span class="s2">&quot;2025-01-27 00:07:12.056000-05:00&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-01-27 00:07:16.126000-05:00&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
-    <span class="k">assert</span> <span class="n">datetime_string</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="c1"># Test conversion</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">datetime_string</span><span class="o">.</span><span class="n">try_convert</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_datetime_with_timezone_parsing" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_datetime_with_timezone_parsing</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test parsing datetime strings with timezone</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_datetime_with_timezone_parsing</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test parsing datetime strings with timezone&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;2025-02-28 00:36:15 UTC&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-02-28 00:36:13 UTC&quot;</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="n">datetime_string</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="c1"># Test conversion</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">datetime_string</span><span class="o">.</span><span class="n">try_convert</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_mixed_valid_invalid_dates" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_mixed_valid_invalid_dates</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test series with mix of valid and invalid datetime strings</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_mixed_valid_invalid_dates</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test series with mix of valid and invalid datetime strings&quot;&quot;&quot;</span>
-    <span class="n">mixed_series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;2025-01-01 UTC&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid_date&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-01-02 UTC&quot;</span><span class="p">])</span>
-    <span class="n">semantic</span> <span class="o">=</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">mixed_series</span><span class="p">)</span>
-    <span class="c1"># should be free_text with threshold 0.8</span>
-    <span class="k">assert</span> <span class="n">semantic</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;free_text&quot;</span>
-
-    <span class="n">semantic</span> <span class="o">=</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">series</span><span class="o">=</span><span class="n">mixed_series</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">semantic</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;datetime&quot;</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_native_date_recognition" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_native_date_recognition</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that pl.Date columns get recognized correctly</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_native_date_recognition</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that pl.Date columns get recognized correctly&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">Date</span>
-    <span class="p">)</span>
-    <span class="k">assert</span> <span class="n">native_date</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_native_datetime_recognition" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_native_datetime_recognition</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that pl.Datetime columns get recognized correctly</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_native_datetime_recognition</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that pl.Datetime columns get recognized correctly&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
-    <span class="k">assert</span> <span class="n">native_datetime</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_native_types_inference" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_native_types_inference</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that native temporal types get recognized</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_native_types_inference</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that native temporal types get recognized&quot;&quot;&quot;</span>
-    <span class="n">date_series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">Date</span><span class="p">)</span>
-    <span class="n">datetime_series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">date_series</span><span class="p">)</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;native_date&quot;</span>
-    <span class="k">assert</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">datetime_series</span><span class="p">)</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;native_datetime&quot;</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_parse_datetime_mixed_timezones_warning" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_parse_datetime_mixed_timezones_warning</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that mixed timezones trigger a warning</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_parse_datetime_mixed_timezones_warning</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that mixed timezones trigger a warning&quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">warnings</span>
-
-    <span class="c1"># Series with mixed timezone abbreviations and offsets</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-        <span class="p">[</span>
-            <span class="s2">&quot;2025-01-27 00:07:12 UTC&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;2025-01-27 00:07:16-05:00&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;2025-01-27 00:07:20 EST&quot;</span><span class="p">,</span>
-        <span class="p">]</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Capture warnings</span>
-    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">parse_datetime_with_tz</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-        <span class="c1"># Should have issued a warning</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-        <span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="s2">&quot;Multiple timezones found&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="s2">&quot;UTC&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="s2">&quot;-05:00&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="s2">&quot;EST&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-
-    <span class="c1"># But parsing should still work</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_parse_datetime_with_tz" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_parse_datetime_with_tz</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test timezone parsing helper function</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_parse_datetime_with_tz</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test timezone parsing helper function&quot;&quot;&quot;</span>
-
-    <span class="c1"># Use same timezone to avoid warning</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;2025-02-28 00:36:15 UTC&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-02-28 00:36:13 UTC&quot;</span><span class="p">])</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">parse_datetime_with_tz</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_parse_datetime_with_tz_no_timezone" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_parse_datetime_with_tz_no_timezone</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test datetime parsing without timezone suffix</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_parse_datetime_with_tz_no_timezone</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test datetime parsing without timezone suffix&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;2025-02-28 00:36:15&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-02-28 00:36:13&quot;</span><span class="p">])</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">parse_datetime_with_tz</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_parse_datetime_with_tz_offset" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_parse_datetime_with_tz_offset</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test datetime parsing with timezone offset format</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_parse_datetime_with_tz_offset</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test datetime parsing with timezone offset format&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-        <span class="p">[</span><span class="s2">&quot;2025-01-27 00:07:12.056000-05:00&quot;</span><span class="p">,</span> <span class="s2">&quot;2025-01-27 00:07:16.126000-05:00&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">parse_datetime_with_tz</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Datetime</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_text_catch_all" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_text_catch_all</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test free form text parsing</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_text_catch_all</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test free form text parsing&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-        <span class="p">[</span><span class="s2">&quot;First post with some content!&quot;</span><span class="p">,</span> <span class="s2">&quot;a different no all caps post&quot;</span><span class="p">,</span> <span class="s2">&quot;THIRD POST&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
-    <span class="k">assert</span> <span class="n">text_catch_all</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="n">text_catch_all</span><span class="o">.</span><span class="n">try_convert</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">String</span>
-
-    <span class="n">semantic</span> <span class="o">=</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">semantic</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;free_text&quot;</span>
-    <span class="k">assert</span> <span class="n">semantic</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_threshold_behavior" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_threshold_behavior</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test that recognition threshold works correctly</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_threshold_behavior</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that recognition threshold works correctly&quot;&quot;&quot;</span>
-
-    <span class="c1"># 70% of data is date, the rest is text</span>
-    <span class="n">mixed_series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;2025-01-01 UTC&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;not_a_date&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
-
-    <span class="c1"># Should work with the right threshold (i.e. &gt; 50%)</span>
-    <span class="n">semantic_low</span> <span class="o">=</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">mixed_series</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">semantic_low</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;datetime&quot;</span>
-
-    <span class="c1"># Check a threshold that&#39;s not met, should defer to free_text</span>
-    <span class="n">semantic_high</span> <span class="o">=</span> <span class="n">infer_series_semantic</span><span class="p">(</span><span class="n">mixed_series</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">semantic_high</span><span class="o">.</span><span class="n">semantic_name</span> <span class="o">==</span> <span class="s2">&quot;free_text&quot;</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="preprocessing.test_series_semantic.test_time_string_parsing" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">test_time_string_parsing</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Test time-only string parsing</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>preprocessing/test_series_semantic.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_time_string_parsing</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test time-only string parsing&quot;&quot;&quot;</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s2">&quot;14:30:15&quot;</span><span class="p">,</span> <span class="s2">&quot;09:15:30&quot;</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="n">time_string</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="n">time_string</span><span class="o">.</span><span class="n">try_convert</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pl</span><span class="o">.</span><span class="n">Time</span>
-    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
   </div>
 
@@ -2646,7 +1845,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.sections", "navigation.top", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.92b07e13.min.js"></script>
