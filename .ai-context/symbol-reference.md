@@ -145,7 +145,7 @@ Base interface for data importers
 
 ### Tokenizer Service (`services/tokenizer/`)
 
-Unicode-aware text tokenization with multilingual support and social media entity preservation.
+Unicode-aware text tokenization with scriptio continua (character-level) and space-separated script support, plus social media entity preservation.
 
 #### Core Interface - `services/tokenizer/core/base.py`
 
@@ -173,7 +173,7 @@ Comprehensive tokenization configuration:
 
 **Core Enums:**
 
-- `LanguageFamily` - Language script families (LATIN, CJK, ARABIC, MIXED, UNKNOWN)
+- `LanguageFamily` - Language script families (LATIN, CJK, ARABIC, MIXED, UNKNOWN) - CJK includes all scriptio continua scripts
 - `TokenType` - Token classifications (WORD, HASHTAG, MENTION, URL, EMOJI, etc.)
 - `CaseHandling` - Case transformation options (PRESERVE, LOWERCASE, UPPERCASE, NORMALIZE)
 
@@ -183,11 +183,12 @@ Comprehensive tokenization configuration:
 
 Core tokenizer implementation with Unicode awareness:
 
-- Multilingual tokenization for Latin, CJK, and Arabic script families
+- Scriptio continua tokenization: Character-level for CJK, Thai, Lao, Myanmar, Khmer
+- Space-separated tokenization: Word-level for Latin, Arabic scripts
 - Social media entity preservation (hashtags, mentions, URLs)
 - Unicode normalization and proper space handling
 - Configurable preprocessing and postprocessing
-- Single-pass regex-based token extraction
+- Single-pass regex-based token extraction with order preservation
 
 #### Pattern Matching - `services/tokenizer/basic/patterns.py`
 

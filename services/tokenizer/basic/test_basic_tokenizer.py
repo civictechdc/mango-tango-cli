@@ -271,15 +271,7 @@ class TestBasicTokenizerConfig:
 
         # CRITICAL: Specific numeric tokens should be preserved
         assert "123" in result, f"Integer '123' not found in result: {result}"
-        assert "45.67" in result or (
-            "45" in result and "67" in result
-        ), f"Decimal '45.67' not properly tokenized in result: {result}"
-
-        # Verify numeric tokens are actually included
-        numeric_tokens = [
-            token for token in result if any(char.isdigit() for char in token)
-        ]
-        assert len(numeric_tokens) > 0, f"No numeric tokens found in result: {result}"
+        assert "45.67" in result, f"Decimal '45.67' not properly tokenized in result: {result}"
 
     def test_emoji_inclusion_disabled(self):
         """Test emoji exclusion."""

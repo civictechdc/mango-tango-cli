@@ -79,10 +79,12 @@ Reusable services that support analyzers and data processing
 
 Key Services:
 
-- **Tokenizer Service** (`services/tokenizer/`) - Unicode-aware text tokenization
+- **Tokenizer Service** (`services/tokenizer/`) - Unicode-aware scriptio continua tokenization
   - `AbstractTokenizer` - Base interface for tokenizer implementations
   - `TokenizerConfig` - Configuration for tokenization behavior
-  - `BasicTokenizer` - Core implementation with multilingual support
+  - `BasicTokenizer` - Core implementation with character-level and word-level tokenization
+  - Character-level: CJK, Thai, Lao, Myanmar, Khmer scripts
+  - Word-level: Latin, Arabic scripts with space separation
   - `TokenType`, `LanguageFamily` - Type definitions for tokenization
   - Comprehensive regex patterns and social media entity preservation
 

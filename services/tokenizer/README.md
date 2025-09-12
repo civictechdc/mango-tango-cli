@@ -85,7 +85,7 @@ class TokenizerConfig:
     # Token type filtering
     include_punctuation: bool = False
     include_numeric: bool = True
-    include_emoji: bool = False  # Default is False
+    include_emoji: bool = False
 
     # Text preprocessing
     case_handling: CaseHandling = CaseHandling.LOWERCASE
