@@ -261,6 +261,7 @@ Add new tokenizers to the service interface:
 ```python
 # In services/tokenizer/__init__.py
 from .custom_tokenizer import CustomTokenizer
+from .core.types import TokenizerConfig
 
 def create_custom_tokenizer(config: TokenizerConfig = None) -> CustomTokenizer:
     return CustomTokenizer(config)

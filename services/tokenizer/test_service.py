@@ -89,16 +89,22 @@ class TestMultilingualTokenization:
 
         assert isinstance(result, list)
         assert len(result) > 0
-        # Should handle mixed scripts at service level
-        assert "hello" in result or "world" in result
-        assert "你" in result or "好" in result or "你好" in result
+
+        # CRITICAL: Should handle scripts with predictable tokenization
+        # Latin script should be lowercased and space-separated
+        assert "hello" in result, f"Latin text 'hello' not found in result: {result}"
+        assert "world" in result, f"Latin text 'world' not found in result: {result}"
+
+        # CJK should be character-level tokenized
+        assert "你" in result, f"Chinese character '你' not found in result: {result}"
+        assert "好" in result, f"Chinese character '好' not found in result: {result}"
 
 
 class TestSocialMediaEntities:
     """Test basic social media entity extraction through service API (smoke test)."""
 
     def test_combined_social_entities_smoke(self):
-        """Test service API with multiple social media entities."""
+        """Test service API with multiple social media entities enabled."""
         text = "@user check #hashtag https://example.com 🎉"
 
         config = TokenizerConfig(
@@ -117,6 +123,39 @@ class TestSocialMediaEntities:
         assert "#hashtag" in result
         assert "https://example.com" in result
         assert "check" in result
+
+        # CRITICAL: Emoji should be preserved when enabled
+        assert "🎉" in result, f"Emoji should be preserved when enabled: {result}"
+
+    def test_combined_social_entities_disabled(self):
+        """Test service API with all social media entities disabled."""
+        text = "@user check #hashtag https://example.com 🎉"
+
+        config = TokenizerConfig(
+            extract_mentions=False,
+            extract_hashtags=False,
+            extract_urls=False,
+            include_emoji=False,
+        )
+        tokenizer = create_basic_tokenizer(config)
+        result = tokenizer.tokenize(text)
+
+        # Service API should handle disabled entities
+        assert isinstance(result, list)
+
+        # Basic words should be present
+        assert "check" in result
+
+        # Social media entities should NOT be preserved intact
+        assert "@user" not in result, "Mentions should be disabled"
+        assert "#hashtag" not in result, "Hashtags should be disabled"
+        assert "https://example.com" not in result, "URLs should be disabled"
+        assert "🎉" not in result, "Emojis should be disabled"
+
+        # Components should be tokenized separately
+        assert (
+            "user" in result or "hashtag" in result
+        ), "Entity content should be tokenized as words"
 
 
 class TestTokenizerConfiguration:

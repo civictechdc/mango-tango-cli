@@ -175,7 +175,11 @@ class TokenizerPatterns:
         )
 
         # Thai script pattern
-        thai_pattern = r"[\u0e00-\u0e7f]+"  # Thai script range
+        thai_pattern = (
+            r"(?:"
+            r"[\u0e00-\u0e7f]"  # Thai script range
+            r")"
+        )
 
         # Other Southeast Asian scripts (common in social media)
         sea_pattern = (
@@ -189,7 +193,7 @@ class TokenizerPatterns:
 
         # Word patterns for different script types
         latin_word_pattern = r"[a-zA-Z]+(?:\'[a-zA-Z]+)*"  # Handle contractions
-        word_pattern = f"(?:{latin_word_pattern}|{cjk_pattern}+|{arabic_pattern}+|{thai_pattern}|{sea_pattern}+)"
+        word_pattern = f"(?:{latin_word_pattern}|{cjk_pattern}+|{arabic_pattern}+|{thai_pattern}+|{sea_pattern}+)"
 
         # Punctuation (preserve some, group others)
         punctuation_pattern = r'[.!?;:,\-\(\)\[\]{}"\']'

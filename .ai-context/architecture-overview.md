@@ -11,15 +11,15 @@ flowchart TD
     App --> Importers[Data Importers]
     App --> Preprocessing[Semantic Preprocessor]
     App --> Analyzers[Analyzer System]
-    App --> Services[Tokenizer Service]
+    App --> TokenizerService[Tokenizer Service]
 
     Importers --> Parquet[(Parquet Files)]
     Preprocessing --> Parquet
     Analyzers --> Parquet
 
-    Services --> Analyzers
-    Services --> TokenizerCore[Core Types & Base]
-    Services --> BasicTokenizer[BasicTokenizer]
+    Analyzers --> TokenizerService
+    TokenizerService --> BasicTokenizer[BasicTokenizer]
+    BasicTokenizer --> Primary
 
     Analyzers --> Primary[Primary Analyzers]
     Analyzers --> Secondary[Secondary Analyzers]

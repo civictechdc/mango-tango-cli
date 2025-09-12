@@ -80,8 +80,8 @@ class TestTokenizerConfig:
         assert config.max_token_length == 100
         assert config.strip_whitespace is False
 
-    def test_config_immutability(self):
-        """Test that configuration can be modified after creation."""
+    def test_config_mutability(self):
+        """Test that configuration can be modified after creation (dataclass is mutable by default)."""
         config = TokenizerConfig()
 
         # Should be able to modify (dataclass is mutable by default)
@@ -89,6 +89,11 @@ class TestTokenizerConfig:
         config.min_token_length = 5
         assert config.min_token_length == 5
         assert config.min_token_length != original_min_length
+
+        # Test modification of other fields to ensure true mutability
+        config.include_emoji = not config.include_emoji
+        config.case_handling = CaseHandling.UPPERCASE
+        assert config.case_handling == CaseHandling.UPPERCASE
 
     def test_config_type_hints(self):
         """Test that type hints are correctly specified."""

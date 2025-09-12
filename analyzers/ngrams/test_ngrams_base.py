@@ -88,16 +88,11 @@ def test_tokenize():
 
     assert isinstance(
         test_tokenized_actual, list
-    ), "output of tokenize_text() is not instance of list"
+    ), "output of tokenize_text() is not an instance of list"
 
-    assert all(
-        [
-            expected_str == actual_str
-            for expected_str, actual_str in zip(
-                TEST_TOKENIZED_EXPECTED, test_tokenized_actual
-            )
-        ]
-    ), "Tokenized strings does not matched expected tokens."
+    assert (
+        test_tokenized_actual == TEST_TOKENIZED_EXPECTED
+    ), "Tokenized strings do not match expected tokens."
 
     pass
 

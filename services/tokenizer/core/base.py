@@ -79,8 +79,8 @@ class AbstractTokenizer(ABC):
         elif self._config.case_handling == CaseHandling.UPPERCASE:
             text = text.upper()
         elif self._config.case_handling == CaseHandling.NORMALIZE:
-            # Simple normalization - convert to lowercase but preserve proper nouns
-            # This is a basic implementation, can be enhanced later
+            # TODO: Implement proper noun detection for smart normalization
+            # Currently using simple lowercase as a placeholder
             text = text.lower()
 
         return text
