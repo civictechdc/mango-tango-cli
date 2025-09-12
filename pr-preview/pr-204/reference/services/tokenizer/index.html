@@ -2834,8 +2834,8 @@ different implementation strategies.</p>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">case_handling</span> <span class="o">==</span> <span class="n">CaseHandling</span><span class="o">.</span><span class="n">UPPERCASE</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">case_handling</span> <span class="o">==</span> <span class="n">CaseHandling</span><span class="o">.</span><span class="n">NORMALIZE</span><span class="p">:</span>
-            <span class="c1"># Simple normalization - convert to lowercase but preserve proper nouns</span>
-            <span class="c1"># This is a basic implementation, can be enhanced later</span>
+            <span class="c1"># TODO: Implement proper noun detection for smart normalization</span>
+            <span class="c1"># Currently using simple lowercase as a placeholder</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">text</span>
@@ -3850,8 +3850,8 @@ different implementation strategies.</p>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">case_handling</span> <span class="o">==</span> <span class="n">CaseHandling</span><span class="o">.</span><span class="n">UPPERCASE</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">case_handling</span> <span class="o">==</span> <span class="n">CaseHandling</span><span class="o">.</span><span class="n">NORMALIZE</span><span class="p">:</span>
-            <span class="c1"># Simple normalization - convert to lowercase but preserve proper nouns</span>
-            <span class="c1"># This is a basic implementation, can be enhanced later</span>
+            <span class="c1"># TODO: Implement proper noun detection for smart normalization</span>
+            <span class="c1"># Currently using simple lowercase as a placeholder</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">text</span>
@@ -5045,7 +5045,12 @@ for different script families.</p>
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
-<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unicode-aware basic tokenizer for social media text.</span>
 
@@ -5104,8 +5109,8 @@ for different script families.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_tokens_ordered</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">MIXED</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_is_cjk_char</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if character is CJK.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_is_char_level_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if character belongs to a script that uses character-level tokenization (scriptio continua).&quot;&quot;&quot;</span>
         <span class="n">code_point</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(</span><span class="mh">0x4E00</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x9FFF</span><span class="p">)</span>  <span class="c1"># CJK Unified Ideographs</span>
@@ -5113,6 +5118,10 @@ for different script families.</p>
             <span class="ow">or</span> <span class="p">(</span><span class="mh">0x3040</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x309F</span><span class="p">)</span>  <span class="c1"># Hiragana</span>
             <span class="ow">or</span> <span class="p">(</span><span class="mh">0x30A0</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x30FF</span><span class="p">)</span>  <span class="c1"># Katakana</span>
             <span class="ow">or</span> <span class="p">(</span><span class="mh">0xAC00</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0xD7AF</span><span class="p">)</span>  <span class="c1"># Hangul Syllables</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x0E00</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x0E7F</span><span class="p">)</span>  <span class="c1"># Thai</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x0E80</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x0EFF</span><span class="p">)</span>  <span class="c1"># Lao</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x1000</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x109F</span><span class="p">)</span>  <span class="c1"># Myanmar</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x1780</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x17FF</span><span class="p">)</span>  <span class="c1"># Khmer</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_char_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -5135,8 +5144,8 @@ for different script families.</p>
         <span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;latin&quot;</span>
 
-        <span class="c1"># CJK scripts</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">):</span>
+        <span class="c1"># Character-level scripts (CJK, Thai, etc.)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;cjk&quot;</span>
 
         <span class="c1"># Arabic script</span>
@@ -5193,19 +5202,20 @@ for different script families.</p>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_url_like</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
                 <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_url_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
-            <span class="c1"># For CJK languages, break down multi-character tokens into individual characters</span>
+            <span class="c1"># For character-level scripts, break down multi-character tokens into individual characters</span>
             <span class="c1"># This maintains compatibility with existing test expectations</span>
-            <span class="k">if</span> <span class="n">language_family</span> <span class="o">==</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">CJK</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_cjk_chars</span><span class="p">(</span>
-                <span class="n">token</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">language_family</span> <span class="o">==</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">CJK</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_char_level_chars</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
             <span class="p">):</span>
-                <span class="c1"># Only break down pure CJK tokens, not mixed tokens</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pure_cjk_token</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+                <span class="c1"># Only break down pure character-level tokens, not mixed tokens</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pure_char_level_token</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
                     <span class="n">tokens</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># Mixed token - keep as is but process CJK parts</span>
+                    <span class="c1"># Mixed token - keep as is but process character-level parts</span>
                     <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">language_family</span> <span class="o">==</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">MIXED</span><span class="p">:</span>
-                <span class="c1"># For mixed script, break down CJK parts but keep Latin parts whole</span>
+                <span class="c1"># For mixed script, break down character-level script parts but keep Latin parts whole</span>
                 <span class="n">processed_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_mixed_script_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
                 <span class="n">tokens</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">processed_tokens</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -5241,17 +5251,17 @@ for different script families.</p>
         <span class="n">trailing_punctuation</span> <span class="o">=</span> <span class="s2">&quot;.!?;:,)]}</span><span class="se">\&quot;</span><span class="s2">&#39;&quot;</span>
         <span class="k">return</span> <span class="n">url_token</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">trailing_punctuation</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_contains_cjk_chars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains any CJK characters.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_contains_char_level_chars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains any character-level script characters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_is_pure_cjk_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains only CJK characters.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_is_pure_char_level_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains only character-level script characters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_process_mixed_script_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenList</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process mixed script tokens by breaking down CJK parts.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_cjk_chars</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process mixed script tokens by breaking down character-level script parts.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_char_level_chars</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">token</span><span class="p">]</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
@@ -5259,7 +5269,7 @@ for different script families.</p>
         <span class="n">current_is_cjk</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">:</span>
-            <span class="n">char_is_cjk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+            <span class="n">char_is_cjk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">current_is_cjk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">current_is_cjk</span> <span class="o">=</span> <span class="n">char_is_cjk</span>
@@ -5703,17 +5713,17 @@ while preserving social media entities and handling Unicode correctly.</p>
 
             <details class="quote">
               <summary>Source code in <code>services/tokenizer/basic/patterns.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
 <span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
-<span class="normal">272</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_patterns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">TokenizerPatterns</span><span class="p">:</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_patterns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">TokenizerPatterns</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get global TokenizerPatterns instance.</span>
 
@@ -6125,7 +6135,11 @@ for different token types found in social media text.</p>
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
-<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TokenizerPatterns</span><span class="p">:</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">TokenizerPatterns</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compiled regex patterns for tokenization.</span>
 
@@ -6280,7 +6294,11 @@ for different token types found in social media text.</p>
         <span class="p">)</span>
 
         <span class="c1"># Thai script pattern</span>
-        <span class="n">thai_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;[\u0e00-\u0e7f]+&quot;</span>  <span class="c1"># Thai script range</span>
+        <span class="n">thai_pattern</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;(?:&quot;</span>
+            <span class="sa">r</span><span class="s2">&quot;[\u0e00-\u0e7f]&quot;</span>  <span class="c1"># Thai script range</span>
+            <span class="sa">r</span><span class="s2">&quot;)&quot;</span>
+        <span class="p">)</span>
 
         <span class="c1"># Other Southeast Asian scripts (common in social media)</span>
         <span class="n">sea_pattern</span> <span class="o">=</span> <span class="p">(</span>
@@ -6294,7 +6312,7 @@ for different token types found in social media text.</p>
 
         <span class="c1"># Word patterns for different script types</span>
         <span class="n">latin_word_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-Z]+(?:\&#39;[a-zA-Z]+)*&quot;</span>  <span class="c1"># Handle contractions</span>
-        <span class="n">word_pattern</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(?:</span><span class="si">{</span><span class="n">latin_word_pattern</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">cjk_pattern</span><span class="si">}</span><span class="s2">+|</span><span class="si">{</span><span class="n">arabic_pattern</span><span class="si">}</span><span class="s2">+|</span><span class="si">{</span><span class="n">thai_pattern</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">sea_pattern</span><span class="si">}</span><span class="s2">+)&quot;</span>
+        <span class="n">word_pattern</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(?:</span><span class="si">{</span><span class="n">latin_word_pattern</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">cjk_pattern</span><span class="si">}</span><span class="s2">+|</span><span class="si">{</span><span class="n">arabic_pattern</span><span class="si">}</span><span class="s2">+|</span><span class="si">{</span><span class="n">thai_pattern</span><span class="si">}</span><span class="s2">+|</span><span class="si">{</span><span class="n">sea_pattern</span><span class="si">}</span><span class="s2">+)&quot;</span>
 
         <span class="c1"># Punctuation (preserve some, group others)</span>
         <span class="n">punctuation_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[.!?;:,\-\(\)\[\]</span><span class="si">{}</span><span class="s1">&quot;</span><span class="se">\&#39;</span><span class="s1">]&#39;</span>
@@ -6815,17 +6833,17 @@ eliminating the need for segmentation and reassembly.</p>
 
             <details class="quote">
               <summary>Source code in <code>services/tokenizer/basic/patterns.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
 <span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
-<span class="normal">272</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_patterns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">TokenizerPatterns</span><span class="p">:</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_patterns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">TokenizerPatterns</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get global TokenizerPatterns instance.</span>
 
@@ -7256,7 +7274,12 @@ for different script families.</p>
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
-<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unicode-aware basic tokenizer for social media text.</span>
 
@@ -7315,8 +7338,8 @@ for different script families.</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_tokens_ordered</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">MIXED</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_is_cjk_char</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if character is CJK.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_is_char_level_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if character belongs to a script that uses character-level tokenization (scriptio continua).&quot;&quot;&quot;</span>
         <span class="n">code_point</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(</span><span class="mh">0x4E00</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x9FFF</span><span class="p">)</span>  <span class="c1"># CJK Unified Ideographs</span>
@@ -7324,6 +7347,10 @@ for different script families.</p>
             <span class="ow">or</span> <span class="p">(</span><span class="mh">0x3040</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x309F</span><span class="p">)</span>  <span class="c1"># Hiragana</span>
             <span class="ow">or</span> <span class="p">(</span><span class="mh">0x30A0</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x30FF</span><span class="p">)</span>  <span class="c1"># Katakana</span>
             <span class="ow">or</span> <span class="p">(</span><span class="mh">0xAC00</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0xD7AF</span><span class="p">)</span>  <span class="c1"># Hangul Syllables</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x0E00</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x0E7F</span><span class="p">)</span>  <span class="c1"># Thai</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x0E80</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x0EFF</span><span class="p">)</span>  <span class="c1"># Lao</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x1000</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x109F</span><span class="p">)</span>  <span class="c1"># Myanmar</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="mh">0x1780</span> <span class="o">&lt;=</span> <span class="n">code_point</span> <span class="o">&lt;=</span> <span class="mh">0x17FF</span><span class="p">)</span>  <span class="c1"># Khmer</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_char_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -7346,8 +7373,8 @@ for different script families.</p>
         <span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;latin&quot;</span>
 
-        <span class="c1"># CJK scripts</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">):</span>
+        <span class="c1"># Character-level scripts (CJK, Thai, etc.)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;cjk&quot;</span>
 
         <span class="c1"># Arabic script</span>
@@ -7404,19 +7431,20 @@ for different script families.</p>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_url_like</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
                 <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_url_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
-            <span class="c1"># For CJK languages, break down multi-character tokens into individual characters</span>
+            <span class="c1"># For character-level scripts, break down multi-character tokens into individual characters</span>
             <span class="c1"># This maintains compatibility with existing test expectations</span>
-            <span class="k">if</span> <span class="n">language_family</span> <span class="o">==</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">CJK</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_cjk_chars</span><span class="p">(</span>
-                <span class="n">token</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">language_family</span> <span class="o">==</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">CJK</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_char_level_chars</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
             <span class="p">):</span>
-                <span class="c1"># Only break down pure CJK tokens, not mixed tokens</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pure_cjk_token</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+                <span class="c1"># Only break down pure character-level tokens, not mixed tokens</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pure_char_level_token</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
                     <span class="n">tokens</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># Mixed token - keep as is but process CJK parts</span>
+                    <span class="c1"># Mixed token - keep as is but process character-level parts</span>
                     <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">language_family</span> <span class="o">==</span> <span class="n">LanguageFamily</span><span class="o">.</span><span class="n">MIXED</span><span class="p">:</span>
-                <span class="c1"># For mixed script, break down CJK parts but keep Latin parts whole</span>
+                <span class="c1"># For mixed script, break down character-level script parts but keep Latin parts whole</span>
                 <span class="n">processed_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_mixed_script_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
                 <span class="n">tokens</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">processed_tokens</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -7452,17 +7480,17 @@ for different script families.</p>
         <span class="n">trailing_punctuation</span> <span class="o">=</span> <span class="s2">&quot;.!?;:,)]}</span><span class="se">\&quot;</span><span class="s2">&#39;&quot;</span>
         <span class="k">return</span> <span class="n">url_token</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">trailing_punctuation</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_contains_cjk_chars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains any CJK characters.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_contains_char_level_chars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains any character-level script characters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_is_pure_cjk_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains only CJK characters.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_is_pure_char_level_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if token contains only character-level script characters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_process_mixed_script_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenList</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process mixed script tokens by breaking down CJK parts.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_cjk_chars</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process mixed script tokens by breaking down character-level script parts.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contains_char_level_chars</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">token</span><span class="p">]</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
@@ -7470,7 +7498,7 @@ for different script families.</p>
         <span class="n">current_is_cjk</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">token</span><span class="p">:</span>
-            <span class="n">char_is_cjk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cjk_char</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+            <span class="n">char_is_cjk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">current_is_cjk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">current_is_cjk</span> <span class="o">=</span> <span class="n">char_is_cjk</span>
