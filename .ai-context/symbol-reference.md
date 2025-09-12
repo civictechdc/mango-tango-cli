@@ -193,10 +193,15 @@ Core tokenizer implementation with Unicode awareness:
 
 **Pattern Functions:**
 
-- `get_patterns(language_family: LanguageFamily) -> dict` - Get tokenization patterns
-- `get_pattern(name: str, language_family: LanguageFamily) -> str` - Get specific pattern
-- `get_comprehensive_pattern(config: TokenizerConfig) -> Pattern` - Build single comprehensive regex for all token types
+- `get_patterns() -> TokenizerPatterns` - Get singleton TokenizerPatterns instance
 - Unicode-aware regex patterns for different script families
+
+**Pattern Classes:**
+
+- `TokenizerPatterns` - Compiled regex patterns for tokenization
+- `SOCIAL_PATTERNS` - Social media entity patterns
+- `LINGUISTIC_PATTERNS` - Language-specific tokenization patterns  
+- `FORMATTING_PATTERNS` - Text formatting and structure patterns
 
 #### Service API - `services/tokenizer/__init__.py`
 
@@ -207,7 +212,7 @@ Core tokenizer implementation with Unicode awareness:
 
 **Public Exports:**
 
-- Core types: `AbstractTokenizer`, `TokenizerConfig`, `TokenType`, `LanguageFamily`
+- Core types: `AbstractTokenizer`, `TokenizerConfig`, `TokenList`, `TokenType`, `LanguageFamily`, `CaseHandling`
 - Implementation: `BasicTokenizer`
 - Factory functions: `create_basic_tokenizer`, `tokenize_text`
 
