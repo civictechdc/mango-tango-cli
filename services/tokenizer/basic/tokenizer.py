@@ -72,8 +72,8 @@ class BasicTokenizer(AbstractTokenizer):
         """
         return self._extract_tokens_ordered(text, LanguageFamily.MIXED)
 
-    def _is_cjk_char(self, char: str) -> bool:
-        """Check if character is CJK."""
+    def _is_char_level_script(self, char: str) -> bool:
+        """Check if character belongs to a script that uses character-level tokenization (scriptio continua)."""
         code_point = ord(char)
         return (
             (0x4E00 <= code_point <= 0x9FFF)  # CJK Unified Ideographs
@@ -81,6 +81,10 @@ class BasicTokenizer(AbstractTokenizer):
             or (0x3040 <= code_point <= 0x309F)  # Hiragana
             or (0x30A0 <= code_point <= 0x30FF)  # Katakana
             or (0xAC00 <= code_point <= 0xD7AF)  # Hangul Syllables
+            or (0x0E00 <= code_point <= 0x0E7F)  # Thai
+            or (0x0E80 <= code_point <= 0x0EFF)  # Lao
+            or (0x1000 <= code_point <= 0x109F)  # Myanmar
+            or (0x1780 <= code_point <= 0x17FF)  # Khmer
         )
 
     def _get_char_script(self, char: str) -> str:
@@ -103,8 +107,8 @@ class BasicTokenizer(AbstractTokenizer):
         ):
             return "latin"
 
-        # CJK scripts
-        elif self._is_cjk_char(char):
+        # Character-level scripts (CJK, Thai, etc.)
+        elif self._is_char_level_script(char):
             return "cjk"
 
         # Arabic script
@@ -161,19 +165,19 @@ class BasicTokenizer(AbstractTokenizer):
             if self._is_url_like(token):
                 token = self._clean_url_token(token)
 
-            # For CJK languages, break down multi-character tokens into individual characters
+            # For character-level scripts, break down multi-character tokens into individual characters
             # This maintains compatibility with existing test expectations
-            if language_family == LanguageFamily.CJK and self._contains_cjk_chars(
+            if language_family == LanguageFamily.CJK and self._contains_char_level_chars(
                 token
             ):
-                # Only break down pure CJK tokens, not mixed tokens
-                if self._is_pure_cjk_token(token):
+                # Only break down pure character-level tokens, not mixed tokens
+                if self._is_pure_char_level_token(token):
                     tokens.extend(list(token))
                 else:
-                    # Mixed token - keep as is but process CJK parts
+                    # Mixed token - keep as is but process character-level parts
                     tokens.append(token)
             elif language_family == LanguageFamily.MIXED:
-                # For mixed script, break down CJK parts but keep Latin parts whole
+                # For mixed script, break down character-level script parts but keep Latin parts whole
                 processed_tokens = self._process_mixed_script_token(token)
                 tokens.extend(processed_tokens)
             else:
@@ -209,17 +213,17 @@ class BasicTokenizer(AbstractTokenizer):
         trailing_punctuation = ".!?;:,)]}\"'"
         return url_token.rstrip(trailing_punctuation)
 
-    def _contains_cjk_chars(self, token: str) -> bool:
-        """Check if token contains any CJK characters."""
-        return any(self._is_cjk_char(char) for char in token)
+    def _contains_char_level_chars(self, token: str) -> bool:
+        """Check if token contains any character-level script characters."""
+        return any(self._is_char_level_script(char) for char in token)
 
-    def _is_pure_cjk_token(self, token: str) -> bool:
-        """Check if token contains only CJK characters."""
-        return all(self._is_cjk_char(char) or char.isspace() for char in token)
+    def _is_pure_char_level_token(self, token: str) -> bool:
+        """Check if token contains only character-level script characters."""
+        return all(self._is_char_level_script(char) or char.isspace() for char in token)
 
     def _process_mixed_script_token(self, token: str) -> TokenList:
-        """Process mixed script tokens by breaking down CJK parts."""
-        if not self._contains_cjk_chars(token):
+        """Process mixed script tokens by breaking down character-level script parts."""
+        if not self._contains_char_level_chars(token):
             return [token]
 
         result = []
@@ -227,7 +231,7 @@ class BasicTokenizer(AbstractTokenizer):
         current_is_cjk = None
 
         for char in token:
-            char_is_cjk = self._is_cjk_char(char)
+            char_is_cjk = self._is_char_level_script(char)
 
             if current_is_cjk is None:
                 current_is_cjk = char_is_cjk
