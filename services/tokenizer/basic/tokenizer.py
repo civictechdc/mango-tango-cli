@@ -9,12 +9,7 @@ import re
 from typing import Optional
 
 from ..core.base import AbstractTokenizer
-from ..core.types import (
-    LanguageFamily,
-    TokenizerConfig,
-    TokenList,
-    TokenType,
-)
+from ..core.types import LanguageFamily, TokenizerConfig, TokenList, TokenType
 from .patterns import get_patterns
 
 
@@ -64,7 +59,6 @@ class BasicTokenizer(AbstractTokenizer):
         # Apply post-processing
         return self._postprocess_tokens(tokens)
 
-
     def _extract_tokens(self, text: str) -> TokenList:
         """
         Extract tokens using comprehensive regex patterns.
@@ -77,7 +71,6 @@ class BasicTokenizer(AbstractTokenizer):
             List of extracted tokens in their original order
         """
         return self._extract_tokens_ordered(text, LanguageFamily.MIXED)
-
 
     def _is_cjk_char(self, char: str) -> bool:
         """Check if character is CJK."""

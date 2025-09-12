@@ -12,13 +12,7 @@ from typing import Optional
 
 import pytest
 
-from .types import (
-    CaseHandling,
-    LanguageFamily,
-    TokenizerConfig,
-    TokenList,
-    TokenType,
-)
+from .types import CaseHandling, LanguageFamily, TokenizerConfig, TokenList, TokenType
 
 
 class TestTokenizerConfig:
@@ -227,7 +221,6 @@ class TestTypeAliases:
         # Empty list should be valid
         empty_list: TokenList = []
         assert isinstance(empty_list, list)
-
 
 
 class TestConfigurationValidation:

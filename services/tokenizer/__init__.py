@@ -5,6 +5,9 @@ This service provides tokenization capabilities for social media analytics,
 with support for multilingual content and entity preservation.
 """
 
+# Basic implementation
+from .basic import BasicTokenizer, create_basic_tokenizer, tokenize_text
+
 # Core interfaces and types
 from .core import (
     AbstractTokenizer,
@@ -14,9 +17,6 @@ from .core import (
     TokenList,
     TokenType,
 )
-
-# Basic implementation
-from .basic import BasicTokenizer, create_basic_tokenizer, tokenize_text
 
 # Main exports
 __all__ = [

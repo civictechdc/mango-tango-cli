@@ -50,8 +50,6 @@ class TokenizerPatterns:
             raise KeyError(f"Pattern '{pattern_name}' not found")
         return self._patterns[pattern_name]
 
-
-
     def get_comprehensive_pattern(self, config) -> Any:
         """
         Build comprehensive tokenization pattern based on configuration.
@@ -272,9 +270,6 @@ def get_patterns() -> TokenizerPatterns:
     if _global_patterns is None:
         _global_patterns = TokenizerPatterns()
     return _global_patterns
-
-
-
 
 
 # Pattern categories for easy access
