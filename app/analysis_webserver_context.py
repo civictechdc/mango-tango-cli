@@ -1,5 +1,7 @@
+from asyncio import CancelledError, Event, create_task
 from os import path
 from pathlib import Path
+from signal import SIGINT, default_int_handler, signal
 from tempfile import TemporaryDirectory
 
 from a2wsgi import WSGIMiddleware
@@ -92,18 +94,38 @@ class AnalysisWebServerContext(BaseModel):
                 Mount("/shiny", app=shiny_app, name="shiny_app"),
             ],
         )
+        config = Config(
+            app, host="0.0.0.0", port=8050, log_level="error", lifespan="off"
+        )
+        uvi_server = Server(config)
+        shutdown_event = Event()
+
+        async def shutdown_handler():
+            if shutdown_event.is_set():
+                return
+
+            shutdown_event.set()
+            uvi_server.should_exit = True
+
+        def signal_handler(sig, frame):
+            create_task(shutdown_handler())
+
+        signal(SIGINT, signal_handler)
 
         try:
-            config = Config(app, host="0.0.0.0", port=8050, log_level="error")
-            uvi_server = Server(config)
-
             uvi_server.run()
 
         except KeyboardInterrupt:
-            pass
+            print("gracefully shutting down server...")
+
+        except CancelledError:
+            print("gracefully shutting down server...")
 
         except Exception as err:
-            print(err)
+            if not isinstance(err, (KeyboardInterrupt, CancelledError)):
+                print(f"Unexpected error: {err}")
+
+        signal(SIGINT, default_int_handler)
 
         for temp_dir in temp_dirs:
             temp_dir.cleanup()
