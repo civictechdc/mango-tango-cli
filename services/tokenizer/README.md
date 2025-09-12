@@ -1,61 +1,34 @@
 # Tokenizer Service
 
-Text tokenization service for social media analytics with multilingual support and entity preservation.
+Unicode-aware text tokenization for social media analytics with multilingual support.
 
-## Purpose
+## Overview
 
-The tokenizer service provides text tokenization that handles multiple languages and preserves social media entities. It supports:
+The tokenizer service provides configurable text tokenization that handles:
 
-- **Multilingual Content**: Unicode-aware tokenization for Latin, CJK, and Arabic script families
-- **Social Media Entities**: Preservation of hashtags, mentions, URLs, and email addresses as single tokens
-- **Unicode Normalization**: Handling of Unicode characters, emojis, and combined characters
-- **Configurable Processing**: Configuration options for different analysis requirements
+- **Multilingual text**: Latin, CJK (Chinese/Japanese/Korean), and Arabic scripts
+- **Social media entities**: Hashtags, mentions, URLs preserved as single tokens
+- **Unicode normalization**: Proper handling of combined characters and emojis
+- **Configurable processing**: Flexible options for different analysis needs
 
-## Features
+## Quick Start
 
-### Language Support
-
-- **Latin Scripts**: English, French, German, Spanish, and other space-separated languages
-- **CJK Scripts**: Chinese, Japanese, Korean with character-level tokenization
-- **Arabic Scripts**: Arabic, Persian, Urdu with proper RTL handling
-- **Mixed Content**: Regex patterns handle mixed-script content
-- **Language Detection**: Automatic script family detection for appropriate tokenization
-
-### Social Media Processing
-
-- **Hashtag Preservation**: `#trending` remains as single token
-- **Mention Extraction**: `@username` preserved with proper boundaries
-- **URL Handling**: Complete URLs maintained as single tokens
-- **Email Detection**: Email addresses extracted as entities
-- **Emoji Support**: Unicode emoji characters properly tokenized
-
-### Text Preprocessing
-
-- **Case Handling**: Configurable case normalization (preserve, lowercase, uppercase, smart)
-- **Unicode Normalization**: NFKC normalization for consistent character representation
-- **Space Processing**: Handling of various Unicode space characters
-- **Length Filtering**: Configurable minimum and maximum token length limits
-
-## Basic Usage
-
-### Simple Tokenization
+### Simple Usage
 
 ```python
 from services.tokenizer import tokenize_text
 
-# Basic tokenization with default configuration
-text = "Hello world! Check out #python @user https://example.com 🚀"
+text = "Hello @user! Check out #python https://example.com 🚀"
 tokens = tokenize_text(text)
-# Result: ['hello', 'world', '#python', '@user', 'https://example.com', '🚀']
+# Result: ['hello', '@user', 'check', 'out', '#python', 'https://example.com', '🚀']
 ```
 
-### Using BasicTokenizer Directly
+### Custom Configuration
 
 ```python
 from services.tokenizer import BasicTokenizer, TokenizerConfig
 from services.tokenizer.core import CaseHandling
 
-# Create tokenizer with custom configuration
 config = TokenizerConfig(
     case_handling=CaseHandling.PRESERVE,
     extract_hashtags=True,
@@ -67,258 +40,281 @@ tokenizer = BasicTokenizer(config)
 tokens = tokenizer.tokenize("Social media text #analysis @researcher")
 ```
 
-### Tokenization with Type Classification
+## Core Concepts
+
+### Abstract Interface
+
+All tokenizers implement `AbstractTokenizer`:
 
 ```python
-from services.tokenizer import create_basic_tokenizer
+from services.tokenizer.core.base import AbstractTokenizer
 
-tokenizer = create_basic_tokenizer()
-result = tokenizer.tokenize_with_types("Visit https://example.com #cool @user!")
-
-# Result structure:
-# {
-#     'word': ['visit'],
-#     'url': ['https://example.com'],
-#     'hashtag': ['#cool'],
-#     'mention': ['@user']
-# }
+class CustomTokenizer(AbstractTokenizer):
+    def tokenize(self, text: str) -> list[str]:
+        # Your implementation here
+        pass
 ```
 
-## Configuration
+### Configuration-Driven Processing
+
+The `TokenizerConfig` dataclass controls all tokenization behavior:
+
+- **Text preprocessing**: Case handling, Unicode normalization
+- **Token filtering**: What types of content to include/exclude
+- **Social media handling**: How to treat hashtags, mentions, URLs
+- **Output control**: Length limits, whitespace handling
+
+### Single-Pass Tokenization
+
+The `BasicTokenizer` uses a comprehensive regex approach:
+
+- One regex pattern matches all token types
+- Tokens extracted in document order
+- Social media entities matched before general words
+
+## Configuration Reference
 
 ### TokenizerConfig Options
 
-#### Language Handling
-
-- `fallback_language_family: LanguageFamily = LanguageFamily.MIXED` - Default language family for tokenization patterns
-
-#### Token Filtering
-
-- `include_punctuation: bool = False` - Include punctuation marks as tokens
-- `include_numeric: bool = True` - Include numeric tokens
-- `include_emoji: bool = True` - Include emoji characters
-
-#### Text Preprocessing Options
-
-- `case_handling: CaseHandling = CaseHandling.LOWERCASE` - Case transformation strategy
-- `normalize_unicode: bool = True` - Apply Unicode NFKC normalization
-
-#### Social Media Features
-
-- `extract_hashtags: bool = True` - Preserve hashtags as single tokens
-- `extract_mentions: bool = True` - Preserve mentions as single tokens
-- `extract_urls: bool = True` - Preserve URLs as single tokens
-- `extract_emails: bool = False` - Extract email addresses
-
-#### Output Control
-
-- `min_token_length: int = 1` - Minimum token length (characters)
-- `max_token_length: int = None` - Maximum token length (None for no limit)
-- `strip_whitespace: bool = True` - Remove leading/trailing whitespace from tokens
-
-### Configuration Examples
-
-#### Social Media Analysis
-
 ```python
-from services.tokenizer import TokenizerConfig
-from services.tokenizer.core import CaseHandling
+@dataclass
+class TokenizerConfig:
+    # Language detection
+    fallback_language_family: LanguageFamily = LanguageFamily.MIXED
 
-social_config = TokenizerConfig(
-    case_handling=CaseHandling.LOWERCASE,
-    extract_hashtags=True,
-    extract_mentions=True,
-    extract_urls=True,
-    include_emoji=True,
-    min_token_length=2
-)
+    # Token type filtering
+    include_punctuation: bool = False
+    include_numeric: bool = True
+    include_emoji: bool = False  # Default is False
+
+    # Text preprocessing
+    case_handling: CaseHandling = CaseHandling.LOWERCASE
+    normalize_unicode: bool = True
+
+    # Social media features
+    extract_hashtags: bool = True
+    extract_mentions: bool = True
+    extract_urls: bool = True
+    extract_emails: bool = True
+
+    # Output control
+    min_token_length: int = 1
+    max_token_length: Optional[int] = None
+    strip_whitespace: bool = True
 ```
 
-#### Multilingual Content Processing
+### Enum Values
 
-```python
-multilingual_config = TokenizerConfig(
-    normalize_unicode=True,
-    case_handling=CaseHandling.NORMALIZE,
-    include_punctuation=False,
-    fallback_language_family=LanguageFamily.MIXED  # For mixed content
-)
-```
-
-#### N-gram Analysis Preparation
-
-```python
-ngram_config = TokenizerConfig(
-    case_handling=CaseHandling.LOWERCASE,
-    include_punctuation=False,
-    include_numeric=False,
-    extract_hashtags=False,  # Split hashtags for n-gram analysis
-    min_token_length=3
-)
-```
-
-## API Reference
-
-### Core Types
-
-#### AbstractTokenizer
-
-Base interface for all tokenizer implementations.
-
-**Methods:**
-
-- `tokenize(text: str) -> list[str]` - Basic tokenization
-- `tokenize_with_types(text: str) -> dict[str, list[str]]` - Tokenization with type classification
-- `preprocess_text(text: str) -> str` - Apply preprocessing (case, normalization)
-- `postprocess_tokens(tokens: list[str]) -> list[str]` - Filter and clean tokens
-
-#### BasicTokenizer
-
-Core implementation of AbstractTokenizer with Unicode awareness and multilingual support.
-
-Inherits all AbstractTokenizer methods and provides:
-
-- Multilingual tokenization with automatic language detection
-- Social media entity preservation
-- Unicode normalization
-- Configurable preprocessing and postprocessing
-
-### Enumerations
-
-#### LanguageFamily
-
-- `LATIN` - Space-separated languages (English, French, etc.)
-- `CJK` - Chinese, Japanese, Korean
-- `ARABIC` - Arabic script languages
-- `MIXED` - Mixed content requiring multiple strategies
-- `UNKNOWN` - Language detection failed
-
-#### TokenType
-
-- `WORD` - Regular words
-- `HASHTAG` - Social media hashtags
-- `MENTION` - Social media mentions
-- `URL` - URLs and links
-- `EMAIL` - Email addresses
-- `EMOJI` - Emoji characters
-- `NUMERIC` - Numbers
-- `PUNCTUATION` - Punctuation marks
-- `WHITESPACE` - Whitespace (when preserved)
-
-#### CaseHandling
+**CaseHandling:**
 
 - `PRESERVE` - Keep original case
 - `LOWERCASE` - Convert to lowercase
 - `UPPERCASE` - Convert to uppercase
 - `NORMALIZE` - Smart case normalization
 
-## Integration with Analyzers
+**LanguageFamily:**
 
-### N-gram Analyzer Integration
+- `LATIN` - Space-separated languages
+- `CJK` - Character-based languages
+- `ARABIC` - Right-to-left scripts
+- `MIXED` - Multiple script families
+- `UNKNOWN` - Language detection failed
 
-The tokenizer service is designed to work seamlessly with the n-gram analyzer:
+## API Reference
+
+### Factory Functions
+
+```python
+# Simple tokenization with optional config
+def tokenize_text(text: str, config: TokenizerConfig = None) -> list[str]
+
+# Create configured tokenizer instance
+def create_basic_tokenizer(config: TokenizerConfig = None) -> BasicTokenizer
+```
+
+### AbstractTokenizer Interface
+
+```python
+class AbstractTokenizer:
+    def __init__(self, config: TokenizerConfig = None)
+    def tokenize(self, text: str) -> list[str]  # Main tokenization method
+
+    @property
+    def config(self) -> TokenizerConfig  # Access configuration
+
+    # Protected methods for subclassing
+    def _preprocess_text(self, text: str) -> str
+    def _postprocess_tokens(self, tokens: list[str]) -> list[str]
+```
+
+### BasicTokenizer Implementation
+
+The main implementation provides:
+
+- Unicode-aware multilingual tokenization
+- Social media entity preservation
+- Configurable preprocessing and postprocessing
+- Support for mixed-script content
+
+## Usage Patterns
+
+### Preserving Original Case
+
+```python
+config = TokenizerConfig(
+    case_handling=CaseHandling.PRESERVE,
+    include_emoji=True,
+    min_token_length=1
+)
+```
+
+### Content-Only Tokenization
+
+```python
+config = TokenizerConfig(
+    extract_hashtags=False,  # Split hashtags to get content words
+    extract_mentions=False,  # Split mentions to get usernames
+    extract_urls=False,      # Split URLs into components
+    include_punctuation=False
+)
+```
+
+### Strict Filtering
+
+```python
+config = TokenizerConfig(
+    include_punctuation=False,
+    include_numeric=False,
+    include_emoji=False,
+    min_token_length=3,
+    max_token_length=20
+)
+```
+
+## Integration Examples
+
+### Basic Integration
 
 ```python
 from services.tokenizer import create_basic_tokenizer, TokenizerConfig
-from services.tokenizer.core import CaseHandling
 
-# Configure for n-gram analysis
-config = TokenizerConfig(
-    case_handling=CaseHandling.LOWERCASE,
-    include_punctuation=False,
-    extract_hashtags=False,  # Allow hashtag content to be n-grammed
-    min_token_length=2
-)
+# Use default configuration
+tokenizer = create_basic_tokenizer()
+tokens = tokenizer.tokenize(text)
 
+# Or with custom configuration
+config = TokenizerConfig(min_token_length=2)
 tokenizer = create_basic_tokenizer(config)
 tokens = tokenizer.tokenize(text)
-# Tokens ready for n-gram generation
 ```
 
-### Hashtag Analysis Integration
-
-For hashtag analysis, preserve hashtags as complete entities:
+### Configuration Factory Pattern
 
 ```python
 from services.tokenizer import TokenizerConfig
 from services.tokenizer.core import CaseHandling
 
-config = TokenizerConfig(
-    extract_hashtags=True,
-    case_handling=CaseHandling.PRESERVE,
-    include_emoji=True
-)
+def create_custom_config():
+    return TokenizerConfig(
+        case_handling=CaseHandling.PRESERVE,
+        include_emoji=True,
+        min_token_length=1
+    )
+
+config = create_custom_config()
 ```
 
-## Architecture
+## Extending the Service
 
-### Regex-Based Tokenization
-
-The tokenizer service uses a comprehensive regex approach:
-
-- **Single Pattern**: `get_comprehensive_pattern()` creates one regex that finds all tokens in document order
-- **Priority-Based Matching**: Social media entities matched before general words to preserve boundaries
-- **Document Order Preservation**: `findall()` returns tokens in their original text sequence
-- **Configuration-Driven**: Pattern construction adapts to enabled token types
-
-### Plugin System
-
-The tokenizer service uses an abstract base class pattern that supports extensibility:
+### Creating Custom Tokenizers
 
 ```python
 from services.tokenizer.core.base import AbstractTokenizer
 from services.tokenizer.core.types import TokenizerConfig
 
 class CustomTokenizer(AbstractTokenizer):
+    """Custom tokenizer implementation."""
+
     def __init__(self, config: TokenizerConfig = None):
         super().__init__(config)
         # Custom initialization
 
     def tokenize(self, text: str) -> list[str]:
-        # Custom tokenization logic
-        pass
+        """Implement custom tokenization logic."""
+        if not text:
+            return []
 
-    def tokenize_with_types(self, text: str) -> dict[str, list[str]]:
-        # Custom type-aware tokenization
-        pass
+        # Apply preprocessing
+        processed_text = self._preprocess_text(text)
+
+        # Your tokenization logic here
+        tokens = custom_tokenize_logic(processed_text)
+
+        # Apply postprocessing
+        return self._postprocess_tokens(tokens)
 ```
 
-### Module Structure
+### Plugin Registration
 
-```text
-services/tokenizer/
-├── __init__.py              # Public API and factory functions
-├── core/                    # Core interfaces and types
-│   ├── __init__.py         # Core exports
-│   ├── base.py             # AbstractTokenizer base class
-│   ├── types.py            # Configuration and enums
-│   └── test_types.py       # Type system tests
-├── basic/                   # BasicTokenizer implementation
-│   ├── __init__.py         # Basic tokenizer exports
-│   ├── tokenizer.py        # Main BasicTokenizer class
-│   ├── patterns.py         # Regex patterns for tokenization
-│   └── test_basic_tokenizer.py  # Implementation tests
-└── test_service.py         # Integration tests
-```
-
-## Implementation Details
-
-### Design Characteristics
-
-- **Single-Pass Regex**: All tokens extracted in document order with one regex pattern
-- **Configuration-Driven**: Only compile patterns for enabled token types
-- **Custom Pattern Support**: User-defined regex patterns for domain-specific tokenization
-- **Script Family Support**: Extensible design for additional language families
-
-### Plugin Architecture
-
-The abstract base class pattern supports adding new tokenizer implementations:
+Add new tokenizers to the service interface:
 
 ```python
-# Future plugin example
-from services.tokenizer.core.base import AbstractTokenizer
+# In services/tokenizer/__init__.py
+from .custom_tokenizer import CustomTokenizer
 
-class MLTokenizer(AbstractTokenizer):
-    """Machine learning-based tokenizer implementation."""
-    # Custom ML-based tokenization logic
+def create_custom_tokenizer(config: TokenizerConfig = None) -> CustomTokenizer:
+    return CustomTokenizer(config)
+```
+
+## Implementation Notes
+
+### Architecture Decisions
+
+- **Single comprehensive regex**: All token types extracted in one pass
+- **Configuration-driven patterns**: Regex built based on enabled features
+- **Order preservation**: Tokens returned in document sequence
+- **Abstract base class**: Enables multiple tokenizer implementations
+
+### Performance Characteristics
+
+- Single-pass processing for efficiency
+- Compiled regex patterns cached per configuration
+- Minimal string copying during processing
+- Configuration objects are lightweight
+
+### Unicode Handling
+
+- NFKC normalization for consistent character representation
+- Proper handling of combining characters and diacritics
+- Emoji detection across Unicode ranges
+- Mixed-script content support
+
+## Module Structure
+
+```bash
+services/tokenizer/
+├── __init__.py              # Public API exports
+├── core/                    # Core interfaces and types
+│   ├── __init__.py         # Core type exports
+│   ├── base.py             # AbstractTokenizer interface
+│   └── types.py            # Configuration and enums
+├── basic/                   # BasicTokenizer implementation
+│   ├── __init__.py         # Implementation exports
+│   ├── tokenizer.py        # Main BasicTokenizer class
+│   └── patterns.py         # Regex pattern construction
+└── README.md               # This documentation
+```
+
+## Testing
+
+The service includes comprehensive tests:
+
+- `test_service.py` - Integration tests
+- `core/test_types.py` - Configuration tests
+- `basic/test_basic_tokenizer.py` - Implementation tests
+
+Run tests with:
+
+```bash
+pytest services/tokenizer/ -v
 ```

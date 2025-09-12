@@ -19,7 +19,7 @@ class BasicTokenizer(AbstractTokenizer):
 
     This tokenizer handles mixed-script content, preserves social media entities
     (@mentions, #hashtags, URLs), and applies appropriate tokenization strategies
-    based on detected language families.
+    for different script families.
     """
 
     def __init__(self, config: Optional[TokenizerConfig] = None):
@@ -36,7 +36,7 @@ class BasicTokenizer(AbstractTokenizer):
         """
         Tokenize input text into a list of tokens.
 
-        Applies appropriate tokenization strategy based on detected language family
+        Applies appropriate tokenization strategies for mixed-script content
         while preserving social media entities and handling Unicode correctly.
 
         Args:

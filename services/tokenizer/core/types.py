@@ -63,7 +63,7 @@ class TokenizerConfig:
     extract_hashtags: bool = True
     extract_mentions: bool = True
     extract_urls: bool = True
-    extract_emails: bool = False
+    extract_emails: bool = True
 
     # Output formatting
     min_token_length: int = 1

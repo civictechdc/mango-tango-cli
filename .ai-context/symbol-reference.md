@@ -143,23 +143,6 @@ Base interface for data importers
 
 - `analyzers.suite` - `analyzers/__init__.py` - Central registry of all analyzers
 
-## Entry Points
-
-### Main Application
-
-- `mangotango.py` - Application bootstrap and initialization
-  - `freeze_support()` - Multiprocessing setup
-  - `enable_windows_ansi_support()` - Terminal color support
-  - Storage initialization with app metadata
-  - Component orchestration (splash, main_menu)
-
-### Module Entry Point
-
-- `python -m mangotango` - Standard execution command
-- `python -m mangotango --noop` - No-operation mode for testing
-
-## Service Layer
-
 ### Tokenizer Service (`services/tokenizer/`)
 
 Unicode-aware text tokenization with multilingual support and social media entity preservation.
@@ -172,9 +155,9 @@ Base interface for all tokenizer implementations:
 
 - `__init__(config: TokenizerConfig = None)` - Initialize with configuration
 - `tokenize(text: str) -> list[str]` - Basic tokenization into token list
-- `tokenize_with_types(text: str) -> dict[str, list[str]]` - Tokenize with type classification
-- `preprocess_text(text: str) -> str` - Apply preprocessing (case, normalization)
-- `postprocess_tokens(tokens: list[str]) -> list[str]` - Filter and clean tokens
+- `config: TokenizerConfig` - Property to access tokenizer configuration
+- `_preprocess_text(text: str) -> str` - Apply preprocessing (case, normalization)
+- `_postprocess_tokens(tokens: list[str]) -> list[str]` - Filter and clean tokens
 
 #### Configuration Types - `services/tokenizer/core/types.py`
 
@@ -200,11 +183,11 @@ Comprehensive tokenization configuration:
 
 Core tokenizer implementation with Unicode awareness:
 
-- Optimized multilingual tokenization (language detection removed for 45.6% performance gain)
+- Multilingual tokenization for Latin, CJK, and Arabic script families
 - Social media entity preservation (hashtags, mentions, URLs)
 - Unicode normalization and proper space handling
 - Configurable preprocessing and postprocessing
-- Support for Latin, CJK, and Arabic script families
+- Single-pass regex-based token extraction
 
 #### Pattern Matching - `services/tokenizer/basic/patterns.py`
 
@@ -227,6 +210,21 @@ Core tokenizer implementation with Unicode awareness:
 - Core types: `AbstractTokenizer`, `TokenizerConfig`, `TokenType`, `LanguageFamily`
 - Implementation: `BasicTokenizer`
 - Factory functions: `create_basic_tokenizer`, `tokenize_text`
+
+## Entry Points
+
+### Main Application
+
+- `mangotango.py` - Application bootstrap and initialization
+  - `freeze_support()` - Multiprocessing setup
+  - `enable_windows_ansi_support()` - Terminal color support
+  - Storage initialization with app metadata
+  - Component orchestration (splash, main_menu)
+
+### Module Entry Point
+
+- `python -m mangotango` - Standard execution command
+- `python -m mangotango --noop` - No-operation mode for testing
 
 ## Integration Points
 
@@ -257,6 +255,7 @@ Core tokenizer implementation with Unicode awareness:
 Application-wide structured JSON logging with configurable levels and automatic rotation.
 
 **Core Functions:**
+
 - `setup_logging(log_file_path: Path, level: int = logging.INFO)` - Configure application logging
 - `get_logger(name: str) -> logging.Logger` - Get logger instance for module
 
