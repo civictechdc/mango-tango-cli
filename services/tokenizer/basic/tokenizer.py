@@ -167,8 +167,9 @@ class BasicTokenizer(AbstractTokenizer):
 
             # For character-level scripts, break down multi-character tokens into individual characters
             # This maintains compatibility with existing test expectations
-            if language_family == LanguageFamily.CJK and self._contains_char_level_chars(
-                token
+            if (
+                language_family == LanguageFamily.CJK
+                and self._contains_char_level_chars(token)
             ):
                 # Only break down pure character-level tokens, not mixed tokens
                 if self._is_pure_char_level_token(token):
