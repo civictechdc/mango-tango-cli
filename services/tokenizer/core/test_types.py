@@ -40,7 +40,7 @@ class TestTokenizerConfig:
         assert config.extract_hashtags is True
         assert config.extract_mentions is True
         assert config.extract_urls is True
-        assert config.extract_emails is False
+        assert config.extract_emails is True
 
         # Output formatting defaults
         assert config.min_token_length == 1
