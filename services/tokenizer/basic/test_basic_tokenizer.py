@@ -1026,10 +1026,8 @@ class TestBasicTokenizerNegativeTesting:
     def test_numeric_exclusion(self):
         """Test numeric token exclusion behavior.
 
-        BUG REPORT: Current implementation does not respect include_numeric=False.
-        Numeric tokens are still being included even when exclusion is configured.
-        Expected: numeric tokens should be excluded from results.
-        Actual: numeric tokens are preserved in results.
+        Verifies that when include_numeric=False, all numeric tokens (integers, decimals, etc.)
+        are properly excluded from tokenization results.
         """
         config = TokenizerConfig(include_numeric=False)
         tokenizer = BasicTokenizer(config)
@@ -1041,18 +1039,12 @@ class TestBasicTokenizerNegativeTesting:
         for word in expected_words:
             assert word in result, f"Word '{word}' not found in result: {result}"
 
-        # TODO: These assertions represent the EXPECTED behavior once bug is fixed
-        # Currently failing due to implementation bug:
-        # numeric_tokens = ["123", "45.67", "1000"]
-        # for num in numeric_tokens:
-        #     assert num not in result, f"Numeric token '{num}' should not be in result when disabled: {result}"
-
-        # CURRENT ACTUAL BEHAVIOR (documents the bug):
-        # Some numeric tokens are incorrectly included when exclusion should be enabled
-        # The integer tokens "123" and "1000" are properly excluded, but decimal "45.67" is not
-        assert "123" not in result, "Integer exclusion works correctly"
-        assert "1000" not in result, "Integer exclusion works correctly"
-        assert "45.67" in result, "BUG: Decimal numeric tokens not properly excluded"
+        # All numeric tokens should be excluded when include_numeric=False
+        numeric_tokens = ["123", "45.67", "1000"]
+        for num in numeric_tokens:
+            assert (
+                num not in result
+            ), f"Numeric token '{num}' should not be in result when disabled: {result}"
 
     def test_all_social_features_disabled(self):
         """Test comprehensive behavior when all social media features are disabled."""

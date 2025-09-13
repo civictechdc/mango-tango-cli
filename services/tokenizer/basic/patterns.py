@@ -133,6 +133,9 @@ class TokenizerPatterns:
         if not config.include_emails:
             exclusion_parts.append(self.get_pattern("email").pattern)
 
+        if not config.include_numeric:
+            exclusion_parts.append(self.get_pattern("numeric").pattern)
+
         if not exclusion_parts:
             return None
 
