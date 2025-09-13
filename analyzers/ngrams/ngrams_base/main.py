@@ -35,7 +35,7 @@ def main(context: PrimaryAnalyzerContext):
         normalize_unicode=True,
         extract_hashtags=True,
         extract_mentions=True,
-        extract_urls=True,
+        include_urls=True,
         min_token_length=1,
     )
 

@@ -110,7 +110,7 @@ class TestSocialMediaEntities:
         config = TokenizerConfig(
             extract_mentions=True,
             extract_hashtags=True,
-            extract_urls=True,
+            include_urls=True,
             include_emoji=True,
         )
         tokenizer = create_basic_tokenizer(config)
@@ -134,7 +134,7 @@ class TestSocialMediaEntities:
         config = TokenizerConfig(
             extract_mentions=False,
             extract_hashtags=False,
-            extract_urls=False,
+            include_urls=False,
             include_emoji=False,
         )
         tokenizer = create_basic_tokenizer(config)
@@ -279,7 +279,7 @@ class TestTokenizerIntegration:
             case_handling=CaseHandling.LOWERCASE,
             extract_hashtags=False,
             extract_mentions=False,
-            extract_urls=False,
+            include_urls=False,
             min_token_length=1,
         )
         tokens = tokenize_text(text, config)
@@ -306,7 +306,7 @@ class TestTokenizerIntegration:
             case_handling=CaseHandling.LOWERCASE,
             extract_hashtags=True,
             extract_mentions=True,
-            extract_urls=True,
+            include_urls=True,
             include_emoji=True,
             min_token_length=1,
         )

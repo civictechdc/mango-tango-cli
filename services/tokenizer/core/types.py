@@ -62,8 +62,8 @@ class TokenizerConfig:
     # Social media features
     extract_hashtags: bool = True
     extract_mentions: bool = True
-    extract_urls: bool = True
-    extract_emails: bool = True
+    include_urls: bool = True
+    include_emails: bool = True
 
     # Output formatting
     min_token_length: int = 1

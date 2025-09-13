@@ -39,8 +39,8 @@ class TestTokenizerConfig:
         # Social media defaults
         assert config.extract_hashtags is True
         assert config.extract_mentions is True
-        assert config.extract_urls is True
-        assert config.extract_emails is True
+        assert config.include_urls is True
+        assert config.include_emails is True
 
         # Output formatting defaults
         assert config.min_token_length == 1
@@ -58,8 +58,8 @@ class TestTokenizerConfig:
             normalize_unicode=False,
             extract_hashtags=False,
             extract_mentions=False,
-            extract_urls=False,
-            extract_emails=True,
+            include_urls=False,
+            include_emails=True,
             min_token_length=2,
             max_token_length=100,
             strip_whitespace=False,
@@ -74,8 +74,8 @@ class TestTokenizerConfig:
         assert config.normalize_unicode is False
         assert config.extract_hashtags is False
         assert config.extract_mentions is False
-        assert config.extract_urls is False
-        assert config.extract_emails is True
+        assert config.include_urls is False
+        assert config.include_emails is True
         assert config.min_token_length == 2
         assert config.max_token_length == 100
         assert config.strip_whitespace is False
@@ -121,24 +121,24 @@ class TestTokenizerConfig:
         social_config = TokenizerConfig(
             extract_hashtags=True,
             extract_mentions=True,
-            extract_urls=True,
-            extract_emails=True,
+            include_urls=True,
+            include_emails=True,
             include_emoji=True,
             case_handling=CaseHandling.LOWERCASE,
         )
 
         assert social_config.extract_hashtags
         assert social_config.extract_mentions
-        assert social_config.extract_urls
-        assert social_config.extract_emails
+        assert social_config.include_urls
+        assert social_config.include_emails
         assert social_config.include_emoji
 
         # Preset 2: Clean text only (no social entities)
         clean_config = TokenizerConfig(
             extract_hashtags=False,
             extract_mentions=False,
-            extract_urls=False,
-            extract_emails=False,
+            include_urls=False,
+            include_emails=False,
             include_emoji=False,
             include_punctuation=False,
             case_handling=CaseHandling.LOWERCASE,
@@ -146,8 +146,8 @@ class TestTokenizerConfig:
 
         assert not clean_config.extract_hashtags
         assert not clean_config.extract_mentions
-        assert not clean_config.extract_urls
-        assert not clean_config.extract_emails
+        assert not clean_config.include_urls
+        assert not clean_config.include_emails
         assert not clean_config.include_emoji
         assert not clean_config.include_punctuation
 
@@ -255,8 +255,8 @@ class TestConfigurationValidation:
         config_all = TokenizerConfig(
             extract_hashtags=True,
             extract_mentions=True,
-            extract_urls=True,
-            extract_emails=True,
+            include_urls=True,
+            include_emails=True,
             include_emoji=True,
             include_punctuation=True,
             include_numeric=True,
@@ -265,8 +265,8 @@ class TestConfigurationValidation:
         social_features = [
             config_all.extract_hashtags,
             config_all.extract_mentions,
-            config_all.extract_urls,
-            config_all.extract_emails,
+            config_all.include_urls,
+            config_all.include_emails,
         ]
         include_features = [
             config_all.include_emoji,
@@ -281,8 +281,8 @@ class TestConfigurationValidation:
         config_none = TokenizerConfig(
             extract_hashtags=False,
             extract_mentions=False,
-            extract_urls=False,
-            extract_emails=False,
+            include_urls=False,
+            include_emails=False,
             include_emoji=False,
             include_punctuation=False,
             include_numeric=False,
@@ -291,8 +291,8 @@ class TestConfigurationValidation:
         social_features_none = [
             config_none.extract_hashtags,
             config_none.extract_mentions,
-            config_none.extract_urls,
-            config_none.extract_emails,
+            config_none.include_urls,
+            config_none.include_emails,
         ]
         include_features_none = [
             config_none.include_emoji,
@@ -313,8 +313,8 @@ class TestConfigurationUseCases:
             # Clean text processing
             extract_hashtags=False,
             extract_mentions=False,
-            extract_urls=False,
-            extract_emails=False,
+            include_urls=False,
+            include_emails=False,
             include_emoji=False,
             include_punctuation=False,
             # Consistent casing
@@ -337,8 +337,8 @@ class TestConfigurationUseCases:
             # Extract all social entities
             extract_hashtags=True,
             extract_mentions=True,
-            extract_urls=True,
-            extract_emails=True,
+            include_urls=True,
+            include_emails=True,
             include_emoji=True,
             # Keep some formatting
             include_punctuation=True,
@@ -352,7 +352,7 @@ class TestConfigurationUseCases:
         # Verify social media settings
         assert config.extract_hashtags
         assert config.extract_mentions
-        assert config.extract_urls
+        assert config.include_urls
         assert config.include_emoji
         assert config.case_handling == CaseHandling.PRESERVE
         assert config.min_token_length == 1
@@ -363,8 +363,8 @@ class TestConfigurationUseCases:
             # Pure content focus
             extract_hashtags=False,
             extract_mentions=False,
-            extract_urls=False,
-            extract_emails=False,
+            include_urls=False,
+            include_emails=False,
             include_emoji=False,
             # Clean text processing
             include_punctuation=False,
@@ -379,8 +379,8 @@ class TestConfigurationUseCases:
         social_extractions = [
             config.extract_hashtags,
             config.extract_mentions,
-            config.extract_urls,
-            config.extract_emails,
+            config.include_urls,
+            config.include_emails,
             config.include_emoji,
         ]
         assert not any(social_extractions)

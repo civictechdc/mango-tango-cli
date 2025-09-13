@@ -55,7 +55,9 @@ class TokenizerPatterns:
         Build comprehensive tokenization pattern based on configuration.
 
         This creates a single regex pattern that finds ALL tokens in document order,
-        eliminating the need for segmentation and reassembly.
+        eliminating the need for segmentation and reassembly. URLs and emails are
+        conditionally included in the regex itself based on configuration, avoiding
+        the need for post-processing filtering.
 
         Args:
             config: TokenizerConfig specifying which token types to include
@@ -65,11 +67,12 @@ class TokenizerPatterns:
         """
         pattern_parts = []
 
-        # Add patterns in priority order (most specific first)
-        if config.extract_urls:
+        # Conditionally add URL and email patterns based on configuration
+        # This eliminates the need for post-processing filtering
+        if config.include_urls:
             pattern_parts.append(self.get_pattern("url").pattern)
 
-        if config.extract_emails:
+        if config.include_emails:
             pattern_parts.append(self.get_pattern("email").pattern)
 
         if config.extract_mentions:
@@ -107,6 +110,46 @@ class TokenizerPatterns:
                     return re.compile(r"\S+", re.IGNORECASE)
             else:
                 return re.compile(r"\S+", re.IGNORECASE)
+
+    def get_exclusion_pattern(self, config) -> Any:
+        """
+        Build pattern to identify and skip excluded entities in text.
+
+        This creates a pattern that matches URLs and emails that should be excluded,
+        allowing the tokenizer to skip over them entirely instead of breaking them
+        into component words.
+
+        Args:
+            config: TokenizerConfig specifying which token types to exclude
+
+        Returns:
+            Compiled regex pattern that matches excluded entities, or None if no exclusions
+        """
+        exclusion_parts = []
+
+        if not config.include_urls:
+            exclusion_parts.append(self.get_pattern("url").pattern)
+
+        if not config.include_emails:
+            exclusion_parts.append(self.get_pattern("email").pattern)
+
+        if not exclusion_parts:
+            return None
+
+        # Combine exclusion patterns
+        exclusion_pattern = "(?:" + "|".join(exclusion_parts) + ")"
+
+        try:
+            return REGEX_MODULE.compile(exclusion_pattern, REGEX_MODULE.IGNORECASE)
+        except Exception:
+            # Fallback to standard re module
+            if REGEX_AVAILABLE and REGEX_MODULE is not re:
+                try:
+                    return re.compile(exclusion_pattern, re.IGNORECASE)
+                except Exception:
+                    return None
+            else:
+                return None
 
     def list_patterns(self) -> List[str]:
         """Get list of available pattern names."""

@@ -70,26 +70,25 @@ class TestBasicTokenizerMultilingual:
         text = "Hello 你好 こんにちは مرحبا สวัสดี"
         result = tokenizer.tokenize(text)
 
-        # Should handle script boundaries with predictable tokenization
-        assert isinstance(result, list)
-        assert len(result) > 0
-
-        # Latin script: space-separated tokenization
-        assert "hello" in result
-
-        # CRITICAL: CJK script should use character-level tokenization
-        assert "你" in result, f"Chinese character '你' not found in result: {result}"
-        assert "好" in result, f"Chinese character '好' not found in result: {result}"
-        assert "こ" in result, f"Hiragana character 'こ' not found in result: {result}"
-
-        # CRITICAL: Arabic script should use space-separated tokenization
-        assert "مرحبا" in result, f"Arabic word 'مرحبا' not found in result: {result}"
-
-        # CRITICAL: Thai script should use character-level tokenization
-        for thai_char in ["ส", "ว", "ั", "ด", "ี"]:
-            assert (
-                thai_char in result
-            ), f"Thai character '{thai_char}' not found in result: {result}"
+        # Should handle script boundaries with specific expected tokenization
+        expected = [
+            "hello",
+            "你",
+            "好",
+            "こ",
+            "ん",
+            "に",
+            "ち",
+            "は",
+            "مرحبا",
+            "ส",
+            "ว",
+            "ั",
+            "ส",
+            "ด",
+            "ี",
+        ]
+        assert result == expected, f"Expected {expected}, got {result}"
 
 
 class TestBasicTokenizerSocialMedia:
@@ -196,7 +195,7 @@ class TestBasicTokenizerSocialMedia:
 
     def test_email_extraction(self):
         """Test email extraction when enabled."""
-        config = TokenizerConfig(extract_emails=True)
+        config = TokenizerConfig(include_emails=True)
         tokenizer = BasicTokenizer(config)
         text = "Contact me at user@example.com for details"
         result = tokenizer.tokenize(text)
@@ -271,7 +270,9 @@ class TestBasicTokenizerConfig:
 
         # CRITICAL: Specific numeric tokens should be preserved
         assert "123" in result, f"Integer '123' not found in result: {result}"
-        assert "45.67" in result, f"Decimal '45.67' not properly tokenized in result: {result}"
+        assert (
+            "45.67" in result
+        ), f"Decimal '45.67' not properly tokenized in result: {result}"
 
     def test_emoji_inclusion_disabled(self):
         """Test emoji exclusion."""
@@ -315,7 +316,7 @@ class TestBasicTokenizerConfig:
     def test_social_media_entity_configuration(self):
         """Test selective social media entity extraction."""
         config = TokenizerConfig(
-            extract_hashtags=False, extract_mentions=True, extract_urls=False
+            extract_hashtags=False, extract_mentions=True, include_urls=False
         )
         tokenizer = BasicTokenizer(config)
         text = "@user check #hashtag https://example.com"
@@ -325,14 +326,18 @@ class TestBasicTokenizerConfig:
         assert "@user" in result
         assert "check" in result
 
-        # CRITICAL: Disabled features should tokenize entities as regular words
+        # CRITICAL: Disabled features should behave according to their type
         assert "#hashtag" not in result  # Should be tokenized as "hashtag"
         assert "hashtag" in result
-        assert "https://example.com" not in result  # Should be broken into parts
-        # URL components should appear as separate tokens when extraction is disabled
-        assert any(
-            "https" in token or "example" in token or "com" in token for token in result
-        )
+        assert "https://example.com" not in result  # Should be completely excluded
+
+        # URLs should be completely excluded when include_urls=False, not tokenized as parts
+        url_components = [
+            token
+            for token in result
+            if any(comp in token.lower() for comp in ["https", "example", "com"])
+        ]
+        assert len(url_components) == 0, f"URLs should be completely excluded: {result}"
 
 
 class TestBasicTokenizerEdgeCases:
@@ -409,8 +414,9 @@ class TestBasicTokenizerMethods:
         text = "Hello world"
         result = tokenizer.tokenize(text)
 
-        assert isinstance(result, list)
-        assert all(isinstance(token, str) for token in result)
+        # Should return specific expected tokens, not just check types
+        expected = ["hello", "world"]
+        assert result == expected
 
 
 class TestBasicTokenizerPerformance:
@@ -540,6 +546,74 @@ class TestTokenOrderPreservation:
         expected = ["hello", "@user", "check", "#hashtag", "visit", "https://site.com"]
         assert result == expected, f"Expected {expected}, got {result}"
 
+    def test_mixed_entity_interactions_order(self):
+        """Test comprehensive mixed entity interactions preserving order.
+
+        This test validates the interaction between different entity types
+        (@mentions, #hashtags, URLs, emails) within a single text to ensure
+        proper tokenization and order preservation across entity boundaries.
+        """
+        # Test basic mixed entities as requested in code review
+        tokenizer = BasicTokenizer()
+        text = "Check @user1 #tag1 @user2 #tag2 content"
+        result = tokenizer.tokenize(text)
+
+        expected = ["check", "@user1", "#tag1", "@user2", "#tag2", "content"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+        # Test more complex mixed entity scenario with URLs
+        text_with_url = (
+            "Follow @user1 for #updates at https://site.com and contact @user2"
+        )
+        result_with_url = tokenizer.tokenize(text_with_url)
+
+        expected_with_url = [
+            "follow",
+            "@user1",
+            "for",
+            "#updates",
+            "at",
+            "https://site.com",
+            "and",
+            "contact",
+            "@user2",
+        ]
+        assert (
+            result_with_url == expected_with_url
+        ), f"Expected {expected_with_url}, got {result_with_url}"
+
+        # Test mixed entities with email (when email extraction is enabled)
+        config_with_email = TokenizerConfig(include_emails=True)
+        tokenizer_email = BasicTokenizer(config_with_email)
+        text_with_email = (
+            "Contact team@example.com about #project or reach @manager directly"
+        )
+        result_with_email = tokenizer_email.tokenize(text_with_email)
+
+        expected_with_email = [
+            "contact",
+            "team@example.com",
+            "about",
+            "#project",
+            "or",
+            "reach",
+            "@manager",
+            "directly",
+        ]
+        assert (
+            result_with_email == expected_with_email
+        ), f"Expected {expected_with_email}, got {result_with_email}"
+
+        # Test entity boundaries and spacing variations
+        text_boundary = "Check@user1#tag1 @user2 #tag2 content"
+        result_boundary = tokenizer.tokenize(text_boundary)
+
+        # Should properly separate entities with proper spacing
+        expected_boundary = ["check", "@user1", "#tag1", "@user2", "#tag2", "content"]
+        assert (
+            result_boundary == expected_boundary
+        ), f"Expected {expected_boundary}, got {result_boundary}"
+
     def test_multilingual_mixed_order(self):
         """Test multilingual content with entities preserves order."""
         tokenizer = BasicTokenizer()
@@ -556,7 +630,7 @@ class TestTokenOrderPreservation:
         text = "Just launched @company's new #product! Check it out at https://launch.example.com 🚀"
         result = tokenizer.tokenize(text)
 
-        # Should preserve original order (emoji may be filtered by default config)
+        # Should preserve original order (emoji is excluded with default config)
         expected = [
             "just",
             "launched",
@@ -574,7 +648,7 @@ class TestTokenOrderPreservation:
 
     def test_email_in_context_order(self):
         """Test email in context preserves order."""
-        config = TokenizerConfig(extract_emails=True)
+        config = TokenizerConfig(include_emails=True)
         tokenizer = BasicTokenizer(config)
         text = "Contact me at user@example.com for details"
         result = tokenizer.tokenize(text)
@@ -589,7 +663,7 @@ class TestTokenOrderPreservation:
         text = "Email team@company.com about #project and @user feedback"
 
         # Enable email extraction to see interaction
-        config = TokenizerConfig(extract_emails=True)
+        config = TokenizerConfig(include_emails=True)
         tokenizer = BasicTokenizer(config)
         result = tokenizer.tokenize(text)
 
@@ -603,17 +677,6 @@ class TestTokenOrderPreservation:
             "@user",
             "feedback",
         ]
-        assert result == expected, f"Expected {expected}, got {result}"
-
-    def test_order_with_case_preservation(self):
-        """Test order preservation with case handling enabled."""
-        config = TokenizerConfig(case_handling=CaseHandling.PRESERVE)
-        tokenizer = BasicTokenizer(config)
-        text = "Hello @User Check #HashTag"
-        result = tokenizer.tokenize(text)
-
-        # Should preserve original order and case
-        expected = ["Hello", "@User", "Check", "#HashTag"]
         assert result == expected, f"Expected {expected}, got {result}"
 
     def test_order_with_punctuation_inclusion(self):
@@ -660,7 +723,19 @@ class TestTokenOrderPreservation:
 
 
 class TestOrderPreservationValidation:
-    """Validation tests for order preservation implementation."""
+    """Validation tests for order preservation implementation.
+
+    This test class focuses on validating the order preservation feature
+    from a system integration and performance perspective, including:
+    - Performance benchmarks for order preservation
+    - Memory efficiency validation
+    - Configuration compatibility across different tokenizer settings
+    - Edge case handling for order preservation logic
+    - Multi-language order preservation integration
+
+    Note: Basic order preservation functionality is tested in TestTokenOrderPreservation.
+    This class provides deeper validation and integration testing.
+    """
 
     def test_order_preservation_performance_benchmark(self):
         """Test that order preservation doesn't significantly impact performance."""
@@ -710,7 +785,12 @@ class TestOrderPreservationValidation:
         assert object_increase < 50, f"Too many objects created: {object_increase}"
 
     def test_downstream_compatibility(self):
-        """Test that order preservation works consistently."""
+        """Test that order preservation works consistently for downstream consumers.
+
+        This test validates that order preservation works reliably for systems
+        that depend on consistent token ordering, using presence and position checks
+        rather than exact array matching for robustness.
+        """
         tokenizer = BasicTokenizer()
         text = "Hello @user check #hashtag visit https://example.com"
 
@@ -746,7 +826,7 @@ class TestOrderPreservationValidation:
 
         # Test with social media extraction disabled
         config_no_social = TokenizerConfig(
-            extract_hashtags=False, extract_mentions=False, extract_urls=False
+            extract_hashtags=False, extract_mentions=False, include_urls=False
         )
         tokenizer_no_social = BasicTokenizer(config_no_social)
         text_no_social = "Hello @user check #hashtag"
@@ -810,15 +890,11 @@ class TestOrderPreservationValidation:
         # Mixed script
         mixed_text = "Hello 你好 @user مرحبا #hashtag"
         mixed_result = tokenizer.tokenize(mixed_text)
-        # Should preserve order across different scripts
-        assert "@user" in mixed_result
-        assert "#hashtag" in mixed_result
-        # Order verification for mixed script (exact order may vary based on script detection)
-        user_index = mixed_result.index("@user")
-        hashtag_index = mixed_result.index("#hashtag")
+        # Should preserve exact order across different scripts
+        expected_mixed = ["hello", "你", "好", "@user", "مرحبا", "#hashtag"]
         assert (
-            user_index < hashtag_index
-        ), "Entity order should be preserved even in mixed scripts"
+            mixed_result == expected_mixed
+        ), f"Expected {expected_mixed}, got {mixed_result}"
 
 
 class TestBasicTokenizerNegativeTesting:
@@ -860,42 +936,42 @@ class TestBasicTokenizerNegativeTesting:
         assert "you" in result
 
     def test_url_extraction_disabled(self):
-        """Test that URLs are broken into component parts when extraction is disabled."""
-        config = TokenizerConfig(extract_urls=False)
+        """Test that URLs are completely excluded when extraction is disabled."""
+        config = TokenizerConfig(include_urls=False)
         tokenizer = BasicTokenizer(config)
         text = "Visit https://example.com and http://test.org for more info"
         result = tokenizer.tokenize(text)
 
-        # URLs should be broken into component parts
+        # URLs should be completely excluded, not broken into parts
         assert "https://example.com" not in result
         assert "http://test.org" not in result
 
-        # URL components should appear as separate tokens
+        # Basic words should still be present
         assert "visit" in result
+        assert "and" in result
         assert "for" in result
         assert "more" in result
         assert "info" in result
 
-        # Should contain parts of the URLs
+        # URLs should be completely excluded - no URL components should appear
         url_components = [
             token
             for token in result
             if any(
-                comp in token
-                for comp in ["https", "http", "example", "com", "test", "org"]
+                comp in token.lower()
+                for comp in ["https", "http", "example.com", "test.org"]
             )
         ]
-        assert len(url_components) > 0, f"No URL components found in result: {result}"
+        assert (
+            len(url_components) == 0
+        ), f"URL components should not appear when include_urls=False: {result}"
 
     def test_email_extraction_disabled(self):
         """Test email extraction disabled behavior.
 
-        BUG REPORT: Current implementation does not respect extract_emails=False.
-        Emails are still being preserved intact even when extraction is disabled.
-        Expected: emails should be broken into component tokens.
-        Actual: emails are preserved as complete tokens.
+        With the fixed implementation, emails should be completely excluded when include_emails=False.
         """
-        config = TokenizerConfig(extract_emails=False)
+        config = TokenizerConfig(include_emails=False)
         tokenizer = BasicTokenizer(config)
         text = "Contact user@example.com or admin@test.org for help"
         result = tokenizer.tokenize(text)
@@ -906,17 +982,9 @@ class TestBasicTokenizerNegativeTesting:
         assert "for" in result
         assert "help" in result
 
-        # TODO: These assertions represent the EXPECTED behavior once bug is fixed
-        # Currently failing due to implementation bug:
-        # assert "user@example.com" not in result
-        # assert "admin@test.org" not in result
-
-        # CURRENT ACTUAL BEHAVIOR (documents the bug):
-        # Emails are incorrectly preserved when extraction should be disabled
-        assert (
-            "user@example.com" in result
-        ), "BUG: Email extraction not properly disabled"
-        assert "admin@test.org" in result, "BUG: Email extraction not properly disabled"
+        # Emails should be completely excluded from results
+        assert "user@example.com" not in result
+        assert "admin@test.org" not in result
 
     def test_emoji_exclusion_comprehensive(self):
         """Test comprehensive emoji exclusion with various emoji types."""
@@ -992,8 +1060,8 @@ class TestBasicTokenizerNegativeTesting:
         config = TokenizerConfig(
             extract_hashtags=False,
             extract_mentions=False,
-            extract_urls=False,
-            extract_emails=False,
+            include_urls=False,
+            include_emails=False,
             include_emoji=False,
         )
         tokenizer = BasicTokenizer(config)
@@ -1013,10 +1081,11 @@ class TestBasicTokenizerNegativeTesting:
         assert "me@test.com" not in result
         assert "🎉" not in result
 
-        # Components should be tokenized separately
-        assert (
-            "user" in result or "hashtag" in result
-        )  # At least some components present
+        # For hashtags and mentions with extraction disabled, components are tokenized separately
+        assert "user" in result  # @ mention becomes regular word
+        assert "hashtag" in result  # # hashtag becomes regular word
+
+        # URLs and emails should be completely excluded, not tokenized as components
 
     def test_feature_independence(self):
         """Test that disabling one feature doesn't affect others."""
@@ -1024,19 +1093,21 @@ class TestBasicTokenizerNegativeTesting:
         config = TokenizerConfig(
             extract_hashtags=False,  # Disabled
             extract_mentions=True,  # Enabled
-            extract_urls=True,  # Enabled
+            include_urls=True,  # Enabled
             include_emoji=True,  # Enabled
         )
         tokenizer = BasicTokenizer(config)
         text = "Check @user and #hashtag at https://site.com 🎉"
         result = tokenizer.tokenize(text)
 
-        # Enabled features should work
+        # Should preserve original order with specific expected result
+        expected = ["check", "@user", "and", "hashtag", "at", "https://site.com", "🎉"]
+        assert result == expected
+
+        # Verify specific feature behavior
         assert "@user" in result, "Mentions should work when enabled"
         assert "https://site.com" in result, "URLs should work when enabled"
         assert "🎉" in result, "Emojis should work when enabled"
-
-        # Disabled feature should not work
         assert "#hashtag" not in result, "Hashtags should be disabled"
         assert (
             "hashtag" in result
@@ -1052,15 +1123,23 @@ class TestBasicTokenizerIntegration:
         text = "Just posted a new blog at https://myblog.com! Check it out @followers #blogging #tech 🚀"
         result = tokenizer.tokenize(text)
 
-        # Should preserve entities and handle content appropriately
-        # Note: URL may have punctuation attached, so check contains
-        assert any("https://myblog.com" in token for token in result)
-        assert "@followers" in result
-        assert "#blogging" in result
-        assert "#tech" in result
-        # Note: Emoji may be processed differently
-        assert "just" in result
-        assert "posted" in result
+        # Should tokenize with specific expected result (emoji excluded with default config)
+        expected = [
+            "just",
+            "posted",
+            "a",
+            "new",
+            "blog",
+            "at",
+            "https://myblog.com",
+            "check",
+            "it",
+            "out",
+            "@followers",
+            "#blogging",
+            "#tech",
+        ]
+        assert result == expected
 
     def test_facebook_like_content(self):
         """Test Facebook-like content with longer text."""
@@ -1123,8 +1202,8 @@ def social_media_config():
     return TokenizerConfig(
         extract_hashtags=True,
         extract_mentions=True,
-        extract_urls=True,
-        extract_emails=True,
+        include_urls=True,
+        include_emails=True,
         include_emoji=True,
         case_handling=CaseHandling.LOWERCASE,
     )

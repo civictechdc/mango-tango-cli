@@ -142,6 +142,18 @@ class BasicTokenizer(AbstractTokenizer):
         if not text.strip():
             return []
 
+        # Remove excluded entities (URLs/emails) from text if they are disabled
+        # This prevents them from being tokenized into component words
+        exclusion_pattern = self._patterns.get_exclusion_pattern(self._config)
+        if exclusion_pattern:
+            # Replace excluded entities with spaces to maintain word boundaries
+            text = exclusion_pattern.sub(" ", text)
+            # Clean up multiple spaces
+            text = " ".join(text.split())
+
+        if not text.strip():
+            return []
+
         # Get comprehensive pattern based on configuration
         # This single pattern finds ALL tokens in document order
         comprehensive_pattern = self._patterns.get_comprehensive_pattern(self._config)
@@ -203,11 +215,23 @@ class BasicTokenizer(AbstractTokenizer):
 
     def _is_url_like(self, token: str) -> bool:
         """Check if token looks like a URL."""
+        # Don't classify emails as URLs
+        if self._is_email_like(token):
+            return False
+
         return (
             token.startswith(("http://", "https://", "www."))
             or "://" in token
-            or (token.count(".") >= 1 and any(c.isalpha() for c in token))
+            or (
+                token.count(".") >= 1
+                and any(c.isalpha() for c in token)
+                and "@" not in token
+            )
         )
+
+    def _is_email_like(self, token: str) -> bool:
+        """Check if token looks like an email address."""
+        return "@" in token and "." in token and not token.startswith("@")
 
     def _clean_url_token(self, url_token: str) -> str:
         """Remove trailing punctuation from URL tokens."""
@@ -258,3 +282,19 @@ class BasicTokenizer(AbstractTokenizer):
                 result.append(current_token)
 
         return result
+
+    def _postprocess_tokens(self, tokens: TokenList) -> TokenList:
+        """
+        Apply post-processing to extracted tokens.
+
+        Args:
+            tokens: List of raw tokens
+
+        Returns:
+            Processed token list
+        """
+        if not tokens:
+            return tokens
+
+        # Apply base class post-processing (length filtering, whitespace stripping, etc.)
+        return super()._postprocess_tokens(tokens)

@@ -81,7 +81,7 @@ def test_tokenize():
         normalize_unicode=True,
         extract_hashtags=False,
         extract_mentions=False,
-        extract_urls=False,
+        include_urls=False,
         min_token_length=1,
     )
     test_tokenized_actual = tokenize_text(TEST_STRING, config)
@@ -104,7 +104,7 @@ def test_ngrams():
         normalize_unicode=True,
         extract_hashtags=False,
         extract_mentions=False,
-        extract_urls=False,
+        include_urls=False,
         min_token_length=1,
     )
     test_string_tokenized = tokenize_text(TEST_STRING, config)
@@ -149,7 +149,7 @@ def test_serialize_ngram():
         normalize_unicode=True,
         extract_hashtags=False,
         extract_mentions=False,
-        extract_urls=False,
+        include_urls=False,
         min_token_length=1,
     )
     test_ngrams = list(ngrams(tokenize_text(TEST_STRING, config), min=5, max=8))
