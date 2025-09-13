@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Optional
 
 
-class LanguageFamily(Enum):
+class LanguageFamily(str, Enum):
     """Language families that affect tokenization strategies."""
 
     LATIN = "latin"  # Space-separated languages (English, French, etc.)
@@ -20,7 +20,7 @@ class LanguageFamily(Enum):
     UNKNOWN = "unknown"  # Language detection failed or not performed
 
 
-class TokenType(Enum):
+class TokenType(str, Enum):
     """Types of tokens that can be extracted."""
 
     WORD = "word"  # Regular words

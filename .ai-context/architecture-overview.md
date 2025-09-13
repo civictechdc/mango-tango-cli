@@ -87,6 +87,24 @@ Key Services:
   - Word-level: Latin, Arabic scripts with space separation
   - `TokenType`, `LanguageFamily` - Type definitions for tokenization
   - Comprehensive regex patterns and social media entity preservation
+  - API contract:
+    - `tokenize(text: str, lang: LanguageFamily | None = None, *, preserve_entities: bool = True) -> list[Token] | Iterator[Token]`
+    - Thread-safe, stateless; may return an iterator for streaming large inputs.
+  - Token model:
+    - `Token { text: str, type: TokenType, start: int, end: int, script: str | None, norm: str | None }`
+    - Offsets are codepoint indices; guarantee grapheme-cluster boundaries (respect ZWJ/emoji sequences).
+  - Normalization:
+    - Apply NFC by default; configurable NFKC for compatibility when requested; never alter preserved entities.
+  - Language handling:
+    - If `lang` is None, infer via Unicode Script with overrides for mixed-script; Arabic note: handle proclitics/enclitics, not just spaces.
+  - Social media entity precedence:
+    - Detect URL (RFC 3986), @mentions, #hashtags before general tokenization; entities are single, atomic tokens.
+  - Regex safety:
+    - Precompile all patterns; avoid catastrophic backtracking; enforce per-call max steps/timeout or fallback to simpler patterns.
+  - Error and config semantics:
+    - Invalid config ⇒ explicit exception; defaults sourced from `SettingsContext` with per-analyzer overrides in `AnalysisContext`.
+  - Performance:
+    - Optional caching of per-script patterns; zero-copy slicing where possible; streaming mode for texts > N chars (configurable).
 
 ## Data Flow Architecture
 

@@ -130,7 +130,8 @@ class AbstractTokenizer(ABC):
 
         return processed_tokens
 
-    def _is_emoji(self, token: str) -> bool:
+    @staticmethod
+    def _is_emoji(token: str) -> bool:
         """
         Check if a token is an emoji character.
 
@@ -143,19 +144,36 @@ class AbstractTokenizer(ABC):
         if not token:
             return False
 
-        # Check if the token consists entirely of emoji characters
-        for char in token:
-            code_point = ord(char)
-            # Check common emoji Unicode ranges
-            if not (
-                (0x1F600 <= code_point <= 0x1F64F)  # Emoticons
-                or (0x1F300 <= code_point <= 0x1F5FF)  # Misc Symbols
-                or (0x1F680 <= code_point <= 0x1F6FF)  # Transport
-                or (0x1F1E0 <= code_point <= 0x1F1FF)  # Flags
-                or (0x2700 <= code_point <= 0x27BF)  # Dingbats
-                or (0x1F900 <= code_point <= 0x1F9FF)  # Supplemental Symbols
-                or (0x2600 <= code_point <= 0x26FF)  # Misc symbols
-            ):
-                return False
+        # Accept sequences made of emoji code points plus common modifiers
+        EMOJI_RANGES = (
+            (0x1F600, 0x1F64F),  # Emoticons
+            (0x1F300, 0x1F5FF),  # Misc Symbols & Pictographs
+            (0x1F680, 0x1F6FF),  # Transport & Map
+            (0x1F1E6, 0x1F1FF),  # Regional Indicators
+            (0x2600, 0x26FF),  # Misc symbols
+            (0x2700, 0x27BF),  # Dingbats
+            (0x1F900, 0x1F9FF),  # Supplemental Symbols & Pictographs
+            (0x1FA70, 0x1FAFF),  # Symbols & Pictographs Extended-A
+        )
+        MODIFIERS = {0x200D, 0xFE0E, 0xFE0F}  # ZWJ, VS15, VS16
+        SKIN_TONE = (0x1F3FB, 0x1F3FF)
+        TAGS = (0xE0020, 0xE007F)  # Emoji tag sequences
 
+        def in_any_range(cp: int, ranges) -> bool:
+            for a, b in ranges:
+                if a <= cp <= b:
+                    return True
+            return False
+
+        def is_modifier(cp: int) -> bool:
+            return (
+                cp in MODIFIERS
+                or SKIN_TONE[0] <= cp <= SKIN_TONE[1]
+                or TAGS[0] <= cp <= TAGS[1]
+            )
+
+        for ch in token:
+            cp = ord(ch)
+            if not (in_any_range(cp, EMOJI_RANGES) or is_modifier(cp)):
+                return False
         return True

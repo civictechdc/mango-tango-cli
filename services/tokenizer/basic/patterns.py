@@ -163,7 +163,7 @@ class TokenizerPatterns:
             r"(?:"
             r"https?://\S+|"  # http/https URLs
             r"www\.\S+|"  # www URLs
-            r"\S+\.\w{2,}(?:/\S*)?"  # domain.ext patterns
+            r"[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}(?:/\S*)?"  # domain.ext patterns
             r")"
         )
 
@@ -178,7 +178,7 @@ class TokenizerPatterns:
         numeric_pattern = (
             r"(?:"
             r"\d+\.?\d*%?|"  # Basic numbers with optional percentage
-            r"\$\d+\.?\d*|"  # Money amounts
+            r"[$€£¥₹₽¥¢]\d+\.?\d*|"  # Money amounts with common currency symbols
             r"\d+[.,]\d+|"  # Numbers with comma/period separators
             r"\d+(?:st|nd|rd|th)?"  # Ordinals
             r")"

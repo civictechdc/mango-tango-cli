@@ -1,8 +1,23 @@
 """
-Core tokenizer components
+Core tokenizer components.
 
-This module exports AbstractTokenizer and TokenizerConfig for
-implementing custom tokenization strategies.
+Exports:
+- AbstractTokenizer
+- TokenizerConfig
+- TokenList
+- LanguageFamily
+- TokenType
+- CaseHandling
+
+Intended usage:
+    from services.tokenizer.core import (
+        AbstractTokenizer,
+        TokenizerConfig,
+        TokenList,
+        LanguageFamily,
+        TokenType,
+        CaseHandling,
+    )
 """
 
 from .base import AbstractTokenizer

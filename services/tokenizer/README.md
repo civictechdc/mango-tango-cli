@@ -20,8 +20,7 @@ from services.tokenizer import tokenize_text
 
 text = "Hello @user! Check out #python https://example.com 🚀"
 tokens = tokenize_text(text)
-# Result: ['hello', '@user', 'check', 'out', '#python', 'https://example.com', '🚀']
-```
+# Result: ['hello', '@user', 'check', 'out', '#python', 'https://example.com']
 
 ### Custom Configuration
 

@@ -243,10 +243,9 @@ class TestBasicTokenizerConfig:
         assert "world" in result
 
         # CRITICAL: Specific punctuation should be preserved as separate tokens
-        assert "," in result or "hello," in result  # Comma should be preserved
-        assert (
-            "!" in result or "world!" in result or "!" in "".join(result)
-        )  # Exclamation should be preserved
+        # CRITICAL: Specific punctuation should be preserved as separate tokens
+        assert "," in result, "Comma should be preserved as a separate token"
+        assert "!" in result, "Exclamation should be preserved as a separate token"
 
         # Verify punctuation is actually included in the tokenization
         has_punctuation = any(
