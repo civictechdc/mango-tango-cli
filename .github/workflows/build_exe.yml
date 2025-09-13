@@ -29,26 +29,26 @@ jobs:
             artifact_name: windows
             os: windows-2022
             version_command: icacls "VERSION" /grant Everyone:F /T /C /Q
-            move_command: move dist\mangotango.exe dist\mangotango_windows.exe
-            sha_command: pwsh -c "Get-FileHash -Algorithm SHA1 dist\mangotango_windows.exe | Format-Table Hash -HideTableHeaders > dist\mangotango_windows.exe.sha1"
+            move_command: move dist\cibmangotree.exe dist\cibmangotree_windows.exe
+            sha_command: pwsh -c "Get-FileHash -Algorithm SHA1 dist\cibmangotree_windows.exe | Format-Table Hash -HideTableHeaders > dist\cibmangotree_windows.exe.sha1"
             list_command: dir dist
-            check_command: dist\mangotango_windows.exe --noop
+            check_command: dist\cibmangotree_windows.exe --noop
           - platform_name: MacOS (x86)
             artifact_name: macos-x86
             os: macos-13
-            move_command: mv dist/mangotango dist/mangotango_macos-x86
-            sha_command: shasum -a 1 dist/mangotango_macos-x86 > dist/mangotango_macos-x86.sha1
-            sha_command_pkg: shasum -a 1 dist/mangotango_macos-x86.pkg > dist/mangotango_macos-x86.pkg.sha1
+            move_command: mv dist/cibmangotree dist/cibmangotree_macos-x86
+            sha_command: shasum -a 1 dist/cibmangotree_macos-x86 > dist/cibmangotree_macos-x86.sha1
+            sha_command_pkg: shasum -a 1 dist/cibmangotree_macos-x86.pkg > dist/cibmangotree_macos-x86.pkg.sha1
             list_command: ls -ll dist
-            check_command: dist/mangotango_macos-x86 --noop
+            check_command: dist/cibmangotree_macos-x86 --noop
           - platform_name: MacOS (arm64)
             artifact_name: macos-arm64
             os: macos-15
-            move_command: mv dist/mangotango dist/mangotango_macos-arm64
-            sha_command: shasum -a 1 dist/mangotango_macos-arm64 > dist/mangotango_macos-arm64.sha1
-            sha_command_pkg: shasum -a 1 dist/mangotango_macos-arm64.pkg > dist/mangotango_macos-arm64.pkg.sha1
+            move_command: mv dist/cibmangotree dist/cibmangotree_macos-arm64
+            sha_command: shasum -a 1 dist/cibmangotree_macos-arm64 > dist/cibmangotree_macos-arm64.sha1
+            sha_command_pkg: shasum -a 1 dist/cibmangotree_macos-arm64.pkg > dist/cibmangotree_macos-arm64.pkg.sha1
             list_command: ls -ll dist
-            check_command: dist/mangotango_macos-arm64 --noop
+            check_command: dist/cibmangotree_macos-arm64 --noop
 
     name: Build ${{ matrix.platform_name }}
     runs-on: ${{ matrix.os }}
@@ -130,13 +130,13 @@ jobs:
           APPLE_INST_CERT_ID: ${{secrets.APPLE_INST_CERT_ID}}
           APPLE_KEYCHAIN_PASS: ${{secrets.APPLE_KEY_PASS}}
         run: |
-          mkdir -p /tmp/mangotango/
-          ditto dist/mangotango_${{matrix.artifact_name}} /tmp/mangotango/mangotango
-          chmod +x /tmp/mangotango/mangotango
+          mkdir -p /tmp/cibmangotree/
+          ditto dist/cibmangotree_${{matrix.artifact_name}} /tmp/cibmangotree/cibmangotree
+          chmod +x /tmp/cibmangotree/cibmangotree
           security unlock-keychain -p $APPLE_KEYCHAIN_PASS build.keychain
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$APPLE_KEYCHAIN_PASS" build.keychain
           security find-identity -v -p codesigning build.keychain
-          pkgbuild --identifier "org.mangotango.cli" --timestamp --root /tmp/mangotango --install-location /Applications "./dist/mangotango_${{matrix.artifact_name}}_signed.pkg" --sign "$APPLE_INST_CERT_ID"
+          pkgbuild --identifier "org.cibmangotree.cli" --timestamp --root /tmp/cibmangotree --install-location /Applications "./dist/cibmangotree_${{matrix.artifact_name}}_signed.pkg" --sign "$APPLE_INST_CERT_ID"
 
       - name: Notarize Mac package
         if: runner.os == 'macOS' && inputs.is_release
@@ -144,19 +144,19 @@ jobs:
           APPLE_DEV_EMAIL: ${{secrets.APPLE_DEV_EMAIL}}
           APPLE_TEAM_ID: ${{secrets.TEAM_ID}}
           APP_SPEC_PASS: ${{secrets.APP_SPEC_PASS}}
-        run: xcrun notarytool submit dist/mangotango_${{matrix.artifact_name}}_signed.pkg --apple-id $APPLE_DEV_EMAIL --team-id $APPLE_TEAM_ID --password $APP_SPEC_PASS --wait
+        run: xcrun notarytool submit dist/cibmangotree_${{matrix.artifact_name}}_signed.pkg --apple-id $APPLE_DEV_EMAIL --team-id $APPLE_TEAM_ID --password $APP_SPEC_PASS --wait
 
       - name: Staple the notarization ticket
         if: runner.os == 'macOS' && inputs.is_release
-        run: xcrun stapler staple dist/mangotango_${{matrix.artifact_name}}_signed.pkg
+        run: xcrun stapler staple dist/cibmangotree_${{matrix.artifact_name}}_signed.pkg
 
       - name: Clean up macOS Artifacts
         if: runner.os == 'macOS' && inputs.is_release
         run: |
-          rm -rf /tmp/mangotango
-          rm -rf dist/mangotango_${{matrix.artifact_name}}
-          rm -rf dist/mangotango_${{matrix.artifact_name}}.pkg
-          mv dist/mangotango_${{matrix.artifact_name}}_signed.pkg dist/mangotango_${{matrix.artifact_name}}.pkg
+          rm -rf /tmp/cibmangotree
+          rm -rf dist/cibmangotree_${{matrix.artifact_name}}
+          rm -rf dist/cibmangotree_${{matrix.artifact_name}}.pkg
+          mv dist/cibmangotree_${{matrix.artifact_name}}_signed.pkg dist/cibmangotree_${{matrix.artifact_name}}.pkg
 
       - name: Compute the SHA1 hashsum for macOS .pkg
         if: runner.os == 'macOS' && inputs.is_release
