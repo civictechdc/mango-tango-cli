@@ -43,7 +43,7 @@ class BasicTokenizer(AbstractTokenizer):
             text: Input text to tokenize
 
         Returns:
-            List of tokens extracted from the input text
+            List of tokens extracted from the input text in document order
         """
         if not text:
             return []

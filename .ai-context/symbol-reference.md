@@ -168,7 +168,7 @@ Comprehensive tokenization configuration:
 - Language handling: `fallback_language_family`
 - Token filtering: `include_punctuation`, `include_numeric`, `include_emoji`
 - Text preprocessing: `case_handling`, `normalize_unicode`
-- Social media: `extract_hashtags`, `extract_mentions`, `extract_urls`, `extract_emails`
+- Social media: `extract_hashtags`, `extract_mentions`, `include_urls`, `include_emails`
 - Output control: `min_token_length`, `max_token_length`, `strip_whitespace`
 
 **Core Enums:**
@@ -201,7 +201,7 @@ Core tokenizer implementation with Unicode awareness:
 
 - `TokenizerPatterns` - Compiled regex patterns for tokenization
 - `SOCIAL_PATTERNS` - Social media entity patterns
-- `LINGUISTIC_PATTERNS` - Language-specific tokenization patterns  
+- `LINGUISTIC_PATTERNS` - Language-specific tokenization patterns
 - `FORMATTING_PATTERNS` - Text formatting and structure patterns
 
 #### Service API - `services/tokenizer/__init__.py`
