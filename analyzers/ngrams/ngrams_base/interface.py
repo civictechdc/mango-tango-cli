@@ -37,7 +37,7 @@ the corpus of text, and whether certain authors use these sequences more often.
         columns=[
             InputColumn(
                 name=COL_AUTHOR_ID,
-                human_readable_name="Message Author ID",
+                human_readable_name="Unique User ID",
                 data_type="identifier",
                 description="The unique identifier of the author of the message",
                 name_hints=[
@@ -53,7 +53,7 @@ the corpus of text, and whether certain authors use these sequences more often.
             ),
             InputColumn(
                 name=COL_MESSAGE_ID,
-                human_readable_name="Unique Message ID",
+                human_readable_name="Unique Post Number",
                 data_type="identifier",
                 description="The unique identifier of the message",
                 name_hints=[
@@ -67,7 +67,7 @@ the corpus of text, and whether certain authors use these sequences more often.
             ),
             InputColumn(
                 name=COL_MESSAGE_TEXT,
-                human_readable_name="Message Text",
+                human_readable_name="Post Content",
                 data_type="text",
                 description="The text content of the message",
                 name_hints=[
@@ -82,7 +82,7 @@ the corpus of text, and whether certain authors use these sequences more often.
             ),
             InputColumn(
                 name=COL_MESSAGE_TIMESTAMP,
-                human_readable_name="Message Timestamp",
+                human_readable_name="Timestamp",
                 data_type="datetime",
                 description="The time at which the message was posted",
                 name_hints=["time", "timestamp", "date", "ts"],
