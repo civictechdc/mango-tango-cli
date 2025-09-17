@@ -1,6 +1,6 @@
 from analyzer_interface import WebPresenterInterface
 
-from ..hashtags import interface as hashtags_interface
+from ..hashtags_base import interface as hashtags_interface
 
 interface = WebPresenterInterface(
     id="hashtags_dashboard",

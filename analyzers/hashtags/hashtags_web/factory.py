@@ -10,7 +10,7 @@ from analyzer_interface.context import (
 from app.project_context import _get_columns_with_semantic
 from app.shiny import page_dependencies
 
-from ..hashtags.interface import COL_TIME, OUTPUT_GINI
+from ..hashtags_base.interface import COL_TIME, OUTPUT_GINI
 from .app import (
     analysis_panel,
     hashtag_plot_panel,

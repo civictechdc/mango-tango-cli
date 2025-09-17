@@ -6,7 +6,7 @@ from dateutil import parser as dateutil_parser
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
-from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
+from ..hashtags_base.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
 from .analysis import secondary_analyzer
 from .plots import (
     MANGO_DARK_GREEN,
