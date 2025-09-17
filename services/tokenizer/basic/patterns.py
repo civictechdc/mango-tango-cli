@@ -271,7 +271,6 @@ class TokenizerPatterns:
     def _compile_patterns(self):
         """Compile all regex patterns with fallback support."""
 
-
         # Compile patterns with fallback handling
         patterns_to_compile = {
             "url": URL_PATTERN,
