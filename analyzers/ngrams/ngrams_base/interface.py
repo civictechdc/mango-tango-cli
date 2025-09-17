@@ -2,9 +2,11 @@ from analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,
+    AnalyzerParam,
     InputColumn,
     OutputColumn,
 )
+from analyzer_interface.params import IntegerParam
 
 COL_AUTHOR_ID = "user_id"
 COL_MESSAGE_ID = "message_id"
@@ -20,15 +22,23 @@ OUTPUT_MESSAGE_NGRAMS = "message_ngrams"
 OUTPUT_NGRAM_DEFS = "ngrams"
 OUTPUT_MESSAGE = "message_authors"
 
+# Parameter definitions
+PARAM_MIN_N = "min_n"
+PARAM_MAX_N = "max_n"
+
 interface = AnalyzerInterface(
     id="ngrams",
     version="0.1.0",
     name="N-gram Analysis",
-    short_description="Extracts n-grams from text data",
+    short_description="Extracts n-grams from text data with multilingual support",
     long_description="""
-The n-gram analysis extract n-grams (sequences of n words) from the text data
+The n-gram analysis extracts n-grams (sequences of n words) from the text data
 in the input and counts the occurrences of each n-gram in each message, linking
 the message author to the ngram frequency.
+
+This analyzer uses Unicode-aware tokenization with support for multilingual content,
+including proper handling of different scripts (Latin, CJK, Arabic) and social media
+entities (hashtags, mentions, URLs).
 
 The result can be used to see if certain word sequences are more common in
 the corpus of text, and whether certain authors use these sequences more often.
@@ -123,6 +133,22 @@ the corpus of text, and whether certain authors use these sequences more often.
                 OutputColumn(name=COL_MESSAGE_TEXT, data_type="text"),
                 OutputColumn(name=COL_MESSAGE_TIMESTAMP, data_type="datetime"),
             ],
+        ),
+    ],
+    params=[
+        AnalyzerParam(
+            id=PARAM_MIN_N,
+            human_readable_name="Minimum N-gram Length",
+            description="Minimum length of n-grams to extract (e.g., 3 for trigrams and longer)",
+            type=IntegerParam(min=1, max=10),
+            default=3,
+        ),
+        AnalyzerParam(
+            id=PARAM_MAX_N,
+            human_readable_name="Maximum N-gram Length",
+            description="Maximum length of n-grams to extract (e.g., 5 for up to 5-grams)",
+            type=IntegerParam(min=1, max=10),
+            default=5,
         ),
     ],
 )

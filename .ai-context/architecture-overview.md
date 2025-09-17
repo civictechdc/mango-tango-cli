@@ -11,10 +11,15 @@ flowchart TD
     App --> Importers[Data Importers]
     App --> Preprocessing[Semantic Preprocessor]
     App --> Analyzers[Analyzer System]
+    App --> TokenizerService[Tokenizer Service]
 
     Importers --> Parquet[(Parquet Files)]
     Preprocessing --> Parquet
     Analyzers --> Parquet
+
+    Analyzers --> TokenizerService
+    TokenizerService --> BasicTokenizer[BasicTokenizer]
+    BasicTokenizer --> Primary
 
     Analyzers --> Primary[Primary Analyzers]
     Analyzers --> Secondary[Secondary Analyzers]
@@ -67,6 +72,39 @@ Key Classes:
 - `SettingsModel` - User preferences and application settings
 - `FileSelectionState` - File picker state management
 - `TableStats` - Data statistics and preview information
+
+### Service Layer (`services/`)
+
+Reusable services that support analyzers and data processing
+
+Key Services:
+
+- **Tokenizer Service** (`services/tokenizer/`) - Unicode-aware scriptio continua tokenization
+  - `AbstractTokenizer` - Base interface for tokenizer implementations
+  - `TokenizerConfig` - Configuration for tokenization behavior
+  - `BasicTokenizer` - Core implementation with character-level and word-level tokenization
+  - Character-level: CJK, Thai, Lao, Myanmar, Khmer scripts
+  - Word-level: Latin, Arabic scripts with space separation
+  - `TokenType`, `LanguageFamily` - Type definitions for tokenization
+  - Comprehensive regex patterns and social media entity preservation
+  - API contract:
+    - `tokenize(text: str, lang: LanguageFamily | None = None, *, preserve_entities: bool = True) -> list[Token] | Iterator[Token]`
+    - Thread-safe, stateless; may return an iterator for streaming large inputs.
+  - Token model:
+    - `Token { text: str, type: TokenType, start: int, end: int, script: str | None, norm: str | None }`
+    - Offsets are codepoint indices; guarantee grapheme-cluster boundaries (respect ZWJ/emoji sequences).
+  - Normalization:
+    - Apply NFC by default; configurable NFKC for compatibility when requested; never alter preserved entities.
+  - Language handling:
+    - If `lang` is None, infer via Unicode Script with overrides for mixed-script; Arabic note: handle proclitics/enclitics, not just spaces.
+  - Social media entity precedence:
+    - Detect URL (RFC 3986), @mentions, #hashtags before general tokenization; entities are single, atomic tokens.
+  - Regex safety:
+    - Precompile all patterns; avoid catastrophic backtracking; enforce per-call max steps/timeout or fallback to simpler patterns.
+  - Error and config semantics:
+    - Invalid config ⇒ explicit exception; defaults sourced from `SettingsContext` with per-analyzer overrides in `AnalysisContext`.
+  - Performance:
+    - Optional caching of per-script patterns; zero-copy slicing where possible; streaming mode for texts > N chars (configurable).
 
 ## Data Flow Architecture
 

@@ -143,6 +143,80 @@ Base interface for data importers
 
 - `analyzers.suite` - `analyzers/__init__.py` - Central registry of all analyzers
 
+### Tokenizer Service (`services/tokenizer/`)
+
+Unicode-aware text tokenization with scriptio continua (character-level) and space-separated script support, plus social media entity preservation.
+
+#### Core Interface - `services/tokenizer/core/base.py`
+
+**`AbstractTokenizer` class**
+
+Base interface for all tokenizer implementations:
+
+- `__init__(config: TokenizerConfig = None)` - Initialize with configuration
+- `tokenize(text: str) -> list[str]` - Basic tokenization into token list
+- `config: TokenizerConfig` - Property to access tokenizer configuration
+- `_preprocess_text(text: str) -> str` - Apply preprocessing (case, normalization)
+- `_postprocess_tokens(tokens: list[str]) -> list[str]` - Filter and clean tokens
+
+#### Configuration Types - `services/tokenizer/core/types.py`
+
+**`TokenizerConfig` dataclass**
+
+Comprehensive tokenization configuration:
+
+- Language handling: `fallback_language_family`
+- Token filtering: `include_punctuation`, `include_numeric`, `include_emoji`
+- Text preprocessing: `case_handling`, `normalize_unicode`
+- Social media: `extract_hashtags`, `extract_mentions`, `include_urls`, `include_emails`
+- Output control: `min_token_length`, `max_token_length`, `strip_whitespace`
+
+**Core Enums:**
+
+- `LanguageFamily` - Language script families (LATIN, CJK, ARABIC, MIXED, UNKNOWN) - CJK includes all scriptio continua scripts
+- `TokenType` - Token classifications (WORD, HASHTAG, MENTION, URL, EMOJI, etc.)
+- `CaseHandling` - Case transformation options (PRESERVE, LOWERCASE, UPPERCASE, NORMALIZE)
+
+#### Basic Implementation - `services/tokenizer/basic/tokenizer.py`
+
+**`BasicTokenizer` class**
+
+Core tokenizer implementation with Unicode awareness:
+
+- Scriptio continua tokenization: Character-level for CJK, Thai, Lao, Myanmar, Khmer
+- Space-separated tokenization: Word-level for Latin, Arabic scripts
+- Social media entity preservation (hashtags, mentions, URLs)
+- Unicode normalization and proper space handling
+- Configurable preprocessing and postprocessing
+- Single-pass regex-based token extraction with order preservation
+
+#### Pattern Matching - `services/tokenizer/basic/patterns.py`
+
+**Pattern Functions:**
+
+- `get_patterns() -> TokenizerPatterns` - Get singleton TokenizerPatterns instance
+- Unicode-aware regex patterns for different script families
+
+**Pattern Classes:**
+
+- `TokenizerPatterns` - Compiled regex patterns for tokenization
+- `SOCIAL_PATTERNS` - Social media entity patterns
+- `LINGUISTIC_PATTERNS` - Language-specific tokenization patterns
+- `FORMATTING_PATTERNS` - Text formatting and structure patterns
+
+#### Service API - `services/tokenizer/__init__.py`
+
+**Convenience Functions:**
+
+- `tokenize_text(text: str, config: TokenizerConfig = None) -> list[str]` - Simple tokenization
+- `create_basic_tokenizer(config: TokenizerConfig = None) -> BasicTokenizer` - Factory function
+
+**Public Exports:**
+
+- Core types: `AbstractTokenizer`, `TokenizerConfig`, `TokenList`, `TokenType`, `LanguageFamily`, `CaseHandling`
+- Implementation: `BasicTokenizer`
+- Factory functions: `create_basic_tokenizer`, `tokenize_text`
+
 ## Entry Points
 
 ### Main Application
@@ -187,17 +261,20 @@ Base interface for data importers
 Application-wide structured JSON logging with configurable levels and automatic rotation.
 
 **Core Functions:**
+
 - `setup_logging(log_file_path: Path, level: int = logging.INFO)` - Configure application logging
 - `get_logger(name: str) -> logging.Logger` - Get logger instance for module
 
 **Features:**
-- Dual handlers: console (ERROR+) and file (INFO+) 
+
+- Dual handlers: console (ERROR+) and file (INFO+)
 - JSON-formatted structured logs with timestamps and context
 - Automatic log rotation (10MB files, 5 backups)
 - CLI-configurable log levels via `--log-level` flag
 - Log location: `~/.local/share/MangoTango/logs/mangotango.log`
 
 **Usage Pattern:**
+
 ```python
 from app.logger import get_logger
 logger = get_logger(__name__)

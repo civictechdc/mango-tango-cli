@@ -18,3 +18,4 @@ uvicorn==0.34.3
 a2wsgi==1.10.10
 python-json-logger==2.0.7
 rich==14.0.0
+regex==2025.9.1
