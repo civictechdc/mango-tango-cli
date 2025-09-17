@@ -3,7 +3,7 @@
 Tests for core tokenizer types and configuration.
 
 This module tests:
-- TokenizerConfig dataclass and validation
+- TokenizerConfig Pydantic model and validation
 - Enum types (LanguageFamily, TokenType, CaseHandling, etc.)
 - Type system edge cases and defaults
 """
@@ -16,7 +16,7 @@ from .types import CaseHandling, LanguageFamily, TokenizerConfig, TokenList, Tok
 
 
 class TestTokenizerConfig:
-    """Test TokenizerConfig dataclass and validation."""
+    """Test TokenizerConfig Pydantic model and validation."""
 
     def test_default_config(self):
         """Test default configuration values."""

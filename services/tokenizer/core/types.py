@@ -1,13 +1,14 @@
 """
 TokenizerConfig, enums, and shared types
 
-This module contains configuration dataclasses, enumerations,
+This module contains configuration models, enumerations,
 and shared type definitions used across the tokenizer service.
 """
 
-from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class LanguageFamily(str, Enum):
@@ -43,8 +44,7 @@ class CaseHandling(Enum):
     NORMALIZE = "normalize"  # Smart case normalization
 
 
-@dataclass
-class TokenizerConfig:
+class TokenizerConfig(BaseModel):
     """Configuration for tokenizer behavior.
 
     Controls all aspects of text tokenization including script handling,
