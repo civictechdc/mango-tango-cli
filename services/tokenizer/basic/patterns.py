@@ -20,6 +20,116 @@ except ImportError:
     REGEX_AVAILABLE = False
 
 
+# Pattern constants
+# URL patterns (comprehensive)
+URL_PATTERN = (
+    r"(?:"
+    r"https?://\S+|"  # http/https URLs
+    r"www\.\S+|"  # www URLs
+    r"[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}(?:/\S*)?"  # domain.ext patterns
+    r")"
+)
+
+# Email patterns
+EMAIL_PATTERN = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+
+# Social media mentions and hashtags
+MENTION_PATTERN = r"@[A-Za-z0-9_]+"
+HASHTAG_PATTERN = r"#[A-Za-z0-9_]+"
+
+# Numeric patterns (including decimals, percentages, etc.)
+NUMERIC_PATTERN = (
+    r"(?:"
+    r"\d+\.?\d*%?|"  # Basic numbers with optional percentage
+    r"[$€£¥₹₽¥¢]\d+\.?\d*|"  # Money amounts with common currency symbols
+    r"\d+[.,]\d+|"  # Numbers with comma/period separators
+    r"\d+(?:st|nd|rd|th)?"  # Ordinals
+    r")"
+)
+
+# Emoji pattern (basic Unicode ranges)
+EMOJI_PATTERN = (
+    r"(?:"
+    r"[\U0001F600-\U0001F64F]|"  # Emoticons
+    r"[\U0001F300-\U0001F5FF]|"  # Misc Symbols
+    r"[\U0001F680-\U0001F6FF]|"  # Transport
+    r"[\U0001F1E0-\U0001F1FF]|"  # Flags
+    r"[\U00002700-\U000027BF]|"  # Dingbats
+    r"[\U0001F900-\U0001F9FF]|"  # Supplemental Symbols
+    r"[\U00002600-\U000026FF]"  # Misc symbols
+    r")"
+)
+
+# CJK character pattern
+CJK_PATTERN = (
+    r"(?:"
+    r"[\u4e00-\u9fff]|"  # CJK Unified Ideographs
+    r"[\u3400-\u4dbf]|"  # CJK Extension A
+    r"[\u3040-\u309f]|"  # Hiragana
+    r"[\u30a0-\u30ff]|"  # Katakana
+    r"[\uac00-\ud7af]"  # Hangul Syllables
+    r")"
+)
+
+# Arabic script pattern
+ARABIC_PATTERN = (
+    r"(?:"
+    r"[\u0600-\u06ff]|"  # Arabic
+    r"[\u0750-\u077f]|"  # Arabic Supplement
+    r"[\u08a0-\u08ff]"  # Arabic Extended-A
+    r")"
+)
+
+# Thai script pattern
+THAI_PATTERN = (
+    r"(?:"
+    r"[\u0e00-\u0e7f]"  # Thai script range
+    r")"
+)
+
+# Other Southeast Asian scripts (common in social media)
+SEA_PATTERN = (
+    r"(?:"
+    r"[\u1780-\u17ff]|"  # Khmer
+    r"[\u1000-\u109f]|"  # Myanmar
+    r"[\u1a00-\u1a1f]|"  # Buginese
+    r"[\u1b00-\u1b7f]"  # Balinese
+    r")"
+)
+
+# Word patterns for different script types
+LATIN_WORD_PATTERN = r"[a-zA-Z]+(?:\'[a-zA-Z]+)*"  # Handle contractions
+WORD_PATTERN = f"(?:{LATIN_WORD_PATTERN}|{CJK_PATTERN}+|{ARABIC_PATTERN}+|{THAI_PATTERN}+|{SEA_PATTERN}+)"
+
+# Punctuation (preserve some, group others)
+PUNCTUATION_PATTERN = r'[.!?;:,\-\(\)\[\]{}"\']'
+
+# Main social media tokenization pattern
+SOCIAL_MEDIA_PATTERN = (
+    f"(?:"
+    f"{URL_PATTERN}|"
+    f"{EMAIL_PATTERN}|"
+    f"{MENTION_PATTERN}|"
+    f"{HASHTAG_PATTERN}|"
+    f"{EMOJI_PATTERN}|"
+    f"{NUMERIC_PATTERN}|"
+    f"{WORD_PATTERN}|"
+    f"{PUNCTUATION_PATTERN}"
+    f")"
+)
+
+# Word boundary pattern for space-separated languages
+WORD_BOUNDARY_PATTERN = r"\S+"
+
+# Combined social media entity pattern with named groups for single-pass detection
+COMBINED_SOCIAL_ENTITIES_PATTERN = (
+    f"(?P<url>{URL_PATTERN})|"
+    f"(?P<email>{EMAIL_PATTERN})|"
+    f"(?P<mention>{MENTION_PATTERN})|"
+    f"(?P<hashtag>{HASHTAG_PATTERN})"
+)
+
+
 class TokenizerPatterns:
     """
     Compiled regex patterns for tokenization.
@@ -161,130 +271,23 @@ class TokenizerPatterns:
     def _compile_patterns(self):
         """Compile all regex patterns with fallback support."""
 
-        # URL patterns (comprehensive)
-        url_pattern = (
-            r"(?:"
-            r"https?://\S+|"  # http/https URLs
-            r"www\.\S+|"  # www URLs
-            r"[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}(?:/\S*)?"  # domain.ext patterns
-            r")"
-        )
-
-        # Email patterns
-        email_pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-
-        # Social media mentions and hashtags
-        mention_pattern = r"@[A-Za-z0-9_]+"
-        hashtag_pattern = r"#[A-Za-z0-9_]+"
-
-        # Numeric patterns (including decimals, percentages, etc.)
-        numeric_pattern = (
-            r"(?:"
-            r"\d+\.?\d*%?|"  # Basic numbers with optional percentage
-            r"[$€£¥₹₽¥¢]\d+\.?\d*|"  # Money amounts with common currency symbols
-            r"\d+[.,]\d+|"  # Numbers with comma/period separators
-            r"\d+(?:st|nd|rd|th)?"  # Ordinals
-            r")"
-        )
-
-        # Emoji pattern (basic Unicode ranges)
-        emoji_pattern = (
-            r"(?:"
-            r"[\U0001F600-\U0001F64F]|"  # Emoticons
-            r"[\U0001F300-\U0001F5FF]|"  # Misc Symbols
-            r"[\U0001F680-\U0001F6FF]|"  # Transport
-            r"[\U0001F1E0-\U0001F1FF]|"  # Flags
-            r"[\U00002700-\U000027BF]|"  # Dingbats
-            r"[\U0001F900-\U0001F9FF]|"  # Supplemental Symbols
-            r"[\U00002600-\U000026FF]"  # Misc symbols
-            r")"
-        )
-
-        # CJK character pattern
-        cjk_pattern = (
-            r"(?:"
-            r"[\u4e00-\u9fff]|"  # CJK Unified Ideographs
-            r"[\u3400-\u4dbf]|"  # CJK Extension A
-            r"[\u3040-\u309f]|"  # Hiragana
-            r"[\u30a0-\u30ff]|"  # Katakana
-            r"[\uac00-\ud7af]"  # Hangul Syllables
-            r")"
-        )
-
-        # Arabic script pattern
-        arabic_pattern = (
-            r"(?:"
-            r"[\u0600-\u06ff]|"  # Arabic
-            r"[\u0750-\u077f]|"  # Arabic Supplement
-            r"[\u08a0-\u08ff]"  # Arabic Extended-A
-            r")"
-        )
-
-        # Thai script pattern
-        thai_pattern = (
-            r"(?:"
-            r"[\u0e00-\u0e7f]"  # Thai script range
-            r")"
-        )
-
-        # Other Southeast Asian scripts (common in social media)
-        sea_pattern = (
-            r"(?:"
-            r"[\u1780-\u17ff]|"  # Khmer
-            r"[\u1000-\u109f]|"  # Myanmar
-            r"[\u1a00-\u1a1f]|"  # Buginese
-            r"[\u1b00-\u1b7f]"  # Balinese
-            r")"
-        )
-
-        # Word patterns for different script types
-        latin_word_pattern = r"[a-zA-Z]+(?:\'[a-zA-Z]+)*"  # Handle contractions
-        word_pattern = f"(?:{latin_word_pattern}|{cjk_pattern}+|{arabic_pattern}+|{thai_pattern}+|{sea_pattern}+)"
-
-        # Punctuation (preserve some, group others)
-        punctuation_pattern = r'[.!?;:,\-\(\)\[\]{}"\']'
-
-        # Main social media tokenization pattern
-        social_media_pattern = (
-            f"(?:"
-            f"{url_pattern}|"
-            f"{email_pattern}|"
-            f"{mention_pattern}|"
-            f"{hashtag_pattern}|"
-            f"{emoji_pattern}|"
-            f"{numeric_pattern}|"
-            f"{word_pattern}|"
-            f"{punctuation_pattern}"
-            f")"
-        )
-
-        # Word boundary pattern for space-separated languages
-        word_boundary_pattern = r"\S+"
-
-        # Combined social media entity pattern with named groups for single-pass detection
-        combined_social_entities_pattern = (
-            f"(?P<url>{url_pattern})|"
-            f"(?P<email>{email_pattern})|"
-            f"(?P<mention>{mention_pattern})|"
-            f"(?P<hashtag>{hashtag_pattern})"
-        )
 
         # Compile patterns with fallback handling
         patterns_to_compile = {
-            "url": url_pattern,
-            "email": email_pattern,
-            "mention": mention_pattern,
-            "hashtag": hashtag_pattern,
-            "emoji": emoji_pattern,
-            "numeric": numeric_pattern,
-            "word": word_pattern,
-            "latin_word": latin_word_pattern,
-            "cjk_chars": cjk_pattern,
-            "arabic_chars": arabic_pattern,
-            "punctuation": punctuation_pattern,
-            "social_media": social_media_pattern,
-            "word_boundary": word_boundary_pattern,
-            "combined_social_entities": combined_social_entities_pattern,
+            "url": URL_PATTERN,
+            "email": EMAIL_PATTERN,
+            "mention": MENTION_PATTERN,
+            "hashtag": HASHTAG_PATTERN,
+            "emoji": EMOJI_PATTERN,
+            "numeric": NUMERIC_PATTERN,
+            "word": WORD_PATTERN,
+            "latin_word": LATIN_WORD_PATTERN,
+            "cjk_chars": CJK_PATTERN,
+            "arabic_chars": ARABIC_PATTERN,
+            "punctuation": PUNCTUATION_PATTERN,
+            "social_media": SOCIAL_MEDIA_PATTERN,
+            "word_boundary": WORD_BOUNDARY_PATTERN,
+            "combined_social_entities": COMBINED_SOCIAL_ENTITIES_PATTERN,
         }
 
         for name, pattern in patterns_to_compile.items():
