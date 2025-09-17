@@ -35,8 +35,7 @@ nav:
       - "Meta": "reference/meta.md"
       - "Storage": "reference/storage.md"
       - "Testing": "reference/testing.md"
-      - "Services":
-          - "Tokenizer": "reference/services/tokenizer.md"
+      - "Tokenizer": "reference/tokenizer.md"
 
 theme:
   name: material
