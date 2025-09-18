@@ -110,8 +110,13 @@ def importer_flow(
                 print(f"Importing as {importer.name} with these options:")
                 import_session.print_config()
                 print("")
-                print("The data has these columns:")
-                print("(Each column should be listed in its own line)")
+                print(
+                    "The data has these columns (each column should be listed in its own line):"
+                )
+                print(
+                    "Hint: if detected column names do not seem right, try changing the `skip_rows` parameter.)"
+                )
+                print("")
                 for column in import_preview.columns:
                     print(f"  [{column}]")
                 print("")
