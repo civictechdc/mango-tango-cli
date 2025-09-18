@@ -1,3 +1,4 @@
+import csv
 from csv import Sniffer
 from typing import Callable, Optional
 
@@ -17,15 +18,122 @@ class CSVImporter(Importer["CsvImportSession"]):
     def suggest(self, input_path: str) -> bool:
         return input_path.endswith(".csv")
 
+    def _detect_skip_rows(self, input_path: str) -> int:
+        """Detect the number of rows to skip before CSV data begins."""
+        try:
+            with open(input_path, "r", encoding="utf8") as file:
+                lines = []
+                for i, line in enumerate(file):
+                    if i >= 50:  # Sample first 50 lines max
+                        break
+                    lines.append(line.strip())
+
+                if len(lines) < 2:
+                    return 0
+
+                # Parse each line and analyze content
+                parsed_rows = []
+                for line in lines:
+                    if not line:  # Skip empty lines
+                        continue
+                    try:
+                        reader = csv.reader([line])
+                        row = next(reader)
+                        parsed_rows.append(row)
+                    except Exception:
+                        parsed_rows.append([line])  # Fallback for problematic lines
+
+                if len(parsed_rows) < 2:
+                    return 0
+
+                # Look for the actual CSV header (column names)
+                for i, row in enumerate(parsed_rows):
+                    if self._looks_like_csv_header(row):
+                        return i  # Skip everything before the header
+
+                # Fallback: use field count analysis
+                field_counts = [len(row) for row in parsed_rows]
+                from collections import Counter
+
+                count_frequency = Counter(field_counts)
+                most_common_count = count_frequency.most_common(1)[0][0]
+
+                # Find first row that matches the most common field count
+                for i, count in enumerate(field_counts):
+                    if count == most_common_count:
+                        return i
+
+                return 0
+
+        except Exception:
+            # If anything fails, don't skip rows
+            return 0
+
+    def _looks_like_csv_header(self, row: list[str]) -> bool:
+        """Check if a row looks like a CSV header with column names."""
+        if not row or len(row) < 2:
+            return False
+
+        # Skip rows where most fields are empty (likely CSV notes with trailing commas)
+        non_empty_fields = [field.strip() for field in row if field.strip()]
+        if len(non_empty_fields) < len(row) // 2:
+            return False
+
+        # Look for typical CSV header characteristics
+        header_indicators = 0
+
+        for field in non_empty_fields:
+            field = field.lower().strip()
+
+            # Common column name patterns
+            if any(
+                word in field
+                for word in [
+                    "id",
+                    "name",
+                    "date",
+                    "time",
+                    "user",
+                    "tweet",
+                    "text",
+                    "count",
+                    "number",
+                    "sent",
+                    "screen",
+                    "retweeted",
+                    "favorited",
+                ]
+            ):
+                header_indicators += 1
+
+            # Short descriptive column names (not long sentences like CSV notes)
+            if 3 <= len(field) <= 30 and not field.startswith(
+                ("http", "www", "from ", "if you")
+            ):
+                header_indicators += 1
+
+        # Consider it a CSV header if at least 50% of non-empty fields look like column names
+        return header_indicators >= len(non_empty_fields) * 0.5
+
     def init_session(self, input_path: str):
+        skip_rows = self._detect_skip_rows(input_path)
+
+        # Read sample for dialect detection, skipping detected rows
         with open(input_path, "r", encoding="utf8") as file:
-            dialect = Sniffer().sniff(file.read(65536))
+            # Skip the detected rows
+            for _ in range(skip_rows):
+                file.readline()
+
+            # Use remaining content for dialect detection
+            sample = file.read(65536)
+            dialect = Sniffer().sniff(sample)
 
         return CsvImportSession(
             input_file=input_path,
             separator=dialect.delimiter,
             quote_char=dialect.quotechar,
             has_header=True,
+            skip_rows=skip_rows,
         )
 
     def manual_init_session(self, input_path: str):
@@ -41,11 +149,16 @@ class CSVImporter(Importer["CsvImportSession"]):
         if has_header is None:
             return None
 
+        skip_rows = self._skip_rows_option(None)
+        if skip_rows is None:
+            return None
+
         return CsvImportSession(
             input_file=input_path,
             separator=separator,
             quote_char=quote_char,
             has_header=has_header,
+            skip_rows=skip_rows,
         )
 
     def modify_session(
@@ -63,6 +176,7 @@ class CSVImporter(Importer["CsvImportSession"]):
                     ("Column separator", "separator"),
                     ("Quote character", "quote_char"),
                     ("Header", "header"),
+                    ("Skip rows", "skip_rows"),
                     ("Done. Use these options.", "done"),
                 ],
                 default=None if is_first_time else "done",
@@ -91,6 +205,12 @@ class CSVImporter(Importer["CsvImportSession"]):
                 if has_header is None:
                     continue
                 import_session.has_header = has_header
+
+            if action == "skip_rows":
+                skip_rows = self._skip_rows_option(import_session.skip_rows)
+                if skip_rows is None:
+                    continue
+                import_session.skip_rows = skip_rows
 
     @staticmethod
     def _separator_option(previous_value: Optional[str]) -> Optional[str]:
@@ -158,12 +278,29 @@ class CSVImporter(Importer["CsvImportSession"]):
             default=previous_value,
         )
 
+    @staticmethod
+    def _skip_rows_option(previous_value: Optional[int]) -> Optional[int]:
+        input_str = prompts.text(
+            f"Number of rows to skip at the beginning (current: {previous_value or 0})",
+            default=str(previous_value) if previous_value is not None else "0",
+        )
+        if input_str is None:
+            return None
+        try:
+            skip_rows = int(input_str.strip())
+            if skip_rows < 0:
+                return None
+            return skip_rows
+        except ValueError:
+            return None
+
 
 class CsvImportSession(ImporterSession, BaseModel):
     input_file: str
     separator: str
     quote_char: str
     has_header: bool = True
+    skip_rows: int = 0
 
     def print_config(self):
         def present_separator(value: str) -> str:
@@ -186,6 +323,7 @@ class CsvImportSession(ImporterSession, BaseModel):
         print(f"- Column separator: {present_separator(self.separator)}")
         print(f"- Quote character: {present_separator(self.quote_char)}")
         print(f"- First row is header: {'yes' if self.has_header else 'no'}")
+        print(f"- Skip rows: {self.skip_rows}")
 
     def load_preview(self, n_records: int) -> pl.DataFrame:
         return pl.read_csv(
@@ -193,6 +331,7 @@ class CsvImportSession(ImporterSession, BaseModel):
             separator=self.separator,
             quote_char=self.quote_char,
             has_header=self.has_header,
+            skip_rows=self.skip_rows,
             n_rows=n_records,
             truncate_ragged_lines=True,
             ignore_errors=True,
@@ -204,6 +343,7 @@ class CsvImportSession(ImporterSession, BaseModel):
             separator=self.separator,
             quote_char=self.quote_char,
             has_header=self.has_header,
+            skip_rows=self.skip_rows,
             truncate_ragged_lines=True,
             ignore_errors=True,
         )
