@@ -6,6 +6,7 @@ import polars as pl
 from pydantic import BaseModel
 
 import terminal_tools.prompts as prompts
+from terminal_tools.utils import smart_print_data_frame
 
 from .importer import Importer, ImporterSession
 
@@ -321,10 +322,27 @@ class CsvImportSession(ImporterSession, BaseModel):
                 return "(Pipe |)"
             return value
 
-        print(f"- Column separator: {present_separator(self.separator)}")
-        print(f"- Quote character: {present_separator(self.quote_char)}")
-        print(f"- First row is header: {'yes' if self.has_header else 'no'}")
-        print(f"- Skip rows: {self.skip_rows}")
+        # Create configuration DataFrame
+        config_data = pl.DataFrame(
+            {
+                "Option": [
+                    "Column separator",
+                    "Quote character",
+                    "First row is header",
+                    "Skip rows",
+                ],
+                "Value": [
+                    present_separator(self.separator),
+                    present_separator(self.quote_char),
+                    "yes" if self.has_header else "no",
+                    str(self.skip_rows),
+                ],
+            }
+        )
+
+        smart_print_data_frame(
+            config_data, "CSV Import Configuration", apply_color=None
+        )
 
     def load_preview(self, n_records: int) -> pl.DataFrame:
         return pl.read_csv(
