@@ -7,8 +7,14 @@ from analyzer_interface.params import TimeBinningValue
 from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from testing import CsvTestData, JsonTestData, test_primary_analyzer
 
-from .interface import COL_AUTHOR_ID, COL_POST, COL_TIME, OUTPUT_GINI, interface
-from .main import gini, main
+from .hashtags_base.interface import (
+    COL_AUTHOR_ID,
+    COL_POST,
+    COL_TIME,
+    OUTPUT_GINI,
+    interface,
+)
+from .hashtags_base.main import gini, main
 from .test_data import test_data_dir
 
 HASHTAGS = [

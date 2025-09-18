@@ -1,6 +1,6 @@
 from analyzer_interface import WebPresenterInterface
 
-from ..temporal import interface as temporal_interface
+from ..temporal_base import interface as temporal_interface
 
 interface = WebPresenterInterface(
     id="time_interval_frequencies",

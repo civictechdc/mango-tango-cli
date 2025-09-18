@@ -35,6 +35,7 @@ nav:
       - "Meta": "reference/meta.md"
       - "Storage": "reference/storage.md"
       - "Testing": "reference/testing.md"
+      - "Tokenizer": "reference/tokenizer.md"
 
 theme:
   name: material
@@ -42,10 +43,10 @@ theme:
   features:
     - navigation.tracking
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.path
     - navigation.sections
     - navigation.top
-    - navigation.tabs
     - content.code.copy
     - content.tooltips
     - toc.follow
@@ -54,22 +55,31 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [src] # search packages in the src folder
+          # paths: [src] # search packages in the src folder
           options:
-            show_root_heading: true
-            # show_category_heading: true
-            show_root_toc_entry: false
-            show_root_full_path: true
-            heading_level: 2
             docstring_style: google
+            extensions:
+              - griffe_pydantic
+            filters:
+              - '!^_[^_]'
+              - '!^test_'
+            heading_level: 2
             parameter_headings: true
-            show_symbol_type_heading: True
-            show_symbol_type_toc: True
+            show_category_heading: true
+            show_root_full_path: true
+            show_root_heading: true
+            show_root_toc_entry: false
+            show_submodules: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            summary: true
   - search
   - mermaid2
 
 markdown_extensions:
   - toc:
       baselevel: 2
-
   - pymdownx.snippets
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences

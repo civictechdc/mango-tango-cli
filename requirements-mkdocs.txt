@@ -4,3 +4,4 @@ mkdocs-material
 markdown
 pymdown-extensions
 mkdocs-mermaid2-plugin
+griffe_pydantic
