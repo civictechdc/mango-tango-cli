@@ -1,4 +1,4 @@
-user_id,time,text
+Unique UserID,Timestamp,Post Content
 user05,2025-03-25T18:17:05.000000,"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce mauris lacus, consectetur non consequat non, sollicitudin eget ex. Mauris sit amet sem at augue accumsan aliquam sit amet id lacus. #happy #fitness"
 user01,2025-03-26T01:10:16.000000,"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce mauris lacus, consectetur non consequat non, sollicitudin eget ex. Mauris sit amet sem at augue accumsan aliquam sit amet id lacus. Nunc neque nisl, mattis at ornare vel, gravida at libero. Etiam es #fun #friends #art"
 user09,2025-03-26T08:59:19.000000,"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce mauris lacus, consectetur non consequat non, sollicitudin eget ex. Mauris sit amet sem at augue accumsan aliquam sit amet id"
