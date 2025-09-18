@@ -82,7 +82,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
@@ -170,14 +172,8 @@
     
   </nav>
   
-</header>
     
-    <div class="md-container" data-md-component="container">
       
-      
-        
-          
-            
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
@@ -259,7 +255,13 @@
     </ul>
   </div>
 </nav>
-          
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
         
       
       <main class="md-main" data-md-component="main">
@@ -1616,6 +1618,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../reference/tokenizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tokenizer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2064,452 +2089,452 @@
 </ul>
 <h3 id="basic-structure">Basic Structure</h3>
 <p>Every Shiny web presenter follows this pattern:</p>
-<pre><code class="language-python">from shiny import reactive, render, ui
-from shinywidgets import output_widget, render_widget
-from analyzer_interface.context import WebPresenterContext, FactoryOutputContext, ShinyContext
-import polars as pl
-import plotly.express as px
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shiny</span> <span class="kn">import</span> <span class="n">reactive</span><span class="p">,</span> <span class="n">render</span><span class="p">,</span> <span class="n">ui</span>
+<span class="kn">from</span> <span class="nn">shinywidgets</span> <span class="kn">import</span> <span class="n">output_widget</span><span class="p">,</span> <span class="n">render_widget</span>
+<span class="kn">from</span> <span class="nn">analyzer_interface.context</span> <span class="kn">import</span> <span class="n">WebPresenterContext</span><span class="p">,</span> <span class="n">FactoryOutputContext</span><span class="p">,</span> <span class="n">ShinyContext</span>
+<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
 
-def factory(context: WebPresenterContext) -&gt; FactoryOutputContext:
-    # Load analyzer data
-    df = pl.read_parquet(context.base.table(&quot;your_output&quot;).parquet_path)
+<span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">WebPresenterContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FactoryOutputContext</span><span class="p">:</span>
+    <span class="c1"># Load analyzer data</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;your_output&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span><span class="p">)</span>
 
-    # Define UI layout
-    dashboard_ui = ui.card(
-        ui.card_header(&quot;Your Dashboard Title&quot;),
-        ui.row(
-            ui.column(4, 
-                # Input controls
-                ui.input_selectize(&quot;category&quot;, &quot;Select Category&quot;, 
-                                 choices=df[&quot;category&quot;].unique().to_list()),
-                ui.input_slider(&quot;threshold&quot;, &quot;Threshold&quot;, 0, 100, 50)
-            ),
-            ui.column(8,
-                # Output displays
-                output_widget(&quot;main_plot&quot;, height=&quot;400px&quot;),
-                ui.output_text(&quot;summary_stats&quot;)
-            )
-        )
-    )
+    <span class="c1"># Define UI layout</span>
+    <span class="n">dashboard_ui</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">card</span><span class="p">(</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">card_header</span><span class="p">(</span><span class="s2">&quot;Your Dashboard Title&quot;</span><span class="p">),</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">row</span><span class="p">(</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> 
+                <span class="c1"># Input controls</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">input_selectize</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;Select Category&quot;</span><span class="p">,</span> 
+                                 <span class="n">choices</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()),</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">input_slider</span><span class="p">(</span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;Threshold&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span>
+                <span class="c1"># Output displays</span>
+                <span class="n">output_widget</span><span class="p">(</span><span class="s2">&quot;main_plot&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;400px&quot;</span><span class="p">),</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">output_text</span><span class="p">(</span><span class="s2">&quot;summary_stats&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 
-    def server(input, output, session):
-        @reactive.Calc
-        def filtered_data():
-            # Reactive data filtering
-            return df.filter(
-                (pl.col(&quot;category&quot;) == input.category()) &amp;
-                (pl.col(&quot;value&quot;) &gt;= input.threshold())
-            )
+    <span class="k">def</span> <span class="nf">server</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="nd">@reactive</span><span class="o">.</span><span class="n">Calc</span>
+        <span class="k">def</span> <span class="nf">filtered_data</span><span class="p">():</span>
+            <span class="c1"># Reactive data filtering</span>
+            <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">input</span><span class="o">.</span><span class="n">category</span><span class="p">())</span> <span class="o">&amp;</span>
+                <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">input</span><span class="o">.</span><span class="n">threshold</span><span class="p">())</span>
+            <span class="p">)</span>
 
-        @render_widget
-        def main_plot():
-            # Create interactive plot
-            plot_df = filtered_data().to_pandas()
-            fig = px.scatter(plot_df, x=&quot;x&quot;, y=&quot;y&quot;, color=&quot;category&quot;)
-            return fig
+        <span class="nd">@render_widget</span>
+        <span class="k">def</span> <span class="nf">main_plot</span><span class="p">():</span>
+            <span class="c1"># Create interactive plot</span>
+            <span class="n">plot_df</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">plot_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
 
-        @render.text
-        def summary_stats():
-            data = filtered_data()
-            return f&quot;Showing {len(data)} items, avg value: {data['value'].mean():.2f}&quot;
+        <span class="nd">@render</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">def</span> <span class="nf">summary_stats</span><span class="p">():</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Showing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> items, avg value: </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    return FactoryOutputContext(
-        shiny=ShinyContext(
-            server_handler=server,
-            panel=nav_panel(&quot;Dashboard&quot;, dashboard_ui)
-        )
-    )
-</code></pre>
+    <span class="k">return</span> <span class="n">FactoryOutputContext</span><span class="p">(</span>
+        <span class="n">shiny</span><span class="o">=</span><span class="n">ShinyContext</span><span class="p">(</span>
+            <span class="n">server_handler</span><span class="o">=</span><span class="n">server</span><span class="p">,</span>
+            <span class="n">panel</span><span class="o">=</span><span class="n">nav_panel</span><span class="p">(</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">,</span> <span class="n">dashboard_ui</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+</code></pre></div>
 <h3 id="user-interface-components">User Interface Components</h3>
 <h4 id="layout-components">Layout Components</h4>
 <p>Organize your dashboard with these layout elements:</p>
-<pre><code class="language-python"># Cards for grouped content
-ui.card(
-    ui.card_header(&quot;Section Title&quot;),
-    ui.card_body(&quot;Content goes here&quot;)
-)
+<div class="highlight"><pre><span></span><code><span class="c1"># Cards for grouped content</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">card</span><span class="p">(</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">card_header</span><span class="p">(</span><span class="s2">&quot;Section Title&quot;</span><span class="p">),</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">card_body</span><span class="p">(</span><span class="s2">&quot;Content goes here&quot;</span><span class="p">)</span>
+<span class="p">)</span>
 
-# Grid layouts
-ui.row(
-    ui.column(6, &quot;Left column&quot;),
-    ui.column(6, &quot;Right column&quot;)
-)
+<span class="c1"># Grid layouts</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">row</span><span class="p">(</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;Left column&quot;</span><span class="p">),</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;Right column&quot;</span><span class="p">)</span>
+<span class="p">)</span>
 
-# Navigation
-ui.navset_tab(
-    ui.nav_panel(&quot;Tab 1&quot;, &quot;Content 1&quot;),
-    ui.nav_panel(&quot;Tab 2&quot;, &quot;Content 2&quot;)
-)
+<span class="c1"># Navigation</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">navset_tab</span><span class="p">(</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">nav_panel</span><span class="p">(</span><span class="s2">&quot;Tab 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Content 1&quot;</span><span class="p">),</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">nav_panel</span><span class="p">(</span><span class="s2">&quot;Tab 2&quot;</span><span class="p">,</span> <span class="s2">&quot;Content 2&quot;</span><span class="p">)</span>
+<span class="p">)</span>
 
-# Sidebars
-ui.sidebar(
-    &quot;Sidebar content&quot;,
-    open=&quot;open&quot;  # or &quot;closed&quot;
-)
-</code></pre>
+<span class="c1"># Sidebars</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">sidebar</span><span class="p">(</span>
+    <span class="s2">&quot;Sidebar content&quot;</span><span class="p">,</span>
+    <span class="nb">open</span><span class="o">=</span><span class="s2">&quot;open&quot;</span>  <span class="c1"># or &quot;closed&quot;</span>
+<span class="p">)</span>
+</code></pre></div>
 <h4 id="input-controls">Input Controls</h4>
 <p>Collect user input with various widgets:</p>
-<pre><code class="language-python"># Text inputs
-ui.input_text(&quot;text_id&quot;, &quot;Label&quot;, value=&quot;default&quot;)
-ui.input_text_area(&quot;textarea_id&quot;, &quot;Description&quot;, rows=3)
+<div class="highlight"><pre><span></span><code><span class="c1"># Text inputs</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_text</span><span class="p">(</span><span class="s2">&quot;text_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Label&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_text_area</span><span class="p">(</span><span class="s2">&quot;textarea_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Description&quot;</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
-# Numeric inputs
-ui.input_numeric(&quot;number_id&quot;, &quot;Number&quot;, value=10, min=0, max=100)
-ui.input_slider(&quot;slider_id&quot;, &quot;Range&quot;, 0, 100, value=[20, 80])
+<span class="c1"># Numeric inputs</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_numeric</span><span class="p">(</span><span class="s2">&quot;number_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Number&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_slider</span><span class="p">(</span><span class="s2">&quot;slider_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Range&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">80</span><span class="p">])</span>
 
-# Selection inputs
-ui.input_select(&quot;select_id&quot;, &quot;Choose one&quot;, choices=[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;])
-ui.input_selectize(&quot;selectize_id&quot;, &quot;Type to search&quot;, 
-                   choices=data[&quot;column&quot;].unique().to_list(),
-                   multiple=True)
+<span class="c1"># Selection inputs</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_select</span><span class="p">(</span><span class="s2">&quot;select_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Choose one&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">])</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_selectize</span><span class="p">(</span><span class="s2">&quot;selectize_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Type to search&quot;</span><span class="p">,</span> 
+                   <span class="n">choices</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;column&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+                   <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-# Boolean inputs
-ui.input_checkbox(&quot;check_id&quot;, &quot;Enable feature&quot;, value=True)
-ui.input_switch(&quot;switch_id&quot;, &quot;Toggle mode&quot;)
+<span class="c1"># Boolean inputs</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_checkbox</span><span class="p">(</span><span class="s2">&quot;check_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Enable feature&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_switch</span><span class="p">(</span><span class="s2">&quot;switch_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Toggle mode&quot;</span><span class="p">)</span>
 
-# File uploads
-ui.input_file(&quot;file_id&quot;, &quot;Upload CSV&quot;, accept=&quot;.csv&quot;)
+<span class="c1"># File uploads</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_file</span><span class="p">(</span><span class="s2">&quot;file_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Upload CSV&quot;</span><span class="p">,</span> <span class="n">accept</span><span class="o">=</span><span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
 
-# Date/time inputs
-ui.input_date(&quot;date_id&quot;, &quot;Select date&quot;)
-ui.input_date_range(&quot;daterange_id&quot;, &quot;Date range&quot;)
-</code></pre>
+<span class="c1"># Date/time inputs</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_date</span><span class="p">(</span><span class="s2">&quot;date_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Select date&quot;</span><span class="p">)</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">input_date_range</span><span class="p">(</span><span class="s2">&quot;daterange_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Date range&quot;</span><span class="p">)</span>
+</code></pre></div>
 <h4 id="output-components">Output Components</h4>
 <p>Display results with these output components:</p>
-<pre><code class="language-python"># Text outputs
-ui.output_text(&quot;text_id&quot;)        # Plain text
-ui.output_text_verbatim(&quot;code_id&quot;)  # Monospace text
-ui.output_ui(&quot;dynamic_ui&quot;)       # Dynamic UI elements
+<div class="highlight"><pre><span></span><code><span class="c1"># Text outputs</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">output_text</span><span class="p">(</span><span class="s2">&quot;text_id&quot;</span><span class="p">)</span>        <span class="c1"># Plain text</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">output_text_verbatim</span><span class="p">(</span><span class="s2">&quot;code_id&quot;</span><span class="p">)</span>  <span class="c1"># Monospace text</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">output_ui</span><span class="p">(</span><span class="s2">&quot;dynamic_ui&quot;</span><span class="p">)</span>       <span class="c1"># Dynamic UI elements</span>
 
-# Tables
-ui.output_table(&quot;table_id&quot;)      # Basic table
-ui.output_data_frame(&quot;df_id&quot;)    # Interactive data frame
+<span class="c1"># Tables</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">output_table</span><span class="p">(</span><span class="s2">&quot;table_id&quot;</span><span class="p">)</span>      <span class="c1"># Basic table</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">output_data_frame</span><span class="p">(</span><span class="s2">&quot;df_id&quot;</span><span class="p">)</span>    <span class="c1"># Interactive data frame</span>
 
-# Plots
-output_widget(&quot;plot_id&quot;)         # For plotly/bokeh widgets
-ui.output_plot(&quot;matplotlib_id&quot;)  # For matplotlib plots
+<span class="c1"># Plots</span>
+<span class="n">output_widget</span><span class="p">(</span><span class="s2">&quot;plot_id&quot;</span><span class="p">)</span>         <span class="c1"># For plotly/bokeh widgets</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">output_plot</span><span class="p">(</span><span class="s2">&quot;matplotlib_id&quot;</span><span class="p">)</span>  <span class="c1"># For matplotlib plots</span>
 
-# Downloads
-ui.download_button(&quot;download_id&quot;, &quot;Download Data&quot;)
-</code></pre>
+<span class="c1"># Downloads</span>
+<span class="n">ui</span><span class="o">.</span><span class="n">download_button</span><span class="p">(</span><span class="s2">&quot;download_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Download Data&quot;</span><span class="p">)</span>
+</code></pre></div>
 <h3 id="reactive-programming">Reactive Programming</h3>
 <p>Shiny's reactive system automatically updates outputs when inputs change:</p>
 <h4 id="reactive-calculations">Reactive Calculations</h4>
 <p>Use <code>@reactive.Calc</code> for expensive computations that multiple outputs depend on:</p>
-<pre><code class="language-python">@reactive.Calc
-def processed_data():
-    # This only runs when dependencies change
-    raw_data = load_data()
-    return raw_data.filter(pl.col(&quot;active&quot;) == input.show_active())
+<div class="highlight"><pre><span></span><code><span class="nd">@reactive</span><span class="o">.</span><span class="n">Calc</span>
+<span class="k">def</span> <span class="nf">processed_data</span><span class="p">():</span>
+    <span class="c1"># This only runs when dependencies change</span>
+    <span class="n">raw_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;active&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">input</span><span class="o">.</span><span class="n">show_active</span><span class="p">())</span>
 
-@render_widget
-def plot1():
-    data = processed_data()  # Uses cached result
-    return create_plot(data)
+<span class="nd">@render_widget</span>
+<span class="k">def</span> <span class="nf">plot1</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">processed_data</span><span class="p">()</span>  <span class="c1"># Uses cached result</span>
+    <span class="k">return</span> <span class="n">create_plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-@render.text  
-def summary():
-    data = processed_data()  # Uses same cached result
-    return f&quot;Records: {len(data)}&quot;
-</code></pre>
+<span class="nd">@render</span><span class="o">.</span><span class="n">text</span>  
+<span class="k">def</span> <span class="nf">summary</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">processed_data</span><span class="p">()</span>  <span class="c1"># Uses same cached result</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Records: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div>
 <h4 id="reactive-effects">Reactive Effects</h4>
 <p>Use <code>@reactive.Effect</code> for side effects like updating other inputs:</p>
-<pre><code class="language-python">@reactive.Effect
-def update_choices():
-    # Update selectize choices when category changes
-    category = input.category()
-    new_choices = df.filter(pl.col(&quot;category&quot;) == category)[&quot;subcategory&quot;].unique()
-    ui.update_selectize(&quot;subcategory&quot;, choices=new_choices.to_list())
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nd">@reactive</span><span class="o">.</span><span class="n">Effect</span>
+<span class="k">def</span> <span class="nf">update_choices</span><span class="p">():</span>
+    <span class="c1"># Update selectize choices when category changes</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">category</span><span class="p">()</span>
+    <span class="n">new_choices</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">category</span><span class="p">)[</span><span class="s2">&quot;subcategory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">update_selectize</span><span class="p">(</span><span class="s2">&quot;subcategory&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">new_choices</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span>
+</code></pre></div>
 <h4 id="event-handling">Event Handling</h4>
 <p>Respond to button clicks and other events:</p>
-<pre><code class="language-python">@reactive.Effect
-@reactive.event(input.reset_button)
-def reset_filters():
-    ui.update_slider(&quot;threshold&quot;, value=50)
-    ui.update_select(&quot;category&quot;, selected=&quot;All&quot;)
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nd">@reactive</span><span class="o">.</span><span class="n">Effect</span>
+<span class="nd">@reactive</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">reset_button</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">reset_filters</span><span class="p">():</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">update_slider</span><span class="p">(</span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">ui</span><span class="o">.</span><span class="n">update_select</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="n">selected</span><span class="o">=</span><span class="s2">&quot;All&quot;</span><span class="p">)</span>
+</code></pre></div>
 <h3 id="data-visualization">Data Visualization</h3>
 <h4 id="plotly-integration">Plotly Integration</h4>
 <p>Create interactive plots with plotly:</p>
-<pre><code class="language-python">from shinywidgets import output_widget, render_widget
-import plotly.express as px
-import plotly.graph_objects as go
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shinywidgets</span> <span class="kn">import</span> <span class="n">output_widget</span><span class="p">,</span> <span class="n">render_widget</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
 
-@render_widget
-def scatter_plot():
-    df_plot = filtered_data().to_pandas()
+<span class="nd">@render_widget</span>
+<span class="k">def</span> <span class="nf">scatter_plot</span><span class="p">():</span>
+    <span class="n">df_plot</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
-    fig = px.scatter(
-        df_plot, 
-        x=&quot;x_value&quot;, 
-        y=&quot;y_value&quot;,
-        color=&quot;category&quot;,
-        size=&quot;size_value&quot;,
-        hover_data=[&quot;additional_info&quot;],
-        title=&quot;Interactive Scatter Plot&quot;
-    )
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">df_plot</span><span class="p">,</span> 
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x_value&quot;</span><span class="p">,</span> 
+        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y_value&quot;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="s2">&quot;size_value&quot;</span><span class="p">,</span>
+        <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;additional_info&quot;</span><span class="p">],</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Interactive Scatter Plot&quot;</span>
+    <span class="p">)</span>
 
-    # Customize layout
-    fig.update_layout(
-        height=500,
-        showlegend=True,
-        hovermode=&quot;closest&quot;
-    )
+    <span class="c1"># Customize layout</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">hovermode</span><span class="o">=</span><span class="s2">&quot;closest&quot;</span>
+    <span class="p">)</span>
 
-    return fig
+    <span class="k">return</span> <span class="n">fig</span>
 
-@render_widget  
-def time_series():
-    df_ts = time_series_data().to_pandas()
+<span class="nd">@render_widget</span>  
+<span class="k">def</span> <span class="nf">time_series</span><span class="p">():</span>
+    <span class="n">df_ts</span> <span class="o">=</span> <span class="n">time_series_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
-    fig = go.Figure()
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
 
-    for category in df_ts[&quot;category&quot;].unique():
-        category_data = df_ts[df_ts[&quot;category&quot;] == category]
-        fig.add_trace(go.Scatter(
-            x=category_data[&quot;date&quot;],
-            y=category_data[&quot;value&quot;],
-            name=category,
-            mode=&quot;lines+markers&quot;
-        ))
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">df_ts</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="n">category_data</span> <span class="o">=</span> <span class="n">df_ts</span><span class="p">[</span><span class="n">df_ts</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">category</span><span class="p">]</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">category_data</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">],</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">category_data</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">category</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines+markers&quot;</span>
+        <span class="p">))</span>
 
-    fig.update_layout(
-        title=&quot;Time Series Analysis&quot;,
-        xaxis_title=&quot;Date&quot;,
-        yaxis_title=&quot;Value&quot;
-    )
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Time Series Analysis&quot;</span><span class="p">,</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;Date&quot;</span><span class="p">,</span>
+        <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Value&quot;</span>
+    <span class="p">)</span>
 
-    return fig
-</code></pre>
+    <span class="k">return</span> <span class="n">fig</span>
+</code></pre></div>
 <h4 id="custom-plots">Custom Plots</h4>
 <p>Create custom visualizations with matplotlib or other libraries:</p>
-<pre><code class="language-python">from shiny import render
-import matplotlib.pyplot as plt
-import seaborn as sns
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shiny</span> <span class="kn">import</span> <span class="n">render</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
-@render.plot
-def correlation_heatmap():
-    df_corr = correlation_data().to_pandas()
+<span class="nd">@render</span><span class="o">.</span><span class="n">plot</span>
+<span class="k">def</span> <span class="nf">correlation_heatmap</span><span class="p">():</span>
+    <span class="n">df_corr</span> <span class="o">=</span> <span class="n">correlation_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(
-        df_corr.corr(),
-        annot=True,
-        cmap=&quot;coolwarm&quot;,
-        center=0,
-        square=True
-    )
-    plt.title(&quot;Correlation Matrix&quot;)
-    plt.tight_layout()
-    return plt.gcf()
-</code></pre>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+        <span class="n">df_corr</span><span class="o">.</span><span class="n">corr</span><span class="p">(),</span>
+        <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+        <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">square</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation Matrix&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+</code></pre></div>
 <h3 id="data-tables">Data Tables</h3>
 <p>Display and interact with tabular data:</p>
 <h4 id="basic-tables">Basic Tables</h4>
-<pre><code class="language-python">@render.table
-def simple_table():
-    return filtered_data().to_pandas()
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nd">@render</span><span class="o">.</span><span class="n">table</span>
+<span class="k">def</span> <span class="nf">simple_table</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">filtered_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+</code></pre></div>
 <h4 id="interactive-data-frames">Interactive Data Frames</h4>
-<pre><code class="language-python">from shiny.render import DataGrid, DataTable
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shiny.render</span> <span class="kn">import</span> <span class="n">DataGrid</span><span class="p">,</span> <span class="n">DataTable</span>
 
-@render.data_frame
-def interactive_grid():
-    df_display = filtered_data().to_pandas()
+<span class="nd">@render</span><span class="o">.</span><span class="n">data_frame</span>
+<span class="k">def</span> <span class="nf">interactive_grid</span><span class="p">():</span>
+    <span class="n">df_display</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
-    return DataGrid(
-        df_display,
-        selection_mode=&quot;rows&quot;,  # or &quot;none&quot;, &quot;row&quot;, &quot;rows&quot;, &quot;col&quot;, &quot;cols&quot;
-        filters=True,
-        width=&quot;100%&quot;,
-        height=&quot;400px&quot;
-    )
+    <span class="k">return</span> <span class="n">DataGrid</span><span class="p">(</span>
+        <span class="n">df_display</span><span class="p">,</span>
+        <span class="n">selection_mode</span><span class="o">=</span><span class="s2">&quot;rows&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;none&quot;, &quot;row&quot;, &quot;rows&quot;, &quot;col&quot;, &quot;cols&quot;</span>
+        <span class="n">filters</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="s2">&quot;100%&quot;</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="s2">&quot;400px&quot;</span>
+    <span class="p">)</span>
 
-# Access selected rows
-@reactive.Effect
-def handle_selection():
-    selected = interactive_grid.data_view(selected=True)
-    if len(selected) &gt; 0:
-        # Process selected data
-        pass
-</code></pre>
+<span class="c1"># Access selected rows</span>
+<span class="nd">@reactive</span><span class="o">.</span><span class="n">Effect</span>
+<span class="k">def</span> <span class="nf">handle_selection</span><span class="p">():</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="n">interactive_grid</span><span class="o">.</span><span class="n">data_view</span><span class="p">(</span><span class="n">selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Process selected data</span>
+        <span class="k">pass</span>
+</code></pre></div>
 <h4 id="custom-table-styling">Custom Table Styling</h4>
-<pre><code class="language-python">@render.table
-def styled_table():
-    df = summary_stats().to_pandas()
+<div class="highlight"><pre><span></span><code><span class="nd">@render</span><span class="o">.</span><span class="n">table</span>
+<span class="k">def</span> <span class="nf">styled_table</span><span class="p">():</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">summary_stats</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
-    # Format numeric columns
-    df[&quot;percentage&quot;] = df[&quot;percentage&quot;].map(&quot;{:.1%}&quot;.format)
-    df[&quot;amount&quot;] = df[&quot;amount&quot;].map(&quot;${:,.0f}&quot;.format)
+    <span class="c1"># Format numeric columns</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.1%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s2">&quot;$</span><span class="si">{:,.0f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
 
-    return df
-</code></pre>
+    <span class="k">return</span> <span class="n">df</span>
+</code></pre></div>
 <h3 id="advanced-features">Advanced Features</h3>
 <h4 id="dynamic-ui">Dynamic UI</h4>
 <p>Create UI elements that change based on user input:</p>
-<pre><code class="language-python">@render.ui
-def dynamic_controls():
-    analysis_type = input.analysis_type()
+<div class="highlight"><pre><span></span><code><span class="nd">@render</span><span class="o">.</span><span class="n">ui</span>
+<span class="k">def</span> <span class="nf">dynamic_controls</span><span class="p">():</span>
+    <span class="n">analysis_type</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">analysis_type</span><span class="p">()</span>
 
-    if analysis_type == &quot;correlation&quot;:
-        return ui.div(
-            ui.input_selectize(&quot;x_var&quot;, &quot;X Variable&quot;, choices=numeric_columns),
-            ui.input_selectize(&quot;y_var&quot;, &quot;Y Variable&quot;, choices=numeric_columns)
-        )
+    <span class="k">if</span> <span class="n">analysis_type</span> <span class="o">==</span> <span class="s2">&quot;correlation&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ui</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_selectize</span><span class="p">(</span><span class="s2">&quot;x_var&quot;</span><span class="p">,</span> <span class="s2">&quot;X Variable&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">numeric_columns</span><span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_selectize</span><span class="p">(</span><span class="s2">&quot;y_var&quot;</span><span class="p">,</span> <span class="s2">&quot;Y Variable&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">numeric_columns</span><span class="p">)</span>
+        <span class="p">)</span>
 
-    if analysis_type == &quot;distribution&quot;:
-        return ui.div(
-            ui.input_select(&quot;dist_var&quot;, &quot;Variable&quot;, choices=all_columns),
-            ui.input_numeric(&quot;bins&quot;, &quot;Number of bins&quot;, value=30)
-        )
+    <span class="k">if</span> <span class="n">analysis_type</span> <span class="o">==</span> <span class="s2">&quot;distribution&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ui</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_select</span><span class="p">(</span><span class="s2">&quot;dist_var&quot;</span><span class="p">,</span> <span class="s2">&quot;Variable&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">all_columns</span><span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_numeric</span><span class="p">(</span><span class="s2">&quot;bins&quot;</span><span class="p">,</span> <span class="s2">&quot;Number of bins&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="p">)</span>
 
-    eturn ui.div(&quot;Select an analysis type&quot;)
-</code></pre>
+    <span class="n">eturn</span> <span class="n">ui</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="s2">&quot;Select an analysis type&quot;</span><span class="p">)</span>
+</code></pre></div>
 <h4 id="progress-indicators">Progress Indicators</h4>
 <p>Show progress for long-running operations:</p>
-<pre><code class="language-python">from shiny import ui
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shiny</span> <span class="kn">import</span> <span class="n">ui</span>
 
-@reactive.Effect
-@reactive.event(input.run_analysis)
-def run_long_analysis():
-    with ui.Progress(min=0, max=100) as progress:
-        progress.set(message=&quot;Loading data&quot;, value=0)
-        data = load_large_dataset()
+<span class="nd">@reactive</span><span class="o">.</span><span class="n">Effect</span>
+<span class="nd">@reactive</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">run_analysis</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">run_long_analysis</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">Progress</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span> <span class="k">as</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Loading data&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">load_large_dataset</span><span class="p">()</span>
 
-        progress.set(message=&quot;Processing&quot;, value=50)
-        results = process_data(data)
+        <span class="n">progress</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Processing&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">process_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        progress.set(message=&quot;Finalizing&quot;, value=90)
-        save_results(results)
+        <span class="n">progress</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Finalizing&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+        <span class="n">save_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-        progress.set(value=100)
+        <span class="n">progress</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
-    ui.notification_show(&quot;Analysis complete!&quot;, type=&quot;success&quot;)
-</code></pre>
+    <span class="n">ui</span><span class="o">.</span><span class="n">notification_show</span><span class="p">(</span><span class="s2">&quot;Analysis complete!&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">)</span>
+</code></pre></div>
 <h3 id="integration-with-analyzers">Integration with Analyzers</h3>
 <h4 id="accessing-analyzer-data">Accessing Analyzer Data</h4>
-<pre><code class="language-python">def factory(context: WebPresenterContext) -&gt; FactoryOutputContext:
-    # Access primary analyzer outputs
-    main_data = pl.read_parquet(
-        context.base.table(&quot;main_analysis&quot;).parquet_path
-    )
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">WebPresenterContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FactoryOutputContext</span><span class="p">:</span>
+    <span class="c1"># Access primary analyzer outputs</span>
+    <span class="n">main_data</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;main_analysis&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span>
+    <span class="p">)</span>
 
-    # Access secondary analyzer outputs
-    summary_data = pl.read_parquet(
-        context.dependency(summary_analyzer).table(&quot;summary&quot;).parquet_path
-    )
+    <span class="c1"># Access secondary analyzer outputs</span>
+    <span class="n">summary_data</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">dependency</span><span class="p">(</span><span class="n">summary_analyzer</span><span class="p">)</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span>
+    <span class="p">)</span>
 
-    # Access parameters used in analysis
-    threshold = context.base_params.get(&quot;threshold&quot;, 0.5)
+    <span class="c1"># Access parameters used in analysis</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">base_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
 
-    # Build dashboard with this data
-    # ...
-</code></pre>
+    <span class="c1"># Build dashboard with this data</span>
+    <span class="c1"># ...</span>
+</code></pre></div>
 <h4 id="parameter-integration">Parameter Integration</h4>
 <p>Use analyzer parameters in your dashboard:</p>
-<pre><code class="language-python">def server(input, output, session):
-    # Get analyzer parameters
-    analyzer_threshold = context.base_params.get(&quot;threshold&quot;, 0.5)
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">server</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+    <span class="c1"># Get analyzer parameters</span>
+    <span class="n">analyzer_threshold</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">base_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
 
-    @render.text
-    def analysis_info():
-        return f&quot;Analysis run with threshold: {analyzer_threshold}&quot;
+    <span class="nd">@render</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">def</span> <span class="nf">analysis_info</span><span class="p">():</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Analysis run with threshold: </span><span class="si">{</span><span class="n">analyzer_threshold</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    @render_widget
-    def threshold_comparison():
-        # Compare user input with analyzer parameter
-        user_threshold = input.user_threshold()
-        df_comparison = main_data.with_columns([
-            (pl.col(&quot;value&quot;) &gt; analyzer_threshold).alias(&quot;analyzer_flag&quot;),
-            (pl.col(&quot;value&quot;) &gt; user_threshold).alias(&quot;user_flag&quot;)
-        ])
+    <span class="nd">@render_widget</span>
+    <span class="k">def</span> <span class="nf">threshold_comparison</span><span class="p">():</span>
+        <span class="c1"># Compare user input with analyzer parameter</span>
+        <span class="n">user_threshold</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_threshold</span><span class="p">()</span>
+        <span class="n">df_comparison</span> <span class="o">=</span> <span class="n">main_data</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span>
+            <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">analyzer_threshold</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;analyzer_flag&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">user_threshold</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;user_flag&quot;</span><span class="p">)</span>
+        <span class="p">])</span>
 
-        return create_comparison_plot(df_comparison)
-</code></pre>
+        <span class="k">return</span> <span class="n">create_comparison_plot</span><span class="p">(</span><span class="n">df_comparison</span><span class="p">)</span>
+</code></pre></div>
 <h3 id="performance-optimization">Performance Optimization</h3>
 <h4 id="efficient-data-processing">Efficient Data Processing</h4>
-<pre><code class="language-python">@reactive.Calc
-def base_data():
-    # Load once and cache
-    return pl.read_parquet(data_path)
+<div class="highlight"><pre><span></span><code><span class="nd">@reactive</span><span class="o">.</span><span class="n">Calc</span>
+<span class="k">def</span> <span class="nf">base_data</span><span class="p">():</span>
+    <span class="c1"># Load once and cache</span>
+    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
 
-@reactive.Calc  
-def filtered_data():
-    # Efficient filtering with Polars
-    filters = []
+<span class="nd">@reactive</span><span class="o">.</span><span class="n">Calc</span>  
+<span class="k">def</span> <span class="nf">filtered_data</span><span class="p">():</span>
+    <span class="c1"># Efficient filtering with Polars</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
 
-    if input.category() != &quot;All&quot;:
-        filters.append(pl.col(&quot;category&quot;) == input.category())
+    <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">category</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;All&quot;</span><span class="p">:</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">input</span><span class="o">.</span><span class="n">category</span><span class="p">())</span>
 
-    if input.date_range() is not None:
-        start, end = input.date_range()
-        filters.append(pl.col(&quot;date&quot;).is_between(start, end))
+    <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">date_range</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">date_range</span><span class="p">()</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_between</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
 
-    if filters:
-        return base_data().filter(pl.all_horizontal(filters))
+    <span class="k">if</span> <span class="n">filters</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">base_data</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">all_horizontal</span><span class="p">(</span><span class="n">filters</span><span class="p">))</span>
 
-    else:
-        return base_data()
-</code></pre>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">base_data</span><span class="p">()</span>
+</code></pre></div>
 <h4 id="lazy-evaluation">Lazy Evaluation</h4>
-<pre><code class="language-python">@reactive.Calc
-def expensive_calculation():
-    # Only runs when dependencies change
-    data = filtered_data()
+<div class="highlight"><pre><span></span><code><span class="nd">@reactive</span><span class="o">.</span><span class="n">Calc</span>
+<span class="k">def</span> <span class="nf">expensive_calculation</span><span class="p">():</span>
+    <span class="c1"># Only runs when dependencies change</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()</span>
 
-    # Use lazy evaluation
-    result = (
-        data
-        .group_by(&quot;category&quot;)
-        .agg([
-            pl.col(&quot;value&quot;).mean().alias(&quot;avg_value&quot;),
-            pl.col(&quot;value&quot;).std().alias(&quot;std_value&quot;),
-            pl.col(&quot;value&quot;).count().alias(&quot;count&quot;)
-        ])
-        .sort(&quot;avg_value&quot;, descending=True)
-    )
+    <span class="c1"># Use lazy evaluation</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">data</span>
+        <span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">agg</span><span class="p">([</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;avg_value&quot;</span><span class="p">),</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;std_value&quot;</span><span class="p">),</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;avg_value&quot;</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">)</span>
 
-    return result
-</code></pre>
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div>
 <h3 id="testing-shiny-dashboards">Testing Shiny Dashboards</h3>
 <h4 id="unit-testing-components">Unit Testing Components</h4>
-<pre><code class="language-python">import pytest
-from shiny.testing import ShinyAppProc
-from your_presenter import factory
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">shiny.testing</span> <span class="kn">import</span> <span class="n">ShinyAppProc</span>
+<span class="kn">from</span> <span class="nn">your_presenter</span> <span class="kn">import</span> <span class="n">factory</span>
 
-def test_dashboard_loads():
-    &quot;&quot;&quot;Test that dashboard loads without errors&quot;&quot;&quot;
-    app = factory(mock_context)
+<span class="k">def</span> <span class="nf">test_dashboard_loads</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that dashboard loads without errors&quot;&quot;&quot;</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="n">mock_context</span><span class="p">)</span>
 
-    # Test UI renders
-    assert app.shiny.panel is not None
+    <span class="c1"># Test UI renders</span>
+    <span class="k">assert</span> <span class="n">app</span><span class="o">.</span><span class="n">shiny</span><span class="o">.</span><span class="n">panel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-    # Test server function exists
-    assert callable(app.shiny.server_handler)
+    <span class="c1"># Test server function exists</span>
+    <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">shiny</span><span class="o">.</span><span class="n">server_handler</span><span class="p">)</span>
 
-def test_data_filtering():
-    &quot;&quot;&quot;Test reactive data filtering&quot;&quot;&quot;
-    with ShinyAppProc(factory(mock_context)) as proc:
-        # Set input values
-        proc.set_inputs(category=&quot;TypeA&quot;, threshold=50)
+<span class="k">def</span> <span class="nf">test_data_filtering</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test reactive data filtering&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">ShinyAppProc</span><span class="p">(</span><span class="n">factory</span><span class="p">(</span><span class="n">mock_context</span><span class="p">))</span> <span class="k">as</span> <span class="n">proc</span><span class="p">:</span>
+        <span class="c1"># Set input values</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">set_inputs</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;TypeA&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 
-        # Check outputs update correctly
-        output = proc.get_output(&quot;summary_stats&quot;)
-        assert &quot;TypeA&quot; in output
-</code></pre>
+        <span class="c1"># Check outputs update correctly</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s2">&quot;summary_stats&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="s2">&quot;TypeA&quot;</span> <span class="ow">in</span> <span class="n">output</span>
+</code></pre></div>
 <h4 id="integration-testing">Integration Testing</h4>
-<pre><code class="language-python">def test_with_real_data():
-    &quot;&quot;&quot;Test dashboard with actual analyzer output&quot;&quot;&quot;
-    # Run analyzer to generate test data
-    context = create_test_context(test_data_path)
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">test_with_real_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test dashboard with actual analyzer output&quot;&quot;&quot;</span>
+    <span class="c1"># Run analyzer to generate test data</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">create_test_context</span><span class="p">(</span><span class="n">test_data_path</span><span class="p">)</span>
 
-    # Test dashboard with real data
-    app = factory(context)
+    <span class="c1"># Test dashboard with real data</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 
-    # Verify data loads correctly
-    assert app.shiny.panel is not None
-</code></pre>
+    <span class="c1"># Verify data loads correctly</span>
+    <span class="k">assert</span> <span class="n">app</span><span class="o">.</span><span class="n">shiny</span><span class="o">.</span><span class="n">panel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</code></pre></div>
 <h3 id="deployment-considerations">Deployment Considerations</h3>
 <h4 id="resource-management">Resource Management</h4>
 <ul>
@@ -2519,185 +2544,185 @@ def test_data_filtering():
 <li>Use lazy loading for secondary data</li>
 </ul>
 <h4 id="error-handling">Error Handling</h4>
-<pre><code class="language-python">@render_widget
-def safe_plot():
-    try:
-        data = filtered_data()
-        if len(data) == 0:
-            return empty_plot_message()
+<div class="highlight"><pre><span></span><code><span class="nd">@render_widget</span>
+<span class="k">def</span> <span class="nf">safe_plot</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">empty_plot_message</span><span class="p">()</span>
 
-        return create_plot(data)
+        <span class="k">return</span> <span class="n">create_plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-    except Exception as e:
-        ui.notification_show(f&quot;Plot error: {str(e)}&quot;, type=&quot;error&quot;)
-        return error_plot()
-</code></pre>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">notification_show</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plot error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">error_plot</span><span class="p">()</span>
+</code></pre></div>
 <h4 id="session-management">Session Management</h4>
-<pre><code class="language-python">def server(input, output, session):
-    # Clean up resources when session ends
-    @reactive.Effect
-    def cleanup():
-        session.on_ended(lambda: cleanup_user_data())
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">server</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+    <span class="c1"># Clean up resources when session ends</span>
+    <span class="nd">@reactive</span><span class="o">.</span><span class="n">Effect</span>
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">():</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">on_ended</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cleanup_user_data</span><span class="p">())</span>
+</code></pre></div>
 <h3 id="example-complete-dashboard">Example: Complete Dashboard</h3>
 <p>Here's a complete example of a Shiny dashboard for analyzing message sentiment:</p>
-<pre><code class="language-python">from shiny import reactive, render, ui
-from shinywidgets import output_widget, render_widget
-import plotly.express as px
-import polars as pl
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shiny</span> <span class="kn">import</span> <span class="n">reactive</span><span class="p">,</span> <span class="n">render</span><span class="p">,</span> <span class="n">ui</span>
+<span class="kn">from</span> <span class="nn">shinywidgets</span> <span class="kn">import</span> <span class="n">output_widget</span><span class="p">,</span> <span class="n">render_widget</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
 
-def factory(context: WebPresenterContext) -&gt; FactoryOutputContext:
-    # Load data
-    df_sentiment = pl.read_parquet(
-        context.base.table(&quot;sentiment_analysis&quot;).parquet_path
-    )
+<span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">WebPresenterContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FactoryOutputContext</span><span class="p">:</span>
+    <span class="c1"># Load data</span>
+    <span class="n">df_sentiment</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;sentiment_analysis&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span>
+    <span class="p">)</span>
 
-    # Get unique values for inputs
-    date_range = (df_sentiment[&quot;date&quot;].min(), df_sentiment[&quot;date&quot;].max())
-    categories = [&quot;All&quot;] + df_sentiment[&quot;category&quot;].unique().to_list()
+    <span class="c1"># Get unique values for inputs</span>
+    <span class="n">date_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_sentiment</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df_sentiment</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;All&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_sentiment</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
 
-    # UI Layout
-    dashboard = ui.page_sidebar(
-        ui.sidebar(
-            ui.h3(&quot;Analysis Controls&quot;),
-            ui.input_date_range(
-                &quot;date_filter&quot;, 
-                &quot;Date Range&quot;,
-                start=date_range[0],
-                end=date_range[1]
-            ),
-            ui.input_selectize(
-                &quot;category_filter&quot;,
-                &quot;Categories&quot;, 
-                choices=categories,
-                selected=&quot;All&quot;,
-                multiple=True
-            ),
-            ui.input_slider(
-                &quot;sentiment_threshold&quot;,
-                &quot;Sentiment Threshold&quot;,
-                -1, 1, 0, step=0.1
-            ),
-            ui.hr(),
-            ui.input_action_button(&quot;reset&quot;, &quot;Reset Filters&quot;),
-            ui.download_button(&quot;download&quot;, &quot;Download Data&quot;)
-        ),
+    <span class="c1"># UI Layout</span>
+    <span class="n">dashboard</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">page_sidebar</span><span class="p">(</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">sidebar</span><span class="p">(</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">h3</span><span class="p">(</span><span class="s2">&quot;Analysis Controls&quot;</span><span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_date_range</span><span class="p">(</span>
+                <span class="s2">&quot;date_filter&quot;</span><span class="p">,</span> 
+                <span class="s2">&quot;Date Range&quot;</span><span class="p">,</span>
+                <span class="n">start</span><span class="o">=</span><span class="n">date_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">end</span><span class="o">=</span><span class="n">date_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_selectize</span><span class="p">(</span>
+                <span class="s2">&quot;category_filter&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Categories&quot;</span><span class="p">,</span> 
+                <span class="n">choices</span><span class="o">=</span><span class="n">categories</span><span class="p">,</span>
+                <span class="n">selected</span><span class="o">=</span><span class="s2">&quot;All&quot;</span><span class="p">,</span>
+                <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_slider</span><span class="p">(</span>
+                <span class="s2">&quot;sentiment_threshold&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Sentiment Threshold&quot;</span><span class="p">,</span>
+                <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span>
+            <span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">hr</span><span class="p">(),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">input_action_button</span><span class="p">(</span><span class="s2">&quot;reset&quot;</span><span class="p">,</span> <span class="s2">&quot;Reset Filters&quot;</span><span class="p">),</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">download_button</span><span class="p">(</span><span class="s2">&quot;download&quot;</span><span class="p">,</span> <span class="s2">&quot;Download Data&quot;</span><span class="p">)</span>
+        <span class="p">),</span>
 
-        ui.div(
-            ui.h2(&quot;Sentiment Analysis Dashboard&quot;),
+        <span class="n">ui</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">h2</span><span class="p">(</span><span class="s2">&quot;Sentiment Analysis Dashboard&quot;</span><span class="p">),</span>
 
-            ui.row(
-                ui.column(6, ui.value_box(
-                    title=&quot;Total Messages&quot;,
-                    value=ui.output_text(&quot;total_count&quot;),
-                    theme=&quot;primary&quot;
-                )),
-                ui.column(6, ui.value_box(
-                    title=&quot;Avg Sentiment&quot;, 
-                    value=ui.output_text(&quot;avg_sentiment&quot;),
-                    theme=&quot;success&quot;
-                ))
-            ),
+            <span class="n">ui</span><span class="o">.</span><span class="n">row</span><span class="p">(</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">ui</span><span class="o">.</span><span class="n">value_box</span><span class="p">(</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Total Messages&quot;</span><span class="p">,</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">ui</span><span class="o">.</span><span class="n">output_text</span><span class="p">(</span><span class="s2">&quot;total_count&quot;</span><span class="p">),</span>
+                    <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span>
+                <span class="p">)),</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">ui</span><span class="o">.</span><span class="n">value_box</span><span class="p">(</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Avg Sentiment&quot;</span><span class="p">,</span> 
+                    <span class="n">value</span><span class="o">=</span><span class="n">ui</span><span class="o">.</span><span class="n">output_text</span><span class="p">(</span><span class="s2">&quot;avg_sentiment&quot;</span><span class="p">),</span>
+                    <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;success&quot;</span>
+                <span class="p">))</span>
+            <span class="p">),</span>
 
-            ui.navset_tab(
-                ui.nav_panel(
-                    &quot;Time Series&quot;,
-                    output_widget(&quot;timeseries_plot&quot;, height=&quot;500px&quot;)
-                ),
-                ui.nav_panel(
-                    &quot;Distribution&quot;, 
-                    output_widget(&quot;distribution_plot&quot;, height=&quot;500px&quot;)
-                ),
-                ui.nav_panel(
-                    &quot;Data Table&quot;,
-                    ui.output_data_frame(&quot;data_table&quot;)
-                )
-            )
-        )
-    )
+            <span class="n">ui</span><span class="o">.</span><span class="n">navset_tab</span><span class="p">(</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">nav_panel</span><span class="p">(</span>
+                    <span class="s2">&quot;Time Series&quot;</span><span class="p">,</span>
+                    <span class="n">output_widget</span><span class="p">(</span><span class="s2">&quot;timeseries_plot&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;500px&quot;</span><span class="p">)</span>
+                <span class="p">),</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">nav_panel</span><span class="p">(</span>
+                    <span class="s2">&quot;Distribution&quot;</span><span class="p">,</span> 
+                    <span class="n">output_widget</span><span class="p">(</span><span class="s2">&quot;distribution_plot&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;500px&quot;</span><span class="p">)</span>
+                <span class="p">),</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">nav_panel</span><span class="p">(</span>
+                    <span class="s2">&quot;Data Table&quot;</span><span class="p">,</span>
+                    <span class="n">ui</span><span class="o">.</span><span class="n">output_data_frame</span><span class="p">(</span><span class="s2">&quot;data_table&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 
-    def server(input, output, session):
-        @reactive.Calc
-        def filtered_data():
-            data = df_sentiment
+    <span class="k">def</span> <span class="nf">server</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="nd">@reactive</span><span class="o">.</span><span class="n">Calc</span>
+        <span class="k">def</span> <span class="nf">filtered_data</span><span class="p">():</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">df_sentiment</span>
 
-            # Date filtering
-            if input.date_filter() is not None:
-                start, end = input.date_filter()
-                data = data.filter(pl.col(&quot;date&quot;).is_between(start, end))
+            <span class="c1"># Date filtering</span>
+            <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">date_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">date_filter</span><span class="p">()</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_between</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
 
-            # Category filtering
-            if &quot;All&quot; not in input.category_filter():
-                data = data.filter(pl.col(&quot;category&quot;).is_in(input.category_filter()))
+            <span class="c1"># Category filtering</span>
+            <span class="k">if</span> <span class="s2">&quot;All&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">category_filter</span><span class="p">():</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_in</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">category_filter</span><span class="p">()))</span>
 
-            # Sentiment filtering
-            data = data.filter(pl.col(&quot;sentiment&quot;) &gt;= input.sentiment_threshold())
+            <span class="c1"># Sentiment filtering</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;sentiment&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">input</span><span class="o">.</span><span class="n">sentiment_threshold</span><span class="p">())</span>
 
-            return data
+            <span class="k">return</span> <span class="n">data</span>
 
-        @render.text
-        def total_count():
-            return f&quot;{len(filtered_data()):,}&quot;
+        <span class="nd">@render</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">def</span> <span class="nf">total_count</span><span class="p">():</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_data</span><span class="p">())</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        @render.text
-        def avg_sentiment():
-            avg = filtered_data()[&quot;sentiment&quot;].mean()
-            return f&quot;{avg:.3f}&quot;
+        <span class="nd">@render</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">def</span> <span class="nf">avg_sentiment</span><span class="p">():</span>
+            <span class="n">avg</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()[</span><span class="s2">&quot;sentiment&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">avg</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        @render_widget
-        def timeseries_plot():
-            df_plot = (
-                filtered_data()
-                .group_by(&quot;date&quot;)
-                .agg(pl.col(&quot;sentiment&quot;).mean().alias(&quot;avg_sentiment&quot;))
-                .sort(&quot;date&quot;)
-                .to_pandas()
-            )
+        <span class="nd">@render_widget</span>
+        <span class="k">def</span> <span class="nf">timeseries_plot</span><span class="p">():</span>
+            <span class="n">df_plot</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">filtered_data</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;sentiment&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;avg_sentiment&quot;</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+            <span class="p">)</span>
 
-            fig = px.line(
-                df_plot, 
-                x=&quot;date&quot;, 
-                y=&quot;avg_sentiment&quot;,
-                title=&quot;Sentiment Over Time&quot;
-            )
-            fig.add_hline(y=0, line_dash=&quot;dash&quot;, line_color=&quot;gray&quot;)
-            return fig
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+                <span class="n">df_plot</span><span class="p">,</span> 
+                <span class="n">x</span><span class="o">=</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> 
+                <span class="n">y</span><span class="o">=</span><span class="s2">&quot;avg_sentiment&quot;</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Sentiment Over Time&quot;</span>
+            <span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_hline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">line_dash</span><span class="o">=</span><span class="s2">&quot;dash&quot;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
 
-        @render_widget
-        def distribution_plot():
-            df_plot = filtered_data().to_pandas()
+        <span class="nd">@render_widget</span>
+        <span class="k">def</span> <span class="nf">distribution_plot</span><span class="p">():</span>
+            <span class="n">df_plot</span> <span class="o">=</span> <span class="n">filtered_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
-            fig = px.histogram(
-                df_plot,
-                x=&quot;sentiment&quot;, 
-                color=&quot;category&quot;,
-                title=&quot;Sentiment Distribution&quot;,
-                nbins=50
-            )
-            return fig
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+                <span class="n">df_plot</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">=</span><span class="s2">&quot;sentiment&quot;</span><span class="p">,</span> 
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Sentiment Distribution&quot;</span><span class="p">,</span>
+                <span class="n">nbins</span><span class="o">=</span><span class="mi">50</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span>
 
-        @render.data_frame
-        def data_table():
-            return filtered_data().to_pandas()
+        <span class="nd">@render</span><span class="o">.</span><span class="n">data_frame</span>
+        <span class="k">def</span> <span class="nf">data_table</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">filtered_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
-        @reactive.Effect
-        @reactive.event(input.reset)
-        def reset_filters():
-            ui.update_date_range(&quot;date_filter&quot;, start=date_range[0], end=date_range[1])
-            ui.update_selectize(&quot;category_filter&quot;, selected=&quot;All&quot;)
-            ui.update_slider(&quot;sentiment_threshold&quot;, value=0)
+        <span class="nd">@reactive</span><span class="o">.</span><span class="n">Effect</span>
+        <span class="nd">@reactive</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">reset</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">reset_filters</span><span class="p">():</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">update_date_range</span><span class="p">(</span><span class="s2">&quot;date_filter&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">date_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">end</span><span class="o">=</span><span class="n">date_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">update_selectize</span><span class="p">(</span><span class="s2">&quot;category_filter&quot;</span><span class="p">,</span> <span class="n">selected</span><span class="o">=</span><span class="s2">&quot;All&quot;</span><span class="p">)</span>
+            <span class="n">ui</span><span class="o">.</span><span class="n">update_slider</span><span class="p">(</span><span class="s2">&quot;sentiment_threshold&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-        @render.download(filename=&quot;sentiment_data.csv&quot;)
-        def download():
-            return filtered_data().write_csv()
+        <span class="nd">@render</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;sentiment_data.csv&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">download</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">filtered_data</span><span class="p">()</span><span class="o">.</span><span class="n">write_csv</span><span class="p">()</span>
 
-    return FactoryOutputContext(
-        shiny=ShinyContext(
-            server_handler=server,
-            panel=nav_panel(&quot;Sentiment Analysis&quot;, dashboard)
-        )
-    )
-</code></pre>
+    <span class="k">return</span> <span class="n">FactoryOutputContext</span><span class="p">(</span>
+        <span class="n">shiny</span><span class="o">=</span><span class="n">ShinyContext</span><span class="p">(</span>
+            <span class="n">server_handler</span><span class="o">=</span><span class="n">server</span><span class="p">,</span>
+            <span class="n">panel</span><span class="o">=</span><span class="n">nav_panel</span><span class="p">(</span><span class="s2">&quot;Sentiment Analysis&quot;</span><span class="p">,</span> <span class="n">dashboard</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+</code></pre></div>
 <p>This comprehensive guide covers all aspects of building Shiny dashboards for your analyzer platform. The reactive programming model, rich widget ecosystem, and seamless Python integration make Shiny an excellent choice for creating sophisticated data analysis interfaces.</p>
 <h2 id="next-steps">Next Steps</h2>
 <p>Once you finish reading section be a good idea to review the section that discuss implementing <a href="https://react.dev">React</a> dashboards. Might also be a good idea to review the sections for each domain. </p>
@@ -2765,7 +2790,7 @@ def factory(context: WebPresenterContext) -&gt; FactoryOutputContext:
     
     
       
-      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.sections", "navigation.top", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../../../assets/javascripts/bundle.f55a23d4.min.js"></script>

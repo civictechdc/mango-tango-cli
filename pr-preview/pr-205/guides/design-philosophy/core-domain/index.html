@@ -82,7 +82,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
       
@@ -170,14 +172,8 @@
     
   </nav>
   
-</header>
     
-    <div class="md-container" data-md-component="container">
       
-      
-        
-          
-            
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
@@ -259,7 +255,13 @@
     </ul>
   </div>
 </nav>
-          
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
         
       
       <main class="md-main" data-md-component="main">
@@ -1281,6 +1283,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/tokenizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tokenizer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1390,607 +1415,607 @@
 <p>The application code should be free of specific storage implementation and be agnostic about the specifics of the terminal interface and the available analyzers.</p>
 <p>Here's what the entrypoint for the application module looks like</p>
 <p><strong>./app/<strong>init</strong>.py</strong>:</p>
-<pre><code class="language-python">from .analysis_context import AnalysisContext
-from .analysis_output_context import AnalysisOutputContext
-from .analysis_webserver_context import AnalysisWebServerContext
-from .app import App
-from .app_context import AppContext
-from .project_context import ProjectContext
-from .settings_context import SettingsContext
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">.analysis_context</span> <span class="kn">import</span> <span class="n">AnalysisContext</span>
+<span class="kn">from</span> <span class="nn">.analysis_output_context</span> <span class="kn">import</span> <span class="n">AnalysisOutputContext</span>
+<span class="kn">from</span> <span class="nn">.analysis_webserver_context</span> <span class="kn">import</span> <span class="n">AnalysisWebServerContext</span>
+<span class="kn">from</span> <span class="nn">.app</span> <span class="kn">import</span> <span class="n">App</span>
+<span class="kn">from</span> <span class="nn">.app_context</span> <span class="kn">import</span> <span class="n">AppContext</span>
+<span class="kn">from</span> <span class="nn">.project_context</span> <span class="kn">import</span> <span class="n">ProjectContext</span>
+<span class="kn">from</span> <span class="nn">.settings_context</span> <span class="kn">import</span> <span class="n">SettingsContext</span>
+</code></pre></div>
 <h4 id="terminal-components">Terminal Components</h4>
 <p>The Terminal Components live inside the <code>terminal_tools</code> inside the project root. Their main responsibility is user flow, rendering the terminal interface, and handling user input.</p>
 <p>The user flow understandably depends on the set of capabilities offered by the <a href="#application">Application</a>, so an adjustment there may require an adjustment here.</p>
 <p>Here's what the entrypoint for the termnal module looks like</p>
 <p><strong>./terminal_tools/<strong>init</strong>.py</strong></p>
-<pre><code class="language-python">from .progress import ProgressReporter
-from .utils import (
-    clear_printed_lines,
-    clear_terminal,
-    draw_box,
-    enable_windows_ansi_support,
-    open_directory_explorer,
-    print_ascii_table,
-    wait_for_key,
-)
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">.progress</span> <span class="kn">import</span> <span class="n">ProgressReporter</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clear_printed_lines</span><span class="p">,</span>
+    <span class="n">clear_terminal</span><span class="p">,</span>
+    <span class="n">draw_box</span><span class="p">,</span>
+    <span class="n">enable_windows_ansi_support</span><span class="p">,</span>
+    <span class="n">open_directory_explorer</span><span class="p">,</span>
+    <span class="n">print_ascii_table</span><span class="p">,</span>
+    <span class="n">wait_for_key</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
 <h4 id="storage-io">Storage IO</h4>
 <p>The Storage IO lives Inside the <code>storage</code> directory inside the project root. It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.</p>
 <p>Here's what the entrypoint for the storage module looks like</p>
 <p><strong>./storage/<strong>init</strong>.py</strong>:</p>
-<pre><code class="language-python">import math
-import os
-import re
-import shutil
-from datetime import datetime
-from typing import Callable, Iterable, Literal, Optional
-
-import platformdirs
-import polars as pl
-import pyarrow.parquet as pq
-from filelock import FileLock
-from pydantic import BaseModel
-from tinydb import Query, TinyDB
-from xlsxwriter import Workbook
-
-from analyzer_interface.interface import AnalyzerOutput
-from analyzer_interface.params import ParamValue
-
-from .file_selector import FileSelectorStateManager
-
-
-class ProjectModel(BaseModel):
-    class_: Literal[&quot;project&quot;] = &quot;project&quot;
-    id: str
-    display_name: str
-
-
-class SettingsModel(BaseModel):
-    class_: Literal[&quot;settings&quot;] = &quot;settings&quot;
-    export_chunk_size: Optional[int | Literal[False]] = None
-
-
-class FileSelectionState(BaseModel):
-    class_: Literal[&quot;file_selector_state&quot;] = &quot;file_selector_state&quot;
-    last_path: Optional[str] = None
-
-
-class AnalysisModel(BaseModel):
-    class_: Literal[&quot;analysis&quot;] = &quot;analysis&quot;
-    analysis_id: str
-    project_id: str
-    display_name: str
-    primary_analyzer_id: str
-    path: str
-    column_mapping: Optional[dict[str, str]] = None
-    create_timestamp: Optional[float] = None
-    param_values: dict[str, ParamValue] = dict()
-    is_draft: bool = False
-
-    def create_time(self):
-        return (
-            datetime.fromtimestamp(self.create_timestamp)
-            if self.create_timestamp
-            else None
-        )
-
-
-SupportedOutputExtension = Literal[&quot;parquet&quot;, &quot;csv&quot;, &quot;xlsx&quot;, &quot;json&quot;]
-
-
-class Storage:
-    def __init__(self, *, app_name: str, app_author: str):
-        self.user_data_dir = platformdirs.user_data_dir(
-            appname=app_name, appauthor=app_author, ensure_exists=True
-        )
-        self.temp_dir = platformdirs.user_cache_dir(
-            appname=app_name, appauthor=app_author, ensure_exists=True
-        )
-        self.db = TinyDB(self._get_db_path())
-        with self._lock_database():
-            self._bootstrap_analyses_v1()
-
-        self.file_selector_state = AppFileSelectorStateManager(self)
-
-    def init_project(self, *, display_name: str, input_temp_file: str):
-        with self._lock_database():
-            project_id = self._find_unique_project_id(display_name)
-            project = ProjectModel(id=project_id, display_name=display_name)
-            self.db.insert(project.model_dump())
-
-        project_dir = self._get_project_path(project_id)
-        os.makedirs(project_dir, exist_ok=True)
-
-        shutil.move(input_temp_file, self._get_project_input_path(project_id))
-        return project
-
-    def list_projects(self):
-        q = Query()
-        projects = self.db.search(q[&quot;class_&quot;] == &quot;project&quot;)
-        return sorted(
-            (ProjectModel(**project) for project in projects),
-            key=lambda project: project.display_name,
-        )
-
-    def get_project(self, project_id: str):
-        q = Query()
-        project = self.db.search((q[&quot;class_&quot;] == &quot;project&quot;) &amp; (q[&quot;id&quot;] == project_id))
-        if project:
-            return ProjectModel(**project[0])
-        return None
-
-    def delete_project(self, project_id: str):
-        with self._lock_database():
-            q = Query()
-            self.db.remove((q[&quot;id&quot;] == project_id) &amp; (q[&quot;class_&quot;] == &quot;project&quot;))
-        project_path = self._get_project_path(project_id)
-        shutil.rmtree(project_path, ignore_errors=True)
-
-    def rename_project(self, project_id: str, name: str):
-        with self._lock_database():
-            q = Query()
-            self.db.update(
-                {&quot;display_name&quot;: name},
-                (q[&quot;id&quot;] == project_id) &amp; (q[&quot;class_&quot;] == &quot;project&quot;),
-            )
-
-    def load_project_input(self, project_id: str, *, n_records: Optional[int] = None):
-        input_path = self._get_project_input_path(project_id)
-        return pl.read_parquet(input_path, n_rows=n_records)
-
-    def get_project_input_stats(self, project_id: str):
-        input_path = self._get_project_input_path(project_id)
-        num_rows = pl.scan_parquet(input_path).select(pl.count()).collect().item()
-        return TableStats(num_rows=num_rows)
-
-    def save_project_primary_outputs(
-        self, analysis: AnalysisModel, outputs: dict[str, pl.DataFrame]
-    ):
-        for output_id, output_df in outputs.items():
-            self._save_output(
-                os.path.join(
-                    self._get_project_primary_output_root_path(analysis),
-                    output_id,
-                ),
-                output_df,
-                &quot;parquet&quot;,
-            )
-
-    def save_project_secondary_outputs(
-        self,
-        analysis: AnalysisModel,
-        secondary_id: str,
-        outputs: dict[str, pl.DataFrame],
-    ):
-        for output_id, output_df in outputs.items():
-            self._save_output(
-                os.path.join(
-                    self._get_project_secondary_output_root_path(
-                        analysis, secondary_id
-                    ),
-                    output_id,
-                ),
-                output_df,
-                &quot;parquet&quot;,
-            )
-
-    def save_project_secondary_output(
-        self,
-        analysis: AnalysisModel,
-        secondary_id: str,
-        output_id: str,
-        output_df: pl.DataFrame,
-        extension: SupportedOutputExtension,
-    ):
-        root_path = self._get_project_secondary_output_root_path(analysis, secondary_id)
-        self._save_output(
-            os.path.join(root_path, output_id),
-            output_df,
-            extension,
-        )
-
-    def _save_output(
-        self,
-        output_path_without_extension,
-        output_df: pl.DataFrame | pl.LazyFrame,
-        extension: SupportedOutputExtension,
-    ):
-        output_df = output_df.lazy()
-        os.makedirs(os.path.dirname(output_path_without_extension), exist_ok=True)
-        output_path = f&quot;{output_path_without_extension}.{extension}&quot;
-        if extension == &quot;parquet&quot;:
-            output_df.sink_parquet(output_path)
-        elif extension == &quot;csv&quot;:
-            output_df.sink_csv(output_path)
-        elif extension == &quot;xlsx&quot;:
-            # See https://xlsxwriter.readthedocs.io/working_with_dates_and_time.html#timezone-handling
-            with Workbook(output_path, {&quot;remove_timezone&quot;: True}) as workbook:
-                output_df.collect().write_excel(workbook)
-        elif extension == &quot;json&quot;:
-            output_df.collect().write_json(output_path)
-        else:
-            raise ValueError(f&quot;Unsupported format: {extension}&quot;)
-        return output_path
-
-    def load_project_primary_output(self, analysis: AnalysisModel, output_id: str):
-        output_path = self.get_primary_output_parquet_path(analysis, output_id)
-        return pl.read_parquet(output_path)
-
-    def get_primary_output_parquet_path(self, analysis: AnalysisModel, output_id: str):
-        return os.path.join(
-            self._get_project_primary_output_root_path(analysis),
-            f&quot;{output_id}.parquet&quot;,
-        )
-
-    def load_project_secondary_output(
-        self, analysis: AnalysisModel, secondary_id: str, output_id: str
-    ):
-        output_path = self.get_secondary_output_parquet_path(
-            analysis, secondary_id, output_id
-        )
-        return pl.read_parquet(output_path)
-
-    def get_secondary_output_parquet_path(
-        self, analysis: AnalysisModel, secondary_id: str, output_id: str
-    ):
-        return os.path.join(
-            self._get_project_secondary_output_root_path(analysis, secondary_id),
-            f&quot;{output_id}.parquet&quot;,
-        )
-
-    def export_project_primary_output(
-        self,
-        analysis: AnalysisModel,
-        output_id: str,
-        *,
-        extension: SupportedOutputExtension,
-        spec: AnalyzerOutput,
-        export_chunk_size: Optional[int] = None,
-    ):
-        return self._export_output(
-            self.get_primary_output_parquet_path(analysis, output_id),
-            os.path.join(self._get_project_exports_root_path(analysis), output_id),
-            extension=extension,
-            spec=spec,
-            export_chunk_size=export_chunk_size,
-        )
-
-    def export_project_secondary_output(
-        self,
-        analysis: AnalysisModel,
-        secondary_id: str,
-        output_id: str,
-        *,
-        extension: SupportedOutputExtension,
-        spec: AnalyzerOutput,
-        export_chunk_size: Optional[int] = None,
-    ):
-        exported_path = os.path.join(
-            self._get_project_exports_root_path(analysis),
-            (
-                secondary_id
-                if secondary_id == output_id
-                else f&quot;{secondary_id}__{output_id}&quot;
-            ),
-        )
-        return self._export_output(
-            self.get_secondary_output_parquet_path(analysis, secondary_id, output_id),
-            exported_path,
-            extension=extension,
-            spec=spec,
-            export_chunk_size=export_chunk_size,
-        )
-
-    def _export_output(
-        self,
-        input_path: str,
-        output_path: str,
-        *,
-        extension: SupportedOutputExtension,
-        spec: AnalyzerOutput,
-        export_chunk_size: Optional[int] = None,
-    ):
-        with pq.ParquetFile(input_path) as reader:
-            num_chunks = (
-                math.ceil(reader.metadata.num_rows / export_chunk_size)
-                if export_chunk_size
-                else 1
-            )
-
-        if num_chunks == 1:
-            df = pl.scan_parquet(input_path)
-            self._save_output(output_path, spec.transform_output(df), extension)
-            return f&quot;{output_path}.{extension}&quot;
-
-        with pq.ParquetFile(input_path) as reader:
-            get_batches = (
-                df
-                for batch in reader.iter_batches()
-                if (df := pl.from_arrow(batch)) is not None
-            )
-            for chunk_id, chunk in enumerate(
-                collect_dataframe_chunks(get_batches, export_chunk_size)
-            ):
-                chunk = spec.transform_output(chunk)
-                self._save_output(f&quot;{output_path}_{chunk_id}&quot;, chunk, extension)
-                yield chunk_id / num_chunks
-            return f&quot;{output_path}_[*].{extension}&quot;
-
-    def list_project_analyses(self, project_id: str):
-        with self._lock_database():
-            q = Query()
-            analysis_models = self.db.search(
-                (q[&quot;class_&quot;] == &quot;analysis&quot;) &amp; (q[&quot;project_id&quot;] == project_id)
-            )
-        return [AnalysisModel(**analysis) for analysis in analysis_models]
-
-    def init_analysis(
-        self,
-        project_id: str,
-        display_name: str,
-        primary_analyzer_id: str,
-        column_mapping: dict[str, str],
-        param_values: dict[str, ParamValue],
-    ) -&gt; AnalysisModel:
-        with self._lock_database():
-            analysis_id = self._find_unique_analysis_id(project_id, display_name)
-            analysis = AnalysisModel(
-                analysis_id=analysis_id,
-                project_id=project_id,
-                display_name=display_name,
-                primary_analyzer_id=primary_analyzer_id,
-                path=os.path.join(&quot;analysis&quot;, analysis_id),
-                column_mapping=column_mapping,
-                create_timestamp=datetime.now().timestamp(),
-                param_values=param_values,
-                is_draft=True,
-            )
-            self.db.insert(analysis.model_dump())
-        return analysis
-
-    def save_analysis(self, analysis: AnalysisModel):
-        with self._lock_database():
-            q = Query()
-            self.db.update(
-                analysis.model_dump(),
-                (q[&quot;class_&quot;] == &quot;analysis&quot;)
-                &amp; (q[&quot;project_id&quot;] == analysis.project_id)
-                &amp; (q[&quot;analysis_id&quot;] == analysis.analysis_id),
-            )
-
-    def delete_analysis(self, analysis: AnalysisModel):
-        with self._lock_database():
-            q = Query()
-            self.db.remove(
-                (q[&quot;class_&quot;] == &quot;analysis&quot;)
-                &amp; (q[&quot;project_id&quot;] == analysis.project_id)
-                &amp; (q[&quot;analysis_id&quot;] == analysis.analysis_id)
-            )
-            analysis_path = os.path.join(
-                self._get_project_path(analysis.project_id), analysis.path
-            )
-            shutil.rmtree(analysis_path, ignore_errors=True)
-
-    def _find_unique_analysis_id(self, project_id: str, display_name: str):
-        return self._get_unique_name(
-            self._slugify_name(display_name),
-            lambda analysis_id: self._is_analysis_id_unique(project_id, analysis_id),
-        )
-
-    def _is_analysis_id_unique(self, project_id: str, analysis_id: str):
-        q = Query()
-        id_unique = not self.db.search(
-            (q[&quot;class_&quot;] == &quot;analysis&quot;)
-            &amp; (q[&quot;project_id&quot;] == project_id)
-            &amp; (q[&quot;analysis_id&quot;] == analysis_id)
-        )
-        dir_unique = not os.path.exists(
-            os.path.join(self._get_project_path(project_id), &quot;analysis&quot;, analysis_id)
-        )
-        return id_unique and dir_unique
-
-    def _bootstrap_analyses_v1(self):
-        legacy_v1_analysis_dirname = &quot;analyzers&quot;
-        projects = self.list_projects()
-        for project in projects:
-            project_id = project.id
-            project_path = self._get_project_path(project_id)
-            try:
-                v1_analyses = os.listdir(
-                    os.path.join(project_path, legacy_v1_analysis_dirname)
-                )
-            except FileNotFoundError:
-                continue
-            for analyzer_id in v1_analyses:
-                db_analyzer_id = f&quot;__v1__{analyzer_id}&quot;
-                modified_time = os.path.getmtime(
-                    os.path.join(project_path, legacy_v1_analysis_dirname, analyzer_id)
-                )
-                self.db.upsert(
-                    AnalysisModel(
-                        analysis_id=db_analyzer_id,
-                        project_id=project_id,
-                        display_name=analyzer_id,
-                        primary_analyzer_id=analyzer_id,
-                        path=os.path.join(legacy_v1_analysis_dirname, analyzer_id),
-                        create_timestamp=modified_time,
-                    ).model_dump(),
-                    (Query()[&quot;class_&quot;] == &quot;analysis&quot;)
-                    &amp; (Query()[&quot;project_id&quot;] == project_id)
-                    &amp; (Query()[&quot;analysis_id&quot;] == db_analyzer_id),
-                )
-
-    def list_secondary_analyses(self, analysis: AnalysisModel) -&gt; list[str]:
-        try:
-            analyzers = os.listdir(
-                os.path.join(
-                    self._get_project_path(analysis.project_id),
-                    analysis.path,
-                    &quot;secondary_outputs&quot;,
-                ),
-            )
-            return analyzers
-        except FileNotFoundError:
-            return []
-
-    def _find_unique_project_id(self, display_name: str):
-        &quot;&quot;&quot;Turn the display name into a unique project ID&quot;&quot;&quot;
-        return self._get_unique_name(
-            self._slugify_name(display_name), self._is_project_id_unique
-        )
-
-    def _is_project_id_unique(self, project_id: str):
-        &quot;&quot;&quot;Check the database if the project ID is unique&quot;&quot;&quot;
-        q = Query()
-        id_unique = not self.db.search(
-            q[&quot;class_&quot;] == &quot;project&quot; and q[&quot;id&quot;] == project_id
-        )
-        dir_unique = not os.path.exists(self._get_project_path(project_id))
-        return id_unique and dir_unique
-
-    def _get_db_path(self):
-        return os.path.join(self.user_data_dir, &quot;db.json&quot;)
-
-    def _get_project_path(self, project_id: str):
-        return os.path.join(self.user_data_dir, &quot;projects&quot;, project_id)
-
-    def _get_project_input_path(self, project_id: str):
-        return os.path.join(self._get_project_path(project_id), &quot;input.parquet&quot;)
-
-    def _get_project_primary_output_root_path(self, analysis: AnalysisModel):
-        return os.path.join(
-            self._get_project_path(analysis.project_id),
-            analysis.path,
-            &quot;primary_outputs&quot;,
-        )
-
-    def _get_project_secondary_output_root_path(
-        self, analysis: AnalysisModel, secondary_id: str
-    ):
-        return os.path.join(
-            self._get_project_path(analysis.project_id),
-            analysis.path,
-            &quot;secondary_outputs&quot;,
-            secondary_id,
-        )
-
-    def _get_project_exports_root_path(self, analysis: AnalysisModel):
-        return os.path.join(
-            self._get_project_path(analysis.project_id), analysis.path, &quot;exports&quot;
-        )
-
-    def _get_web_presenter_state_path(self, analysis: AnalysisModel, presenter_id: str):
-        return os.path.join(
-            self._get_project_path(analysis.project_id),
-            analysis.path,
-            &quot;web_presenters&quot;,
-            presenter_id,
-            &quot;state&quot;,
-        )
-
-    def _lock_database(self):
-        &quot;&quot;&quot;
-        Locks the database to prevent concurrent access, in case multiple instances
-        of the application are running.
-        &quot;&quot;&quot;
-        lock_path = os.path.join(self.temp_dir, &quot;db.lock&quot;)
-        return FileLock(lock_path)
-
-    def get_settings(self):
-        with self._lock_database():
-            return self._get_settings()
-
-    def _get_settings(self):
-        q = Query()
-        settings = self.db.search(q[&quot;class_&quot;] == &quot;settings&quot;)
-        if settings:
-            return SettingsModel(**settings[0])
-        return SettingsModel()
-
-    def save_settings(self, **kwargs):
-        with self._lock_database():
-            q = Query()
-            settings = self._get_settings()
-            new_settings = SettingsModel(
-                **{
-                    **settings.model_dump(),
-                    **{
-                        key: value for key, value in kwargs.items() if value is not None
-                    },
-                }
-            )
-            self.db.upsert(new_settings.model_dump(), q[&quot;class_&quot;] == &quot;settings&quot;)
-
-    @staticmethod
-    def _slugify_name(name: str):
-        return re.sub(r&quot;\W+&quot;, &quot;_&quot;, name.lower()).strip(&quot;_&quot;)
-
-    @staticmethod
-    def _get_unique_name(base_name: str, validator: Callable[[str], bool]):
-        if validator(base_name):
-            return base_name
-        i = 1
-        while True:
-            candidate = f&quot;{base_name}_{i}&quot;
-            if validator(candidate):
-                return candidate
-            i += 1
-
-
-class TableStats(BaseModel):
-    num_rows: int
-
-
-def collect_dataframe_chunks(
-    input: Iterable[pl.DataFrame], size_threshold: int
-) -&gt; Iterable[pl.DataFrame]:
-    output_buffer = []
-    size = 0
-    for df in input:
-        while True:
-            available_space = size_threshold - size
-            slice = df.head(available_space)
-            output_buffer.append(slice)
-            size = size + slice.height
-            remaining_space = available_space - slice.height
-
-            if remaining_space == 0:
-                yield pl.concat(output_buffer)
-                output_buffer = []
-                size = 0
-
-            if slice.height == df.height:
-                break
-            else:
-                df = df.tail(-available_space)
-
-    if output_buffer:
-        yield pl.concat(output_buffer)
-
-
-class AppFileSelectorStateManager(FileSelectorStateManager):
-    def __init__(self, storage: &quot;Storage&quot;):
-        self.storage = storage
-
-    def get_current_path(self):
-        return self._load_state().last_path
-
-    def set_current_path(self, path: str):
-        self._save_state(path)
-
-    def _load_state(self):
-        q = Query()
-        state = self.storage.db.search(q[&quot;class_&quot;] == &quot;file_selector_state&quot;)
-        if state:
-            return FileSelectionState(**state[0])
-        return FileSelectionState()
-
-    def _save_state(self, last_path: str):
-        self.storage.db.upsert(
-            FileSelectionState(last_path=last_path).model_dump(),
-            Query()[&quot;class_&quot;] == &quot;file_selector_state&quot;,
-        )
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">platformdirs</span>
+<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">pyarrow.parquet</span> <span class="k">as</span> <span class="nn">pq</span>
+<span class="kn">from</span> <span class="nn">filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span> <span class="nn">tinydb</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">TinyDB</span>
+<span class="kn">from</span> <span class="nn">xlsxwriter</span> <span class="kn">import</span> <span class="n">Workbook</span>
+
+<span class="kn">from</span> <span class="nn">analyzer_interface.interface</span> <span class="kn">import</span> <span class="n">AnalyzerOutput</span>
+<span class="kn">from</span> <span class="nn">analyzer_interface.params</span> <span class="kn">import</span> <span class="n">ParamValue</span>
+
+<span class="kn">from</span> <span class="nn">.file_selector</span> <span class="kn">import</span> <span class="n">FileSelectorStateManager</span>
+
+
+<span class="k">class</span> <span class="nc">ProjectModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;project&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;project&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span> <span class="nc">SettingsModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;settings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;settings&quot;</span>
+    <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">FileSelectionState</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;file_selector_state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;file_selector_state&quot;</span>
+    <span class="n">last_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">AnalysisModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;analysis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;analysis&quot;</span>
+    <span class="n">analysis_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">primary_analyzer_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">column_mapping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">create_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">param_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParamValue</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">is_draft</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">create_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create_timestamp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_timestamp</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+
+<span class="n">SupportedOutputExtension</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;parquet&quot;</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">Storage</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">app_author</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_data_dir</span> <span class="o">=</span> <span class="n">platformdirs</span><span class="o">.</span><span class="n">user_data_dir</span><span class="p">(</span>
+            <span class="n">appname</span><span class="o">=</span><span class="n">app_name</span><span class="p">,</span> <span class="n">appauthor</span><span class="o">=</span><span class="n">app_author</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span> <span class="o">=</span> <span class="n">platformdirs</span><span class="o">.</span><span class="n">user_cache_dir</span><span class="p">(</span>
+            <span class="n">appname</span><span class="o">=</span><span class="n">app_name</span><span class="p">,</span> <span class="n">appauthor</span><span class="o">=</span><span class="n">app_author</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">TinyDB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_db_path</span><span class="p">())</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bootstrap_analyses_v1</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_selector_state</span> <span class="o">=</span> <span class="n">AppFileSelectorStateManager</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">init_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_temp_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">project_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_unique_project_id</span><span class="p">(</span><span class="n">display_name</span><span class="p">)</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">ProjectModel</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">display_name</span><span class="o">=</span><span class="n">display_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+
+        <span class="n">project_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">input_temp_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_input_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">project</span>
+
+    <span class="k">def</span> <span class="nf">list_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">ProjectModel</span><span class="p">(</span><span class="o">**</span><span class="n">project</span><span class="p">)</span> <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">project</span><span class="p">:</span> <span class="n">project</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">((</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">project</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ProjectModel</span><span class="p">(</span><span class="o">**</span><span class="n">project</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">delete_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">))</span>
+        <span class="n">project_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">rename_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;display_name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_project_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_records</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">input_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_input_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">n_rows</span><span class="o">=</span><span class="n">n_records</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_project_input_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">input_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_input_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">scan_parquet</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">count</span><span class="p">())</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">TableStats</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save_project_primary_outputs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">output_id</span><span class="p">,</span> <span class="n">output_df</span> <span class="ow">in</span> <span class="n">outputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_primary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span>
+                    <span class="n">output_id</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">output_df</span><span class="p">,</span>
+                <span class="s2">&quot;parquet&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save_project_secondary_outputs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">output_id</span><span class="p">,</span> <span class="n">output_df</span> <span class="ow">in</span> <span class="n">outputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_secondary_output_root_path</span><span class="p">(</span>
+                        <span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span>
+                    <span class="p">),</span>
+                    <span class="n">output_id</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">output_df</span><span class="p">,</span>
+                <span class="s2">&quot;parquet&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save_project_secondary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_df</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">root_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_secondary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">output_df</span><span class="p">,</span>
+            <span class="n">extension</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_save_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">output_path_without_extension</span><span class="p">,</span>
+        <span class="n">output_df</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">pl</span><span class="o">.</span><span class="n">LazyFrame</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">output_df</span> <span class="o">=</span> <span class="n">output_df</span><span class="o">.</span><span class="n">lazy</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">output_path_without_extension</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path_without_extension</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+            <span class="n">output_df</span><span class="o">.</span><span class="n">sink_parquet</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+            <span class="n">output_df</span><span class="o">.</span><span class="n">sink_csv</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">:</span>
+            <span class="c1"># See https://xlsxwriter.readthedocs.io/working_with_dates_and_time.html#timezone-handling</span>
+            <span class="k">with</span> <span class="n">Workbook</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;remove_timezone&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span> <span class="k">as</span> <span class="n">workbook</span><span class="p">:</span>
+                <span class="n">output_df</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span><span class="o">.</span><span class="n">write_excel</span><span class="p">(</span><span class="n">workbook</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
+            <span class="n">output_df</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output_path</span>
+
+    <span class="k">def</span> <span class="nf">load_project_primary_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_primary_output_parquet_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">output_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_primary_output_parquet_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_primary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_id</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_project_secondary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secondary_output_parquet_path</span><span class="p">(</span>
+            <span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">,</span> <span class="n">output_id</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_secondary_output_parquet_path</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_secondary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_id</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">export_project_primary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">:</span> <span class="n">AnalyzerOutput</span><span class="p">,</span>
+        <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_output</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_primary_output_parquet_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_exports_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">,</span>
+            <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span>
+            <span class="n">export_chunk_size</span><span class="o">=</span><span class="n">export_chunk_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">export_project_secondary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">:</span> <span class="n">AnalyzerOutput</span><span class="p">,</span>
+        <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">exported_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_exports_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="n">secondary_id</span>
+                <span class="k">if</span> <span class="n">secondary_id</span> <span class="o">==</span> <span class="n">output_id</span>
+                <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">secondary_id</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">output_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_output</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_secondary_output_parquet_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">,</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">exported_path</span><span class="p">,</span>
+            <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">,</span>
+            <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span>
+            <span class="n">export_chunk_size</span><span class="o">=</span><span class="n">export_chunk_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_export_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">:</span> <span class="n">AnalyzerOutput</span><span class="p">,</span>
+        <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">with</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="n">num_chunks</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">/</span> <span class="n">export_chunk_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">export_chunk_size</span>
+                <span class="k">else</span> <span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_chunks</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">scan_parquet</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">transform_output</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">extension</span><span class="p">)</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">with</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="n">get_batches</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">df</span>
+                <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">reader</span><span class="o">.</span><span class="n">iter_batches</span><span class="p">()</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">df</span> <span class="o">:=</span> <span class="n">pl</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">chunk_id</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="n">collect_dataframe_chunks</span><span class="p">(</span><span class="n">get_batches</span><span class="p">,</span> <span class="n">export_chunk_size</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">chunk</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">transform_output</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">chunk_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">chunk_id</span> <span class="o">/</span> <span class="n">num_chunks</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">_[*].</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">list_project_analyses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="n">analysis_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">AnalysisModel</span><span class="p">(</span><span class="o">**</span><span class="n">analysis</span><span class="p">)</span> <span class="k">for</span> <span class="n">analysis</span> <span class="ow">in</span> <span class="n">analysis_models</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">init_analysis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">primary_analyzer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">column_mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">param_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParamValue</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnalysisModel</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">analysis_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_unique_analysis_id</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">display_name</span><span class="p">)</span>
+            <span class="n">analysis</span> <span class="o">=</span> <span class="n">AnalysisModel</span><span class="p">(</span>
+                <span class="n">analysis_id</span><span class="o">=</span><span class="n">analysis_id</span><span class="p">,</span>
+                <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span>
+                <span class="n">display_name</span><span class="o">=</span><span class="n">display_name</span><span class="p">,</span>
+                <span class="n">primary_analyzer_id</span><span class="o">=</span><span class="n">primary_analyzer_id</span><span class="p">,</span>
+                <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;analysis&quot;</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">),</span>
+                <span class="n">column_mapping</span><span class="o">=</span><span class="n">column_mapping</span><span class="p">,</span>
+                <span class="n">create_timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">(),</span>
+                <span class="n">param_values</span><span class="o">=</span><span class="n">param_values</span><span class="p">,</span>
+                <span class="n">is_draft</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">analysis</span>
+
+    <span class="k">def</span> <span class="nf">save_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">analysis</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">analysis_id</span><span class="p">),</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">delete_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">analysis_id</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">analysis_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span> <span class="n">analysis</span><span class="o">.</span><span class="n">path</span>
+            <span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">analysis_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_unique_analysis_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_unique_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_slugify_name</span><span class="p">(</span><span class="n">display_name</span><span class="p">),</span>
+            <span class="k">lambda</span> <span class="n">analysis_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_analysis_id_unique</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_is_analysis_id_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">id_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis_id</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dir_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s2">&quot;analysis&quot;</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">id_unique</span> <span class="ow">and</span> <span class="n">dir_unique</span>
+
+    <span class="k">def</span> <span class="nf">_bootstrap_analyses_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">legacy_v1_analysis_dirname</span> <span class="o">=</span> <span class="s2">&quot;analyzers&quot;</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_projects</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
+            <span class="n">project_id</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">project_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">v1_analyses</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">legacy_v1_analysis_dirname</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">analyzer_id</span> <span class="ow">in</span> <span class="n">v1_analyses</span><span class="p">:</span>
+                <span class="n">db_analyzer_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;__v1__</span><span class="si">{</span><span class="n">analyzer_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">modified_time</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">legacy_v1_analysis_dirname</span><span class="p">,</span> <span class="n">analyzer_id</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">upsert</span><span class="p">(</span>
+                    <span class="n">AnalysisModel</span><span class="p">(</span>
+                        <span class="n">analysis_id</span><span class="o">=</span><span class="n">db_analyzer_id</span><span class="p">,</span>
+                        <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span>
+                        <span class="n">display_name</span><span class="o">=</span><span class="n">analyzer_id</span><span class="p">,</span>
+                        <span class="n">primary_analyzer_id</span><span class="o">=</span><span class="n">analyzer_id</span><span class="p">,</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">legacy_v1_analysis_dirname</span><span class="p">,</span> <span class="n">analyzer_id</span><span class="p">),</span>
+                        <span class="n">create_timestamp</span><span class="o">=</span><span class="n">modified_time</span><span class="p">,</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                    <span class="p">(</span><span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">db_analyzer_id</span><span class="p">),</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">list_secondary_analyses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">analyzers</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+                    <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                    <span class="s2">&quot;secondary_outputs&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">analyzers</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_find_unique_project_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn the display name into a unique project ID&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_unique_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_slugify_name</span><span class="p">(</span><span class="n">display_name</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_project_id_unique</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_is_project_id_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the database if the project ID is unique&quot;&quot;&quot;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">id_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span> <span class="ow">and</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span>
+        <span class="p">)</span>
+        <span class="n">dir_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">id_unique</span> <span class="ow">and</span> <span class="n">dir_unique</span>
+
+    <span class="k">def</span> <span class="nf">_get_db_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_data_dir</span><span class="p">,</span> <span class="s2">&quot;db.json&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_data_dir</span><span class="p">,</span> <span class="s2">&quot;projects&quot;</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_input_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s2">&quot;input.parquet&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_primary_output_root_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+            <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="s2">&quot;primary_outputs&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_secondary_output_root_path</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+            <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="s2">&quot;secondary_outputs&quot;</span><span class="p">,</span>
+            <span class="n">secondary_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_exports_root_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span> <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;exports&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_web_presenter_state_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">presenter_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+            <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="s2">&quot;web_presenters&quot;</span><span class="p">,</span>
+            <span class="n">presenter_id</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_lock_database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Locks the database to prevent concurrent access, in case multiple instances</span>
+<span class="sd">        of the application are running.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lock_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="p">,</span> <span class="s2">&quot;db.lock&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FileLock</span><span class="p">(</span><span class="n">lock_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_settings</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;settings&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SettingsModel</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">SettingsModel</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">save_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_settings</span><span class="p">()</span>
+            <span class="n">new_settings</span> <span class="o">=</span> <span class="n">SettingsModel</span><span class="p">(</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="o">**</span><span class="n">settings</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                    <span class="o">**</span><span class="p">{</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">upsert</span><span class="p">(</span><span class="n">new_settings</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;settings&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_slugify_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W+&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_unique_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">validator</span><span class="p">(</span><span class="n">base_name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">base_name</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">candidate</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">validator</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">candidate</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+<span class="k">class</span> <span class="nc">TableStats</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">num_rows</span><span class="p">:</span> <span class="nb">int</span>
+
+
+<span class="k">def</span> <span class="nf">collect_dataframe_chunks</span><span class="p">(</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">size_threshold</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="n">output_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">available_space</span> <span class="o">=</span> <span class="n">size_threshold</span> <span class="o">-</span> <span class="n">size</span>
+            <span class="nb">slice</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">available_space</span><span class="p">)</span>
+            <span class="n">output_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">)</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="nb">slice</span><span class="o">.</span><span class="n">height</span>
+            <span class="n">remaining_space</span> <span class="o">=</span> <span class="n">available_space</span> <span class="o">-</span> <span class="nb">slice</span><span class="o">.</span><span class="n">height</span>
+
+            <span class="k">if</span> <span class="n">remaining_space</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">)</span>
+                <span class="n">output_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="nb">slice</span><span class="o">.</span><span class="n">height</span> <span class="o">==</span> <span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="o">-</span><span class="n">available_space</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_buffer</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AppFileSelectorStateManager</span><span class="p">(</span><span class="n">FileSelectorStateManager</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="s2">&quot;Storage&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">storage</span>
+
+    <span class="k">def</span> <span class="nf">get_current_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_state</span><span class="p">()</span><span class="o">.</span><span class="n">last_path</span>
+
+    <span class="k">def</span> <span class="nf">set_current_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_state</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;file_selector_state&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FileSelectionState</span><span class="p">(</span><span class="o">**</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">FileSelectionState</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_save_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">upsert</span><span class="p">(</span>
+            <span class="n">FileSelectionState</span><span class="p">(</span><span class="n">last_path</span><span class="o">=</span><span class="n">last_path</span><span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+            <span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;file_selector_state&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div>
 <h2 id="next-steps">Next Steps</h2>
 <p>Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
 <ul>
@@ -2057,7 +2082,7 @@ class AppFileSelectorStateManager(FileSelectorStateManager):
     
     
       
-      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.path", "navigation.sections", "navigation.top", "navigation.tabs", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.sections", "navigation.top", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
