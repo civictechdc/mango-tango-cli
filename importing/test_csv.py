@@ -39,7 +39,7 @@ class TestCSVImporter:
         """Test CSV header detection logic."""
         # Typical header row
         header_row = ["Name", "Age", "City", "Email"]
-        assert self.importer._looks_like_csv_header(header_row) == True
+        assert self.importer._looks_like_csv_header(header_row)
 
         # Twitter-style headers
         twitter_headers = [
@@ -48,17 +48,17 @@ class TestCSVImporter:
             "Tweet text",
             "Times retweeted",
         ]
-        assert self.importer._looks_like_csv_header(twitter_headers) == True
+        assert self.importer._looks_like_csv_header(twitter_headers)
 
         # Note-style row (descriptive text)
         note_row = [
             "I like my csv files to have notes to make dialect detection harder"
         ]
-        assert self.importer._looks_like_csv_header(note_row) == False
+        assert not self.importer._looks_like_csv_header(note_row)
 
         # Row with mostly empty fields (trailing commas)
         empty_row = ["From NBC News story", "", "", "", "", ""]
-        assert self.importer._looks_like_csv_header(empty_row) == False
+        assert not self.importer._looks_like_csv_header(empty_row)
 
     def test_init_session_with_notes(self):
         """Test session initialization with automatic note detection."""
@@ -68,7 +68,7 @@ class TestCSVImporter:
         assert session.input_file == csv_path
         assert session.skip_rows == 2
         assert session.separator == ","
-        assert session.has_header == True
+        assert session.has_header
 
     def test_init_session_no_notes(self):
         """Test session initialization with no notes."""
@@ -78,7 +78,7 @@ class TestCSVImporter:
         assert session.input_file == csv_path
         assert session.skip_rows == 0
         assert session.separator == ","
-        assert session.has_header == True
+        assert session.has_header
 
     def test_load_preview_with_skip_rows(self):
         """Test data preview respects skip_rows parameter."""
