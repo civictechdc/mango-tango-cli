@@ -340,9 +340,7 @@ class CsvImportSession(ImporterSession, BaseModel):
             }
         )
 
-        smart_print_data_frame(
-            config_data, "CSV Import Configuration", apply_color=None
-        )
+        smart_print_data_frame(config_data, title=None, apply_color=None)
 
     def load_preview(self, n_records: int) -> pl.DataFrame:
         return pl.read_csv(
