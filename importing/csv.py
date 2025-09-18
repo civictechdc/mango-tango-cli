@@ -28,6 +28,7 @@ class CSVImporter(Importer["CsvImportSession"]):
                         break
                     lines.append(line.strip())
 
+                # nothing to skip if 0 or 1 line in file
                 if len(lines) < 2:
                     return 0
 
