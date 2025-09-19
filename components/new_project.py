@@ -7,7 +7,7 @@ import polars as pl
 from importing import Importer, ImporterSession, importers
 from terminal_tools import draw_box, prompts, wait_for_key
 from terminal_tools.inception import Scope
-from terminal_tools.utils import smart_print_data_frame
+from terminal_tools.utils import print_message, smart_print_data_frame
 
 from .context import ViewContext
 
@@ -41,10 +41,11 @@ def new_project(context: ViewContext):
         project_name = prompts.text("Name", default=suggested_project_name)
 
     with terminal.nest(draw_box("4. Import", padding_lines=0)):
-        print("Please wait as the dataset is imported...")
+        print_message("Please wait as the dataset is imported...", style="progress")
         project = app.create_project(name=project_name, importer_session=importer)
 
-        print("Dataset successfully imported!")
+        print_message("Dataset successfully imported!", style="main")
+        print("")
         wait_for_key(True)
         return project
 
@@ -126,8 +127,12 @@ def importer_flow(
                     columns_df,
                     "Detected Columns",
                     apply_color=None,
-                    caption="Hint: if detected column names do not seem right, try changing the `skip_rows` parameter.",
                 )
+                print_message(
+                    text="If detected column names do not seem right, try changing the `skip_rows` parameter.",
+                    style="hint",
+                )
+                print("")
         else:
             print(f"Could not figure out how to import this file as {importer.name}.")
 
