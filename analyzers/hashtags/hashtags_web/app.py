@@ -368,7 +368,7 @@ def server(input, output, session):
             pl.col(COL_TIME).dt.strftime("%B %d, %Y %I:%M %p")
         )
 
-        df_posts = df_posts.rename({"time": "Post date and time", "text": "Text"})
+        df_posts = df_posts.rename({COL_TIME: "Post date and time", COL_POST: "Text"})
 
         df_posts = df_posts.drop(pl.col(COL_AUTHOR_ID))
 
