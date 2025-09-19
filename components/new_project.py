@@ -129,7 +129,7 @@ def importer_flow(
                     apply_color=None,
                 )
                 print_message(
-                    text="If detected column names do not seem right, try changing the `skip_rows` parameter.",
+                    text="If detected column names do not seem right, try changing the 'Skip rows' parameter.",
                     style="hint",
                 )
                 print("")
