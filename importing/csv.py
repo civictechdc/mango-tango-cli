@@ -328,13 +328,13 @@ class CsvImportSession(ImporterSession, BaseModel):
                 "Option": [
                     "Column separator",
                     "Quote character",
-                    "First row is header",
+                    "Has header",
                     "Skip rows",
                 ],
                 "Value": [
                     present_separator(self.separator),
                     present_separator(self.quote_char),
-                    "yes" if self.has_header else "no",
+                    "Yes" if self.has_header else "No",
                     str(self.skip_rows),
                 ],
             }
