@@ -501,13 +501,13 @@ def print_message(text: str, style: str = "regular"):
 
     styles_dict = {
         "main": "orange1 bold",
-        "regular": None,
+        "regular": None,  # default styling
         "hint": "#609949",
         "error": "bright_red bold",
         "progress": None,
     }
 
-    text_emoji_suffix = {
+    text_emoji_prefix = {
         "main": "🥭",
         "hint": "💡 Hint:",
         "regular": "",
@@ -515,9 +515,8 @@ def print_message(text: str, style: str = "regular"):
         "error": "❌",
     }
 
-    text = text_emoji_suffix[style] + " " + text
+    text = text_emoji_prefix[style] + " " + text
 
-    # Show loading message early
     console = Console()
     msg = Text(text, style=styles_dict[style])
     console.print(msg)
