@@ -1959,7 +1959,35 @@
 <span class="normal">294</span>
 <span class="normal">295</span>
 <span class="normal">296</span>
-<span class="normal">297</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CSVImporter</span><span class="p">(</span><span class="n">Importer</span><span class="p">[</span><span class="s2">&quot;CsvImportSession&quot;</span><span class="p">]):</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CSVImporter</span><span class="p">(</span><span class="n">Importer</span><span class="p">[</span><span class="s2">&quot;CsvImportSession&quot;</span><span class="p">]):</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;CSV&quot;</span>
@@ -1967,57 +1995,82 @@
     <span class="k">def</span> <span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">input_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_detect_skip_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect the number of rows to skip before CSV data begins.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_detect_skip_rows_and_dialect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">csv</span><span class="o">.</span><span class="n">Dialect</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect the number of rows to skip before CSV data begins and the CSV dialect.&quot;&quot;&quot;</span>
+        <span class="n">skip_rows</span> <span class="o">=</span> <span class="mi">0</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-                <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">:</span>  <span class="c1"># Sample first 50 lines max</span>
-                        <span class="k">break</span>
-                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 
-                <span class="c1"># nothing to skip if 0 or 1 line in file</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="mi">0</span>
+                <span class="n">MAX_LINES</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># check the first 50 lines only</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">MAX_LINES</span><span class="p">]</span>
+                <span class="n">total_lines</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 
-                <span class="c1"># Parse each line and analyze content</span>
-                <span class="n">parsed_rows</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>  <span class="c1"># Skip empty lines</span>
-                        <span class="k">continue</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">([</span><span class="n">line</span><span class="p">])</span>
-                        <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
-                        <span class="n">parsed_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                        <span class="n">parsed_rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line</span><span class="p">])</span>  <span class="c1"># Fallback for problematic lines</span>
+                <span class="c1"># Only analyze if we have enough lines</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="c1"># Parse each line and analyze content, keeping track of original line numbers</span>
+                    <span class="n">parsed_rows</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">line_numbers</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">line_idx</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>  <span class="c1"># Skip empty lines</span>
+                            <span class="k">continue</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">([</span><span class="n">line</span><span class="p">])</span>
+                            <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+                            <span class="n">parsed_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                            <span class="n">line_numbers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_idx</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="n">parsed_rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line</span><span class="p">])</span>  <span class="c1"># Fallback for problematic lines</span>
+                            <span class="n">line_numbers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_idx</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsed_rows</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="mi">0</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsed_rows</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="c1"># Look for the actual CSV header (column names)</span>
+                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parsed_rows</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_looks_like_csv_header</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+                                <span class="n">skip_rows</span> <span class="o">=</span> <span class="n">line_numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                                <span class="k">break</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># Fallback: use field count analysis</span>
+                            <span class="n">field_counts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">parsed_rows</span><span class="p">]</span>
+                            <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
-                <span class="c1"># Look for the actual CSV header (column names)</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parsed_rows</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_looks_like_csv_header</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
-                        <span class="k">return</span> <span class="n">i</span>  <span class="c1"># Skip everything before the header</span>
+                            <span class="n">count_frequency</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">field_counts</span><span class="p">)</span>
+                            <span class="n">most_common_count</span> <span class="o">=</span> <span class="n">count_frequency</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
-                <span class="c1"># Fallback: use field count analysis</span>
-                <span class="n">field_counts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">parsed_rows</span><span class="p">]</span>
-                <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+                            <span class="c1"># Find first row that matches the most common field count</span>
+                            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">field_counts</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="n">most_common_count</span><span class="p">:</span>
+                                    <span class="n">skip_rows</span> <span class="o">=</span> <span class="n">line_numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                                    <span class="k">break</span>
 
-                <span class="n">count_frequency</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">field_counts</span><span class="p">)</span>
-                <span class="n">most_common_count</span> <span class="o">=</span> <span class="n">count_frequency</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Validate skip_rows doesn&#39;t exceed available lines</span>
+                <span class="k">if</span> <span class="n">skip_rows</span> <span class="o">&gt;=</span> <span class="n">total_lines</span><span class="p">:</span>
+                    <span class="n">skip_rows</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Reset to safe default</span>
 
-                <span class="c1"># Find first row that matches the most common field count</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">field_counts</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="n">most_common_count</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">i</span>
+                <span class="c1"># Now detect dialect from the CSV content (after skip_rows)</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">skip_rows</span><span class="p">):</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
-                <span class="k">return</span> <span class="mi">0</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">65536</span><span class="p">)</span>
+                <span class="n">dialect</span> <span class="o">=</span> <span class="n">Sniffer</span><span class="p">()</span><span class="o">.</span><span class="n">sniff</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="c1"># If anything fails, don&#39;t skip rows</span>
-            <span class="k">return</span> <span class="mi">0</span>
+            <span class="c1"># If anything fails, use defaults and try basic dialect detection</span>
+            <span class="n">skip_rows</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">sample</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">65536</span><span class="p">)</span>
+                    <span class="n">dialect</span> <span class="o">=</span> <span class="n">Sniffer</span><span class="p">()</span><span class="o">.</span><span class="n">sniff</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># Create a default dialect if everything fails</span>
+                <span class="k">class</span> <span class="nc">DefaultDialect</span><span class="p">:</span>
+                    <span class="n">delimiter</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span>
+                    <span class="n">quotechar</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span>
+
+                <span class="n">dialect</span> <span class="o">=</span> <span class="n">DefaultDialect</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">skip_rows</span><span class="p">,</span> <span class="n">dialect</span>
 
     <span class="k">def</span> <span class="nf">_looks_like_csv_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a row looks like a CSV header with column names.&quot;&quot;&quot;</span>
@@ -2066,17 +2119,7 @@
         <span class="k">return</span> <span class="n">header_indicators</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty_fields</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
 
     <span class="k">def</span> <span class="nf">init_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">skip_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_skip_rows</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
-
-        <span class="c1"># Read sample for dialect detection, skipping detected rows</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-            <span class="c1"># Skip the detected rows</span>
-            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">skip_rows</span><span class="p">):</span>
-                <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-
-            <span class="c1"># Use remaining content for dialect detection</span>
-            <span class="n">sample</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">65536</span><span class="p">)</span>
-            <span class="n">dialect</span> <span class="o">=</span> <span class="n">Sniffer</span><span class="p">()</span><span class="o">.</span><span class="n">sniff</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">skip_rows</span><span class="p">,</span> <span class="n">dialect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_skip_rows_and_dialect</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">CsvImportSession</span><span class="p">(</span>
             <span class="n">input_file</span><span class="o">=</span><span class="n">input_path</span><span class="p">,</span>
@@ -2230,19 +2273,32 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_skip_rows_option</span><span class="p">(</span><span class="n">previous_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-        <span class="n">input_str</span> <span class="o">=</span> <span class="n">prompts</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Number of rows to skip at the beginning (current: </span><span class="si">{</span><span class="n">previous_value</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">previous_value</span><span class="p">)</span> <span class="k">if</span> <span class="n">previous_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">input_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">skip_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_str</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-            <span class="k">if</span> <span class="n">skip_rows</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">input_str</span> <span class="o">=</span> <span class="n">prompts</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Number of rows to skip at the beginning of file (current: </span><span class="si">{</span><span class="n">previous_value</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="mi">0</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">previous_value</span><span class="p">)</span> <span class="k">if</span> <span class="n">previous_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">input_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># User cancelled</span>
                 <span class="k">return</span> <span class="kc">None</span>
-            <span class="k">return</span> <span class="n">skip_rows</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">skip_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_str</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">skip_rows</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">print_message</span><span class="p">(</span>
+                        <span class="s2">&quot;Skip rows cannot be negative. Please try again.&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">skip_rows</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+                    <span class="n">confirm</span> <span class="o">=</span> <span class="n">prompts</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Skip </span><span class="si">{</span><span class="n">skip_rows</span><span class="si">}</span><span class="s2"> rows? This seems high. Continue?&quot;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">confirm</span><span class="p">:</span>
+                        <span class="k">continue</span>  <span class="c1"># Ask for input again instead of returning None</span>
+                <span class="k">return</span> <span class="n">skip_rows</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">print_message</span><span class="p">(</span><span class="s2">&quot;Please enter a valid number.&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
