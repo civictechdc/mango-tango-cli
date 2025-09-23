@@ -9,29 +9,33 @@ class TestCSVImporter:
         self.importer = CSVImporter()
         self.test_data_dir = Path(__file__).parent / "test_data"
 
-    def test_detect_skip_rows_simple_header(self):
+    def test_detect_skip_rows_and_dialect_simple_header(self):
         """Test detection with simple CSV (no notes to skip)."""
         csv_path = str(self.test_data_dir / "simple_header.csv")
-        skip_rows = self.importer._detect_skip_rows(csv_path)
+        skip_rows, dialect = self.importer._detect_skip_rows_and_dialect(csv_path)
         assert skip_rows == 0
+        assert dialect.delimiter == ","
 
-    def test_detect_skip_rows_notes_with_commas(self):
+    def test_detect_skip_rows_and_dialect_notes_with_commas(self):
         """Test detection with notes containing commas."""
         csv_path = str(self.test_data_dir / "notes_with_commas.csv")
-        skip_rows = self.importer._detect_skip_rows(csv_path)
+        skip_rows, dialect = self.importer._detect_skip_rows_and_dialect(csv_path)
         assert skip_rows == 2
+        assert dialect.delimiter == ","
 
-    def test_detect_skip_rows_single_note(self):
+    def test_detect_skip_rows_and_dialect_single_note(self):
         """Test detection with single note line."""
         csv_path = str(self.test_data_dir / "single_note.csv")
-        skip_rows = self.importer._detect_skip_rows(csv_path)
+        skip_rows, dialect = self.importer._detect_skip_rows_and_dialect(csv_path)
         assert skip_rows == 1
+        assert dialect.delimiter == ","
 
-    def test_detect_skip_rows_trailing_commas(self):
+    def test_detect_skip_rows_and_dialect_trailing_commas(self):
         """Test detection with trailing commas (real-world case)."""
         csv_path = str(self.test_data_dir / "trailing_commas.csv")
-        skip_rows = self.importer._detect_skip_rows(csv_path)
+        skip_rows, dialect = self.importer._detect_skip_rows_and_dialect(csv_path)
         assert skip_rows == 3
+        assert dialect.delimiter == ","
 
     def test_looks_like_csv_header(self):
         """Test CSV header detection logic."""
