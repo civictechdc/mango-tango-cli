@@ -293,7 +293,7 @@ class CSVImporter(Importer["CsvImportSession"]):
     @staticmethod
     def _skip_rows_option(previous_value: Optional[int]) -> Optional[int]:
         input_str = prompts.text(
-            f"Number of rows to skip at the beginning (current: {previous_value or 0})",
+            f"Number of rows to skip at the beginning of file (current: {previous_value or 0}).",
             default=str(previous_value) if previous_value is not None else "0",
         )
         if input_str is None:
@@ -302,8 +302,14 @@ class CSVImporter(Importer["CsvImportSession"]):
             skip_rows = int(input_str.strip())
             if skip_rows < 0:
                 return None
+            if skip_rows > 10:
+                confirm = prompts.confirm(
+                    f"Skip {skip_rows} rows? This seems high. Continue?", default=True
+                )
+                if not confirm:
+                    return None
             return skip_rows
-        except ValueError:
+        except ValueError:  # invalid value
             return None
 
 
