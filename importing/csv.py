@@ -6,7 +6,7 @@ import polars as pl
 from pydantic import BaseModel
 
 import terminal_tools.prompts as prompts
-from terminal_tools.utils import smart_print_data_frame
+from terminal_tools.utils import print_message, smart_print_data_frame
 
 from .importer import Importer, ImporterSession
 
@@ -292,25 +292,32 @@ class CSVImporter(Importer["CsvImportSession"]):
 
     @staticmethod
     def _skip_rows_option(previous_value: Optional[int]) -> Optional[int]:
-        input_str = prompts.text(
-            f"Number of rows to skip at the beginning of file (current: {previous_value or 0}).",
-            default=str(previous_value) if previous_value is not None else "0",
-        )
-        if input_str is None:
-            return None
-        try:
-            skip_rows = int(input_str.strip())
-            if skip_rows < 0:
+        while True:
+            input_str = prompts.text(
+                f"Number of rows to skip at the beginning of file (current: {previous_value or 0}).",
+                default=str(previous_value) if previous_value is not None else "0",
+            )
+            if input_str is None:  # User cancelled
                 return None
-            if skip_rows > 10:
-                confirm = prompts.confirm(
-                    f"Skip {skip_rows} rows? This seems high. Continue?", default=True
-                )
-                if not confirm:
-                    return None
-            return skip_rows
-        except ValueError:  # invalid value
-            return None
+
+            try:
+                skip_rows = int(input_str.strip())
+                if skip_rows < 0:
+                    print_message(
+                        "Skip rows cannot be negative. Please try again.", "error"
+                    )
+                    continue
+                if skip_rows > 10:
+                    confirm = prompts.confirm(
+                        f"Skip {skip_rows} rows? This seems high. Continue?",
+                        default=True,
+                    )
+                    if not confirm:
+                        continue  # Ask for input again instead of returning None
+                return skip_rows
+            except ValueError:
+                print_message("Please enter a valid number.", "error")
+                continue
 
 
 class CsvImportSession(ImporterSession, BaseModel):
