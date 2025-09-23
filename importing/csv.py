@@ -26,8 +26,9 @@ class CSVImporter(Importer["CsvImportSession"]):
         try:
             with open(input_path, "r", encoding="utf8") as file:
 
-                N_LINES = 50  # check the first 50 lines only
-                lines = [line.strip() for i, line in enumerate(file) if i <= N_LINES]
+                MAX_LINES = 50  # check the first 50 lines only
+                lines = [line.strip() for i, line in enumerate(file) if i <= MAX_LINES]
+                total_lines = len(lines)
 
                 # Only analyze if we have enough lines
                 if len(lines) >= 2:
@@ -65,6 +66,10 @@ class CSVImporter(Importer["CsvImportSession"]):
                                 if count == most_common_count:
                                     skip_rows = line_numbers[i]
                                     break
+
+                # Validate skip_rows doesn't exceed available lines
+                if skip_rows >= total_lines:
+                    skip_rows = 0  # Reset to safe default
 
                 # Now detect dialect from the CSV content (after skip_rows)
                 file.seek(0)
