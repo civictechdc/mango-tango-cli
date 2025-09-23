@@ -19,57 +19,77 @@ class CSVImporter(Importer["CsvImportSession"]):
     def suggest(self, input_path: str) -> bool:
         return input_path.endswith(".csv")
 
-    def _detect_skip_rows(self, input_path: str) -> int:
-        """Detect the number of rows to skip before CSV data begins."""
+    def _detect_skip_rows_and_dialect(self, input_path: str) -> tuple[int, csv.Dialect]:
+        """Detect the number of rows to skip before CSV data begins and the CSV dialect."""
+        skip_rows = 0
+
         try:
             with open(input_path, "r", encoding="utf8") as file:
-                lines = []
-                for i, line in enumerate(file):
-                    if i >= 50:  # Sample first 50 lines max
-                        break
-                    lines.append(line.strip())
 
-                # nothing to skip if 0 or 1 line in file
-                if len(lines) < 2:
-                    return 0
+                N_LINES = 50  # check the first 50 lines only
+                lines = [line.strip() for i, line in enumerate(file) if i <= N_LINES]
 
-                # Parse each line and analyze content
-                parsed_rows = []
-                for line in lines:
-                    if not line:  # Skip empty lines
-                        continue
-                    try:
-                        reader = csv.reader([line])
-                        row = next(reader)
-                        parsed_rows.append(row)
-                    except Exception:
-                        parsed_rows.append([line])  # Fallback for problematic lines
+                # Only analyze if we have enough lines
+                if len(lines) >= 2:
+                    # Parse each line and analyze content, keeping track of original line numbers
+                    parsed_rows = []
+                    line_numbers = []
+                    for line_idx, line in enumerate(lines):
+                        if not line:  # Skip empty lines
+                            continue
+                        try:
+                            reader = csv.reader([line])
+                            row = next(reader)
+                            parsed_rows.append(row)
+                            line_numbers.append(line_idx)
+                        except Exception:
+                            parsed_rows.append([line])  # Fallback for problematic lines
+                            line_numbers.append(line_idx)
 
-                if len(parsed_rows) < 2:
-                    return 0
+                    if len(parsed_rows) >= 2:
+                        # Look for the actual CSV header (column names)
+                        for i, row in enumerate(parsed_rows):
+                            if self._looks_like_csv_header(row):
+                                skip_rows = line_numbers[i]
+                                break
+                        else:
+                            # Fallback: use field count analysis
+                            field_counts = [len(row) for row in parsed_rows]
+                            from collections import Counter
 
-                # Look for the actual CSV header (column names)
-                for i, row in enumerate(parsed_rows):
-                    if self._looks_like_csv_header(row):
-                        return i  # Skip everything before the header
+                            count_frequency = Counter(field_counts)
+                            most_common_count = count_frequency.most_common(1)[0][0]
 
-                # Fallback: use field count analysis
-                field_counts = [len(row) for row in parsed_rows]
-                from collections import Counter
+                            # Find first row that matches the most common field count
+                            for i, count in enumerate(field_counts):
+                                if count == most_common_count:
+                                    skip_rows = line_numbers[i]
+                                    break
 
-                count_frequency = Counter(field_counts)
-                most_common_count = count_frequency.most_common(1)[0][0]
+                # Now detect dialect from the CSV content (after skip_rows)
+                file.seek(0)
+                for _ in range(skip_rows):
+                    file.readline()
 
-                # Find first row that matches the most common field count
-                for i, count in enumerate(field_counts):
-                    if count == most_common_count:
-                        return i
-
-                return 0
+                sample = file.read(65536)
+                dialect = Sniffer().sniff(sample)
 
         except Exception:
-            # If anything fails, don't skip rows
-            return 0
+            # If anything fails, use defaults and try basic dialect detection
+            skip_rows = 0
+            try:
+                with open(input_path, "r", encoding="utf8") as file:
+                    sample = file.read(65536)
+                    dialect = Sniffer().sniff(sample)
+            except Exception:
+                # Create a default dialect if everything fails
+                class DefaultDialect:
+                    delimiter = ","
+                    quotechar = '"'
+
+                dialect = DefaultDialect()
+
+        return skip_rows, dialect
 
     def _looks_like_csv_header(self, row: list[str]) -> bool:
         """Check if a row looks like a CSV header with column names."""
@@ -118,17 +138,7 @@ class CSVImporter(Importer["CsvImportSession"]):
         return header_indicators >= len(non_empty_fields) * 0.5
 
     def init_session(self, input_path: str):
-        skip_rows = self._detect_skip_rows(input_path)
-
-        # Read sample for dialect detection, skipping detected rows
-        with open(input_path, "r", encoding="utf8") as file:
-            # Skip the detected rows
-            for _ in range(skip_rows):
-                file.readline()
-
-            # Use remaining content for dialect detection
-            sample = file.read(65536)
-            dialect = Sniffer().sniff(sample)
+        skip_rows, dialect = self._detect_skip_rows_and_dialect(input_path)
 
         return CsvImportSession(
             input_file=input_path,
