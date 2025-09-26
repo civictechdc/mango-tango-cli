@@ -1,4 +1,4 @@
-<h2 align="center">mango-tango-cli</h2>
+<h2 align="center">CIB Mango Tree</h2>
 <h3 align="center">A Python command-line tool for detecting coordinated inauthentic behavior</h3>
 
 <p align="center">
@@ -41,7 +41,7 @@ python -m venv venv
 ## Starting the application
 
 ```shell
-python -m mangotango
+python -m cibmangotree
 ```
 
 ## Development Guide and Documentation
