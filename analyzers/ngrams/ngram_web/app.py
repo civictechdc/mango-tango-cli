@@ -411,7 +411,7 @@ def server(input, output, sessions):
                 old2new = {k: v for k, v in zip(SEL_COLUMNS, COL_RENAME)}
                 
                 data_for_display = search_data.with_columns(
-                    pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%B %d, %Y %I:%M %p")
+                    pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%Y-%m-%d %H:%M:%S")
                 ).select(SEL_COLUMNS).rename(old2new)
         else:
             # Original behavior - show clicked data or summary
