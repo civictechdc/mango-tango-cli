@@ -6933,10 +6933,7 @@ for different script families.</p>
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
+<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unicode-aware basic tokenizer for social media text.</span>
 
@@ -7157,11 +7154,8 @@ for different script families.</p>
         <span class="p">):</span>
             <span class="c1"># Check if this looks like an abbreviation (single letters between periods)</span>
             <span class="c1"># Pattern: letter(s).letter(s).letter(s) where segments are 1-3 chars</span>
-            <span class="c1"># Check if this looks like an abbreviation (single letters between periods)</span>
-            <span class="c1"># Pattern: letter(s).letter(s).letter(s) where segments are 1-3 chars</span>
             <span class="n">abbreviation_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[a-z]{1,3}(?:\.[a-z]{1,3})+\.?$&quot;</span>
 
-            <span class="n">abbreviation_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[a-z]{1,3}(?:\.[a-z]{1,3})+\.?$&quot;</span>
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">abbreviation_pattern</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># This is an abbreviation, not a URL</span>
             <span class="c1"># If it has a period and looks like a domain, it&#39;s URL-like</span>
@@ -9845,10 +9839,7 @@ for different script families.</p>
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
+<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BasicTokenizer</span><span class="p">(</span><span class="n">AbstractTokenizer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unicode-aware basic tokenizer for social media text.</span>
 
@@ -10069,11 +10060,8 @@ for different script families.</p>
         <span class="p">):</span>
             <span class="c1"># Check if this looks like an abbreviation (single letters between periods)</span>
             <span class="c1"># Pattern: letter(s).letter(s).letter(s) where segments are 1-3 chars</span>
-            <span class="c1"># Check if this looks like an abbreviation (single letters between periods)</span>
-            <span class="c1"># Pattern: letter(s).letter(s).letter(s) where segments are 1-3 chars</span>
             <span class="n">abbreviation_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[a-z]{1,3}(?:\.[a-z]{1,3})+\.?$&quot;</span>
 
-            <span class="n">abbreviation_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[a-z]{1,3}(?:\.[a-z]{1,3})+\.?$&quot;</span>
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">abbreviation_pattern</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># This is an abbreviation, not a URL</span>
             <span class="c1"># If it has a period and looks like a domain, it&#39;s URL-like</span>
