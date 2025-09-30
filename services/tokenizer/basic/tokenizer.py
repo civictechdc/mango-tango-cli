@@ -234,11 +234,8 @@ class BasicTokenizer(AbstractTokenizer):
         ):
             # Check if this looks like an abbreviation (single letters between periods)
             # Pattern: letter(s).letter(s).letter(s) where segments are 1-3 chars
-            # Check if this looks like an abbreviation (single letters between periods)
-            # Pattern: letter(s).letter(s).letter(s) where segments are 1-3 chars
             abbreviation_pattern = r"^[a-z]{1,3}(?:\.[a-z]{1,3})+\.?$"
 
-            abbreviation_pattern = r"^[a-z]{1,3}(?:\.[a-z]{1,3})+\.?$"
             if re.match(abbreviation_pattern, token, re.IGNORECASE):
                 return False  # This is an abbreviation, not a URL
             # If it has a period and looks like a domain, it's URL-like
