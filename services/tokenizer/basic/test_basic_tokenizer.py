@@ -8,7 +8,7 @@ and edge cases.
 
 import pytest
 
-from ..core.types import CaseHandling, LanguageFamily, TokenizerConfig, TokenType
+from ..core.types import CaseHandling, TokenizerConfig
 from .tokenizer import BasicTokenizer
 
 
@@ -1181,6 +1181,7 @@ class TestBasicTokenizerIntegration:
 
 
 # Fixtures for reusable test data
+
 
 class TestAbbreviationsAndPunctuation:
     """Test abbreviation handling and punctuation edge cases."""

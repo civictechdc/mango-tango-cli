@@ -9,7 +9,7 @@ import re
 from typing import Optional
 
 from ..core.base import AbstractTokenizer
-from ..core.types import LanguageFamily, TokenizerConfig, TokenList, TokenType
+from ..core.types import LanguageFamily, TokenizerConfig, TokenList
 from .patterns import get_patterns
 
 
