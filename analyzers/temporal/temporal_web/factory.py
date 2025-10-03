@@ -5,7 +5,7 @@ from dash.html import H2, Div, P
 
 from analyzer_interface.context import WebPresenterContext
 
-from ..temporal.interface import (
+from ..temporal_base.interface import (
     OUTPUT_COL_POST_COUNT,
     OUTPUT_COL_TIME_INTERVAL_END,
     OUTPUT_COL_TIME_INTERVAL_START,

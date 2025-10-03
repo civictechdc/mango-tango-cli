@@ -6,6 +6,7 @@ import polars as pl
 from rich.console import Console
 from rich.style import Style
 from rich.table import Table
+from rich.text import Text
 
 
 def clear_terminal():
@@ -469,3 +470,53 @@ def print_dialog_section_title(print_str):
     mango_style = Style(color="#F3921E", bold=True)
 
     console.print(print_str, style=mango_style)
+
+
+def print_message(text: str, style: str = "regular"):
+    """Print styled messages with consistent formatting and emoji prefixes.
+
+    A simple abstraction over Rich's console printing that provides predefined
+    styles and emoji prefixes for different message types. Handles terminal
+    background compatibility by using Rich's adaptive color system.
+
+    Args:
+        text: The message text to display
+        style: Message style type. Available options:
+            - "main": Orange bold text with mango emoji (🥭) - for primary messages
+            - "regular": Plain text with no styling or emoji - for normal output
+            - "hint": Green text with lightbulb emoji (💡) - for helpful tips
+            - "error": Bright red bold text with X emoji (❌) - for error messages
+            - "progress": Plain text with hourglass emoji (⏳) - for loading states
+
+    Examples:
+        >>> print_message("Dataset imported successfully!", "main")
+        🥭 Dataset imported successfully!
+
+        >>> print_message("Check your file path", "hint")
+        💡 Hint: Check your file path
+
+        >>> print_message("File not found", "error")
+        ❌ File not found
+    """
+
+    styles_dict = {
+        "main": "orange1 bold",
+        "regular": None,  # default styling
+        "hint": "#609949",
+        "error": "bright_red bold",
+        "progress": None,
+    }
+
+    text_emoji_prefix = {
+        "main": "🥭",
+        "hint": "💡 Hint:",
+        "regular": "",
+        "progress": "⏳",
+        "error": "❌",
+    }
+
+    text = text_emoji_prefix[style] + " " + text
+
+    console = Console()
+    msg = Text(text, style=styles_dict[style])
+    console.print(msg)

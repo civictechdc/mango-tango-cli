@@ -2,9 +2,11 @@ from analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,
+    AnalyzerParam,
     InputColumn,
     OutputColumn,
 )
+from analyzer_interface.params import IntegerParam
 
 COL_AUTHOR_ID = "user_id"
 COL_MESSAGE_ID = "message_id"
@@ -20,15 +22,23 @@ OUTPUT_MESSAGE_NGRAMS = "message_ngrams"
 OUTPUT_NGRAM_DEFS = "ngrams"
 OUTPUT_MESSAGE = "message_authors"
 
+# Parameter definitions
+PARAM_MIN_N = "min_n"
+PARAM_MAX_N = "max_n"
+
 interface = AnalyzerInterface(
     id="ngrams",
     version="0.1.0",
     name="N-gram Analysis",
-    short_description="Extracts n-grams from text data",
+    short_description="Extracts n-grams from text data with multilingual support",
     long_description="""
-The n-gram analysis extract n-grams (sequences of n words) from the text data
+The n-gram analysis extracts n-grams (sequences of n words) from the text data
 in the input and counts the occurrences of each n-gram in each message, linking
 the message author to the ngram frequency.
+
+This analyzer uses Unicode-aware tokenization with support for multilingual content,
+including proper handling of different scripts (Latin, CJK, Arabic) and social media
+entities (hashtags, mentions, URLs).
 
 The result can be used to see if certain word sequences are more common in
 the corpus of text, and whether certain authors use these sequences more often.
@@ -37,7 +47,7 @@ the corpus of text, and whether certain authors use these sequences more often.
         columns=[
             InputColumn(
                 name=COL_AUTHOR_ID,
-                human_readable_name="Message Author ID",
+                human_readable_name="Unique User ID",
                 data_type="identifier",
                 description="The unique identifier of the author of the message",
                 name_hints=[
@@ -53,7 +63,7 @@ the corpus of text, and whether certain authors use these sequences more often.
             ),
             InputColumn(
                 name=COL_MESSAGE_ID,
-                human_readable_name="Unique Message ID",
+                human_readable_name="Unique Post Number",
                 data_type="identifier",
                 description="The unique identifier of the message",
                 name_hints=[
@@ -67,7 +77,7 @@ the corpus of text, and whether certain authors use these sequences more often.
             ),
             InputColumn(
                 name=COL_MESSAGE_TEXT,
-                human_readable_name="Message Text",
+                human_readable_name="Post Content",
                 data_type="text",
                 description="The text content of the message",
                 name_hints=[
@@ -82,7 +92,7 @@ the corpus of text, and whether certain authors use these sequences more often.
             ),
             InputColumn(
                 name=COL_MESSAGE_TIMESTAMP,
-                human_readable_name="Message Timestamp",
+                human_readable_name="Timestamp",
                 data_type="datetime",
                 description="The time at which the message was posted",
                 name_hints=["time", "timestamp", "date", "ts"],
@@ -123,6 +133,22 @@ the corpus of text, and whether certain authors use these sequences more often.
                 OutputColumn(name=COL_MESSAGE_TEXT, data_type="text"),
                 OutputColumn(name=COL_MESSAGE_TIMESTAMP, data_type="datetime"),
             ],
+        ),
+    ],
+    params=[
+        AnalyzerParam(
+            id=PARAM_MIN_N,
+            human_readable_name="Minimum N-gram Length",
+            description="Minimum length of n-grams to extract (e.g., 3 for trigrams and longer)",
+            type=IntegerParam(min=1, max=10),
+            default=3,
+        ),
+        AnalyzerParam(
+            id=PARAM_MAX_N,
+            human_readable_name="Maximum N-gram Length",
+            description="Maximum length of n-grams to extract (e.g., 5 for up to 5-grams)",
+            type=IntegerParam(min=1, max=10),
+            default=5,
         ),
     ],
 )

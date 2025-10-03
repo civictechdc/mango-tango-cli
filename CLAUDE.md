@@ -1,15 +1,5 @@
 # Claude Code - Mango Tango CLI Integration
 
-## Session Initialization - CRITICAL
-
-**Always start every Claude Code session with**:
-
-```markdown
-Read the initial instructions
-```
-
-This initializes Serena semantic analysis capabilities and loads project context.
-
 ## Project Context
 
 ### Core Documentation
@@ -36,14 +26,6 @@ This initializes Serena semantic analysis capabilities and loads project context
 ## Serena MCP Integration
 
 ### Essential Serena Usage
-
-**Project Onboarding** (done once):
-
-```markdown
-- Call `initial_instructions` tool first
-- Use `check_onboarding_performed` to verify setup
-- If needed, call `onboarding` tool for comprehensive analysis
-```
 
 **Symbol-Level Development**:
 
@@ -119,6 +101,7 @@ find_symbol("AppContext", include_body=True)
 ### Code Development Standards
 
 **Logging Integration:**
+
 ```python
 from app.logger import get_logger
 logger = get_logger(__name__)
@@ -194,7 +177,7 @@ read_memory("task_completion_checklist") # Before committing
 
 ### Symbol Navigation Examples
 
-```python
+```markdown
 # Find app entry point
 find_symbol("main", relative_path="mangotango.py")
 

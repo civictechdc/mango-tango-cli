@@ -20,6 +20,7 @@ consistent UX while allowing easy contribution of new analyzers.
 
 - **Core**: Python 3.12, Inquirer (CLI), TinyDB (metadata)
 - **Data**: Polars/Pandas, PyArrow, Parquet files
+- **Text Processing**: Unicode tokenizer service with scriptio continua support (character-level for CJK/Thai/Southeast Asian scripts, word-level for Latin/Arabic scripts)
 - **Web**: Dash, Shiny for Python, Plotly
 - **Dev Tools**: Black, isort, pytest, PyInstaller
 
