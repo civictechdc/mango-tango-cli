@@ -112,26 +112,7 @@ def _get_app_layout(ngram_choices_dict: dict):
     app_layout = [
         ui.card(
             ui.card_header("N-gram statistics"),
-            ui.input_selectize(
-                id="ngram_selector",
-                label="Included n-grams:",
-                choices=ngram_choices_dict,
-                selected=list(ngram_choices_dict.keys()),
-                multiple=True,
-            ),
-            output_widget("scatter_plot", height="400px"),
-        ),
-        ui.card(
-            ui.card_header("Search & Filter"),
             ui.row(
-                ui.column(
-                    6,
-                    ui.input_text(
-                        id="user_id_search",
-                        label="Search by User ID:",
-                        placeholder="Enter user ID to search",
-                    ),
-                ),
                 ui.column(
                     6,
                     ui.input_text(
@@ -140,7 +121,18 @@ def _get_app_layout(ngram_choices_dict: dict):
                         placeholder="Enter keywords to search",
                     ),
                 ),
+                ui.column(
+                    6,
+                    ui.input_selectize(
+                        id="ngram_selector",
+                        label="Included n-grams:",
+                        choices=ngram_choices_dict,
+                        selected=list(ngram_choices_dict.keys()),
+                        multiple=True,
+                    ),
+                ),
             ),
+            output_widget("scatter_plot", height="400px"),
         ),
         ui.card(
             ui.card_header("Data viewer"),
@@ -169,30 +161,20 @@ def server(input, output, sessions):
 
     @reactive.calc
     def get_search_filtered_data():
-        """Filter data based on user ID and n-gram content search"""
+        """Filter data based on n-gram content search"""
         global data_full
         
-        # Get search values once to avoid multiple reactive calls
-        user_search = input.user_id_search() or ""
+        # Get search value
         content_search = input.ngram_content_search() or ""
         
         # If no search terms, return original data
-        if not user_search.strip() and not content_search.strip():
+        if not content_search.strip():
             return data_full
         
-        filtered_data = data_full
-        
-        # Filter by user ID if provided
-        if user_search.strip():
-            filtered_data = filtered_data.filter(
-                pl.col(COL_AUTHOR_ID).str.contains(user_search.strip(), literal=False)
-            )
-        
         # Filter by n-gram content if provided
-        if content_search.strip():
-            filtered_data = filtered_data.filter(
-                pl.col(COL_NGRAM_WORDS).str.contains(content_search.strip(), literal=False)
-            )
+        filtered_data = data_full.filter(
+            pl.col(COL_NGRAM_WORDS).str.contains(content_search.strip(), literal=False)
+        )
         
         return filtered_data
 
@@ -332,9 +314,8 @@ def server(input, output, sessions):
     @render_widget
     def scatter_plot():
         # Use search-filtered data if search is active, otherwise use regular filtered data
-        user_search = input.user_id_search() or ""
         content_search = input.ngram_content_search() or ""
-        has_search = bool(user_search.strip() or content_search.strip())
+        has_search = bool(content_search.strip())
         
         if has_search:
             df = get_search_filtered_stats()
@@ -358,9 +339,8 @@ def server(input, output, sessions):
     @render.text
     def data_info():
         # Get search values once to avoid multiple reactive calls
-        user_search = input.user_id_search() or ""
         content_search = input.ngram_content_search() or ""
-        has_search = bool(user_search.strip() or content_search.strip())
+        has_search = bool(content_search.strip())
         
         if has_search:
             search_data = get_search_filtered_data()
@@ -371,9 +351,8 @@ def server(input, output, sessions):
             else:
                 total_ngrams = len(search_stats)
                 total_records = len(search_data)
-                user_id_text = f"User ID: '{user_search}'" if user_search.strip() else ""
                 content_text = f"Content: '{content_search}'" if content_search.strip() else ""
-                search_text = " and ".join(filter(None, [user_id_text, content_text]))
+                search_text = " and ".join(filter(None, [content_text]))
                 return f"Search results for {search_text}: {total_ngrams} unique n-grams, {total_records} total records."
         else:
             filtered = get_filtered_data()
@@ -387,9 +366,8 @@ def server(input, output, sessions):
     @render.data_frame
     def data_viewer():
         # Get search values once to avoid multiple reactive calls
-        user_search = input.user_id_search() or ""
         content_search = input.ngram_content_search() or ""
-        has_search = bool(user_search.strip() or content_search.strip())
+        has_search = bool(content_search.strip())
         
         if has_search:
             # Show search results
@@ -411,7 +389,7 @@ def server(input, output, sessions):
                 old2new = {k: v for k, v in zip(SEL_COLUMNS, COL_RENAME)}
                 
                 data_for_display = search_data.with_columns(
-                    pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%Y-%m-%d %H:%M:%S")
+                    pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%B %d, %Y %I:%M %p")
                 ).select(SEL_COLUMNS).rename(old2new)
         else:
             # Original behavior - show clicked data or summary
