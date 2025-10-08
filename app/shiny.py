@@ -62,7 +62,7 @@ class ServerHandleManager(BaseModel):
 
 
 class LayoutManager(BaseModel):
-    title: Optional[str] = "Mango Tango Dashboard"
+    title: Optional[str] = "CIB Mango Tree"
     elements: Optional[List[_navs.NavPanel]] = []
 
     class Config:
