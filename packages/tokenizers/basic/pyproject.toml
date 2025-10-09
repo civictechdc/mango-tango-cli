@@ -26,6 +26,10 @@ dependencies = [
     "regex>=2025.9.1",
 ]
 
+# Workspace dependency resolution
+[tool.uv.sources]
+cibmangotree = { workspace = true }
+
 # Plugin entry points - auto-discovered by core in dev mode
 [project.entry-points."cibmangotree.tokenizers"]
 basic = "cibmangotree_tokenizer_basic:BasicTokenizer"

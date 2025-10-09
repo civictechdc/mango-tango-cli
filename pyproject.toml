@@ -1,14 +1,3 @@
-[project]
-name = "cibmangotree-workspace"
-version = "0.1.0"
-requires-python = ">=3.12"
-description = "CIB Mango Tree CLI - Social Media Data Analysis Tool (Workspace Root)"
-readme = "README.md"
-license = {text = "PolyForm Noncommercial License 1.0.0"}
-
-# This is a virtual workspace root - not a package itself
-# Individual packages are defined in packages/* subdirectories
-
 [tool.uv.workspace]
 members = [
     "packages/core",
@@ -20,6 +9,9 @@ members = [
     "packages/analyzers/temporal",
     "packages/analyzers/time_coordination",
 ]
+
+# Virtual workspace root - does not define a project itself
+# Individual packages are defined in packages/* subdirectories
 
 # Development dependencies available across all workspace members
 [dependency-groups]
@@ -78,7 +70,3 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
 ]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"

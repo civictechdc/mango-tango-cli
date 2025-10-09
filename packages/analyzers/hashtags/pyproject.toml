@@ -27,6 +27,10 @@ dependencies = [
     "plotly>=5.0.0",
 ]
 
+# Workspace dependency resolution
+[tool.uv.sources]
+cibmangotree = { workspace = true }
+
 [project.entry-points."cibmangotree.analyzers"]
 hashtags = "cibmangotree_analyzer_hashtags:get_interface"
 

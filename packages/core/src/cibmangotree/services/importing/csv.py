@@ -5,8 +5,8 @@ from typing import Callable, Optional
 import polars as pl
 from pydantic import BaseModel
 
-import terminal_tools.prompts as prompts
-from terminal_tools.utils import print_message, smart_print_data_frame
+from cibmangotree.tui.tools import prompts
+from cibmangotree.tui.tools.utils import print_message, smart_print_data_frame
 
 from .importer import Importer, ImporterSession
 

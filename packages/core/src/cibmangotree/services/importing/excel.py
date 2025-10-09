@@ -4,8 +4,8 @@ import polars as pl
 from fastexcel import read_excel
 from pydantic import BaseModel
 
-import terminal_tools.prompts as prompts
-from terminal_tools.utils import wait_for_key
+from cibmangotree.tui.tools import prompts
+from cibmangotree.tui.tools.utils import wait_for_key
 
 from .importer import Importer, ImporterSession
 

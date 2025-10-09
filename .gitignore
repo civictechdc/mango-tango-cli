@@ -15,3 +15,6 @@ VERSION
 in-memoria.db
 .in-memoria/cache/
 .in-memoria/.env
+
+# PyInstaller - auto-generated frozen plugins
+packages/core/src/cibmangotree/_frozen_plugins.py

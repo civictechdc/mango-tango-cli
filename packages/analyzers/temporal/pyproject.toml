@@ -26,6 +26,10 @@ dependencies = [
     "polars>=0.20.0",
 ]
 
+# Workspace dependency resolution
+[tool.uv.sources]
+cibmangotree = { workspace = true }
+
 [project.entry-points."cibmangotree.analyzers"]
 temporal = "cibmangotree_analyzer_temporal:get_interface"
 

@@ -27,6 +27,10 @@ dependencies = [
     "plotly>=5.0.0",
 ]
 
+# Workspace dependency resolution
+[tool.uv.sources]
+cibmangotree = { workspace = true }
+
 [project.entry-points."cibmangotree.analyzers"]
 ngrams = "cibmangotree_analyzer_ngrams:get_interface"
 

@@ -26,6 +26,10 @@ dependencies = [
     "polars>=0.20.0",
 ]
 
+# Workspace dependency resolution
+[tool.uv.sources]
+cibmangotree = { workspace = true }
+
 [project.entry-points."cibmangotree.analyzers"]
 time_coordination = "cibmangotree_analyzer_time_coordination:get_interface"
 
