@@ -2,9 +2,9 @@ from pathlib import Path
 
 from cibmangotree_testing import ParquetTestData, test_secondary_analyzer
 
-from .ngram_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS, interface
-from .ngram_stats.main import main
-from .ngrams_base.interface import (
+from cibmangotree_analyzer_ngrams.ngram_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS, interface
+from cibmangotree_analyzer_ngrams.ngram_stats.main import main
+from cibmangotree_analyzer_ngrams.ngrams_base.interface import (
     OUTPUT_MESSAGE,
     OUTPUT_MESSAGE_NGRAMS,
     OUTPUT_NGRAM_DEFS,

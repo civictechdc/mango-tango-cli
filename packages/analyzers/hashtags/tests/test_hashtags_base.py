@@ -4,7 +4,7 @@ import numpy as np
 import polars as pl
 
 from cibmangotree.analyzer_interface.params import TimeBinningValue
-from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
+from cibmangotree.services.preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from cibmangotree_testing import CsvTestData, JsonTestData, test_primary_analyzer
 
 from .hashtags_base.interface import (

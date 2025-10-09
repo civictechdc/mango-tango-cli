@@ -1,11 +1,13 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from cibmangotree.app import AnalysisContext, ProjectContext
 from cibmangotree.tui.tools import prompts, wait_for_key
 
+if TYPE_CHECKING:
+    from cibmangotree.app import AnalysisContext, ProjectContext
 
-def select_analysis(proj: ProjectContext) -> Optional[AnalysisContext]:
+
+def select_analysis(proj: "ProjectContext") -> Optional["AnalysisContext"]:
     now = datetime.now()
     analysis_options = sorted(
         [
@@ -22,7 +24,7 @@ def select_analysis(proj: ProjectContext) -> Optional[AnalysisContext]:
         wait_for_key(True)
         return None
 
-    option: Optional[AnalysisContext] = prompts.list_input(
+    option: Optional["AnalysisContext"] = prompts.list_input(
         "Choose a previously run test to view",
         choices=[
             ("(Back)", None),
@@ -32,7 +34,7 @@ def select_analysis(proj: ProjectContext) -> Optional[AnalysisContext]:
     return option
 
 
-def analysis_label(analysis: AnalysisContext, now: datetime) -> str:
+def analysis_label(analysis: "AnalysisContext", now: datetime) -> str:
     timestamp_suffix = (
         " (" + present_timestamp(analysis.create_time, now) + ")"
         if analysis.create_time is not None

@@ -1,10 +1,10 @@
 import os
 
-from preprocessing.series_semantic import identifier
+from cibmangotree.services.preprocessing.series_semantic import identifier
 from cibmangotree_testing import CsvConfig, CsvTestData, test_primary_analyzer
 
-from .example_base.interface import interface
-from .example_base.main import main
+from cibmangotree_analyzer_example.example_base.interface import interface
+from cibmangotree_analyzer_example.example_base.main import main
 from .test_data import test_data_dir
 
 

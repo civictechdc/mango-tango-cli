@@ -1,6 +1,7 @@
+from typing import TYPE_CHECKING
+
 from colorama import Fore
 
-from cibmangotree.app import ProjectContext
 from cibmangotree.tui.tools import draw_box, prompts, wait_for_key
 
 from .analysis_main import analysis_main
@@ -8,10 +9,13 @@ from .context import ViewContext
 from .new_analysis import new_analysis
 from .select_analysis import select_analysis
 
+if TYPE_CHECKING:
+    from cibmangotree.app import ProjectContext
+
 
 def project_main(
     context: ViewContext,
-    project: ProjectContext,
+    project: "ProjectContext",
 ):
     terminal = context.terminal
     while True:

@@ -14,7 +14,7 @@ from shiny.ui import (
     tags,
 )
 
-from analyzer_interface.context import ServerCallback
+from cibmangotree.analyzer_interface.context import ServerCallback
 
 MANGO_ORANGE2 = "#f3921e"
 LOGO_URL = "https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG"

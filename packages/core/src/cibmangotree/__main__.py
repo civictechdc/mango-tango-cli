@@ -50,10 +50,7 @@ def main():
     console.print(loading_msg)
 
     # Import heavy modules after loading message
-    # NOTE: These imports will fail until Phase 5 (import path fixes)
-    # For now, we're just creating the structure
     try:
-        from analyzers import suite
         from .app import App, AppContext
         from .app.logger import setup_logging
         from .tui.components import ViewContext, main_menu, splash
@@ -76,6 +73,10 @@ def main():
             "Starting CIB Mango Tree application",
             extra={"log_level": args.log_level, "log_file": str(log_file_path)},
         )
+
+        # Initialize app context
+        from .analyzer_interface.suite import AnalyzerSuite
+        suite = AnalyzerSuite()
 
         # Start the application
         splash()

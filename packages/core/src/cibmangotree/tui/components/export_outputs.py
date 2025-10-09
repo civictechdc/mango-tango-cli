@@ -1,6 +1,6 @@
 import os
+from typing import TYPE_CHECKING
 
-from cibmangotree.app import AnalysisContext, AnalysisOutputContext
 from cibmangotree.services.storage import SupportedOutputExtension
 from cibmangotree.tui.tools import (
     open_directory_explorer,
@@ -11,8 +11,11 @@ from cibmangotree.tui.tools.progress import ProgressReporter
 
 from .context import ViewContext
 
+if TYPE_CHECKING:
+    from cibmangotree.app import AnalysisContext, AnalysisOutputContext
 
-def export_outputs(context: ViewContext, analysis: AnalysisContext):
+
+def export_outputs(context: ViewContext, analysis: "AnalysisContext"):
     terminal = context.terminal
     with terminal.nest("[Export Output]\n\n") as scope:
         outputs = sorted(
@@ -57,8 +60,8 @@ def export_outputs(context: ViewContext, analysis: AnalysisContext):
 
 def export_outputs_sequence(
     context: ViewContext,
-    analysis: AnalysisContext,
-    selected_outputs: list[AnalysisOutputContext],
+    analysis: "AnalysisContext",
+    selected_outputs: list["AnalysisOutputContext"],
     format: SupportedOutputExtension,
 ):
     has_large_dfs = any(output.num_rows > 50_000 for output in selected_outputs)
@@ -123,7 +126,7 @@ def export_outputs_sequence(
     wait_for_key(True)
 
 
-def export_format_prompt(analysis: AnalysisContext):
+def export_format_prompt(analysis: "AnalysisContext"):
     analysis_id = analysis.analyzer_id
     return prompts.list_input(
         "Choose an export format",

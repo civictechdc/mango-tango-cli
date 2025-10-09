@@ -1,5 +1,5 @@
 from traceback import format_exc
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import polars as pl
 
@@ -10,16 +10,18 @@ from cibmangotree.analyzer_interface import (
     column_automap,
     get_data_type_compatibility_score,
 )
-from cibmangotree.app import ProjectContext
 from cibmangotree.tui.tools import draw_box, prompts, smart_print_data_frame, wait_for_key
 
 from .analysis_params import customize_analysis
 from .context import ViewContext
 
+if TYPE_CHECKING:
+    from cibmangotree.app import ProjectContext
+
 
 def new_analysis(
     context: ViewContext,
-    project: ProjectContext,
+    project: "ProjectContext",
 ):
     terminal = context.terminal
     app = context.app

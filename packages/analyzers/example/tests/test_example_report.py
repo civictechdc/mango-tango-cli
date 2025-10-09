@@ -2,8 +2,8 @@ import os
 
 from cibmangotree_testing import CsvTestData, test_secondary_analyzer
 
-from .example_report.interface import interface
-from .example_report.main import main
+from cibmangotree_analyzer_example.example_report.interface import interface
+from cibmangotree_analyzer_example.example_report.main import main
 from .test_data import test_data_dir
 
 

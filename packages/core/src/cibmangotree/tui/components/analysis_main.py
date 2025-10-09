@@ -1,6 +1,7 @@
+from typing import TYPE_CHECKING
+
 from colorama import Fore
 
-from cibmangotree.app import AnalysisContext
 from cibmangotree.tui.tools import (
     draw_box,
     open_directory_explorer,
@@ -13,9 +14,12 @@ from .analysis_params import print_param_value
 from .context import ViewContext
 from .export_outputs import export_outputs
 
+if TYPE_CHECKING:
+    from cibmangotree.app import AnalysisContext
+
 
 def analysis_main(
-    context: ViewContext, analysis: AnalysisContext, *, no_web_server=False
+    context: ViewContext, analysis: "AnalysisContext", *, no_web_server=False
 ):
     terminal = context.terminal
     while True:

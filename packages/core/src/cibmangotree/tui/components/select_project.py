@@ -1,9 +1,11 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from cibmangotree.app import ProjectContext
 from cibmangotree.tui.tools import draw_box, prompts, smart_print_data_frame, wait_for_key
 
 from .context import ViewContext
+
+if TYPE_CHECKING:
+    from cibmangotree.app import ProjectContext
 
 
 def select_project(ctx: ViewContext):
@@ -18,7 +20,7 @@ def select_project(ctx: ViewContext):
                 wait_for_key(True)
                 return None
 
-            project: Optional[ProjectContext] = prompts.list_input(
+            project: Optional["ProjectContext"] = prompts.list_input(
                 "Which project?",
                 choices=[(project.display_name, project) for project in projects],
             )

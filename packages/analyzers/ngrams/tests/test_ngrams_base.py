@@ -1,7 +1,7 @@
 import types
 from pathlib import Path
 
-from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
+from cibmangotree.services.preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from services.tokenizer.basic import TokenizerConfig, tokenize_text
 from services.tokenizer.core.types import CaseHandling
 from cibmangotree_testing import CsvTestData, ParquetTestData, test_primary_analyzer

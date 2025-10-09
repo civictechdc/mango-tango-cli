@@ -1,4 +1,5 @@
 from tempfile import TemporaryDirectory
+from typing import TYPE_CHECKING
 
 import polars as pl
 from pydantic import BaseModel
@@ -10,16 +11,18 @@ from cibmangotree.analyzer_interface import (
     ParamValue,
     TimeBinningValue,
 )
-from cibmangotree.app import ProjectContext
 from cibmangotree.context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
 from cibmangotree.tui.tools import prompts, smart_print_data_frame
 
 from .context import ViewContext
 
+if TYPE_CHECKING:
+    from cibmangotree.app import ProjectContext
+
 
 def customize_analysis(
     context: ViewContext,
-    project: ProjectContext,
+    project: "ProjectContext",
     analyzer: AnalyzerInterface,
     column_mapping: dict[str, str],
 ) -> dict[str, ParamValue] | None:
