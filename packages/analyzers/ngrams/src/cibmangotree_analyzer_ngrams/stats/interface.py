@@ -1,7 +1,7 @@
 from cibmangotree.analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
 
-from ..ngrams_base import interface as ngrams_interface
-from ..ngrams_base.interface import (
+from ..base import interface as ngrams_interface
+from ..base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
     COL_MESSAGE_NGRAM_COUNT,

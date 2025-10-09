@@ -2,11 +2,11 @@ import types
 from pathlib import Path
 
 from cibmangotree.services.preprocessing.series_semantic import datetime_string, identifier, text_catch_all
-from services.tokenizer.basic import TokenizerConfig, tokenize_text
-from services.tokenizer.core.types import CaseHandling
+from cibmangotree_tokenizer_basic import TokenizerConfig, tokenize_text
+from cibmangotree.services.tokenizer.core.types import CaseHandling
 from cibmangotree_testing import CsvTestData, ParquetTestData, test_primary_analyzer
 
-from .ngrams_base.interface import (
+from cibmangotree_analyzer_ngrams.base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
     COL_MESSAGE_TEXT,
@@ -16,8 +16,11 @@ from .ngrams_base.interface import (
     OUTPUT_NGRAM_DEFS,
     interface,
 )
-from .ngrams_base.main import main, ngrams, serialize_ngram
-from .test_data import test_data_dir
+from cibmangotree_analyzer_ngrams.base.main import main, ngrams, serialize_ngram
+
+# Test data directory
+from pathlib import Path
+test_data_dir = Path(__file__).parent / "test_data"
 
 TEST_CSV_FILENAME = "ngrams_test_input.csv"
 TEST_STRING = "Mango tree is an open source project."

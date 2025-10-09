@@ -1,6 +1,6 @@
 from cibmangotree.analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
 
-from ..example_base.interface import interface as example_base
+from ..base.interface import interface as example_base
 
 interface = SecondaryAnalyzerInterface(
     # This ID should unique among the analyzers in the application.

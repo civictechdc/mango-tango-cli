@@ -2,7 +2,7 @@ import polars as pl
 
 from cibmangotree.analyzer_interface.context import PrimaryAnalyzerContext
 from cibmangotree_tokenizer_basic import TokenizerConfig, tokenize_text
-from cibmangotree_tokenizer_basic.core.types import CaseHandling
+from cibmangotree.services.tokenizer.core.types import CaseHandling
 from cibmangotree.tui.tools import ProgressReporter
 
 from .interface import (

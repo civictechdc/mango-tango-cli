@@ -1,6 +1,6 @@
 from cibmangotree.analyzer_interface import WebPresenterInterface
 
-from ..hashtags_base import interface as hashtags_interface
+from ..base import interface as hashtags_interface
 
 interface = WebPresenterInterface(
     id="hashtags_dashboard",

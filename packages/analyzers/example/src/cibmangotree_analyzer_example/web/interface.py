@@ -1,7 +1,7 @@
 from cibmangotree.analyzer_interface import WebPresenterInterface
 
-from ..example_base import interface as example_base
-from ..example_report import interface as example_report
+from ..base import interface as example_base
+from ..report import interface as example_report
 
 interface = WebPresenterInterface(
     # This ID must be unique among all web presenters.

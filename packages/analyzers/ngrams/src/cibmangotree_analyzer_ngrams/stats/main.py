@@ -5,7 +5,7 @@ import pyarrow.parquet as pq
 from cibmangotree.analyzer_interface.context import SecondaryAnalyzerContext
 from cibmangotree.tui.tools import ProgressReporter
 
-from ..ngrams_base.interface import (
+from ..base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
     COL_MESSAGE_NGRAM_COUNT,

@@ -7,10 +7,10 @@ from cibmangotree.analyzer_interface.context import (
     ShinyContext,
     WebPresenterContext,
 )
-from app.project_context import _get_columns_with_semantic
-from app.shiny import page_dependencies
+from cibmangotree.app.project_context import _get_columns_with_semantic
+from cibmangotree.app.shiny import page_dependencies
 
-from ..hashtags_base.interface import COL_TIME, OUTPUT_GINI
+from ..base.interface import COL_TIME, OUTPUT_GINI
 from .app import (
     analysis_panel,
     hashtag_plot_panel,

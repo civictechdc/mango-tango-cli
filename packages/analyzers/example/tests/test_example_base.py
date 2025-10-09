@@ -3,9 +3,11 @@ import os
 from cibmangotree.services.preprocessing.series_semantic import identifier
 from cibmangotree_testing import CsvConfig, CsvTestData, test_primary_analyzer
 
-from cibmangotree_analyzer_example.example_base.interface import interface
-from cibmangotree_analyzer_example.example_base.main import main
-from .test_data import test_data_dir
+from cibmangotree_analyzer_example.base.interface import interface
+from cibmangotree_analyzer_example.base.main import main
+from pathlib import Path
+test_data_dir = Path(__file__).parent / "test_data"
+# from .test_data import test_data_dir
 
 
 # This example shows you how to test a primary analyzer.

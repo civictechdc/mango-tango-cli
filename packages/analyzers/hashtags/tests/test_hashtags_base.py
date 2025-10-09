@@ -7,15 +7,17 @@ from cibmangotree.analyzer_interface.params import TimeBinningValue
 from cibmangotree.services.preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from cibmangotree_testing import CsvTestData, JsonTestData, test_primary_analyzer
 
-from .hashtags_base.interface import (
+from cibmangotree_analyzer_hashtags.base.interface import (
     COL_AUTHOR_ID,
     COL_POST,
     COL_TIME,
     OUTPUT_GINI,
     interface,
 )
-from .hashtags_base.main import gini, main
-from .test_data import test_data_dir
+from cibmangotree_analyzer_hashtags.base.main import gini, main
+
+from pathlib import Path
+test_data_dir = Path(__file__).parent / "test_data"
 
 HASHTAGS = [
     "sunset",

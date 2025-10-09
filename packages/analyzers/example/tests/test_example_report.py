@@ -2,9 +2,11 @@ import os
 
 from cibmangotree_testing import CsvTestData, test_secondary_analyzer
 
-from cibmangotree_analyzer_example.example_report.interface import interface
-from cibmangotree_analyzer_example.example_report.main import main
-from .test_data import test_data_dir
+from cibmangotree_analyzer_example.report.interface import interface
+from cibmangotree_analyzer_example.report.main import main
+
+from pathlib import Path
+test_data_dir = Path(__file__).parent / "test_data"
 
 
 # This example shows you how to test a secondary analyzer.
