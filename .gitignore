@@ -1,13 +1,33 @@
+# Virtual environments
 venv
+.venv/
+
+# Python
 __pycache__
-__private__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# UV
+uv.lock
+.python-version
+
+# Build outputs
 /build
 /dist
+*.egg-info
+
+# Application outputs
 /analysis_outputs
 /site
 VERSION
 *.DS_Store
+
+# Environment files
 .env*
+
+# AI tooling
 .serena
 .specify
 
@@ -15,6 +35,9 @@ VERSION
 in-memoria.db
 .in-memoria/cache/
 .in-memoria/.env
+
+# Private/sensitive files
+__private__
 
 # PyInstaller - auto-generated frozen plugins
 packages/core/src/cibmangotree/_frozen_plugins.py

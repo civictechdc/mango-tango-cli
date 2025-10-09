@@ -22,26 +22,44 @@ consistent UX while allowing easy contribution of new analyzers.
 - **Data**: Polars/Pandas, PyArrow, Parquet files
 - **Text Processing**: Unicode tokenizer service with scriptio continua support (character-level for CJK/Thai/Southeast Asian scripts, word-level for Latin/Arabic scripts)
 - **Web**: Dash, Shiny for Python, Plotly
+- **Package Manager**: UV (modern Python package manager)
 - **Dev Tools**: Black, isort, pytest, PyInstaller
+
+### Project Structure
+
+UV workspace monorepo with 8 packages:
+
+```
+packages/
+├── core/                    # cibmangotree - Main application
+├── importing/              # cibmangotree-importing - Data I/O
+├── services/               # cibmangotree-services - Shared services
+├── testing/                # cibmangotree-testing - Testing utilities
+└── analyzers/              # Analysis modules (plugins)
+    ├── hashtags/           # Hashtag analysis
+    ├── ngrams/             # N-gram analysis
+    ├── temporal/           # Temporal patterns
+    └── example/            # Example analyzer template
+```
 
 ## Semantic Code Structure
 
 ### Entry Points
 
-- `mangotango.py` - Main application bootstrap
-- `python -m mangotango` - Standard execution command
+- `packages/core/src/cibmangotree/__main__.py` - Main application bootstrap
+- `uv run cibmangotree` - Standard execution command
 
 ### Core Architecture (MVC-like)
 
-- **Application Layer** (`app/`): Workspace logic, analysis orchestration
-- **View Layer** (`components/`): Terminal UI components using inquirer
-- **Model Layer** (`storage/`): Data persistence, project/analysis models
+- **Application Layer** (`packages/core/src/cibmangotree/app/`): Workspace logic, analysis orchestration
+- **View Layer** (`packages/core/src/cibmangotree/components/`): Terminal UI components using inquirer
+- **Model Layer** (`packages/core/src/cibmangotree/storage/`): Data persistence, project/analysis models
 
 ### Domain Separation
 
-1. **Core Domain**: Application, Terminal Components, Storage IO
-2. **Edge Domain**: Data import/export (`importing/`), preprocessing
-3. **Content Domain**: Analyzers (`analyzers/`), web presenters
+1. **Core Domain**: Application, Terminal Components, Storage IO (`packages/core/`)
+2. **Edge Domain**: Data import/export (`packages/importing/`), preprocessing
+3. **Content Domain**: Analyzers (`packages/analyzers/`), web presenters
 
 ### Key Data Flow
 

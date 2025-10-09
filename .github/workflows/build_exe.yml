@@ -57,21 +57,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.12
-          cache: 'pip'
-          cache-dependency-path: '**/requirements*.txt'
+          python-version-file: '.python-version'
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Install PyInstaller
-        run: |
-          pip install pyinstaller
-          echo "PYINST_BIN=\"$(which pyinstaller)\"" >> "$GITHUB_ENV"
+        run: uv sync
       - name: Create macOS keychain
         id: keychain
         if: runner.os == 'macOS' && inputs.is_release
@@ -116,7 +112,7 @@ jobs:
       - name: Build the executable
         env:
           APPLE_APP_CERT_ID: "${{ inputs.is_release && secrets.APPLE_APP_CERT_ID || '' }}"
-        run: pyinstaller pyinstaller.spec
+        run: uv run pyinstaller pyinstaller.spec
 
       - name: Rename the executable to include platform suffix
         run: ${{ matrix.move_command }}
