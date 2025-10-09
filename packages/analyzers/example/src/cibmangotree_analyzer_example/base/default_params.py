@@ -1,5 +1,5 @@
-from analyzer_interface import ParamValue
-from analyzer_interface.context import PrimaryAnalyzerContext
+from cibmangotree.analyzer_interface import ParamValue
+from cibmangotree.analyzer_interface.context import PrimaryAnalyzerContext
 
 
 def default_params(context: PrimaryAnalyzerContext) -> dict[str, ParamValue]:

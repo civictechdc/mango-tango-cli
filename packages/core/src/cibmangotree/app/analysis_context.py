@@ -5,17 +5,17 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from analyzer_interface import (
+from cibmangotree.analyzer_interface import (
     AnalyzerDeclaration,
     SecondaryAnalyzerDeclaration,
     backfill_param_values,
 )
-from context import (
+from cibmangotree.context import (
     InputColumnProvider,
     PrimaryAnalyzerContext,
     SecondaryAnalyzerContext,
 )
-from storage import AnalysisModel
+from cibmangotree.services.storage import AnalysisModel
 
 from .app_context import AppContext
 from .project_context import ProjectContext

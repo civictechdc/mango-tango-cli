@@ -1,4 +1,4 @@
-from analyzer_interface import (
+from cibmangotree.analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,
@@ -6,7 +6,7 @@ from analyzer_interface import (
     InputColumn,
     OutputColumn,
 )
-from analyzer_interface.params import TimeBinningParam
+from cibmangotree.analyzer_interface.params import TimeBinningParam
 
 COL_AUTHOR_ID = "Unique UserID"
 COL_TIME = "Timestamp"

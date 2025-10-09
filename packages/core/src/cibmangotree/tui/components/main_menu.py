@@ -1,6 +1,6 @@
 from sys import exit
 
-from terminal_tools import draw_box, prompts
+from cibmangotree.tui.tools import draw_box, prompts
 
 from .analysis_main import analysis_main
 from .context import ViewContext

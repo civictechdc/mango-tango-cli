@@ -3,15 +3,15 @@ from typing import Optional
 
 import polars as pl
 
-from analyzer_interface import (
+from cibmangotree.analyzer_interface import (
     AnalyzerInterface,
     InputColumn,
     UserInputColumn,
     column_automap,
     get_data_type_compatibility_score,
 )
-from app import ProjectContext
-from terminal_tools import draw_box, prompts, smart_print_data_frame, wait_for_key
+from cibmangotree.app import ProjectContext
+from cibmangotree.tui.tools import draw_box, prompts, smart_print_data_frame, wait_for_key
 
 from .analysis_params import customize_analysis
 from .context import ViewContext

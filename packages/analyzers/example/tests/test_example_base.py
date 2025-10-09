@@ -1,7 +1,7 @@
 import os
 
 from preprocessing.series_semantic import identifier
-from testing import CsvConfig, CsvTestData, test_primary_analyzer
+from cibmangotree_testing import CsvConfig, CsvTestData, test_primary_analyzer
 
 from .example_base.interface import interface
 from .example_base.main import main

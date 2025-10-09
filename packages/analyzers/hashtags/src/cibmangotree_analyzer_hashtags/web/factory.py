@@ -2,7 +2,7 @@ import polars as pl
 from dash import html
 from shiny.ui import layout_columns, nav_panel
 
-from analyzer_interface.context import (
+from cibmangotree.analyzer_interface.context import (
     FactoryOutputContext,
     ShinyContext,
     WebPresenterContext,

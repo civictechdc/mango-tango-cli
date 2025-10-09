@@ -2,7 +2,7 @@ from tempfile import NamedTemporaryFile
 
 from pydantic import BaseModel
 
-from importing import ImporterSession
+from cibmangotree.services.importing import ImporterSession
 
 from .app_context import AppContext
 from .project_context import ProjectContext

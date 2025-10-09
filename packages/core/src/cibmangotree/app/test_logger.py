@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 import pytest
 
-from app.logger import get_logger, setup_logging
+from cibmangotree.app.logger import get_logger, setup_logging
 
 
 class TestSetupLogging:

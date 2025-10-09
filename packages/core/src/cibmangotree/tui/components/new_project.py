@@ -4,10 +4,10 @@ from typing import Optional
 
 import polars as pl
 
-from importing import Importer, ImporterSession, importers
-from terminal_tools import draw_box, prompts, wait_for_key
-from terminal_tools.inception import Scope
-from terminal_tools.utils import print_message, smart_print_data_frame
+from cibmangotree.services.importing import Importer, ImporterSession, importers
+from cibmangotree.tui.tools import draw_box, prompts, wait_for_key
+from cibmangotree.tui.tools.inception import Scope
+from cibmangotree.tui.tools.utils import print_message, smart_print_data_frame
 
 from .context import ViewContext
 

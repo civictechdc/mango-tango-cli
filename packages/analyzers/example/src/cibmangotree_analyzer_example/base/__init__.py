@@ -1,4 +1,4 @@
-from analyzer_interface import AnalyzerDeclaration
+from cibmangotree.analyzer_interface import AnalyzerDeclaration
 
 from .default_params import default_params
 from .interface import interface

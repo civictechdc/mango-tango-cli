@@ -1,4 +1,4 @@
-from analyzer_interface import WebPresenterInterface
+from cibmangotree.analyzer_interface import WebPresenterInterface
 
 from ..example_base import interface as example_base
 from ..example_report import interface as example_report

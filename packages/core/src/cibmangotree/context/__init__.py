@@ -5,24 +5,24 @@ import polars as pl
 from dash import Dash
 from pydantic import BaseModel, ConfigDict
 
-from analyzer_interface import (
+from cibmangotree.analyzer_interface import (
     AnalyzerInterface,
     ParamValue,
     SecondaryAnalyzerInterface,
     WebPresenterInterface,
     backfill_param_values,
 )
-from analyzer_interface.context import AssetsReader, InputTableReader
-from analyzer_interface.context import (
+from cibmangotree.analyzer_interface.context import AssetsReader, InputTableReader
+from cibmangotree.analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
 )
-from analyzer_interface.context import (
+from cibmangotree.analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
-from analyzer_interface.context import TableReader, TableWriter
-from analyzer_interface.context import WebPresenterContext as BaseWebPresenterContext
-from preprocessing.series_semantic import SeriesSemantic
-from storage import AnalysisModel, Storage
+from cibmangotree.analyzer_interface.context import TableReader, TableWriter
+from cibmangotree.analyzer_interface.context import WebPresenterContext as BaseWebPresenterContext
+from cibmangotree.services.preprocessing.series_semantic import SeriesSemantic
+from cibmangotree.services.storage import AnalysisModel, Storage
 
 
 class PrimaryAnalyzerDefaultParametersContext(BasePrimaryAnalyzerContext):

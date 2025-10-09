@@ -1,4 +1,4 @@
-from analyzer_interface import (
+from cibmangotree.analyzer_interface import (
     AnalyzerInput,
     AnalyzerInterface,
     AnalyzerOutput,

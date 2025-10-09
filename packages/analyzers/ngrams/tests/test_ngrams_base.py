@@ -4,7 +4,7 @@ from pathlib import Path
 from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from services.tokenizer.basic import TokenizerConfig, tokenize_text
 from services.tokenizer.core.types import CaseHandling
-from testing import CsvTestData, ParquetTestData, test_primary_analyzer
+from cibmangotree_testing import CsvTestData, ParquetTestData, test_primary_analyzer
 
 from .ngrams_base.interface import (
     COL_AUTHOR_ID,

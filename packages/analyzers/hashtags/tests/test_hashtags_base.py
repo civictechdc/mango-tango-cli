@@ -3,9 +3,9 @@ import os
 import numpy as np
 import polars as pl
 
-from analyzer_interface.params import TimeBinningValue
+from cibmangotree.analyzer_interface.params import TimeBinningValue
 from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
-from testing import CsvTestData, JsonTestData, test_primary_analyzer
+from cibmangotree_testing import CsvTestData, JsonTestData, test_primary_analyzer
 
 from .hashtags_base.interface import (
     COL_AUTHOR_ID,

@@ -1,14 +1,13 @@
 import os
 
-from app import AnalysisContext, AnalysisOutputContext
-from storage import SupportedOutputExtension
-from terminal_tools import (
-    ProgressReporter,
+from cibmangotree.app import AnalysisContext, AnalysisOutputContext
+from cibmangotree.services.storage import SupportedOutputExtension
+from cibmangotree.tui.tools import (
     open_directory_explorer,
     prompts,
     wait_for_key,
 )
-from terminal_tools.progress import ProgressReporter
+from cibmangotree.tui.tools.progress import ProgressReporter
 
 from .context import ViewContext
 

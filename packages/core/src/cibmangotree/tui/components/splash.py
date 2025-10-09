@@ -2,8 +2,8 @@ from rich import print
 from rich.console import Console
 from rich.panel import Panel
 
-from meta import get_version
-from terminal_tools import clear_terminal, wait_for_key
+from cibmangotree.meta import get_version
+from cibmangotree.tui.tools import clear_terminal, wait_for_key
 
 
 def splash():

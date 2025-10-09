@@ -3,8 +3,8 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel
 
-from analyzer_interface import AnalyzerOutput, SecondaryAnalyzerInterface
-from storage import SupportedOutputExtension
+from cibmangotree.analyzer_interface import AnalyzerOutput, SecondaryAnalyzerInterface
+from cibmangotree.services.storage import SupportedOutputExtension
 
 from .analysis_context import AnalysisContext
 from .app_context import AppContext

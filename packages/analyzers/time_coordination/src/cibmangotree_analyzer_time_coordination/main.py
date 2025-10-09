@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import polars as pl
 
-from analyzer_interface.context import PrimaryAnalyzerContext
+from cibmangotree.analyzer_interface.context import PrimaryAnalyzerContext
 
 from .interface import (
     COL_TIMESTAMP,

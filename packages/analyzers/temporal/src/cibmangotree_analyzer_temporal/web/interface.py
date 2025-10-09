@@ -1,4 +1,4 @@
-from analyzer_interface import WebPresenterInterface
+from cibmangotree.analyzer_interface import WebPresenterInterface
 
 from ..temporal_base import interface as temporal_interface
 

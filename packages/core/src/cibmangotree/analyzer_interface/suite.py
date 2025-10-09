@@ -3,14 +3,14 @@ from typing import Union
 
 from pydantic import BaseModel
 
-from analyzer_interface import (
+from cibmangotree.analyzer_interface import (
     AnalyzerDeclaration,
     AnalyzerInterface,
     SecondaryAnalyzerDeclaration,
     SecondaryAnalyzerInterface,
     WebPresenterDeclaration,
 )
-from meta import is_development
+from cibmangotree.meta import is_development
 
 
 class AnalyzerSuite(BaseModel):

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from testing import ParquetTestData, test_secondary_analyzer
+from cibmangotree_testing import ParquetTestData, test_secondary_analyzer
 
 from .ngram_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS, interface
 from .ngram_stats.main import main

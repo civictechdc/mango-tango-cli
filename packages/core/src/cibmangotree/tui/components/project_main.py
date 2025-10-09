@@ -1,7 +1,7 @@
 from colorama import Fore
 
-from app import ProjectContext
-from terminal_tools import draw_box, prompts, wait_for_key
+from cibmangotree.app import ProjectContext
+from cibmangotree.tui.tools import draw_box, prompts, wait_for_key
 
 from .analysis_main import analysis_main
 from .context import ViewContext

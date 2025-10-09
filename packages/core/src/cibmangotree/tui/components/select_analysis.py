@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Optional
 
-from app import AnalysisContext, ProjectContext
-from terminal_tools import prompts, wait_for_key
+from cibmangotree.app import AnalysisContext, ProjectContext
+from cibmangotree.tui.tools import prompts, wait_for_key
 
 
 def select_analysis(proj: ProjectContext) -> Optional[AnalysisContext]:

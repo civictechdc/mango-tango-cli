@@ -1,6 +1,6 @@
 import os
 
-from testing import CsvTestData, test_secondary_analyzer
+from cibmangotree_testing import CsvTestData, test_secondary_analyzer
 
 from .example_report.interface import interface
 from .example_report.main import main

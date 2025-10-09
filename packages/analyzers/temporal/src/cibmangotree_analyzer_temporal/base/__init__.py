@@ -1,4 +1,4 @@
-from analyzer_interface import AnalyzerDeclaration
+from cibmangotree.analyzer_interface import AnalyzerDeclaration
 
 from .interface import interface
 from .main import main
