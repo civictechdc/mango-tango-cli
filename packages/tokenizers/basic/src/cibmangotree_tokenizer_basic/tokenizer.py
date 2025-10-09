@@ -8,8 +8,13 @@ Unicode-aware tokenization for social media text with entity preservation.
 import re
 from typing import Optional
 
-from ..core.base import AbstractTokenizer
-from ..core.types import LanguageFamily, TokenizerConfig, TokenList
+from cibmangotree.services.tokenizer.core.base import AbstractTokenizer
+from cibmangotree.services.tokenizer.core.types import (
+    LanguageFamily,
+    TokenizerConfig,
+    TokenList,
+)
+
 from .patterns import get_patterns
 
 

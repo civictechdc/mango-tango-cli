@@ -8,8 +8,8 @@ and edge cases.
 
 import pytest
 
-from ..core.types import CaseHandling, TokenizerConfig
-from .tokenizer import BasicTokenizer
+from cibmangotree.services.tokenizer.core.types import CaseHandling, TokenizerConfig
+from cibmangotree_tokenizer_basic import BasicTokenizer
 
 
 class TestBasicTokenizerMultilingual:

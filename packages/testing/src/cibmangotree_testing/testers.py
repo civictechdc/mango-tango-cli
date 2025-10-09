@@ -6,8 +6,11 @@ from typing import Callable
 import polars as pl
 import pytest
 
-from analyzer_interface import AnalyzerInterface, ParamValue
-from analyzer_interface.context import PrimaryAnalyzerContext, SecondaryAnalyzerContext
+from cibmangotree.analyzer_interface import AnalyzerInterface, ParamValue
+from cibmangotree.analyzer_interface.context import (
+    PrimaryAnalyzerContext,
+    SecondaryAnalyzerContext,
+)
 
 from .comparers import compare_dfs
 from .context import TestPrimaryAnalyzerContext, TestSecondaryAnalyzerContext

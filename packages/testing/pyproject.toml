@@ -1,0 +1,42 @@
+[project]
+name = "cibmangotree-testing"
+version = "0.1.0"
+requires-python = ">=3.12"
+description = "Testing utilities for CIB Mango Tree"
+readme = "../../README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Civic Tech DC", email = "info@civictechdc.org"}
+]
+keywords = ["testing", "utilities", "cibmangotree"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+]
+
+# Testing utilities dependencies
+dependencies = [
+    # Core package dependency
+    "cibmangotree>=0.1.0",
+
+    # Testing frameworks
+    "pytest>=8.3.4",
+    "pytest-benchmark>=5.1.0",
+
+    # Data processing (for test data utilities)
+    "polars>=1.9.0",
+
+    # Data models & validation
+    "pydantic>=2.9.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Hatchling build configuration
+[tool.hatchling.build.targets.wheel]
+packages = ["src/cibmangotree_testing"]

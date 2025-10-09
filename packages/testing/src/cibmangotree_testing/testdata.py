@@ -4,7 +4,7 @@ from typing import TypeVar
 import polars as pl
 from pydantic import BaseModel
 
-from preprocessing.series_semantic import SeriesSemantic
+from cibmangotree.preprocessing.series_semantic import SeriesSemantic
 
 T = TypeVar("T", bound=pl.DataFrame | pl.LazyFrame)
 

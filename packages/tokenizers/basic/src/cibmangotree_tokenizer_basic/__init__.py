@@ -5,7 +5,8 @@ This module exports the BasicTokenizer implementation that provides
 fundamental Unicode-aware tokenization capabilities for social media text.
 """
 
-from ..core.types import TokenizerConfig
+from cibmangotree.services.tokenizer.core.types import TokenizerConfig
+
 from .patterns import get_patterns
 from .tokenizer import BasicTokenizer
 
