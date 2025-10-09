@@ -9,7 +9,7 @@ import re
 from typing import Optional
 
 from ..core.base import AbstractTokenizer
-from ..core.types import LanguageFamily, TokenizerConfig, TokenList, TokenType
+from ..core.types import LanguageFamily, TokenizerConfig, TokenList
 from .patterns import get_patterns
 
 
@@ -219,15 +219,29 @@ class BasicTokenizer(AbstractTokenizer):
         if self._is_email_like(token):
             return False
 
-        return (
-            token.startswith(("http://", "https://", "www."))
-            or "://" in token
-            or (
-                token.count(".") >= 1
-                and any(c.isalpha() for c in token)
-                and "@" not in token
-            )
-        )
+        # Explicit URL indicators (http://, https://, www., or protocol markers)
+        if token.startswith(("http://", "https://", "www.")) or "://" in token:
+            return True
+
+        # Domain-like patterns (e.g., "example.com")
+        # But NOT abbreviations (e.g., "U.S.", "c.e.o.s")
+        # Heuristic: URLs have at least one period NOT followed by a single uppercase/lowercase letter
+        # This allows "example.com" but excludes "U.S." and "c.e.o.s"
+        if (
+            token.count(".") >= 1
+            and any(c.isalpha() for c in token)
+            and "@" not in token
+        ):
+            # Check if this looks like an abbreviation (single letters between periods)
+            # Pattern: letter(s).letter(s).letter(s) where segments are 1-3 chars
+            abbreviation_pattern = r"^[a-z]{1,3}(?:\.[a-z]{1,3})+\.?$"
+
+            if re.match(abbreviation_pattern, token, re.IGNORECASE):
+                return False  # This is an abbreviation, not a URL
+            # If it has a period and looks like a domain, it's URL-like
+            return True
+
+        return False
 
     def _is_email_like(self, token: str) -> bool:
         """Check if token looks like an email address."""

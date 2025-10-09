@@ -2,9 +2,12 @@ import os
 from traceback import format_exc
 from typing import Optional
 
+import polars as pl
+
 from importing import Importer, ImporterSession, importers
 from terminal_tools import draw_box, prompts, wait_for_key
 from terminal_tools.inception import Scope
+from terminal_tools.utils import print_message, smart_print_data_frame
 
 from .context import ViewContext
 
@@ -38,10 +41,11 @@ def new_project(context: ViewContext):
         project_name = prompts.text("Name", default=suggested_project_name)
 
     with terminal.nest(draw_box("4. Import", padding_lines=0)):
-        print("Please wait as the dataset is imported...")
+        print_message("Please wait as the dataset is imported...", style="progress")
         project = app.create_project(name=project_name, importer_session=importer)
 
-        print("Dataset successfully imported!")
+        print_message("Dataset successfully imported!", style="main")
+        print("")
         wait_for_key(True)
         return project
 
@@ -110,10 +114,24 @@ def importer_flow(
                 print(f"Importing as {importer.name} with these options:")
                 import_session.print_config()
                 print("")
-                print("The data has these columns:")
-                print("(Each column should be listed in its own line)")
-                for column in import_preview.columns:
-                    print(f"  [{column}]")
+
+                # Create single-column DataFrame for column names
+                columns_df = pl.DataFrame(
+                    {
+                        "Column Nr.": list(range(1, len(import_preview.columns) + 1)),
+                        "Column Name": import_preview.columns,
+                    }
+                )
+
+                smart_print_data_frame(
+                    columns_df,
+                    "Detected Columns",
+                    apply_color=None,
+                )
+                print_message(
+                    text="If detected column names do not seem right, try changing the 'Skip rows' parameter.",
+                    style="hint",
+                )
                 print("")
         else:
             print(f"Could not figure out how to import this file as {importer.name}.")

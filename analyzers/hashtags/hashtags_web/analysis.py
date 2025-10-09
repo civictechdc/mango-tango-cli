@@ -1,6 +1,6 @@
 import polars as pl
 
-from ..hashtags.interface import OUTPUT_COL_HASHTAGS, OUTPUT_COL_USERS
+from ..hashtags_base.interface import OUTPUT_COL_HASHTAGS, OUTPUT_COL_USERS
 
 
 def secondary_analyzer(primary_output, timewindow):

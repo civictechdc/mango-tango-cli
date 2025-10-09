@@ -1,4 +1,3 @@
-from tempfile import TemporaryDirectory
 from traceback import format_exc
 from typing import Optional
 
@@ -7,7 +6,6 @@ import polars as pl
 from analyzer_interface import (
     AnalyzerInterface,
     InputColumn,
-    ParamValue,
     UserInputColumn,
     column_automap,
     get_data_type_compatibility_score,
@@ -63,18 +61,7 @@ def new_analysis(
                 apply_color="row-wise",
             )
 
-            # for index, input_column in enumerate(analyzer.input.columns):
-            #    print(
-            #        f"[{index + 1}] {input_column.human_readable_name_or_fallback()}"
-            #        f" ({input_column.data_type})"
-            #    )
-            #    print(input_column.description or "")
-            #    print("")
-
             user_columns = project.columns
-            user_columns_by_name = {
-                user_column.name: user_column for user_column in user_columns
-            }
             draft_column_mapping = column_automap(user_columns, analyzer.input.columns)
             unmapped_columns = list(
                 input_column

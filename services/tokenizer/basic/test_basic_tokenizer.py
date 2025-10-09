@@ -8,7 +8,7 @@ and edge cases.
 
 import pytest
 
-from ..core.types import CaseHandling, LanguageFamily, TokenizerConfig, TokenType
+from ..core.types import CaseHandling, TokenizerConfig
 from .tokenizer import BasicTokenizer
 
 
@@ -1181,6 +1181,82 @@ class TestBasicTokenizerIntegration:
 
 
 # Fixtures for reusable test data
+
+
+class TestAbbreviationsAndPunctuation:
+    """Test abbreviation handling and punctuation edge cases."""
+
+    def test_abbreviations_basic(self):
+        """Test basic abbreviation tokenization - abbreviations should stay intact."""
+        tokenizer = BasicTokenizer()
+        text = "The c.e.o.s met yesterday"
+        result = tokenizer.tokenize(text)
+
+        # Abbreviations should be preserved as single tokens
+        expected = ["the", "c.e.o.s", "met", "yesterday"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_abbreviations_with_trailing_period(self):
+        """Test abbreviation with trailing sentence period."""
+        tokenizer = BasicTokenizer()
+        text = "I live in U.S. now"
+        result = tokenizer.tokenize(text)
+
+        # Abbreviation should be preserved, period is part of the abbreviation
+        expected = ["i", "live", "in", "u.s.", "now"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_multiple_abbreviations(self):
+        """Test multiple abbreviations in the same sentence."""
+        tokenizer = BasicTokenizer()
+        text = "U.S. and U.K. relations"
+        result = tokenizer.tokenize(text)
+
+        # Both abbreviations should be preserved
+        expected = ["u.s.", "and", "u.k.", "relations"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_ellipses_without_punctuation(self):
+        """Test ellipses handling - ellipses should be filtered out by default."""
+        tokenizer = BasicTokenizer()
+        text = "Wait for it..."
+        result = tokenizer.tokenize(text)
+
+        # Ellipses should be removed with default config (include_punctuation=False)
+        expected = ["wait", "for", "it"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_chinese_tokenization_regression(self):
+        """Test that Chinese character tokenization still works correctly (regression check)."""
+        tokenizer = BasicTokenizer()
+        text = "你好世界"
+        result = tokenizer.tokenize(text)
+
+        # Chinese should still be tokenized character by character
+        expected = ["你", "好", "世", "界"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_contractions_regression(self):
+        """Test that contractions are still handled correctly (regression check)."""
+        tokenizer = BasicTokenizer()
+        text = "I don't think it's ready"
+        result = tokenizer.tokenize(text)
+
+        # Contractions should be preserved as single tokens
+        expected = ["i", "don't", "think", "it's", "ready"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_abbreviations_and_contractions_together(self):
+        """Test complex sentence with both abbreviations and contractions."""
+        tokenizer = BasicTokenizer()
+        text = "U.S. citizens don't always agree"
+        result = tokenizer.tokenize(text)
+
+        # Both abbreviations and contractions should be preserved
+        expected = ["u.s.", "citizens", "don't", "always", "agree"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+
 @pytest.fixture
 def basic_config():
     """Basic tokenizer configuration for tests."""

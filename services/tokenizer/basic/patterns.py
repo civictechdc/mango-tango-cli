@@ -98,7 +98,9 @@ SEA_PATTERN = (
 )
 
 # Word patterns for different script types
-LATIN_WORD_PATTERN = r"[a-zA-Z]+(?:\'[a-zA-Z]+)*"  # Handle contractions
+
+LATIN_WORD_PATTERN = r"[a-zA-Z]+(?:\.[a-zA-Z]+)+\.?|[a-zA-Z]+(?:\'[a-zA-Z]+)*"  # Handle abbreviations and contractions
+
 WORD_PATTERN = f"(?:{LATIN_WORD_PATTERN}|{CJK_PATTERN}+|{ARABIC_PATTERN}+|{THAI_PATTERN}+|{SEA_PATTERN}+)"
 
 # Punctuation (preserve some, group others)

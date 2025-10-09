@@ -8,9 +8,9 @@ from analyzer_interface import (
 )
 from analyzer_interface.params import TimeBinningParam
 
-COL_AUTHOR_ID = "user_id"
-COL_TIME = "time"
-COL_POST = "text"
+COL_AUTHOR_ID = "Unique UserID"
+COL_TIME = "Timestamp"
+COL_POST = "Post Content"
 
 PARAM_TIME_WINDOW = "time_window"
 

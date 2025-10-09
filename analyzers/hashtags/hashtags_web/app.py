@@ -6,7 +6,7 @@ from dateutil import parser as dateutil_parser
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
-from ..hashtags.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
+from ..hashtags_base.interface import COL_AUTHOR_ID, COL_POST, COL_TIME
 from .analysis import secondary_analyzer
 from .plots import (
     MANGO_DARK_GREEN,
@@ -368,7 +368,7 @@ def server(input, output, session):
             pl.col(COL_TIME).dt.strftime("%B %d, %Y %I:%M %p")
         )
 
-        df_posts = df_posts.rename({"time": "Post date and time", "text": "Text"})
+        df_posts = df_posts.rename({COL_TIME: "Post date and time", COL_POST: "Text"})
 
         df_posts = df_posts.drop(pl.col(COL_AUTHOR_ID))
 

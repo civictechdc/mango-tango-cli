@@ -1,25 +1,28 @@
-<h2 align="center">mango-tango-cli</h2>
-<h3 align="center">A Python command-line tool for detecting coordinated inauthentic behavior</h3>
+<h2 align="center">CIB Mango Tree</h2>
+<h3 align="center">An Interactive Command Line and Dashboard Tool for Detecting Coordinated Inauthentic Behavior Datasets of Online Activity</h3>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG" alt="Mango logo" style="width:200px;"/>
 </p>
 
 <p align="center">
-<a href="https://www.python.org/"><img alt="code" src="https://img.shields.io/badge/code-Python%203.12-blue?logo=Python"></a>
+<a href="https://www.python.org/"><img alt="code" src="https://img.shields.io/badge/Python-3.12-blue?logo=Python"></a>
+<a href="https://docs.astral.sh/ruff/"><img alt="style: black" src="https://img.shields.io/badge/Polars-1.9-skyblue?logo=Polars"></a>
+<a href="https://plotly.com/python/"><img alt="style: black" src="https://img.shields.io/badge/Plotly-5.24.1-purple?logo=Plotly"></a>
+<a href="https://github.com/Textualize/rich"><img alt="style: black" src="https://img.shields.io/badge/Rich-14.0.0-gold?logo=Rich"></a>
+<a href="https://civictechdc.github.io/mango-tango-cli/"><img alt="style: black" src="https://img.shields.io/badge/docs-website-blue"></a>
 <a href="https://black.readthedocs.io/en/stable/"><img alt="style: black" src="https://img.shields.io/badge/style-Black-black?logo=Black"></a>
-<a href="https://docs.astral.sh/ruff/"><img alt="style: black" src="https://img.shields.io/badge/tool-Polars-skyblue?logo=Polars"></a>
 </p>
 
 ---
 
 ## Technical Documentation
 
-For in-depth technical docs related to this repository please visit [https://civictechdc.github.io/mango-tango-cli](https://civictechdc.github.io/mango-tango-cli)
+For in-depth technical docs related to this repository please visit: [https://civictechdc.github.io/mango-tango-cli](https://civictechdc.github.io/mango-tango-cli)
 
 ## Requirements
 
-Python 3.12
+Python 3.12 (see [requirements.txt](https://github.com/civictechdc/mango-tango-cli/blob/main/requirements.txt))
 
 ## Setting up
 
@@ -41,7 +44,7 @@ python -m venv venv
 ## Starting the application
 
 ```shell
-python -m mangotango
+python -m cibmangotree
 ```
 
 ## Development Guide and Documentation
