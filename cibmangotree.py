@@ -26,6 +26,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--noop", action="store_true", help="No-operation mode for testing"
     )
+    parser.add_argument(
+        "--gui", action="store_true", help="Launch GUI mode (experimental)"
+    )
 
     args = parser.parse_args()
 
@@ -65,6 +68,19 @@ if __name__ == "__main__":
         extra={"log_level": args.log_level, "log_file": str(log_file_path)},
     )
 
+    # Launch GUI mode if requested
+    if args.gui:
+        logger.info("Launching GUI mode")
+        from gui import gui_main
+
+        # Create App instance
+        app = App(context=AppContext(storage=storage, suite=suite))
+
+        # Launch GUI
+        gui_main(app=app)
+        sys.exit(0)
+
+    # Default: launch terminal UI
     splash()
     main_menu(
         ViewContext(
