@@ -12,15 +12,23 @@ from cibmangotree.analyzer_interface import (
     WebPresenterInterface,
     backfill_param_values,
 )
-from cibmangotree.analyzer_interface.context import AssetsReader, InputTableReader
+from cibmangotree.analyzer_interface.context import (
+    AssetsReader,
+    InputTableReader,
+)
 from cibmangotree.analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
 )
 from cibmangotree.analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
-from cibmangotree.analyzer_interface.context import TableReader, TableWriter
-from cibmangotree.analyzer_interface.context import WebPresenterContext as BaseWebPresenterContext
+from cibmangotree.analyzer_interface.context import (
+    TableReader,
+    TableWriter,
+)
+from cibmangotree.analyzer_interface.context import (
+    WebPresenterContext as BaseWebPresenterContext,
+)
 from cibmangotree.services.preprocessing.series_semantic import SeriesSemantic
 from cibmangotree.services.storage import AnalysisModel, Storage
 

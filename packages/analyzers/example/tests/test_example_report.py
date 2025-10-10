@@ -1,11 +1,10 @@
 import os
-
-from cibmangotree_testing import CsvTestData, test_secondary_analyzer
+from pathlib import Path
 
 from cibmangotree_analyzer_example.report.interface import interface
 from cibmangotree_analyzer_example.report.main import main
+from cibmangotree_testing import CsvTestData, test_secondary_analyzer
 
-from pathlib import Path
 test_data_dir = Path(__file__).parent / "test_data"
 
 

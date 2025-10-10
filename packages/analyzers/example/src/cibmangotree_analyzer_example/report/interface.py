@@ -1,4 +1,8 @@
-from cibmangotree.analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
+from cibmangotree.analyzer_interface import (
+    AnalyzerOutput,
+    OutputColumn,
+    SecondaryAnalyzerInterface,
+)
 
 from ..base.interface import interface as example_base
 

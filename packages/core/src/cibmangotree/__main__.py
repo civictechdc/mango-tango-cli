@@ -53,9 +53,9 @@ def main():
     try:
         from .app import App, AppContext
         from .app.logger import setup_logging
-        from .tui.components import ViewContext, main_menu, splash
         from .meta import get_version
         from .services.storage import Storage
+        from .tui.components import ViewContext, main_menu, splash
         from .tui.tools.inception import TerminalContext
 
         # Initialize storage
@@ -76,6 +76,7 @@ def main():
 
         # Initialize app context
         from .analyzer_interface.suite import AnalyzerSuite
+
         suite = AnalyzerSuite()
 
         # Start the application

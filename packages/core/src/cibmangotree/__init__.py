@@ -33,17 +33,6 @@ __all__ = [
     "Storage",
 ]
 
-# Import core application components
-from .app import (
-    App,
-    AppContext,
-    AnalysisContext,
-    AnalysisOutputContext,
-    AnalysisWebServerContext,
-    ProjectContext,
-    SettingsContext,
-)
-
 # Import analyzer interface
 from .analyzer_interface import (
     AnalyzerInterface,
@@ -53,6 +42,17 @@ from .analyzer_interface import (
 from .analyzer_interface.context import (
     PrimaryAnalyzerContext,
     SecondaryAnalyzerContext,
+)
+
+# Import core application components
+from .app import (
+    AnalysisContext,
+    AnalysisOutputContext,
+    AnalysisWebServerContext,
+    App,
+    AppContext,
+    ProjectContext,
+    SettingsContext,
 )
 
 # Import storage service

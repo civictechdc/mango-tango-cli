@@ -397,7 +397,7 @@ class TestBasicTokenizerEdgeCases:
     def test_special_characters(self):
         """Test handling of special Unicode characters."""
         tokenizer = BasicTokenizer()
-        text = "Hello\u00A0world\u2000test"  # Non-breaking space and em space
+        text = "Hello\u00a0world\u2000test"  # Non-breaking space and em space
         result = tokenizer.tokenize(text)
 
         expected = ["hello", "world", "test"]

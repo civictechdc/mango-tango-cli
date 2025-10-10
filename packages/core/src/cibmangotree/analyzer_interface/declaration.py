@@ -27,7 +27,7 @@ class AnalyzerDeclaration(AnalyzerInterface):
         is_distributed: bool = False,
         default_params: Callable[[PrimaryAnalyzerContext], dict[str, ParamValue]] = (
             lambda _: dict()
-        )
+        ),
     ):
         """Creates a primary analyzer declaration
 
@@ -48,7 +48,7 @@ class AnalyzerDeclaration(AnalyzerInterface):
             **interface.model_dump(),
             entry_point=main,
             default_params=default_params,
-            is_distributed=is_distributed
+            is_distributed=is_distributed,
         )
 
 

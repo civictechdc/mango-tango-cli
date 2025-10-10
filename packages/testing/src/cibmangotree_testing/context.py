@@ -6,14 +6,20 @@ import polars as pl
 from pydantic import BaseModel
 
 from cibmangotree.analyzer_interface import ParamValue, SecondaryAnalyzerInterface
-from cibmangotree.analyzer_interface.context import AssetsReader, InputTableReader
+from cibmangotree.analyzer_interface.context import (
+    AssetsReader,
+    InputTableReader,
+)
 from cibmangotree.analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
 )
 from cibmangotree.analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
-from cibmangotree.analyzer_interface.context import TableReader, TableWriter
+from cibmangotree.analyzer_interface.context import (
+    TableReader,
+    TableWriter,
+)
 
 
 class TestPrimaryAnalyzerContext(BasePrimaryAnalyzerContext):

@@ -1,7 +1,7 @@
 from cibmangotree.analyzer_interface import WebPresenterInterface
 
-from ..stats import interface as ngram_stats_interface
 from ..base import interface as ngrams_interface
+from ..stats import interface as ngram_stats_interface
 
 interface = WebPresenterInterface(
     id="ngram_repetition_by_poster",

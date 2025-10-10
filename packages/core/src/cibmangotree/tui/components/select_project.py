@@ -1,6 +1,11 @@
 from typing import TYPE_CHECKING, Optional
 
-from cibmangotree.tui.tools import draw_box, prompts, smart_print_data_frame, wait_for_key
+from cibmangotree.tui.tools import (
+    draw_box,
+    prompts,
+    smart_print_data_frame,
+    wait_for_key,
+)
 
 from .context import ViewContext
 

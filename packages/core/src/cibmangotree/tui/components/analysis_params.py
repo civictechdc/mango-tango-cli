@@ -11,7 +11,10 @@ from cibmangotree.analyzer_interface import (
     ParamValue,
     TimeBinningValue,
 )
-from cibmangotree.context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
+from cibmangotree.context import (
+    InputColumnProvider,
+    PrimaryAnalyzerDefaultParametersContext,
+)
 from cibmangotree.tui.tools import prompts, smart_print_data_frame
 
 from .context import ViewContext

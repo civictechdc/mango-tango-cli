@@ -1,14 +1,17 @@
 from pathlib import Path
 
-from cibmangotree_testing import ParquetTestData, test_secondary_analyzer
-
-from cibmangotree_analyzer_ngrams.stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS, interface
-from cibmangotree_analyzer_ngrams.stats.main import main
 from cibmangotree_analyzer_ngrams.base.interface import (
     OUTPUT_MESSAGE,
     OUTPUT_MESSAGE_NGRAMS,
     OUTPUT_NGRAM_DEFS,
 )
+from cibmangotree_analyzer_ngrams.stats.interface import (
+    OUTPUT_NGRAM_FULL,
+    OUTPUT_NGRAM_STATS,
+    interface,
+)
+from cibmangotree_analyzer_ngrams.stats.main import main
+from cibmangotree_testing import ParquetTestData, test_secondary_analyzer
 
 test_data_dir = Path(__file__).parent / "test_data"
 

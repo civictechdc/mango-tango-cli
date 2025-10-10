@@ -1,11 +1,11 @@
 import os
+from pathlib import Path
 
 from cibmangotree.services.preprocessing.series_semantic import identifier
-from cibmangotree_testing import CsvConfig, CsvTestData, test_primary_analyzer
-
 from cibmangotree_analyzer_example.base.interface import interface
 from cibmangotree_analyzer_example.base.main import main
-from pathlib import Path
+from cibmangotree_testing import CsvConfig, CsvTestData, test_primary_analyzer
+
 test_data_dir = Path(__file__).parent / "test_data"
 # from .test_data import test_data_dir
 

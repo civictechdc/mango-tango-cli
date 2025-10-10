@@ -1,12 +1,15 @@
 import os
+from pathlib import Path
 
 import numpy as np
 import polars as pl
 
 from cibmangotree.analyzer_interface.params import TimeBinningValue
-from cibmangotree.services.preprocessing.series_semantic import datetime_string, identifier, text_catch_all
-from cibmangotree_testing import CsvTestData, JsonTestData, test_primary_analyzer
-
+from cibmangotree.services.preprocessing.series_semantic import (
+    datetime_string,
+    identifier,
+    text_catch_all,
+)
 from cibmangotree_analyzer_hashtags.base.interface import (
     COL_AUTHOR_ID,
     COL_POST,
@@ -15,8 +18,8 @@ from cibmangotree_analyzer_hashtags.base.interface import (
     interface,
 )
 from cibmangotree_analyzer_hashtags.base.main import gini, main
+from cibmangotree_testing import CsvTestData, JsonTestData, test_primary_analyzer
 
-from pathlib import Path
 test_data_dir = Path(__file__).parent / "test_data"
 
 HASHTAGS = [

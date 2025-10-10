@@ -10,7 +10,12 @@ from cibmangotree.analyzer_interface import (
     column_automap,
     get_data_type_compatibility_score,
 )
-from cibmangotree.tui.tools import draw_box, prompts, smart_print_data_frame, wait_for_key
+from cibmangotree.tui.tools import (
+    draw_box,
+    prompts,
+    smart_print_data_frame,
+    wait_for_key,
+)
 
 from .analysis_params import customize_analysis
 from .context import ViewContext

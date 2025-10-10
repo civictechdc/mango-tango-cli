@@ -1,4 +1,8 @@
-from cibmangotree.analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
+from cibmangotree.analyzer_interface import (
+    AnalyzerOutput,
+    OutputColumn,
+    SecondaryAnalyzerInterface,
+)
 
 from ..base import interface as ngrams_interface
 from ..base.interface import (

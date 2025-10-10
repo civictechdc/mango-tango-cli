@@ -1,11 +1,14 @@
 import types
+
+# Test data directory
 from pathlib import Path
 
-from cibmangotree.services.preprocessing.series_semantic import datetime_string, identifier, text_catch_all
-from cibmangotree_tokenizer_basic import TokenizerConfig, tokenize_text
+from cibmangotree.services.preprocessing.series_semantic import (
+    datetime_string,
+    identifier,
+    text_catch_all,
+)
 from cibmangotree.services.tokenizer.core.types import CaseHandling
-from cibmangotree_testing import CsvTestData, ParquetTestData, test_primary_analyzer
-
 from cibmangotree_analyzer_ngrams.base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
@@ -17,9 +20,9 @@ from cibmangotree_analyzer_ngrams.base.interface import (
     interface,
 )
 from cibmangotree_analyzer_ngrams.base.main import main, ngrams, serialize_ngram
+from cibmangotree_testing import CsvTestData, ParquetTestData, test_primary_analyzer
+from cibmangotree_tokenizer_basic import TokenizerConfig, tokenize_text
 
-# Test data directory
-from pathlib import Path
 test_data_dir = Path(__file__).parent / "test_data"
 
 TEST_CSV_FILENAME = "ngrams_test_input.csv"
