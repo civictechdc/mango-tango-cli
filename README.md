@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD033 MD041 -->
 <h2 align="center">CIB Mango Tree</h2>
 <h3 align="center">An Interactive Command Line and Dashboard Tool for Detecting Coordinated Inauthentic Behavior Datasets of Online Activity</h3>
 
@@ -49,6 +50,7 @@ Run the bootstrap script for your platform:
 ```
 
 This will:
+
 - Install UV package manager (if not present)
 - Install all project dependencies
 - Set up the development environment
@@ -64,7 +66,7 @@ uv run cibmangotree
 
 This is a UV workspace monorepo with the following packages:
 
-```
+```bash
 packages/
 ├── core/                    # Core application (cibmangotree)
 │   ├── src/cibmangotree/   # Main application code
@@ -119,11 +121,10 @@ uv sync --upgrade               # Upgrade dependencies
 
 This repository includes hybrid AI documentation enhanced with semantic code analysis:
 
-- **For Claude Code users**: See `CLAUDE.md` + Serena MCP integration
+- **For Claude Code users**: See `CLAUDE.md`
   - **Important**: Always start sessions with "Read the initial instructions"
 - **For Cursor users**: See `.cursorrules` + `.ai-context/`
 - **For other AI tools**: See `.ai-context/README.md`
-- **For deep semantic analysis**: Serena memories in `.serena/memories/`
 
 ### Quick Start for Contributors
 

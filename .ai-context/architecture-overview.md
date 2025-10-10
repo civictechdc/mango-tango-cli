@@ -1,5 +1,7 @@
 # Architecture Overview
 
+> **Note:** This project uses a UV workspace monorepo structure. All packages are organized under `packages/`, with the core application in `packages/core/src/cibmangotree/` and supporting packages (analyzers, services, importing, testing) in their respective `packages/` subdirectories.
+
 ## High-Level Component Diagram
 
 ```mermaid
@@ -36,7 +38,7 @@ flowchart TD
 
 ### Application Layer (`app/`)
 
-Central orchestration and workspace management
+Central orchestration and workspace management (located in `packages/core/src/cibmangotree/app/`)
 
 Key Classes:
 
@@ -50,7 +52,7 @@ Key Classes:
 
 ### View Layer (`components/`)
 
-Terminal UI components using inquirer
+Terminal UI components using inquirer (located in `packages/core/src/cibmangotree/tui/components/`)
 
 Key Components:
 
@@ -62,7 +64,7 @@ Key Components:
 
 ### Model Layer (`storage/`)
 
-Data persistence and state management
+Data persistence and state management (located in `packages/core/src/cibmangotree/storage/`)
 
 Key Classes:
 
@@ -79,7 +81,7 @@ Reusable services that support analyzers and data processing
 
 Key Services:
 
-- **Tokenizer Service** (`services/tokenizer/`) - Unicode-aware scriptio continua tokenization
+- **Tokenizer Service** - Unicode-aware scriptio continua tokenization (located in `packages/core/src/cibmangotree/services/tokenizer/`)
   - `AbstractTokenizer` - Base interface for tokenizer implementations
   - `TokenizerConfig` - Configuration for tokenization behavior
   - `BasicTokenizer` - Core implementation with character-level and word-level tokenization

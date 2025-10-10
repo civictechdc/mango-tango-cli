@@ -40,7 +40,7 @@ Before contributing, familiarize yourself with:
 
 The Mango Tango CLI is a modular, extensible Python terminal application organized as a UV workspace monorepo:
 
-```
+```bash
 packages/
 ├── core/                    # Core application (cibmangotree)
 ├── importing/              # Data import/export
@@ -50,6 +50,7 @@ packages/
 ```
 
 Three main architectural domains:
+
 - **Core Domain**: Application logic, terminal UI, and storage
 - **Edge Domain**: Data import/export and preprocessing
 - **Content Domain**: Analysis modules and web presenters
@@ -77,6 +78,7 @@ Run the bootstrap script for your platform:
 ```
 
 This will:
+
 - Install UV package manager (if not present)
 - Install all project dependencies
 - Set up the development environment
@@ -158,7 +160,7 @@ git branch -d feature/your-feature-name
 - Input: Primary + secondary outputs
 - Output: Dash/Shiny web applications
 
-See the [analyzer example](analyzers/example/README.md) for implementation guidance.
+See the [analyzer example](packages/analyzers/example/README.md) for implementation guidance.
 
 ### 🔧 Core Improvements
 
@@ -330,7 +332,7 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 This project includes comprehensive AI assistant integration:
 
-- **Claude Code users**: See `CLAUDE.md` + Serena MCP integration
+- **Claude Code users**: See `CLAUDE.md`
 - **Cursor users**: See `.cursorrules` + `.ai-context/`
 - **Other AI tools**: Start with `.ai-context/README.md`
 

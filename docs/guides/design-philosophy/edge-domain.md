@@ -4,29 +4,45 @@ The Edge domain governs data import and export.
 
 ### Importers
 
-The Importers live inside the `importing` directory inside the project root. Each importer offers a new way to import data into the workspace. The importers should be agnostic about the available analyzers. However, the Importers currently provide a terminal user flow so that their options can be customized by the user—a necessity since each importer may expose different sets of options and may have different UX approaches for their configuration.
+The Importers are now part of the core package services, located at `packages/core/src/cibmangotree/services/importing/`. Each importer offers a new way to import data into the workspace. The importers should be agnostic about the available analyzers. However, the Importers currently provide a terminal user flow so that their options can be customized by the user—a necessity since each importer may expose different sets of options and may have different UX approaches for their configuration.
 
 The importers eventually write data to a parquet file, whose path is provisioned by the application.
 
 Here's what the entrypoint for the importer module looks like
 
-**./importing/__init__.py**:
+**packages/core/src/cibmangotree/services/importing/**init**.py**:
 
 ```python
-from .csv import CSVImporter
-from .excel import ExcelImporter
+# Import base classes first (no circular dependency)
 from .importer import Importer, ImporterSession
 
-importers: list[Importer[ImporterSession]] = [CSVImporter(), ExcelImporter()]
+# Lazy import for CSV and Excel to avoid circular import
+# CSV/Excel importers use TUI which imports from app
+def __getattr__(name):
+    if name == "CSVImporter":
+        from .csv import CSVImporter
+        return CSVImporter
+    elif name == "ExcelImporter":
+        from .excel import ExcelImporter
+        return ExcelImporter
+    elif name == "importers":
+        from .csv import CSVImporter
+        from .excel import ExcelImporter
+        return [CSVImporter(), ExcelImporter()]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+__all__ = ["Importer", "ImporterSession", "CSVImporter", "ExcelImporter", "importers"]
 ```
+
+> **Note**: The importing module uses lazy imports to avoid circular dependencies, as the CSV and Excel importers depend on TUI components which import from the main app.
 
 ### Semantic Preprocessor
 
-The Semantic Preprocessor lives inside the `preprocessing` directory inside the project root. It defines all the column data semantics—a kind of type system that is used to guide the user in selecting the right columns for the right analysis. It is agnostic about the specific analyzers but does depend on them in a generic way—the available semantics exist to support the needs of analyzers and will be extended as necessary.
+The Semantic Preprocessor is now part of the core package services, located at `packages/core/src/cibmangotree/services/preprocessing/`. It defines all the column data semantics—a kind of type system that is used to guide the user in selecting the right columns for the right analysis. It is agnostic about the specific analyzers but does depend on them in a generic way—the available semantics exist to support the needs of analyzers and will be extended as necessary.
 
 Here's what the entrypoint for the preprocessing module looks like
 
-**./preprocessing/series_semantic.py**:
+**packages/core/src/cibmangotree/services/preprocessing/series_semantic.py**:
 
 ```python
 from datetime import datetime
@@ -35,7 +51,7 @@ from typing import Callable, Type, Union
 import polars as pl
 from pydantic import BaseModel
 
-from analyzer_interface import DataType
+from cibmangotree.analyzer_interface import DataType
 
 
 class SeriesSemantic(BaseModel):

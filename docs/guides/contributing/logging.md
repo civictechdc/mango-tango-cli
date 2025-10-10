@@ -15,7 +15,7 @@ The application uses a structured JSON logging system that provides consistent l
 #### Basic Usage
 
 ```python
-from app.logger import get_logger
+from cibmangotree.app.logger import get_logger
 
 # Get a logger for your module
 logger = get_logger(__name__)
@@ -48,25 +48,25 @@ logger.critical("A very serious error occurred, program may not be able to conti
 When developing analyzers, add logging to help with debugging and monitoring:
 
 ```python
-from app.logger import get_logger
+from cibmangotree.app.logger import get_logger
 
 def main(context):
     logger = get_logger(__name__)
-    
+
     logger.info("Starting analysis", extra={
         "input_path": str(context.input_path),
         "output_path": str(context.output_path)
     })
-    
+
     try:
         # Your analysis code here
         result = perform_analysis(context)
-        
+
         logger.info("Analysis completed successfully", extra={
             "records_processed": len(result),
             "execution_time": time.time() - start_time
         })
-        
+
     except Exception as e:
         logger.error("Analysis failed", extra={
             "error": str(e),
@@ -78,14 +78,14 @@ def main(context):
 ### Logging Best Practices
 
 1. **Use Appropriate Log Levels**:
-    
+
     - `DEBUG`: Detailed diagnostic information, only useful when debugging
     - `INFO`: General information about program execution
     - `WARNING`: Something unexpected happened, but the program continues
     - `ERROR`: A serious problem occurred
     - `CRITICAL`: A very serious error occurred, program may not be able to continue
 2. **Include Context with `extra` Parameter**:
-    
+
     ```python
     logger.info("Processing file", extra={
         "filename": filename,
@@ -93,18 +93,18 @@ def main(context):
         "record_count": record_count
     })
     ```
-    
+
 3. **Log Exceptions Properly**:
-    
+
     ```python
     try:
         risky_operation()
     except Exception as e:
         logger.error("Operation failed", exc_info=True)  # Includes stack trace
     ```
-    
+
 4. **Avoid Logging Sensitive Information**:
-    
+
     - Never log passwords, API keys, or personal data
     - Be cautious with user-provided data
 
@@ -114,13 +114,13 @@ Users can control log verbosity when running the application:
 
 ```shell
 # Default INFO level
-python -m mangotango
+uv run cibmangotree
 
 # Verbose DEBUG level for troubleshooting
-python -m mangotango --log-level DEBUG
+uv run cibmangotree --log-level DEBUG
 
 # Only show warnings and errors in log file
-python -m mangotango --log-level WARNING
+uv run cibmangotree --log-level WARNING
 ```
 
 ### Log File Management
@@ -136,12 +136,12 @@ When writing tests that involve logging:
 
 ```python
 import logging
-from app.logger import get_logger
+from cibmangotree.app.logger import get_logger
 
 def test_my_function_logs_correctly(caplog):
     with caplog.at_level(logging.INFO):
         my_function()
-        
+
     assert "Expected log message" in caplog.text
 ```
 

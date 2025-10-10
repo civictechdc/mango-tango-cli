@@ -29,7 +29,7 @@ consistent UX while allowing easy contribution of new analyzers.
 
 UV workspace monorepo with 8 packages:
 
-```
+```bash
 packages/
 ├── core/                    # cibmangotree - Main application
 ├── importing/              # cibmangotree-importing - Data I/O
@@ -96,7 +96,7 @@ Dependency injection through context objects:
 ### Code Organization
 
 - Domain-driven module structure
-- Interface-first analyzer design  
+- Interface-first analyzer design
 - Context-based dependency injection
 - Test co-location with implementation
 
@@ -112,21 +112,14 @@ Dependency injection through context objects:
 ### For Development
 
 1. **Setup**: See @.ai-context/setup-guide.md
-2. **Architecture**: See @.ai-context/architecture-overview.md  
+2. **Architecture**: See @.ai-context/architecture-overview.md
 3. **Symbol Reference**: See @.ai-context/symbol-reference.md
 4. **Development Guide**: See @docs/dev-guide.md
 
 ### For AI Assistants
 
-- **Claude Code users**: See @CLAUDE.md (includes Serena integration)
+- **Claude Code users**: See @CLAUDE.md
 - **Cursor users**: See @.cursorrules
-- **Deep semantic analysis**: Explore @.serena/memories/
-
-### Quick References
-
-- **Commands**: @.serena/memories/suggested_commands.md
-- **Style Guide**: @.serena/memories/code_style_conventions.md
-- **Task Checklist**: @.serena/memories/task_completion_checklist.md
 
 ## External Dependencies
 
