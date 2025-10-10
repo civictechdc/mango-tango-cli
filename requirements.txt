@@ -19,3 +19,5 @@ a2wsgi==1.10.10
 python-json-logger==2.0.7
 rich==14.0.0
 regex==2025.9.1
+nicegui==2.10.0  # GUI mode support
+pywebview==5.3.1  # Native window support for NiceGUI
