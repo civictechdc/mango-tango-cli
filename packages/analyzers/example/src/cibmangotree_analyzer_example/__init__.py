@@ -2,17 +2,17 @@
 
 __version__ = "0.1.0"
 
-from .base.interface import interface as base_interface
-from .report.interface import interface as report_interface
-from .web.interface import interface as web_interface
+from .base import example_base
+from .report import example_report
+from .web import example_web
 
 
 def get_interface():
-    """Return the analyzer interface for plugin discovery."""
+    """Return the analyzer declarations for plugin discovery."""
     return {
-        "base": base_interface,
-        "report": report_interface,
-        "web": web_interface,
+        "base": example_base,
+        "report": example_report,
+        "web": example_web,
     }
 
 

@@ -2,15 +2,15 @@
 
 __version__ = "0.1.0"
 
-from .base.interface import interface as base_interface
-from .web.interface import interface as web_interface
+from .base import temporal
+from .web import temporal_web
 
 
 def get_interface():
-    """Return the analyzer interface for plugin discovery."""
+    """Return the analyzer declarations for plugin discovery."""
     return {
-        "base": base_interface,
-        "web": web_interface,
+        "base": temporal,
+        "web": temporal_web,
     }
 
 

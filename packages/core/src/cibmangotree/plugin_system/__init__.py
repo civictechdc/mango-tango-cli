@@ -92,11 +92,11 @@ def discover_analyzers() -> list[
                 )
                 interface_dict = _load_plugin_interface(module_path, attr_name)
                 if interface_dict:
-                    # Each plugin returns {"base": ..., "web": ...}
-                    if "base" in interface_dict:
-                        all_declarations.append(interface_dict["base"])
-                    if "web" in interface_dict:
-                        all_declarations.append(interface_dict["web"])
+                    # Each plugin returns {"base": ..., "web": ..., "stats": ..., "report": ...}
+                    # Collect all declaration objects from the dict
+                    for key, declaration in interface_dict.items():
+                        if declaration is not None:
+                            all_declarations.append(declaration)
         except ImportError as e:
             logger.error(
                 "Failed to import _frozen_plugins in frozen environment",
@@ -123,11 +123,11 @@ def discover_analyzers() -> list[
                 try:
                     # Load the entry point (calls get_interface())
                     interface_dict = ep.load()()
-                    # Each plugin returns {"base": ..., "web": ...}
-                    if "base" in interface_dict:
-                        all_declarations.append(interface_dict["base"])
-                    if "web" in interface_dict:
-                        all_declarations.append(interface_dict["web"])
+                    # Each plugin returns {"base": ..., "web": ..., "stats": ..., "report": ...}
+                    # Collect all declaration objects from the dict
+                    for key, declaration in interface_dict.items():
+                        if declaration is not None:
+                            all_declarations.append(declaration)
                 except Exception as e:
                     logger.error(
                         f"Failed to load plugin entry point: {ep.name}",
