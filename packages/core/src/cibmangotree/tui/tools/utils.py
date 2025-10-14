@@ -22,7 +22,7 @@ def wait_for_key(prompt: bool = False):
 
     Args:
         prompt (bool, optional): If true, a default text
-        `Press any key to continue` will be shown. Defaults to False.
+            `Press any key to continue` will be shown. Defaults to False.
     """
     if prompt:
         print("Press any key to continue...", end="", flush=True)
@@ -86,11 +86,12 @@ def draw_box(text: str, *, padding_spaces: int = 5, padding_lines: int = 1) -> s
 
     Args:
         text (str): The text to be drawn, may be multiline.
-          ANSI formatting and emojis are not supported, as they mess with
-          both the character count calculation and the monospace font.
-
-        padding_spaces (int, optional): Extra spaces on either side of the longest line. Defaults to 5.
-        padding_lines (int, optional): Extra lines above and below the text. Defaults to 1.
+            ANSI formatting and emojis are not supported, as they mess with
+            both the character count calculation and the monospace font.
+        padding_spaces (int, optional): Extra spaces on either side of the longest line.
+            Defaults to 5.
+        padding_lines (int, optional): Extra lines above and below the text.
+            Defaults to 1.
 
     Returns:
         str: The text surrounded by a box.

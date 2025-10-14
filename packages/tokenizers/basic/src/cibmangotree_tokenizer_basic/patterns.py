@@ -7,7 +7,10 @@ regex and re modules.
 """
 
 import re
-from typing import Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List
+
+if TYPE_CHECKING:
+    from cibmangotree.services.tokenizer.core.types import TokenizerConfig
 
 # Try to use the more powerful regex module, fall back to re
 try:
@@ -162,7 +165,7 @@ class TokenizerPatterns:
             raise KeyError(f"Pattern '{pattern_name}' not found")
         return self._patterns[pattern_name]
 
-    def get_comprehensive_pattern(self, config) -> Any:
+    def get_comprehensive_pattern(self, config: "TokenizerConfig") -> Any:
         """
         Build comprehensive tokenization pattern based on configuration.
 
@@ -223,7 +226,7 @@ class TokenizerPatterns:
             else:
                 return re.compile(r"\S+", re.IGNORECASE)
 
-    def get_exclusion_pattern(self, config) -> Any:
+    def get_exclusion_pattern(self, config: "TokenizerConfig") -> Any:
         """
         Build pattern to identify and skip excluded entities in text.
 

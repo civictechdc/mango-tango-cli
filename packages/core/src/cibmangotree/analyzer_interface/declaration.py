@@ -91,7 +91,7 @@ class WebPresenterDeclaration(WebPresenterInterface):
             modify the Dash app in the context to add whatever plotting interface
             the web presenter needs.
 
-          server_name (str):
+          name (str):
             The server name for the Dash app. Typically, you will use the global
             variable `__name__` here.
 

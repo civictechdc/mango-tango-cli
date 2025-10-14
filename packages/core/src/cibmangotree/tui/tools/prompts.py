@@ -16,15 +16,12 @@ if os.name == "nt":
     from string import ascii_uppercase
 
 
-def get_drives():
+def get_drives() -> list[str]:
     """
     Returns a list of the logically assigned drives on a windows system.
 
-    Args:
-        None
-
     Returns:
-        list: A list of drive letters available and accessible on the system.
+        list[str]: A list of drive letters available and accessible on the system.
     """
 
     drives = []
@@ -40,17 +37,18 @@ def get_drives():
 
 def file_selector(
     message: str = "select a file", *, state: Optional[FileSelectorStateManager] = None
-):
+) -> Optional[str]:
     """Lets the user select a file from the filesystem.
 
     Args:
         message (str, optional): The prompt message. Defaults to "select a file".
-        initial_path (str, optional): Where to start the directory listing.
-          Defaults to current working directory.
+        state (FileSelectorStateManager, optional): State manager to track directory
+            navigation. If provided, the selector will start from the last known path.
+            Defaults to None (starts in current working directory).
 
     Returns:
-        (str, optional): The absolute path selected by the user, or None if the
-          user cancels the prompt.
+        str | None: The absolute path selected by the user, or None if the user
+            cancels the prompt.
     """
     initial_dir = state and state.get_current_path()
     if initial_dir and not os.path.isdir(initial_dir):
