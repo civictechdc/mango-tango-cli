@@ -33,17 +33,17 @@ URL_PATTERN = (
 # Email patterns
 EMAIL_PATTERN = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
 
-# Social media mentions and hashtags
-MENTION_PATTERN = r"@[A-Za-z0-9_]+"
-HASHTAG_PATTERN = r"#[A-Za-z0-9_]+"
+# Social media mentions and hashtags (support Unicode including Korean, Arabic, etc.)
+MENTION_PATTERN = r"@[\w]+"
+HASHTAG_PATTERN = r"#[\w]+"
 
 # Numeric patterns (including decimals, percentages, etc.)
 NUMERIC_PATTERN = (
     r"(?:"
-    r"\d+\.?\d*%?|"  # Basic numbers with optional percentage
-    r"[$€£¥₹₽¥¢]\d+\.?\d*|"  # Money amounts with common currency symbols
-    r"\d+[.,]\d+|"  # Numbers with comma/period separators
-    r"\d+(?:st|nd|rd|th)?"  # Ordinals
+    r"\d+(?:st|nd|rd|th)(?!\w)|"  # Ordinals with word boundary (6th, 21st)
+    r"[$€£¥₹₽¥¢]\d+(?:[.,]\d+)*|"  # Currency with multiple separators
+    r"\d+(?:[.,]\d+)+|"  # Numbers with one or more separator groups (200,000)
+    r"\d+\.?\d*%?"  # Basic numbers with optional decimals/percentages
     r")"
 )
 
@@ -99,9 +99,12 @@ SEA_PATTERN = (
 
 # Word patterns for different script types
 
-LATIN_WORD_PATTERN = r"[a-zA-Z]+(?:\.[a-zA-Z]+)+\.?|[a-zA-Z]+(?:\'[a-zA-Z]+)*"  # Handle abbreviations and contractions
+LATIN_WORD_PATTERN = r"[a-zA-Z]+(?:\.[a-zA-Z]+)+\.?|[a-zA-Z]+(?:[-'][a-zA-Z]+)*"  # Handle abbreviations and contractions
 
-WORD_PATTERN = f"(?:{LATIN_WORD_PATTERN}|{CJK_PATTERN}+|{ARABIC_PATTERN}+|{THAI_PATTERN}+|{SEA_PATTERN}+)"
+# Korean Hangul (space-separated, NOT character-level like Chinese/Japanese)
+KOREAN_WORD_PATTERN = r"[\uac00-\ud7af]+"
+
+WORD_PATTERN = f"(?:{LATIN_WORD_PATTERN}|{KOREAN_WORD_PATTERN}|{CJK_PATTERN}+|{ARABIC_PATTERN}+|{THAI_PATTERN}+|{SEA_PATTERN}+)"
 
 # Punctuation (preserve some, group others)
 PUNCTUATION_PATTERN = r'[.!?;:,\-\(\)\[\]{}"\']'
