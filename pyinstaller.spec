@@ -1,13 +1,14 @@
 # code: language=python
 # pyinstaller.spec
 # This file tells PyInstaller how to bundle the monorepo application with dynamic plugin discovery
-from PyInstaller.utils.hooks import copy_metadata
-from PyInstaller.building.api import EXE, PYZ
-from PyInstaller.building.build_main import Analysis
-import sys
 import os
 import site
+import sys
 from pathlib import Path
+
+from PyInstaller.building.api import EXE, PYZ
+from PyInstaller.building.build_main import Analysis
+from PyInstaller.utils.hooks import copy_metadata
 
 # Import plugin discovery system
 try:
@@ -20,6 +21,7 @@ except ImportError:
 # Plugin Discovery System
 # ============================================================================
 
+
 def discover_plugins():
     """
     Discover all installed plugins via entry points.
@@ -28,10 +30,7 @@ def discover_plugins():
         dict: Dictionary with 'analyzers' and 'tokenizers' keys containing
               lists of plugin metadata (name, module, attr).
     """
-    plugins = {
-        'analyzers': [],
-        'tokenizers': []
-    }
+    plugins = {"analyzers": [], "tokenizers": []}
 
     print("=" * 70)
     print("DISCOVERING PLUGINS FOR PYINSTALLER BUILD")
@@ -41,19 +40,17 @@ def discover_plugins():
     try:
         eps = importlib_metadata.entry_points()
         # Handle both old (dict) and new (SelectableGroups) API
-        if hasattr(eps, 'select'):
-            analyzer_eps = eps.select(group='cibmangotree.analyzers')
+        if hasattr(eps, "select"):
+            analyzer_eps = eps.select(group="cibmangotree.analyzers")
         else:
-            analyzer_eps = eps.get('cibmangotree.analyzers', [])
+            analyzer_eps = eps.get("cibmangotree.analyzers", [])
 
         for ep in analyzer_eps:
-            module_path = ep.value.split(':')[0]
-            attr_name = ep.value.split(':')[1] if ':' in ep.value else None
-            plugins['analyzers'].append({
-                'name': ep.name,
-                'module': module_path,
-                'attr': attr_name
-            })
+            module_path = ep.value.split(":")[0]
+            attr_name = ep.value.split(":")[1] if ":" in ep.value else None
+            plugins["analyzers"].append(
+                {"name": ep.name, "module": module_path, "attr": attr_name}
+            )
             print(f"  [Analyzer] {ep.name:20s} -> {module_path}")
     except Exception as e:
         print(f"  Warning: Could not discover analyzer plugins: {e}")
@@ -61,25 +58,25 @@ def discover_plugins():
     # Discover tokenizer plugins
     try:
         eps = importlib_metadata.entry_points()
-        if hasattr(eps, 'select'):
-            tokenizer_eps = eps.select(group='cibmangotree.tokenizers')
+        if hasattr(eps, "select"):
+            tokenizer_eps = eps.select(group="cibmangotree.tokenizers")
         else:
-            tokenizer_eps = eps.get('cibmangotree.tokenizers', [])
+            tokenizer_eps = eps.get("cibmangotree.tokenizers", [])
 
         for ep in tokenizer_eps:
-            module_path = ep.value.split(':')[0]
-            attr_name = ep.value.split(':')[1] if ':' in ep.value else None
-            plugins['tokenizers'].append({
-                'name': ep.name,
-                'module': module_path,
-                'attr': attr_name
-            })
+            module_path = ep.value.split(":")[0]
+            attr_name = ep.value.split(":")[1] if ":" in ep.value else None
+            plugins["tokenizers"].append(
+                {"name": ep.name, "module": module_path, "attr": attr_name}
+            )
             print(f"  [Tokenizer] {ep.name:20s} -> {module_path}")
     except Exception as e:
         print(f"  Warning: Could not discover tokenizer plugins: {e}")
 
-    print(f"\nTotal discovered: {len(plugins['analyzers'])} analyzers, "
-          f"{len(plugins['tokenizers'])} tokenizers")
+    print(
+        f"\nTotal discovered: {len(plugins['analyzers'])} analyzers, "
+        f"{len(plugins['tokenizers'])} tokenizers"
+    )
     print("=" * 70)
 
     return plugins
@@ -98,7 +95,7 @@ def generate_frozen_plugins(plugins):
     Returns:
         str: Path to the generated frozen plugins file
     """
-    frozen_file = Path('packages/core/src/cibmangotree/_frozen_plugins.py')
+    frozen_file = Path("packages/core/src/cibmangotree/_frozen_plugins.py")
 
     content = '''"""
 Auto-generated frozen plugins for PyInstaller builds.
@@ -108,19 +105,21 @@ This file is used when the application is frozen (packaged with PyInstaller)
 to provide explicit plugin imports, since entry points don't work in frozen apps.
 """
 
+import sys
+
 # Analyzer plugins - mapping from plugin name to module path
 ANALYZER_PLUGINS = {
 '''
 
-    for plugin in plugins['analyzers']:
+    for plugin in plugins["analyzers"]:
         content += f"    '{plugin['name']}': '{plugin['module']}:{plugin['attr']}',\n"
 
-    content += '''}\n
+    content += """}\n
 # Tokenizer plugins - mapping from plugin name to module path
 TOKENIZER_PLUGINS = {
-'''
+"""
 
-    for plugin in plugins['tokenizers']:
+    for plugin in plugins["tokenizers"]:
         content += f"    '{plugin['name']}': '{plugin['module']}:{plugin['attr']}',\n"
 
     content += '''}\n
@@ -150,15 +149,15 @@ def get_plugin_hiddenimports(plugins):
     imports = []
 
     # Add analyzer modules
-    for plugin in plugins['analyzers']:
-        base_module = plugin['module'].split('.')[0]
-        imports.append(plugin['module'])
+    for plugin in plugins["analyzers"]:
+        base_module = plugin["module"].split(".")[0]
+        imports.append(plugin["module"])
         imports.append(base_module)
 
     # Add tokenizer modules
-    for plugin in plugins['tokenizers']:
-        base_module = plugin['module'].split('.')[0]
-        imports.append(plugin['module'])
+    for plugin in plugins["tokenizers"]:
+        base_module = plugin["module"].split(".")[0]
+        imports.append(plugin["module"])
         imports.append(base_module)
 
     # Remove duplicates while preserving order
@@ -180,7 +179,7 @@ site_packages_path = None
 block_cipher = None
 
 for site_path in site.getsitepackages():
-    if 'site-packages' in site_path:
+    if "site-packages" in site_path:
         site_packages_path = site_path
         break
 
@@ -212,126 +211,116 @@ plugin_imports = get_plugin_hiddenimports(discovered_plugins)
 # ============================================================================
 
 a = Analysis(
-    ['cibmangotree.py'],  # Entry point (imports from cibmangotree package)
+    ["run_app.py"],  # Entry point wrapper with absolute imports
     pathex=[
-        'packages/core/src',  # Core package source
+        "packages/core/src/cibmangotree",  # Core package source
     ],
     binaries=[],
     datas=[
         # Version file, if defined
-        *(
-            [('./VERSION', '.')]
-            if os.path.exists('VERSION') else []
-        ),
-
+        *([("./VERSION", ".")] if os.path.exists("VERSION") else []),
         # Inquirer depends on readchar as a hidden dependency that requires package metadata
-        *copy_metadata('readchar'),
-
+        *copy_metadata("readchar"),
         # Static assets for web servers (from site-packages)
-        (os.path.join(site_packages_path, 'shiny/www'), 'shiny/www'),
-        (os.path.join(site_packages_path, 'shinywidgets/static'), 'shinywidgets/static'),
-
+        (os.path.join(site_packages_path, "shiny/www"), "shiny/www"),
+        (
+            os.path.join(site_packages_path, "shinywidgets/static"),
+            "shinywidgets/static",
+        ),
         # Application static assets (from monorepo)
-        ('packages/core/src/cibmangotree/app/web_static', 'cibmangotree/app/web_static'),
-        ('packages/core/src/cibmangotree/app/web_templates', 'cibmangotree/app/web_templates'),
-
+        (
+            "packages/core/src/cibmangotree/app/web_static",
+            "cibmangotree/app/web_static",
+        ),
+        (
+            "packages/core/src/cibmangotree/app/web_templates",
+            "cibmangotree/app/web_templates",
+        ),
         # Include the frozen plugins file
-        (frozen_plugins_file, 'cibmangotree'),
+        (frozen_plugins_file, "cibmangotree"),
     ],
     hiddenimports=[
         # Core package modules
-        'cibmangotree',
-        'cibmangotree.__main__',
-        'cibmangotree.app',
-        'cibmangotree.analyzer_interface',
-        'cibmangotree.tui',
-        'cibmangotree.tui.components',
-        'cibmangotree.tui.tools',
-        'cibmangotree.services',
-        'cibmangotree.services.storage',
-        'cibmangotree.services.data_import',
-        'cibmangotree.services.tokenizers',
-        'cibmangotree.context',
-        'cibmangotree.meta',
-        'cibmangotree.plugin_system',
-        'cibmangotree.plugin_system.analyzer_loader',
-        'cibmangotree.plugin_system.tokenizer_loader',
-
+        "cibmangotree",
+        "cibmangotree.__main__",
+        "cibmangotree.app",
+        "cibmangotree.analyzer_interface",
+        "cibmangotree.tui",
+        "cibmangotree.tui.components",
+        "cibmangotree.tui.tools",
+        "cibmangotree.services",
+        "cibmangotree.services.storage",
+        "cibmangotree.services.data_import",
+        "cibmangotree.services.tokenizers",
+        "cibmangotree.context",
+        "cibmangotree.meta",
+        "cibmangotree.plugin_system",
+        "cibmangotree.plugin_system.analyzer_loader",
+        "cibmangotree.plugin_system.tokenizer_loader",
         # Dynamically discovered plugin modules
         *plugin_imports,
-
         # Terminal UI dependencies
-        'readchar',
-        'inquirer',
-        'rich',
-        'colorama',
-
+        "readchar",
+        "inquirer",
+        "rich",
+        "colorama",
         # Data processing
-        'numpy',
-        'numpy.core.multiarray',
-        'polars',
-        'pandas',
-        'pyarrow',
-
+        "numpy",
+        "numpy.core.multiarray",
+        "polars",
+        "pandas",
+        "pyarrow",
         # Visualization
-        'plotly',
-        'plotly.graph_objs',
-
+        "plotly",
+        "plotly.graph_objs",
         # Web frameworks
-        'dash',
-        'dash.dependencies',
-        'shiny',
-        'shiny.ui',
-        'shiny.server',
-        'shinywidgets',
-        'htmltools',
-        'starlette',
-        'starlette.middleware',
-        'starlette.routing',
-
+        "dash",
+        "dash.dependencies",
+        "shiny",
+        "shiny.ui",
+        "shiny.server",
+        "shinywidgets",
+        "htmltools",
+        "starlette",
+        "starlette.middleware",
+        "starlette.routing",
         # Web server
-        'uvicorn',
-        'uvicorn.logging',
-        'uvicorn.loops',
-        'uvicorn.loops.auto',
-        'uvicorn.protocols',
-        'uvicorn.protocols.http',
-        'uvicorn.protocols.http.auto',
-        'uvicorn.protocols.websockets',
-        'uvicorn.protocols.websockets.auto',
-        'uvicorn.lifespan',
-        'uvicorn.lifespan.on',
-        'asyncio',
-        'websockets',
-        'websockets.legacy',
-        'websockets.legacy.server',
-
+        "uvicorn",
+        "uvicorn.logging",
+        "uvicorn.loops",
+        "uvicorn.loops.auto",
+        "uvicorn.protocols",
+        "uvicorn.protocols.http",
+        "uvicorn.protocols.http.auto",
+        "uvicorn.protocols.websockets",
+        "uvicorn.protocols.websockets.auto",
+        "uvicorn.lifespan",
+        "uvicorn.lifespan.on",
+        "asyncio",
+        "websockets",
+        "websockets.legacy",
+        "websockets.legacy.server",
         # Markdown rendering (for Shiny)
-        'linkify_it',
-        'markdown_it',
-        'mdit_py_plugins',
-        'mdurl',
-        'uc_micro',
-
+        "linkify_it",
+        "markdown_it",
+        "mdit_py_plugins",
+        "mdurl",
+        "uc_micro",
         # Logging
-        'pythonjsonlogger',
-        'pythonjsonlogger.jsonlogger',
-
+        "pythonjsonlogger",
+        "pythonjsonlogger.jsonlogger",
         # Storage
-        'tinydb',
-        'platformdirs',
-        'filelock',
-
+        "tinydb",
+        "platformdirs",
+        "filelock",
         # Text processing
-        'regex',
-
+        "regex",
         # Data validation
-        'pydantic',
-        'pydantic.v1',
-
+        "pydantic",
+        "pydantic.v1",
         # Import/Export
-        'xlsxwriter',
-        'fastexcel',
+        "xlsxwriter",
+        "fastexcel",
     ],
     hookspath=[],
     runtime_hooks=[],
@@ -351,13 +340,13 @@ if sys.platform == "darwin":
         a.binaries,
         a.zipfiles,
         a.datas,
-        name='cibmangotree',  # The name of the executable
+        name="cibmangotree",  # The name of the executable
         debug=False,
         strip=True,
         upx=True,
         console=True,
         entitlements_file="./mango.entitlements",
-        codesign_identity=os.getenv('APPLE_APP_CERT_ID'),
+        codesign_identity=os.getenv("APPLE_APP_CERT_ID"),
     )
 else:
     exe = EXE(
@@ -366,7 +355,7 @@ else:
         a.binaries,
         a.zipfiles,
         a.datas,
-        name='cibmangotree',
+        name="cibmangotree",
         debug=False,
         strip=False,
         upx=True,
