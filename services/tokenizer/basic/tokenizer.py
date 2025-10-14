@@ -80,7 +80,6 @@ class BasicTokenizer(AbstractTokenizer):
             or (0x3400 <= code_point <= 0x4DBF)  # CJK Extension A
             or (0x3040 <= code_point <= 0x309F)  # Hiragana
             or (0x30A0 <= code_point <= 0x30FF)  # Katakana
-            or (0xAC00 <= code_point <= 0xD7AF)  # Hangul Syllables
             or (0x0E00 <= code_point <= 0x0E7F)  # Thai
             or (0x0E80 <= code_point <= 0x0EFF)  # Lao
             or (0x1000 <= code_point <= 0x109F)  # Myanmar
@@ -106,6 +105,10 @@ class BasicTokenizer(AbstractTokenizer):
             or (0x1E00 <= code_point <= 0x1EFF)
         ):
             return "latin"
+
+        # Korean Hangul (space-separated, NOT character-level!)
+        elif 0xAC00 <= code_point <= 0xD7AF:
+            return "korean"
 
         # Character-level scripts (CJK, Thai, etc.)
         elif self._is_char_level_script(char):
