@@ -147,4 +147,4 @@ def test_my_function_logs_correctly(caplog):
 
 # Next Steps
 
-Once you finish reading this it's recommended to check out the [architecture](./architecture.md) section.
+Once you finish reading this it's recommended to check out the [architecture](../design-philosophy/architecture.md) section.

@@ -746,9 +746,9 @@ This comprehensive guide covers all aspects of building Shiny dashboards for you
 
 Once you finish reading section be a good idea to review the section that discuss implementing [React](https://react.dev) dashboards. Might also be a good idea to review the sections for each domain. 
 
-- [Core Domain](../domains/core-domain.md)
-- [Edge Domain](../domains/edge-domain.md)
-- [Content Domain](../domains/content-domain.md)
+- [Core Domain](../../design-philosophy/core-domain.md)
+- [Edge Domain](../../design-philosophy/edge-domain.md)
+- [Content Domain](../../design-philosophy/content-domain.md)
 - [React Dashboards](./react.md)
 
 

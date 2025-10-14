@@ -636,5 +636,5 @@ Once you finish reading this section it would be a good idea to review the other
 
 - [Edge Domain](./edge-domain.md)
 - [Content Domain](./content-domain.md)
-- [Shiny Dashboards](../dashboards/shiny.md)
-- [React Dashboards](../dashboards/react.md)
+- [Shiny Dashboards](../contributing/dashboards/shiny.md)
+- [React Dashboards](../contributing/dashboards/react.md)

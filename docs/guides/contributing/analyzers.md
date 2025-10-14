@@ -502,8 +502,8 @@ This creates a complete analysis pipeline that users can run through the applica
 
 Once you finish reading this it would be a good idea to review the sections for each domain. Might also be a good idea to review the sections that discuss implementing  [Shiny](https://shiny.posit.co/py/), and [React](https://react.dev) dashboards.
 
-- [Core Domain](./domains/core-domain.md)
-- [Edge Domain](./domains/edge-domain.md)
-- [Content Domain](./domains/content-domain.md)
+- [Core Domain](../design-philosophy/core-domain.md)
+- [Edge Domain](../design-philosophy/edge-domain.md)
+- [Content Domain](../design-philosophy/content-domain.md)
 - [Shiny Dashboards](./dashboards/shiny.md)
 - [React Dashboards](./dashboards/react.md)

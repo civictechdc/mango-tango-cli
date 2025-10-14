@@ -1625,9 +1625,9 @@ This comprehensive guide covers all aspects of building React dashboards for the
 
 After this section it would be a good idea to review the sections that discuss implementing  [Shiny](https://shiny.posit.co/py/) dashboards. Although once you finish reading this it would also be a good idea to review the sections for each domain.
 
-- [Core Domain](../domains/core-domain.md)
-- [Edge Domain](../domains/edge-domain.md)
-- [Content Domain](../domains/content-domain.md)
+- [Core Domain](../../design-philosophy/core-domain.md)
+- [Edge Domain](../../design-philosophy/edge-domain.md)
+- [Content Domain](../../design-philosophy/content-domain.md)
 - [Shiny Dashboards](./shiny.md)
 
 
