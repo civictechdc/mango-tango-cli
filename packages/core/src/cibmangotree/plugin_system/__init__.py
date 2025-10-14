@@ -80,7 +80,9 @@ def discover_analyzers() -> list[
 
     if _is_frozen():
         # Frozen environment: Load from _frozen_plugins
-        logger.info("Running in frozen environment, loading plugins from _frozen_plugins")
+        logger.info(
+            "Running in frozen environment, loading plugins from _frozen_plugins"
+        )
         try:
             from cibmangotree._frozen_plugins import ANALYZER_PLUGINS
 
