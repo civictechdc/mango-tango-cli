@@ -44,9 +44,8 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --all-extras
       - name: Build
         uses: Tiryoh/actions-mkdocs@v0.24.0
         if: github.event.action != 'closed'
