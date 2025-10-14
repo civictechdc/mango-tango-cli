@@ -64,10 +64,34 @@ class TestBasicTokenizerMultilingual:
         expected = ["ส", "ว", "ั", "ส", "ด", "ี", "ค", "ร", "ั", "บ"]
         assert result == expected, f"Expected {expected}, got {result}"
 
+    def test_korean_text_tokenization(self):
+        """Test Korean space-separated tokenization."""
+        tokenizer = BasicTokenizer()
+        text = "안녕하세요 세계"  # "Hello world" in Korean
+        result = tokenizer.tokenize(text)
+        expected = ["안녕하세요", "세계"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_korean_mixed_with_latin(self):
+        """Test Korean mixed with Latin script."""
+        tokenizer = BasicTokenizer()
+        text = "iPhone용 앱을 사용합니다"  # Mixed Korean-English
+        result = tokenizer.tokenize(text)
+        expected = ["iphone", "용", "앱을", "사용합니다"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_korean_with_social_media(self):
+        """Test Korean with social media entities."""
+        tokenizer = BasicTokenizer()
+        text = "안녕하세요 @user #한글"
+        result = tokenizer.tokenize(text)
+        expected = ["안녕하세요", "@user", "#한글"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
     def test_mixed_script_multilingual(self):
         """Test mixed multilingual content with specific tokenization expectations."""
         tokenizer = BasicTokenizer()
-        text = "Hello 你好 こんにちは مرحبا สวัสดี"
+        text = "Hello 你好 こんにちは 안녕하세요 مرحبا สวัสดี"
         result = tokenizer.tokenize(text)
 
         # Should handle script boundaries with specific expected tokenization
@@ -80,6 +104,7 @@ class TestBasicTokenizerMultilingual:
             "に",
             "ち",
             "は",
+            "안녕하세요",
             "مرحبا",
             "ส",
             "ว",
@@ -257,7 +282,7 @@ class TestBasicTokenizerConfig:
         """Test numeric token handling."""
         config = TokenizerConfig(include_numeric=True)
         tokenizer = BasicTokenizer(config)
-        text = "I have 123 apples and 45.67 oranges"
+        text = "I have 123 apples and 45.67 oranges plus 6th item"
         result = tokenizer.tokenize(text)
 
         # Should include basic word tokens
@@ -272,6 +297,66 @@ class TestBasicTokenizerConfig:
         assert (
             "45.67" in result
         ), f"Decimal '45.67' not properly tokenized in result: {result}"
+        assert "6th" in result, f"Ordinal '6th' not found in result: {result}"
+
+    def test_ordinal_number_preservation(self):
+        """Test ordinal numbers are preserved as single tokens."""
+        config = TokenizerConfig(include_numeric=True)
+        tokenizer = BasicTokenizer(config)
+        text = "The 6th amendment and 21st century trends"
+        result = tokenizer.tokenize(text)
+
+        # Check ordinals are preserved
+        assert "6th" in result, f"Expected '6th' in {result}"
+        assert "21st" in result, f"Expected '21st' in {result}"
+        assert "amendment" in result
+        assert "century" in result
+
+    def test_large_numbers_with_thousand_separators(self):
+        """Test large numbers with multiple thousand separators."""
+        config = TokenizerConfig(include_numeric=True)
+        tokenizer = BasicTokenizer(config)
+        text = "We counted 200,000 ballots and found 1,234,567 votes"
+        result = tokenizer.tokenize(text)
+
+        # Check large numbers are preserved with separators
+        assert "200,000" in result, f"Expected '200,000' in {result}"
+        assert "1,234,567" in result, f"Expected '1,234,567' in {result}"
+        assert "ballots" in result
+        assert "votes" in result
+
+    def test_currency_symbols_with_numbers(self):
+        """Test currency symbols with various number formats."""
+        config = TokenizerConfig(include_numeric=True)
+        tokenizer = BasicTokenizer(config)
+        text = "Prices are $100 €200.50 £50 ¥1000 ₹500.75"
+        result = tokenizer.tokenize(text)
+
+        # Check currency amounts are preserved
+        assert "prices" in result
+        assert "are" in result
+        assert "$100" in result, f"Expected '$100' in {result}"
+        assert "€200.50" in result or "€200,50" in result, f"Expected '€200.50' or '€200,50' in {result}"
+        assert "£50" in result, f"Expected '£50' in {result}"
+        assert "¥1000" in result, f"Expected '¥1000' in {result}"
+        assert "₹500.75" in result or "₹500,75" in result, f"Expected '₹500.75' or '₹500,75' in {result}"
+
+    def test_percentages(self):
+        """Test percentage token handling."""
+        config = TokenizerConfig(include_numeric=True)
+        tokenizer = BasicTokenizer(config)
+        text = "Growth is 50% and completion is 100% target"
+        result = tokenizer.tokenize(text)
+
+        # Check percentages are preserved
+        assert "growth" in result
+        assert "is" in result
+        assert "50%" in result, f"Expected '50%' in {result}"
+        assert "and" in result
+        assert "completion" in result
+        assert "is" in result
+        assert "100%" in result, f"Expected '100%' in {result}"
+        assert "target" in result
 
     def test_emoji_inclusion_disabled(self):
         """Test emoji exclusion."""
@@ -746,6 +831,7 @@ class TestOrderPreservationValidation:
         tokenizer = BasicTokenizer()
 
         # Benchmark current implementation
+        result = []
         start_time = time.time()
         for _ in range(100):  # Run 100 iterations
             result = tokenizer.tokenize(test_text)
@@ -1255,6 +1341,26 @@ class TestAbbreviationsAndPunctuation:
         # Both abbreviations and contractions should be preserved
         expected = ["u.s.", "citizens", "don't", "always", "agree"]
         assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_hyphenated_compound_words(self):
+        """Test hyphenated compound words are preserved as single tokens."""
+        tokenizer = BasicTokenizer()
+        text = "self-aware co-founder twenty-one"
+        result = tokenizer.tokenize(text)
+        expected = ["self-aware", "co-founder", "twenty-one"]
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_hyphenated_words_with_context(self):
+        """Test hyphenated words in natural sentence context."""
+        tokenizer = BasicTokenizer()
+        text = "The self-aware AI is state-of-the-art technology"
+        result = tokenizer.tokenize(text)
+
+        # Check hyphenated compounds are preserved
+        assert "self-aware" in result, f"Expected 'self-aware' in {result}"
+        assert "state-of-the-art" in result, f"Expected 'state-of-the-art' in {result}"
+        assert "ai" in result
+        assert "technology" in result
 
 
 @pytest.fixture
