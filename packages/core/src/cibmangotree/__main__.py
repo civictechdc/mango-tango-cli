@@ -76,8 +76,10 @@ def main():
 
         # Initialize app context
         from .analyzer_interface.suite import AnalyzerSuite
+        from .plugin_system import discover_analyzers
 
-        suite = AnalyzerSuite()
+        all_analyzers = discover_analyzers()
+        suite = AnalyzerSuite(all_analyzers=all_analyzers)
 
         # Start the application
         splash()
