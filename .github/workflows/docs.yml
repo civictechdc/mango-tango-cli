@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy_to:
-        description: "Deployment destination"
+        description: 'Deployment destination'
         type: choice
         options:
           - prod
@@ -35,14 +35,26 @@ jobs:
         with:
           # ✅ Explicitly checkout the PR branch
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
       - name: Build
         uses: Tiryoh/actions-mkdocs@v0.24.0
         if: github.event.action != 'closed'
         with:
           # mkdocs_version: 'latest' # option
           #mkdocs_version: '1.1' # option
-          requirements: "requirements-mkdocs.txt" # option
-          configfile: "mkdocs.yml" # option
+          # requirements: "requirements-mkdocs.txt" # option
+          configfile: 'mkdocs.yml' # option
       - name: Fix site permissions
         if: github.event.action != 'closed'
         run: |
