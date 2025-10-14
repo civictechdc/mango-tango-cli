@@ -3,6 +3,7 @@
 ## Required Software
 
 - **Python 3.12** - Required for all features to work correctly
+- **UV** - Modern Python package manager (automatically installed by bootstrap script)
 - Node.JS (20.0.0 or above) - Required for the React dashboards
   to work correctly
 - **Git** - For version control and contributing
@@ -37,7 +38,7 @@ which <program_name_here (node|python|git)>
 ### Windows
 
 ```PowerShell
-where.exe <program_name_here (node|python|git)> 
+where.exe <program_name_here (node|python|git)>
 ```
 
 # Installation
@@ -49,19 +50,7 @@ git clone https://github.com/CIB-Mango-Tree/mango-tango-cli.git
 cd mango-tango-cli
 ```
 
-## 2. Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-**Verify Python version**:
-
-```bash
-python --version  # Should show Python 3.12.x
-```
-
-## 3. Bootstrap Development Environment
+## 2. Bootstrap Development Environment
 
 **Mac OS/Linux (Bash)**:
 
@@ -77,58 +66,79 @@ python --version  # Should show Python 3.12.x
 
 The bootstrap script will:
 
-- Activate the virtual environment
-- Install all dependencies from `requirements-dev.txt`
+- Install UV package manager (if not already installed)
+- Create `.venv/` virtual environment using UV
+- Install all workspace dependencies via `uv sync`
 - Set up pre-commit hooks for code formatting
 
-## 4. Verify Installation
+**Manual UV Setup** (if needed):
 
 ```bash
-python -m mangotango --noop
+# Install UV
+curl -LsSf https://astral.sh/uv/install.sh | sh  # macOS/Linux
+# or
+pip install uv
+
+# Sync dependencies
+uv sync
+```
+
+## 3. Verify Installation
+
+```bash
+uv run cibmangotree --noop
 ```
 
 Should output: "No-op flag detected. Exiting successfully."
 
 # Activating Virtual Environment
 
-After Completing the Installation the following commands can be used to activate
-the virtual environment in order to work with the project.
+UV automatically manages the virtual environment. When you use `uv run`, it
+activates the `.venv/` environment automatically.
+
+**Manual Activation** (if needed):
 
 **Mac OS/Linux (Bash)**:
 
 ```bash
-source ./venv/bin/activate
+source .venv/bin/activate
 ```
 
 **PowerShell (Windows)**:
 
 ```PowerShell
-./env/bin/Activate.ps1
+.venv/Scripts/Activate.ps1
 ```
+
+**Note**: With UV, you typically don't need to manually activate the environment.
+Use `uv run <command>` instead.
 
 # Development Environment Setup
 
 ## Dependencies Overview
 
-**Production Dependencies** (`requirements.txt`):
+Dependencies are managed by UV using `pyproject.toml` in a workspace configuration.
+Run `uv sync` to install all dependencies across all packages.
 
-- `polars==1.9.0` - Primary data processing
-- `pydantic==2.9.1` - Data validation and models
-- `inquirer==3.4.0` - Interactive terminal prompts
-- `tinydb==4.8.0` - Lightweight JSON database
-- `dash==2.18.1` - Web dashboard framework
-- `shiny==1.4.0` - Modern web UI framework
-- `plotly==5.24.1` - Data visualization
-- `XlsxWriter==3.2.0` - Excel export functionality
+**Core Production Dependencies**:
 
-**Development Dependencies** (`requirements-dev.txt`):
+- `polars>=1.9.0` - Primary data processing
+- `pydantic>=2.9.1` - Data validation and models
+- `inquirer>=3.4.0` - Interactive terminal prompts
+- `tinydb>=4.8.0` - Lightweight JSON database
+- `dash>=2.18.1` - Web dashboard framework
+- `shiny>=1.4.0` - Modern web UI framework
+- `plotly>=5.24.1` - Data visualization
+- `XlsxWriter>=3.2.0` - Excel export functionality
 
-- `black==24.10.0` - Code formatter
-- `isort==5.13.2` - Import organizer
-- `pytest==8.3.4` - Testing framework
-- `pyinstaller==6.14.1` - Executable building
+**Development Dependencies**:
 
-**React Dashboard Dependencies** (app/web_templates/package.json):
+- `black>=24.10.0` - Code formatter
+- `isort>=5.13.2` - Import organizer
+- `pytest>=8.3.4` - Testing framework
+- `pyinstaller>=6.14.1` - Executable building
+
+**React Dashboard Dependencies** (packages/core/src/cibmangotree/app/web_templates/package.json):
 
 - typescript: 5.7.3
 - vite: 6.3.5
@@ -141,6 +151,22 @@ source ./venv/bin/activate
 - tailwindcss: 4.0.6
 - lucide-react: 0.475.0
 
+**Managing Dependencies**:
+
+```bash
+# Install/sync all workspace dependencies
+uv sync
+
+# Add a new dependency to core package
+uv add polars --package cibmangotree
+
+# Add a development dependency
+uv add --dev pytest
+
+# Update all dependencies
+uv sync --upgrade
+```
+
 ## Code Formatting Setup
 
 The project uses automatic code formatting:
@@ -152,8 +178,8 @@ The project uses automatic code formatting:
 **Manual formatting**:
 
 ```bash
-isort .
-black .
+uv run isort .
+uv run black .
 ```
 
 ## Project Structure Setup
@@ -162,19 +188,27 @@ After installation, your project structure should be:
 
 ```bash
 mango-tango-cli/
-├── venv/                    # Virtual environment
-├── .serena/                 # Serena semantic analysis
-│   └── memories/           # Project knowledge base
+├── .venv/                   # UV-managed virtual environment
+├── .ai-context/             # AI assistant context documentation
 ├── docs/                    # Documentation
-│   ├── ai-context/         # AI assistant context
+│   ├── guides/             # User guides
 │   └── dev-guide.md        # Development guide
-├── app/                     # Application layer
-├── analyzers/              # Analysis modules
-├── components/             # Terminal UI components
-├── storage/                # Data persistence
-├── importing/              # Data import modules
-├── requirements*.txt       # Dependencies
-└── mangotango.py          # Main entry point
+├── packages/               # UV workspace packages
+│   ├── core/               # cibmangotree - Main application
+│   │   └── src/cibmangotree/
+│   │       ├── app/        # Application layer
+│   │       ├── components/ # Terminal UI components
+│   │       └── storage/    # Data persistence
+│   ├── importing/          # cibmangotree-importing - Data I/O
+│   ├── services/           # cibmangotree-services - Shared services
+│   ├── testing/            # cibmangotree-testing - Testing utilities
+│   └── analyzers/          # Analysis modules (plugins)
+│       ├── hashtags/       # Hashtag analysis
+│       ├── ngrams/         # N-gram analysis
+│       ├── temporal/       # Temporal patterns
+│       └── example/        # Example analyzer template
+├── pyproject.toml          # UV workspace configuration
+└── uv.lock                 # UV lockfile
 ```
 
 # Database and Storage Setup
@@ -201,14 +235,14 @@ No manual database setup required.
 
 ```bash
 # Start the application
-python -m mangotango
+uv run cibmangotree
 ```
 
 ## Development Mode
 
 ```bash
 # Run with debugging/development flags
-python -m mangotango --noop  # Test mode, exits immediately
+uv run cibmangotree --noop  # Test mode, exits immediately
 ```
 
 ## Development Mode for The React Dashboards
@@ -219,14 +253,14 @@ react dashboards that are currently in development.
 **npm**:
 
 ```bash
-cd ./app/web_templates
+cd packages/core/src/cibmangotree/app/web_templates
 npm run dev
 ```
 
 **pnpm**:
 
 ```bash
-cd ./app/web_templates
+cd packages/core/src/cibmangotree/app/web_templates
 pnpm dev
 ```
 
@@ -236,23 +270,24 @@ pnpm dev
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run specific test file
-pytest analyzers/hashtags/test_hashtags_analyzer.py
+uv run pytest packages/analyzers/hashtags/tests/test_hashtags_analyzer.py
 
 # Run with verbose output
-pytest -v
+uv run pytest -v
 
 # Run specific test function
-pytest analyzers/hashtags/test_hashtags_analyzer.py::test_gini
+uv run pytest packages/analyzers/hashtags/tests/test_hashtags_analyzer.py::test_gini
 ```
 
 ## Test Data
 
 - Test data is co-located with analyzers in `test_data/` directories
-- Each analyzer should include its own test files
+- Each analyzer package includes its own test files
 - Tests use sample data to verify functionality
+- Example: `packages/analyzers/hashtags/test_data/`
 
 # Build Setup (Optional)
 
@@ -260,7 +295,7 @@ pytest analyzers/hashtags/test_hashtags_analyzer.py::test_gini
 
 ```bash
 # Build standalone executable
-pyinstaller pyinstaller.spec
+uv run pyinstaller pyinstaller.spec
 
 # Output will be in dist/ directory
 ```
@@ -270,18 +305,20 @@ pyinstaller pyinstaller.spec
 **npm**:
 
 ```bash
+cd packages/core/src/cibmangotree/app/web_templates
 npm run build
 ```
 
 **pnpm**:
 
 ```bash
+cd packages/core/src/cibmangotree/app/web_templates
 pnpm build
 ```
 
 ## Build Requirements
 
-- Included in `requirements-dev.txt`
+- Managed by UV through `pyproject.toml`
 - Used primarily for release distribution
 - Not required for development
 
@@ -291,16 +328,18 @@ pnpm build
 
 **VS Code** (`.vscode/` configuration):
 
-- Python interpreter: `./venv/bin/python`
+- Python interpreter: `./.venv/bin/python`
 - Black formatter integration
 - isort integration
 - pytest test discovery
+- UV extension (optional): Better UV integration
 
 **PyCharm**:
 
-- Interpreter: Project virtual environment
+- Interpreter: `.venv` virtual environment
 - Code style: Black
 - Import optimizer: isort
+- External tools: Configure UV commands
 
 ## Git Configuration
 
@@ -309,7 +348,9 @@ pnpm build
 ```bash
 # Hooks are set up automatically by bootstrap script
 # Manual setup if needed:
-pip install pre-commit
+uv add --dev pre-commit
+# or if you need to install directly
+uv run pip install pre-commit
 pre-commit install
 ```
 
@@ -370,7 +411,7 @@ if you run into this issue. The commands needed to run the installation manually
 from the project root are as such.
 
 ```bash
-cd ./app/web_templates
+cd packages/core/src/cibmangotree/app/web_templates
 npm install --legacy-peer-deps
 ```
 
@@ -379,30 +420,35 @@ npm install --legacy-peer-deps
 **Import Errors**:
 
 ```bash
-# Ensure virtual environment is activated
-source venv/bin/activate  # macOS/Linux
-venv\Scripts\Activate.ps1     # Windows
+# Ensure dependencies are synced
+uv sync
 
-# Reinstall dependencies
-pip install -r requirements-dev.txt
+# Verify installation
+uv run cibmangotree --noop
+
+# Check UV environment
+uv pip list
 ```
 
 **Formatting Errors in CI**:
 
 ```bash
 # Run formatters locally before committing
-isort .
-black .
+uv run isort .
+uv run black .
 ```
 
 **Test Failures**:
 
 ```bash
 # Ensure test data is present
-ls analyzers/*/test_data/
+ls packages/analyzers/*/test_data/
 
 # Check if specific analyzer tests pass
-pytest analyzers/hashtags/ -v
+uv run pytest packages/analyzers/hashtags/ -v
+
+# Verify all dependencies
+uv sync
 ```
 
 ## Environment Variables
@@ -415,4 +461,4 @@ pytest analyzers/hashtags/ -v
 # Next Steps
 
 Once you have everything installed and running without any problems,
-the next step is to check out the [Contributor Workflow](contributing.md)
+the next step is to check out the [Contributor Workflow](../contributing/contributing.md)

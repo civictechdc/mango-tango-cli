@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD033 MD041 -->
 <h2 align="center">CIB Mango Tree</h2>
 <h3 align="center">An Interactive Command Line and Dashboard Tool for Detecting Coordinated Inauthentic Behavior Datasets of Online Activity</h3>
 
@@ -22,29 +23,94 @@ For in-depth technical docs related to this repository please visit: [https://ci
 
 ## Requirements
 
-Python 3.12 (see [requirements.txt](https://github.com/civictechdc/mango-tango-cli/blob/main/requirements.txt))
+- **Python 3.12** - Required for all features
+- **UV** - Modern Python package manager (automatically installed by bootstrap scripts)
 
-## Setting up
+See [pyproject.toml](pyproject.toml) for complete dependency information.
 
-- Make sure you have Python 3.12 installed on your system.
-- Create the virtual environment at `venv` using the following command:
+## Quick Start
 
-```shell
-python -m venv venv
+### 1. Clone and Setup
+
+```bash
+git clone https://github.com/civictechdc/mango-tango-cli.git
+cd mango-tango-cli
 ```
 
-- Activate the bootstrap script for your shell environmennt:
-  - PS1: `./bootstrap.ps1`
-  - Bash: `./bootstrap.sh`
+### 2. Bootstrap Development Environment
 
-  This will install the required dependencies for project development,
-  activate a pre-commit hook that will format the code using `isort` and
-  `black`.
+Run the bootstrap script for your platform:
 
-## Starting the application
+```bash
+# macOS/Linux
+./bootstrap.sh
 
-```shell
-python -m cibmangotree
+# Windows (PowerShell)
+./bootstrap.ps1
+```
+
+This will:
+
+- Install UV package manager (if not present)
+- Install all project dependencies
+- Set up the development environment
+- Verify the installation
+
+### 3. Run the Application
+
+```bash
+uv run cibmangotree
+```
+
+## Project Structure
+
+This is a UV workspace monorepo with the following packages:
+
+```bash
+packages/
+├── core/                    # Core application (cibmangotree)
+│   ├── src/cibmangotree/   # Main application code
+│   │   ├── app/            # Application logic & terminal UI
+│   │   ├── storage/        # Data persistence layer
+│   │   └── components/     # Terminal UI components
+│   └── pyproject.toml
+├── importing/              # Data import/export (cibmangotree-importing)
+├── services/               # Shared services (cibmangotree-services)
+├── testing/                # Testing utilities (cibmangotree-testing)
+└── analyzers/              # Analysis modules
+    ├── hashtags/           # Hashtag analysis
+    ├── ngrams/             # N-gram analysis
+    ├── temporal/           # Temporal analysis
+    ├── example/            # Example analyzer template
+    └── ...
+```
+
+## Development Commands
+
+```bash
+# Run the application
+uv run cibmangotree
+
+# Run tests
+uv run pytest                    # All tests
+uv run pytest -v                 # Verbose output
+uv run pytest packages/analyzers/hashtags/  # Specific package
+
+# Code quality
+uv run black .                   # Format code
+uv run isort .                   # Sort imports
+uv run black --check .           # Check formatting
+uv run isort --check .           # Check import order
+
+# Build executable
+uv run pyinstaller pyinstaller.spec
+
+# Package management
+uv sync                          # Install/sync dependencies
+uv sync --all-extras            # Install with all optional dependencies
+uv add <package>                # Add a dependency
+uv tree                         # Show dependency tree
+uv sync --upgrade               # Upgrade dependencies
 ```
 
 ## Development Guide and Documentation
@@ -55,11 +121,10 @@ python -m cibmangotree
 
 This repository includes hybrid AI documentation enhanced with semantic code analysis:
 
-- **For Claude Code users**: See `CLAUDE.md` + Serena MCP integration
+- **For Claude Code users**: See `CLAUDE.md`
   - **Important**: Always start sessions with "Read the initial instructions"
 - **For Cursor users**: See `.cursorrules` + `.ai-context/`
 - **For other AI tools**: See `.ai-context/README.md`
-- **For deep semantic analysis**: Serena memories in `.serena/memories/`
 
 ### Quick Start for Contributors
 

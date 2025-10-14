@@ -1,5 +1,72 @@
+[tool.uv.workspace]
+members = [
+    "packages/core",
+    "packages/testing",
+    "packages/tokenizers/basic",
+    "packages/analyzers/example",
+    "packages/analyzers/hashtags",
+    "packages/analyzers/ngrams",
+    "packages/analyzers/temporal",
+    "packages/analyzers/time_coordination",
+]
+
+# Virtual workspace root - does not define a project itself
+# Individual packages are defined in packages/* subdirectories
+
+# Development dependencies available across all workspace members
+[dependency-groups]
+dev = [
+    "black>=24.10.0",
+    "isort>=5.13.2",
+    "pytest>=8.3.4",
+    "pytest-benchmark>=5.1.0",
+    "pyinstaller>=6.14.1",
+    "pyarrow-stubs>=17.13",
+]
+
+# Optional documentation dependencies
+docs = [
+    "mkdocs",
+    "mkdocstrings[python]",
+    "mkdocs-material",
+    "markdown",
+    "pymdown-extensions",
+    "mkdocs-mermaid2-plugin",
+    "griffe-pydantic",
+]
+
+# Centralized tool configurations - inherited by all workspace members
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+extend-exclude = '''
+/(
+  # Directories
+  \.eggs
+  | \.git
+  | \.venv
+  | \.env
+  | build
+  | dist
+  | __pycache__
+)/
+'''
+
 [tool.isort]
 profile = "black"
+line_length = 88
+known_first_party = ["cibmangotree", "cibmangotree_analyzer_*", "cibmangotree_tokenizer_*", "cibmangotree_testing"]
+skip_gitignore = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+testpaths = ["packages"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+# Suppress warnings for cleaner output
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]

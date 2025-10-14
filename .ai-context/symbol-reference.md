@@ -1,12 +1,13 @@
 # Symbol Reference Guide
 
 > **Note**: This reference is generated from semantic code analysis and reflects the actual codebase structure. Update as the codebase evolves.
+> **Monorepo Structure**: This is a UV workspace monorepo with packages organized in the `packages/` directory. Core application is `cibmangotree`, with analyzers and services as separate packages.
 
 ## Core Domain Objects
 
 ### Application Layer (`app/`)
 
-#### `App` class - `app/app.py:10`
+#### `App` class - `packages/core/src/cibmangotree/app/app.py:10`
 
 Main application controller and workspace orchestrator
 
@@ -15,14 +16,14 @@ Main application controller and workspace orchestrator
 - `create_project(name, input_file) -> ProjectModel` - Initialize new project
 - `file_selector_state() -> AppFileSelectorStateManager` - File picker state
 
-#### `AppContext` class - `app/app_context.py`
+#### `AppContext` class - `packages/core/src/cibmangotree/app/app_context.py`
 
 Application-wide dependency injection container
 
 - Provides storage, analyzer suite, and core services
 - Used throughout the application for accessing shared resources
 
-#### `ProjectContext` class - `app/project_context.py`
+#### `ProjectContext` class - `packages/core/src/cibmangotree/app/project_context.py`
 
 Project-specific operations and column semantic mapping
 
@@ -30,16 +31,16 @@ Project-specific operations and column semantic mapping
 - Maps user data columns to analyzer requirements
 - `UserInputColumn` - Column metadata with semantic types
 
-#### `AnalysisContext` class - `app/analysis_context.py`
+#### `AnalysisContext` class - `packages/core/src/cibmangotree/app/analysis_context.py`
 
 Analysis execution environment
 
 - `AnalysisRunProgressEvent` - Progress tracking for long-running analyses
 - Provides file paths, preprocessing functions, and progress callbacks
 
-### Storage Layer (`storage/`)
+### Storage Layer (`services/storage/`)
 
-#### `Storage` class - `storage/__init__.py:60`
+#### `Storage` class - `packages/core/src/cibmangotree/services/storage/__init__.py:60`
 
 Main data persistence and workspace management
 
@@ -78,9 +79,9 @@ Export Operations:
 - `FileSelectionState` - File picker UI state
 - `TableStats` - Data statistics and preview information
 
-### View Layer (`components/`)
+### View Layer (`tui/components/`)
 
-#### `ViewContext` class - `components/context.py`
+#### `ViewContext` class - `packages/core/src/cibmangotree/tui/components/context.py`
 
 UI state management and terminal context
 
@@ -103,9 +104,9 @@ UI state management and terminal context
 
 ## Service Layer
 
-### Data Import (`importing/`)
+### Data Import (`services/importing/`)
 
-#### `Importer` base class - `importing/importer.py`
+#### `Importer` base class - `packages/core/src/cibmangotree/services/importing/importer.py`
 
 Base interface for data importers
 
@@ -114,40 +115,40 @@ Base interface for data importers
 
 #### Concrete Importers
 
-- `CSVImporter` - `importing/csv.py` - CSV file import with encoding detection
-- `ExcelImporter` - `importing/excel.py` - Excel file import with sheet selection
+- `CSVImporter` - `packages/core/src/cibmangotree/services/importing/csv.py` - CSV file import with encoding detection
+- `ExcelImporter` - `packages/core/src/cibmangotree/services/importing/excel.py` - Excel file import with sheet selection
 
-### Analyzer System (`analyzers/`)
+### Analyzer System (`packages/analyzers/`)
 
 #### Built-in Analyzers
 
 **Primary Analyzers** (core data processing):
 
-- `hashtags` - `analyzers/hashtags/main.py:main()` - Hashtag extraction and analysis
-- `ngrams` - `analyzers/ngrams/main.py:main()` - N-gram generation and tokenization
-- `temporal` - `analyzers/temporal/main.py:main()` - Time-based aggregation
-- `time_coordination` - `analyzers/time_coordination/main.py:main()` - User coordination analysis
+- `hashtags` - `packages/analyzers/hashtags/src/cibmangotree_analyzer_hashtags/base/main.py:main()` - Hashtag extraction and analysis
+- `ngrams` - `packages/analyzers/ngrams/src/cibmangotree_analyzer_ngrams/base/main.py:main()` - N-gram generation and tokenization
+- `temporal` - `packages/analyzers/temporal/src/cibmangotree_analyzer_temporal/base/main.py:main()` - Time-based aggregation
+- `time_coordination` - `packages/analyzers/time_coordination/src/cibmangotree_analyzer_time_coordination/base/main.py:main()` - User coordination analysis
 
 **Secondary Analyzers** (result transformation):
 
-- `ngram_stats` - `analyzers/ngram_stats/main.py:main()` - N-gram statistics calculation
+- `ngram_stats` - `packages/analyzers/ngrams/src/cibmangotree_analyzer_ngrams/stats/main.py:main()` - N-gram statistics calculation
 - `hashtags_web/analysis.py:secondary_analyzer()` - Hashtag summary statistics
 
 **Web Presenters** (interactive dashboards):
 
-- `hashtags_web` - `analyzers/hashtags_web/factory.py:factory()` - Hashtag dashboard
-- `ngram_web` - `analyzers/ngram_web/factory.py:factory()` - N-gram exploration dashboard
-- `temporal_barplot` - `analyzers/temporal_barplot/factory.py:factory()` - Temporal visualization
+- `hashtags_web` - `packages/analyzers/hashtags/src/cibmangotree_analyzer_hashtags/web/factory.py:factory()` - Hashtag dashboard
+- `ngram_web` - `packages/analyzers/ngrams/src/cibmangotree_analyzer_ngrams/web/factory.py:factory()` - N-gram exploration dashboard
+- `temporal_barplot` - `packages/analyzers/temporal/src/cibmangotree_analyzer_temporal/web/factory.py:factory()` - Temporal visualization
 
 #### Analyzer Registration
 
-- `analyzers.suite` - `analyzers/__init__.py` - Central registry of all analyzers
+- `analyzers.suite` - `packages/core/src/cibmangotree/plugin_system/__init__.py` - Central registry of all analyzers
 
 ### Tokenizer Service (`services/tokenizer/`)
 
 Unicode-aware text tokenization with scriptio continua (character-level) and space-separated script support, plus social media entity preservation.
 
-#### Core Interface - `services/tokenizer/core/base.py`
+#### Core Interface - `packages/core/src/cibmangotree/services/tokenizer/core/base.py`
 
 **`AbstractTokenizer` class**
 
@@ -159,7 +160,7 @@ Base interface for all tokenizer implementations:
 - `_preprocess_text(text: str) -> str` - Apply preprocessing (case, normalization)
 - `_postprocess_tokens(tokens: list[str]) -> list[str]` - Filter and clean tokens
 
-#### Configuration Types - `services/tokenizer/core/types.py`
+#### Configuration Types - `packages/core/src/cibmangotree/services/tokenizer/core/types.py`
 
 **`TokenizerConfig` dataclass**
 
@@ -177,7 +178,7 @@ Comprehensive tokenization configuration:
 - `TokenType` - Token classifications (WORD, HASHTAG, MENTION, URL, EMOJI, etc.)
 - `CaseHandling` - Case transformation options (PRESERVE, LOWERCASE, UPPERCASE, NORMALIZE)
 
-#### Basic Implementation - `services/tokenizer/basic/tokenizer.py`
+#### Basic Implementation - `packages/tokenizers/basic/src/cibmangotree_tokenizer_basic/tokenizer.py`
 
 **`BasicTokenizer` class**
 
@@ -190,7 +191,7 @@ Core tokenizer implementation with Unicode awareness:
 - Configurable preprocessing and postprocessing
 - Single-pass regex-based token extraction with order preservation
 
-#### Pattern Matching - `services/tokenizer/basic/patterns.py`
+#### Pattern Matching - `packages/tokenizers/basic/src/cibmangotree_tokenizer_basic/patterns.py`
 
 **Pattern Functions:**
 
@@ -204,7 +205,7 @@ Core tokenizer implementation with Unicode awareness:
 - `LINGUISTIC_PATTERNS` - Language-specific tokenization patterns
 - `FORMATTING_PATTERNS` - Text formatting and structure patterns
 
-#### Service API - `services/tokenizer/__init__.py`
+#### Service API - `packages/core/src/cibmangotree/services/tokenizer/__init__.py`
 
 **Convenience Functions:**
 
@@ -221,7 +222,7 @@ Core tokenizer implementation with Unicode awareness:
 
 ### Main Application
 
-- `mangotango.py` - Application bootstrap and initialization
+- `packages/core/src/cibmangotree/__main__.py` - Application bootstrap and initialization
   - `freeze_support()` - Multiprocessing setup
   - `enable_windows_ansi_support()` - Terminal color support
   - Storage initialization with app metadata
@@ -229,8 +230,9 @@ Core tokenizer implementation with Unicode awareness:
 
 ### Module Entry Point
 
-- `python -m mangotango` - Standard execution command
-- `python -m mangotango --noop` - No-operation mode for testing
+- `uv run cibmangotree` - Standard execution command via UV
+- `python -m cibmangotree` - Alternative execution via Python module
+- `uv run cibmangotree --noop` - No-operation mode for testing
 
 ## Integration Points
 
@@ -276,7 +278,7 @@ Application-wide structured JSON logging with configurable levels and automatic 
 **Usage Pattern:**
 
 ```python
-from app.logger import get_logger
+from cibmangotree.app.logger import get_logger
 logger = get_logger(__name__)
 logger.info("Message", extra={"context": "value"})
 ```
@@ -285,19 +287,19 @@ logger.info("Message", extra={"context": "value"})
 
 - `parquet_row_count(path) -> int` - Efficient row counting for large files
 
-### Storage Utilities (`storage/__init__.py`)
+### Storage Utilities (`services/storage/__init__.py`)
 
 - `collect_dataframe_chunks(paths) -> polars.DataFrame` - Combine multiple parquet files
 - `TableStats` - Data statistics and preview generation
 
-### File Management (`storage/file_selector.py`)
+### File Management (`services/storage/file_selector.py`)
 
 - `FileSelectorStateManager` - File picker state persistence
 - `AppFileSelectorStateManager` - Application-specific file selection
 
 ## Testing Infrastructure
 
-### Test Utilities (`testing/`)
+### Test Utilities (`packages/testing/`)
 
 - Primary analyzer testing framework
 - Secondary analyzer testing framework
@@ -305,8 +307,8 @@ logger.info("Message", extra={"context": "value"})
 
 ### Example Tests
 
-- `analyzers/hashtags/test_hashtags_analyzer.py` - Hashtag analyzer tests
-- `analyzers/example/test_example_base.py` - Example analyzer tests
+- `packages/analyzers/hashtags/tests/test_hashtags_analyzer.py` - Hashtag analyzer tests
+- `packages/analyzers/example/tests/test_example_base.py` - Example analyzer tests
 - Test data directories co-located with analyzers
 
 ## Development Patterns

@@ -26,6 +26,7 @@ This project and everyone participating in it is governed by our [Code of Conduc
 ### Prerequisites
 
 - **Python 3.12** (required for all features to work correctly)
+- **UV** (modern Python package manager - automatically installed by bootstrap scripts)
 - **Git** for version control
 - **Terminal/Command Line** access
 
@@ -37,7 +38,18 @@ Before contributing, familiarize yourself with:
 - **Architecture**: Review the [Development Guide](docs/dev-guide.md) for architectural understanding
 - **AI Documentation**: Check `.ai-context/` for comprehensive project context
 
-The Mango Tango CLI is a modular, extensible Python terminal application for social media data analysis with three main domains:
+The Mango Tango CLI is a modular, extensible Python terminal application organized as a UV workspace monorepo:
+
+```bash
+packages/
+├── core/                    # Core application (cibmangotree)
+├── importing/              # Data import/export
+├── services/               # Shared services (tokenizer, etc.)
+├── testing/                # Testing utilities
+└── analyzers/              # Analysis modules (hashtags, ngrams, etc.)
+```
+
+Three main architectural domains:
 
 - **Core Domain**: Application logic, terminal UI, and storage
 - **Edge Domain**: Data import/export and preprocessing
@@ -55,21 +67,27 @@ cd mango-tango-cli
 
 ### 2. Set Up Environment
 
-```bash
-# Create virtual environment
-python -m venv venv
+Run the bootstrap script for your platform:
 
-# Run bootstrap script to install dependencies and set up pre-commit hooks
+```bash
 # macOS/Linux:
 ./bootstrap.sh
+
 # Windows (PowerShell):
 ./bootstrap.ps1
 ```
 
+This will:
+
+- Install UV package manager (if not present)
+- Install all project dependencies
+- Set up the development environment
+- Verify the installation
+
 ### 3. Verify Installation
 
 ```bash
-python -m mangotango --noop
+uv run cibmangotree --noop
 # Should output: "No-op flag detected. Exiting successfully."
 ```
 
@@ -142,7 +160,7 @@ git branch -d feature/your-feature-name
 - Input: Primary + secondary outputs
 - Output: Dash/Shiny web applications
 
-See the [analyzer example](analyzers/example/README.md) for implementation guidance.
+See the [analyzer example](packages/analyzers/example/README.md) for implementation guidance.
 
 ### 🔧 Core Improvements
 
@@ -180,9 +198,13 @@ We use automated code formatting (enforced by pre-commit hooks):
 - **isort**: Import organization
 
 ```bash
-# Manual formatting (if needed)
-isort .
-black .
+# Format code
+uv run isort .
+uv run black .
+
+# Check formatting without changing files
+uv run isort --check .
+uv run black --check .
 ```
 
 ### Code Quality
@@ -211,22 +233,29 @@ black .
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
+
+# Run specific package tests
+uv run pytest packages/analyzers/hashtags/
 
 # Run specific test file
-pytest analyzers/hashtags/test_hashtags_analyzer.py
+uv run pytest packages/analyzers/hashtags/tests/test_main.py
 
 # Run with verbose output
-pytest -v
+uv run pytest -v
+
+# Run with coverage
+uv run pytest --cov=cibmangotree
 ```
 
 ### Test Guidelines
 
 - Write tests for all new functionality
-- Place tests co-located with the modules they test
-- Use the testing framework provided in the `testing/` module
-- Include test data in `test_data/` directories within analyzer modules
+- Place tests in `tests/` directories within each package
+- Use the testing framework provided in the `packages/testing/` package
+- Include test data in `test_data/` directories within analyzer packages
 - Ensure tests are fast and reliable
+- Follow the existing test patterns in analyzer packages
 
 ### Test Types
 
@@ -303,7 +332,7 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 This project includes comprehensive AI assistant integration:
 
-- **Claude Code users**: See `CLAUDE.md` + Serena MCP integration
+- **Claude Code users**: See `CLAUDE.md`
 - **Cursor users**: See `.cursorrules` + `.ai-context/`
 - **Other AI tools**: Start with `.ai-context/README.md`
 

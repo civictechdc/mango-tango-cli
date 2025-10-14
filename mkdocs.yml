@@ -1,41 +1,41 @@
 site_name: CIB Mango Tree
 site_author: CIB Mango Tree
-site_description: "An interactive python terminal UI wrapper for Mango Tree analyzers."
+site_description: 'An interactive python terminal UI wrapper for Mango Tree analyzers.'
 site_url: https://cibmangotree.org
 repo_url: https://github.com/civictechdc/mango-tango-cli
 copyright: Copyright &copy; 2025 CIB Mango Tree
 nav:
-  - "Home":
-      - "About": "index.md"
-      - "License": "license.md"
-  - "Guides":
-      - "Getting Started":
-          - "Overview": "guides/get-started/overview.md"
-          - "Installation": "guides/get-started/installation.md"
-      - "Contributing":
-          - "Contributor Workflow": "guides/contributing/contributing.md"
-          - "Implementing Analyzers": "guides/contributing/analyzers.md"
-          - "Dashboards":
-              - "Shiny": "guides/contributing/dashboards/shiny.md"
-              - "React (WIP)": "guides/contributing/dashboards/react.md"
-          - "Logging": "guides/contributing/logging.md"
-          - "Testing": "guides/contributing/testing.md"
-      - "Design Philosophy":
-          - "Architecture": "guides/design-philosophy/architecture.md"
-          - "Core Domain": "guides/design-philosophy/core-domain.md"
-          - "Edge Domain": "guides/design-philosophy/edge-domain.md"
-          - "Content Domain": "guides/design-philosophy/content-domain.md"
-  - "Reference (CLI)":
-      - "Analyzer Interface": "reference/analyzer_interface.md"
-      - "Components": "reference/components.md"
-      - "App": "reference/app.md"
-      - "Preprocessing": "reference/preprocessing.md"
-      - "Terminal Tools": "reference/terminal_tools.md"
-      - "Importing": "reference/importing.md"
-      - "Meta": "reference/meta.md"
-      - "Storage": "reference/storage.md"
-      - "Testing": "reference/testing.md"
-      - "Tokenizer": "reference/tokenizer.md"
+  - 'Home':
+      - 'About': 'index.md'
+      - 'License': 'license.md'
+  - 'Guides':
+      - 'Getting Started':
+          - 'Overview': 'guides/get-started/overview.md'
+          - 'Installation': 'guides/get-started/installation.md'
+      - 'Contributing':
+          - 'Contributor Workflow': 'guides/contributing/contributing.md'
+          - 'Implementing Analyzers': 'guides/contributing/analyzers.md'
+          - 'Dashboards':
+              - 'Shiny': 'guides/contributing/dashboards/shiny.md'
+              - 'React (WIP)': 'guides/contributing/dashboards/react.md'
+          - 'Logging': 'guides/contributing/logging.md'
+          - 'Testing': 'guides/contributing/testing.md'
+      - 'Design Philosophy':
+          - 'Architecture': 'guides/design-philosophy/architecture.md'
+          - 'Core Domain': 'guides/design-philosophy/core-domain.md'
+          - 'Edge Domain': 'guides/design-philosophy/edge-domain.md'
+          - 'Content Domain': 'guides/design-philosophy/content-domain.md'
+  - 'Reference (CLI)':
+      - 'Analyzer Interface': 'reference/analyzer_interface.md'
+      - 'Components': 'reference/components.md'
+      - 'App': 'reference/app.md'
+      - 'Preprocessing': 'reference/preprocessing.md'
+      - 'Terminal Tools': 'reference/terminal_tools.md'
+      - 'Importing': 'reference/importing.md'
+      - 'Meta': 'reference/meta.md'
+      - 'Storage': 'reference/storage.md'
+      - 'Testing': 'reference/testing.md'
+      - 'Tokenizer': 'reference/tokenizer.md'
 
 theme:
   name: material
@@ -55,7 +55,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          # paths: [src] # search packages in the src folder
+          paths: [packages]
           options:
             docstring_style: google
             extensions:

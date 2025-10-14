@@ -1,0 +1,100 @@
+[project]
+name = "cibmangotree"
+version = "0.1.0"
+requires-python = ">=3.12"
+description = "CIB Mango Tree CLI - Social Media Data Analysis Tool"
+readme = "../../README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Civic Tech DC", email = "info@civictechdc.org"}
+]
+keywords = ["social-media", "data-analysis", "cli", "text-analysis"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+# Core runtime dependencies
+dependencies = [
+    # Data processing
+    "polars==1.9.0",      # Pinned to avoid UDF API changes in 1.34+
+    "pandas==2.2.3",      # needed by plotly
+    "pyarrow==17.0.0",    # Pinned for compatibility
+
+    # Storage & persistence
+    "tinydb>=4.8.0",
+    "platformdirs>=4.3.6",
+    "filelock>=3.16.1",
+
+    # Terminal UI
+    "inquirer>=3.4.0",
+    "rich>=14.0.0",
+    "colorama>=0.4.6",
+
+    # Web dashboards
+    "dash>=2.18.1",
+    "plotly>=5.24.1",
+    "shiny>=1.4.0",
+    "shinywidgets>=0.6.2",
+    "starlette>=0.47.1",
+    "uvicorn>=0.34.3",
+    "a2wsgi>=1.10.10",
+
+    # Import/Export
+    "xlsxwriter>=3.2.0",
+    "fastexcel>=0.13.0",
+
+    # Data models & validation
+    "pydantic>=2.9.1",
+
+    # Text processing
+    "regex>=2025.9.1",
+
+    # Logging
+    "python-json-logger>=2.0.7",
+]
+
+# Optional dependencies for different features
+[project.optional-dependencies]
+dev = [
+    "black>=24.10.0",
+    "isort>=5.13.2",
+    "pytest>=8.3.4",
+    "pytest-benchmark>=5.1.0",
+    "pyarrow-stubs>=17.13",
+]
+
+docs = [
+    "mkdocs",
+    "mkdocstrings[python]",
+    "mkdocs-material",
+    "markdown",
+    "pymdown-extensions",
+    "mkdocs-mermaid2-plugin",
+    "griffe-pydantic",
+]
+
+# CLI entry point
+[project.scripts]
+cibmangotree = "cibmangotree.__main__:main"
+
+# Plugin system entry points for analyzers
+[project.entry-points."cibmangotree.analyzers"]
+# Analyzer plugins will register here via their own pyproject.toml
+# Example: example = "cibmangotree_analyzer_example:analyzer"
+
+# Plugin system entry points for tokenizers
+[project.entry-points."cibmangotree.tokenizers"]
+# Tokenizer plugins will register here via their own pyproject.toml
+# Example: basic = "cibmangotree_tokenizer_basic:tokenizer"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Hatchling build configuration
+[tool.hatchling.build.targets.wheel]
+packages = ["src/cibmangotree"]

@@ -29,9 +29,9 @@ Every primary analyzer must define an interface that specifies:
 - Output tables the analyzer produces
 
 ```python
-from analyzer_interface import (
+from cibmangotree.analyzer_interface import (
     AnalyzerInput,
-    AnalyzerInterface, 
+    AnalyzerInterface,
     AnalyzerOutput,
     AnalyzerParam,
     InputColumn,
@@ -45,14 +45,14 @@ interface = AnalyzerInterface(
     name="Example Analyzer",
     short_description="Counts characters in messages",
     long_description="""
-This analyzer demonstrates the basic structure by counting 
+This analyzer demonstrates the basic structure by counting
 characters in each message and marking long messages.
     """,
     input=AnalyzerInput(
         columns=[
             InputColumn(
                 name="message_id",
-                human_readable_name="Unique Message ID", 
+                human_readable_name="Unique Message ID",
                 data_type="identifier",
                 description="The unique identifier of the message",
                 name_hints=["post", "message", "tweet", "id"]
@@ -60,7 +60,7 @@ characters in each message and marking long messages.
             InputColumn(
                 name="message_text",
                 human_readable_name="Message Text",
-                data_type="text", 
+                data_type="text",
                 description="The text content of the message",
                 name_hints=["message", "text", "content", "body"]
             )
@@ -78,7 +78,7 @@ characters in each message and marking long messages.
     outputs=[
         AnalyzerOutput(
             id="character_count",
-            name="Character Count Per Message", 
+            name="Character Count Per Message",
             internal=True,  # Not shown in export list
             columns=[
                 OutputColumn(name="message_id", data_type="integer"),
@@ -95,18 +95,18 @@ The main function receives a context object with access to input data and output
 
 ```python
 import polars as pl
-from analyzer_interface.context import PrimaryAnalyzerContext
+from cibmangotree.analyzer_interface.context import PrimaryAnalyzerContext
 from terminal_tools import ProgressReporter
 
 def main(context: PrimaryAnalyzerContext):
     # Read and preprocess input data
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
-    
+
     # Access parameters
     fudge_factor = context.params.get("fudge_factor")
     assert isinstance(fudge_factor, int), "Fudge factor must be an integer"
-    
+
     # Perform analysis with progress reporting
     with ProgressReporter("Counting characters") as progress:
         df_count = df_input.select(
@@ -117,7 +117,7 @@ def main(context: PrimaryAnalyzerContext):
             .alias("character_count")
         )
         progress.update(1.0)
-    
+
     # Write output to specified path
     df_count.write_parquet(context.output("character_count").parquet_path)
 ```
@@ -127,7 +127,7 @@ def main(context: PrimaryAnalyzerContext):
 Finally, create the analyzer declaration:
 
 ```python
-from analyzer_interface import AnalyzerDeclaration
+from cibmangotree.analyzer_interface import AnalyzerDeclaration
 from .interface import interface
 from .main import main
 
@@ -147,19 +147,19 @@ Secondary analyzers process the output of primary analyzers to create user-frien
 Secondary analyzers specify their base primary analyzer and their own outputs:
 
 ```python
-from analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
+from cibmangotree.analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerInterface
 from ..example_base.interface import interface as example_base
 
 interface = SecondaryAnalyzerInterface(
     id="example_report",
-    version="0.1.0", 
+    version="0.1.0",
     name="Example Report",
     short_description="Adds 'is_long' flag to character count analysis",
     base_analyzer=example_base,  # Reference to primary analyzer
     outputs=[
         AnalyzerOutput(
             id="example_report",
-            name="Example Report", 
+            name="Example Report",
             columns=[
                 OutputColumn(name="message_id", data_type="integer"),
                 OutputColumn(name="character_count", data_type="integer"),
@@ -176,22 +176,22 @@ Secondary analyzers read primary outputs and create enhanced results:
 
 ```python
 import polars as pl
-from analyzer_interface.context import SecondaryAnalyzerContext
+from cibmangotree.analyzer_interface.context import SecondaryAnalyzerContext
 
 def main(context: SecondaryAnalyzerContext):
     # Read primary analyzer output
     df_character_count = pl.read_parquet(
         context.base.table("character_count").parquet_path
     )
-    
+
     # Add derived columns
     df_export = df_character_count.with_columns(
         pl.col("character_count").gt(100).alias("is_long")
     )
-    
+
     # Access primary analyzer parameters if needed
     fudge_factor = context.base_params.get("fudge_factor")
-    
+
     # Write enhanced output
     df_export.write_parquet(context.output("example_report").parquet_path)
 ```
@@ -203,12 +203,12 @@ Web presenters create interactive dashboards using either Dash or Shiny framewor
 ### Interface Definition
 
 ```python
-from analyzer_interface import WebPresenterInterface
+from cibmangotree.analyzer_interface import WebPresenterInterface
 from ..example_base import interface as example_base
 from ..example_report import interface as example_report
 
 interface = WebPresenterInterface(
-    id="example_web", 
+    id="example_web",
     version="0.1.0",
     name="Message Length Histogram",
     short_description="Shows distribution of message lengths",
@@ -224,19 +224,19 @@ For more interactive dashboards:
 ```python
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
-from analyzer_interface.context import WebPresenterContext, FactoryOutputContext, ShinyContext
+from cibmangotree.analyzer_interface.context import WebPresenterContext, FactoryOutputContext, ShinyContext
 
 def factory(context: WebPresenterContext) -> FactoryOutputContext:
     # Load data
     df = pl.read_parquet(context.base.table("character_count").parquet_path)
-    
+
     # Define UI components
     analysis_panel = ui.card(
         ui.card_header("Character Count Analysis"),
         ui.input_checkbox("show_details", "Show detailed view", value=False),
         output_widget("histogram", height="400px")
     )
-    
+
     def server(input, output, session):
         @render_widget
         def histogram():
@@ -244,11 +244,11 @@ def factory(context: WebPresenterContext) -> FactoryOutputContext:
             show_details = input.show_details()
             # ... create plotly figure ...
             return fig
-            
+
         @render.text
         def summary():
             return f"Total messages: {len(df)}"
-    
+
     return FactoryOutputContext(
         shiny=ShinyContext(
             server_handler=server,
@@ -267,41 +267,41 @@ from ..utils.pop import pop_unnecessary_fields
 def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
     """
     Provides structured data for React dashboards via API endpoints.
-    
+
     Args:
         context: WebPresenterContext with access to analyzer outputs
         options: Optional parameters from API requests (filters, etc.)
-    
+
     Returns:
         Dict with presenter metadata and processed data arrays
     """
     # Extract API options/filters
     filter_value = options.get("matcher", "") if options else ""
-    
+
     # Load data
     data_frame = pl.read_parquet(context.base.table("character_count").parquet_path)
-    
+
     # Apply filters if provided
     if filter_value:
         # Apply filtering logic based on the filter_value
         data_frame = data_frame.filter(pl.col("message_text").str.contains(filter_value))
-    
+
     # Build presenter model with metadata
     presenter_model = context.web_presenter.model_dump()
-    
+
     # Add visualization configuration
     presenter_model["figure_type"] = "histogram"
     presenter_model["axis"] = {
         "x": {"label": "Message Character Count", "value": "message_character_count"},
         "y": {"label": "Number of Messages", "value": "number_of_messages"}
     }
-    
+
     # Add data arrays for the frontend
     presenter_model["x"] = data_frame["character_count"].to_list()
-    
+
     # Remove internal fields not needed by frontend
     return FactoryOutputContext(
-	    api=pop_unnecessary_fields(presenter_model)
+     api=pop_unnecessary_fields(presenter_model)
     )
 ```
 
@@ -312,7 +312,7 @@ For analyzers with multiple outputs, return a dictionary with different data vie
 ```python
 def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] = None):
     filter_value = options.get("matcher", "") if options else ""
-    
+
     # Load different data sources
     df_stats = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_STATS).parquet_path
@@ -320,18 +320,18 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
     df_full = pl.read_parquet(
         context.dependency(ngram_stats).table(OUTPUT_NGRAM_FULL).parquet_path
     )
-    
+
     # Apply filtering to both datasets
     if filter_value:
         matcher = create_word_matcher(filter_value, pl.col(COL_NGRAM_WORDS))
         if matcher is not None:
             df_stats = df_stats.filter(matcher)
             df_full = df_full.filter(matcher)
-    
+
     # Create separate presenter models for each output
     stats_model = context.web_presenter.model_dump()
     full_model = context.web_presenter.model_dump()
-    
+
     # Configure stats view
     stats_model.update({
         "figure_type": "scatter",
@@ -347,14 +347,14 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
         "y": {
             "total_repetition": df_stats[COL_NGRAM_TOTAL_REPS].to_list(),
             "amplification_factor": (
-                df_stats[COL_NGRAM_TOTAL_REPS] / 
+                df_stats[COL_NGRAM_TOTAL_REPS] /
                 df_stats[COL_NGRAM_DISTINCT_POSTER_COUNT]
             ).to_list()
         },
         "ngrams": df_stats[COL_NGRAM_WORDS].to_list()
     })
-    
-    # Configure full data view  
+
+    # Configure full data view
     full_model.update({
         "figure_type": "scatter",
         "ids": df_full[COL_NGRAM_ID].to_list(),
@@ -363,13 +363,13 @@ def api_factory(context: WebPresenterContext, options: Optional[dict[str, Any]] 
         "users": df_full[COL_AUTHOR_ID].to_list(),
         # ... additional fields for detailed view
     })
-    
+
     return FactoryOutputContext(
-	    api={
-	        "default_output": OUTPUT_NGRAM_STATS,
-	        OUTPUT_NGRAM_STATS: pop_unnecessary_fields(stats_model),
-	        OUTPUT_NGRAM_FULL: pop_unnecessary_fields(full_model)
-	    }
+     api={
+         "default_output": OUTPUT_NGRAM_STATS,
+         OUTPUT_NGRAM_STATS: pop_unnecessary_fields(stats_model),
+         OUTPUT_NGRAM_FULL: pop_unnecessary_fields(full_model)
+     }
     )
 ```
 
@@ -408,7 +408,7 @@ curl "/api/presenters/ngram_repetition_by_poster/download/csv"
 ### Testing Primary Analyzers
 
 ```python
-from testing import CsvTestData, test_primary_analyzer
+from cibmangotree_testing import CsvTestData, test_primary_analyzer
 from .interface import interface
 from .main import main
 
@@ -430,7 +430,7 @@ def test_example_analyzer():
 ### Testing Secondary Analyzers
 
 ```python
-from testing import test_secondary_analyzer, ParquetTestData
+from cibmangotree_testing import test_secondary_analyzer, ParquetTestData
 
 def test_example_report():
     test_secondary_analyzer(
@@ -478,18 +478,18 @@ def test_example_report():
 
 ## Adding to the Suite
 
-Register all analyzers in `analyzers/__init__.py`:
+Register all analyzers in `packages/core/src/cibmangotree/analyzers.py`:
 
 ```python
-from analyzer_interface import AnalyzerSuite
+from cibmangotree.analyzer_interface import AnalyzerSuite
 from .example.example_base import example_base
-from .example.example_report import example_report  
+from .example.example_report import example_report
 from .example.example_web import example_web
 
 suite = AnalyzerSuite(
     all_analyzers=[
         example_base,
-        example_report, 
+        example_report,
         example_web,
         # ... other analyzers
     ]
@@ -502,8 +502,8 @@ This creates a complete analysis pipeline that users can run through the applica
 
 Once you finish reading this it would be a good idea to review the sections for each domain. Might also be a good idea to review the sections that discuss implementing  [Shiny](https://shiny.posit.co/py/), and [React](https://react.dev) dashboards.
 
-- [Core Domain](./domains/core-domain.md)
-- [Edge Domain](./domains/edge-domain.md)
-- [Content Domain](./domains/content-domain.md)
+- [Core Domain](../design-philosophy/core-domain.md)
+- [Edge Domain](../design-philosophy/edge-domain.md)
+- [Content Domain](../design-philosophy/content-domain.md)
 - [Shiny Dashboards](./dashboards/shiny.md)
 - [React Dashboards](./dashboards/react.md)

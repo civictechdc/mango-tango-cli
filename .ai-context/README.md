@@ -22,26 +22,44 @@ consistent UX while allowing easy contribution of new analyzers.
 - **Data**: Polars/Pandas, PyArrow, Parquet files
 - **Text Processing**: Unicode tokenizer service with scriptio continua support (character-level for CJK/Thai/Southeast Asian scripts, word-level for Latin/Arabic scripts)
 - **Web**: Dash, Shiny for Python, Plotly
+- **Package Manager**: UV (modern Python package manager)
 - **Dev Tools**: Black, isort, pytest, PyInstaller
+
+### Project Structure
+
+UV workspace monorepo with 8 packages:
+
+```bash
+packages/
+├── core/                    # cibmangotree - Main application
+├── importing/              # cibmangotree-importing - Data I/O
+├── services/               # cibmangotree-services - Shared services
+├── testing/                # cibmangotree-testing - Testing utilities
+└── analyzers/              # Analysis modules (plugins)
+    ├── hashtags/           # Hashtag analysis
+    ├── ngrams/             # N-gram analysis
+    ├── temporal/           # Temporal patterns
+    └── example/            # Example analyzer template
+```
 
 ## Semantic Code Structure
 
 ### Entry Points
 
-- `mangotango.py` - Main application bootstrap
-- `python -m mangotango` - Standard execution command
+- `packages/core/src/cibmangotree/__main__.py` - Main application bootstrap
+- `uv run cibmangotree` - Standard execution command
 
 ### Core Architecture (MVC-like)
 
-- **Application Layer** (`app/`): Workspace logic, analysis orchestration
-- **View Layer** (`components/`): Terminal UI components using inquirer
-- **Model Layer** (`storage/`): Data persistence, project/analysis models
+- **Application Layer** (`packages/core/src/cibmangotree/app/`): Workspace logic, analysis orchestration
+- **View Layer** (`packages/core/src/cibmangotree/components/`): Terminal UI components using inquirer
+- **Model Layer** (`packages/core/src/cibmangotree/storage/`): Data persistence, project/analysis models
 
 ### Domain Separation
 
-1. **Core Domain**: Application, Terminal Components, Storage IO
-2. **Edge Domain**: Data import/export (`importing/`), preprocessing
-3. **Content Domain**: Analyzers (`analyzers/`), web presenters
+1. **Core Domain**: Application, Terminal Components, Storage IO (`packages/core/`)
+2. **Edge Domain**: Data import/export (`packages/importing/`), preprocessing
+3. **Content Domain**: Analyzers (`packages/analyzers/`), web presenters
 
 ### Key Data Flow
 
@@ -78,7 +96,7 @@ Dependency injection through context objects:
 ### Code Organization
 
 - Domain-driven module structure
-- Interface-first analyzer design  
+- Interface-first analyzer design
 - Context-based dependency injection
 - Test co-location with implementation
 
@@ -94,21 +112,14 @@ Dependency injection through context objects:
 ### For Development
 
 1. **Setup**: See @.ai-context/setup-guide.md
-2. **Architecture**: See @.ai-context/architecture-overview.md  
+2. **Architecture**: See @.ai-context/architecture-overview.md
 3. **Symbol Reference**: See @.ai-context/symbol-reference.md
 4. **Development Guide**: See @docs/dev-guide.md
 
 ### For AI Assistants
 
-- **Claude Code users**: See @CLAUDE.md (includes Serena integration)
+- **Claude Code users**: See @CLAUDE.md
 - **Cursor users**: See @.cursorrules
-- **Deep semantic analysis**: Explore @.serena/memories/
-
-### Quick References
-
-- **Commands**: @.serena/memories/suggested_commands.md
-- **Style Guide**: @.serena/memories/code_style_conventions.md
-- **Task Checklist**: @.serena/memories/task_completion_checklist.md
 
 ## External Dependencies
 

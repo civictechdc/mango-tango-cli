@@ -89,7 +89,7 @@
 ```markdown
 # Find files by pattern
 Glob: "**/*analyzer*.py"
-Glob: "app/**/*.py"
+Glob: "packages/core/src/cibmangotree/app/**/*.py"
 
 # Find class definitions
 Grep: "^class AnalyzerInterface" --type py
@@ -98,12 +98,12 @@ Grep: "^class AnalyzerInterface" --type py
 Grep: "^def main\(" --type py
 
 # Find usage/references
-Grep: "from app.logger import" --type py
+Grep: "from cibmangotree.app.logger import" --type py
 Grep: "AnalysisContext" --type py
 
 # Read specific files
-Read: app/app.py
-Read: analyzers/hashtags/main.py
+Read: packages/core/src/cibmangotree/app/app.py
+Read: packages/analyzers/hashtags/src/cibmangotree_analyzers_hashtags/main.py
 ```
 
 ### Code Exploration Workflow
@@ -129,22 +129,42 @@ Read: analyzers/hashtags/main.py
 **Logging Integration:**
 
 ```python
-from app.logger import get_logger
+from cibmangotree.app.logger import get_logger
 logger = get_logger(__name__)
 logger.info("Operation started", extra={"context": "value"})
 ```
 
 Use structured logging throughout development. See `docs/dev-guide.md#logging` for complete patterns.
 
+**UV Workflow:**
+
+```bash
+# Install dependencies
+uv sync
+
+# Run the application
+uv run cibmangotree
+
+# Run tests
+uv run pytest
+
+# Format code
+uv run black .
+uv run isort .
+
+# Build executable
+uv run pyinstaller pyinstaller.spec
+```
+
 ### Task-Specific Patterns
 
 **New Analyzer Development**:
 
 ```markdown
-1. Glob: "analyzers/example/**/*.py"  # Find example analyzer
-2. Read: analyzers/example/interface.py
+1. Glob: "packages/analyzers/example/**/*.py"  # Find example analyzer
+2. Read: packages/analyzers/example/src/cibmangotree_analyzers_example/interface.py
 3. search_nodes("analyzer architecture")  # Understand patterns
-4. Read: analyzers/example/main.py
+4. Read: packages/analyzers/example/src/cibmangotree_analyzers_example/main.py
 5. Use knowledge graph insights to implement
 ```
 
@@ -179,7 +199,7 @@ Use structured logging throughout development. See `docs/dev-guide.md#logging` f
   entityType: "Analyzer",
   observations: [
     "Primary analyzer for hashtag extraction and analysis",
-    "Located in analyzers/hashtags/main.py",
+    "Located in packages/analyzers/hashtags/src/cibmangotree_analyzers_hashtags/main.py",
     "Uses regex patterns to extract hashtags from text columns",
     "Outputs: hashtag frequency, co-occurrence, temporal patterns",
     "Gotcha: Handles Unicode hashtags correctly via preprocessing"
@@ -210,7 +230,7 @@ Use structured logging throughout development. See `docs/dev-guide.md#logging` f
   name: "TokenizerService",
   entityType: "Service",
   observations: [
-    "Located in services/tokenizer/",
+    "Located in packages/services/src/cibmangotree_services/tokenizer/",
     "AbstractTokenizer base, BasicTokenizer implementation",
     "Handles scriptio continua (CJK, Thai, Lao, Myanmar, Khmer)",
     "Space-separated tokenization (Latin, Arabic)",
@@ -295,18 +315,18 @@ search_nodes("tokenizer patterns")     # For text processing
 
 ```markdown
 # Find app entry point
-Grep: "^def main" --path mangotango.py
+Grep: "^def main" --path packages/core/src/cibmangotree/__main__.py
 
 # Explore analyzer system
-Glob: "analyzers/**/__init__.py"
-Read: analyzers/__init__.py
+Glob: "packages/analyzers/**/__init__.py"
+Read: packages/core/src/cibmangotree/analyzers.py
 
 # Understand storage layer
 Grep: "^class Storage" --type py
-Read: storage/__init__.py
+Read: packages/core/src/cibmangotree/storage/__init__.py
 
 # Trace UI components
-Glob: "components/**/*.py"
+Glob: "packages/core/src/cibmangotree/components/**/*.py"
 Grep: "^def main_menu" --type py
 ```
 
@@ -329,18 +349,41 @@ Grep: "^def main_menu" --type py
 
 ### Key Architecture References
 
-- **Entry Point**: `mangotango.py` - Application bootstrap
-- **Core App**: `app/app.py:App` - Main application controller
-- **Storage**: `storage/__init__.py:Storage` - Data persistence
-- **UI Components**: `components/main_menu.py:main_menu()` - Terminal interface
-- **Analyzer Suite**: `analyzers/__init__.py:suite` - Analysis registry
+- **Entry Point**: `packages/core/src/cibmangotree/__main__.py` - Application bootstrap
+- **Core App**: `packages/core/src/cibmangotree/app/app.py:App` - Main application controller
+- **Storage**: `packages/core/src/cibmangotree/storage/__init__.py:Storage` - Data persistence
+- **UI Components**: `packages/core/src/cibmangotree/components/main_menu.py:main_menu()` - Terminal interface
+- **Analyzer Discovery**: `packages/core/src/cibmangotree/analyzers.py:discover_analyzers()` - Plugin discovery
+
+### Package Structure
+
+```
+packages/
+├── core/                    # cibmangotree - Main application
+│   └── src/cibmangotree/
+│       ├── app/             # Application logic & terminal UI
+│       ├── storage/         # Data persistence layer
+│       ├── components/      # Terminal UI components
+│       └── analyzers.py     # Analyzer discovery & registry
+├── importing/              # cibmangotree-importing - Data import/export
+├── services/               # cibmangotree-services - Shared services
+│   └── src/cibmangotree_services/
+│       └── tokenizer/      # Text tokenization service
+├── testing/                # cibmangotree-testing - Testing utilities
+└── analyzers/              # Analysis modules (plugins)
+    ├── hashtags/           # cibmangotree-analyzers-hashtags
+    ├── ngrams/             # cibmangotree-analyzers-ngrams
+    ├── temporal/           # cibmangotree-analyzers-temporal
+    └── example/            # cibmangotree-analyzers-example
+```
 
 ### Integration Points
 
-- **Data Import**: `importing/` - CSV/Excel to Parquet conversion
+- **Data Import**: `packages/importing/` - CSV/Excel to Parquet conversion
 - **Analysis Pipeline**: Primary → Secondary → Web presentation
 - **Web Dashboards**: Dash and Shiny framework integration
 - **Export System**: Multi-format output generation
+- **Analyzer Plugins**: Auto-discovered from installed packages
 
 ## Documentation Integration Strategy
 

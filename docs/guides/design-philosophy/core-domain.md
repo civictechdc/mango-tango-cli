@@ -2,13 +2,13 @@
 
 ### Application
 
-The Application lives inside the `app` directory in the project root. This is responsible for defining and executing all capabilities of the application's workspace. Any extension or modification of the application's workspace capabilities should be done here.
+The Application lives in `packages/core/src/cibmangotree/app/`. This is responsible for defining and executing all capabilities of the application's workspace. Any extension or modification of the application's workspace capabilities should be done here.
 
 The application code should be free of specific storage implementation and be agnostic about the specifics of the terminal interface and the available analyzers.
 
 Here's what the entrypoint for the application module looks like
 
-**./app/__init__.py**:
+**packages/core/src/cibmangotree/app/**init**.py**:
 
 ```python
 from .analysis_context import AnalysisContext
@@ -22,13 +22,13 @@ from .settings_context import SettingsContext
 
 ### Terminal Components
 
-The Terminal Components live inside the `terminal_tools` inside the project root. Their main responsibility is user flow, rendering the terminal interface, and handling user input.
+The Terminal Components live in `packages/core/src/cibmangotree/tui/`. Their main responsibility is user flow, rendering the terminal interface, and handling user input. Terminal utilities and tools are located in `packages/core/src/cibmangotree/tui/tools/`.
 
 The user flow understandably depends on the set of capabilities offered by the [Application](#application), so an adjustment there may require an adjustment here.
 
-Here's what the entrypoint for the termnal module looks like
+Here's what the entrypoint for the terminal tools module looks like
 
-**./terminal_tools/__init__.py**
+**packages/core/src/cibmangotree/tui/tools/**init**.py**
 
 ```python
 from .progress import ProgressReporter
@@ -39,17 +39,21 @@ from .utils import (
     enable_windows_ansi_support,
     open_directory_explorer,
     print_ascii_table,
+    print_dialog_section_title,
+    smart_print_data_frame,
     wait_for_key,
 )
 ```
 
 ### Storage IO
 
-The Storage IO lives Inside the `storage` directory inside the project root. It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.
+The Storage IO lives in `packages/core/src/cibmangotree/storage/`. It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.
 
 Here's what the entrypoint for the storage module looks like
 
-**./storage/__init__.py**:
+**packages/core/src/cibmangotree/storage/**init**.py**:
+
+> **Note:** The code listing below (lines 55-627) is the actual implementation of the Storage module, not just example code.
 
 ```python
 import math
@@ -632,5 +636,5 @@ Once you finish reading this section it would be a good idea to review the other
 
 - [Edge Domain](./edge-domain.md)
 - [Content Domain](./content-domain.md)
-- [Shiny Dashboards](../dashboards/shiny.md)
-- [React Dashboards](../dashboards/react.md)
+- [Shiny Dashboards](../contributing/dashboards/shiny.md)
+- [React Dashboards](../contributing/dashboards/react.md)
