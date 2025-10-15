@@ -6,20 +6,14 @@ import polars as pl
 from pydantic import BaseModel
 
 from analyzer_interface import ParamValue, SecondaryAnalyzerInterface
-from analyzer_interface.context import (
-    AssetsReader,
-    InputTableReader,
-)
+from analyzer_interface.context import AssetsReader, InputTableReader
 from analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
 )
 from analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
-from analyzer_interface.context import (
-    TableReader,
-    TableWriter,
-)
+from analyzer_interface.context import TableReader, TableWriter
 
 
 class TestPrimaryAnalyzerContext(BasePrimaryAnalyzerContext):

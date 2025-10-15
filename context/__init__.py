@@ -12,20 +12,14 @@ from analyzer_interface import (
     WebPresenterInterface,
     backfill_param_values,
 )
-from analyzer_interface.context import (
-    AssetsReader,
-    InputTableReader,
-)
+from analyzer_interface.context import AssetsReader, InputTableReader
 from analyzer_interface.context import (
     PrimaryAnalyzerContext as BasePrimaryAnalyzerContext,
 )
 from analyzer_interface.context import (
     SecondaryAnalyzerContext as BaseSecondaryAnalyzerContext,
 )
-from analyzer_interface.context import (
-    TableReader,
-    TableWriter,
-)
+from analyzer_interface.context import TableReader, TableWriter
 from analyzer_interface.context import WebPresenterContext as BaseWebPresenterContext
 from preprocessing.series_semantic import SeriesSemantic
 from storage import AnalysisModel, Storage
