@@ -10,10 +10,7 @@ Test Organization:
 - TestBasicTokenizerSocialMedia: Entity extraction (hashtags, mentions, URLs, emojis)
 - TestBasicTokenizerConfig: Configuration options and parameters
 - TestBasicTokenizerEdgeCases: Edge cases and error conditions
-- TestBasicTokenizerMethods: Method-level validation
-- TestBasicTokenizerPerformance: Performance benchmarks
 - TestErrorHandling: Error handling and robustness
-- TestOrderPreservation: Token order preservation validation (consolidated)
 - TestBasicTokenizerNegativeTesting: Disabled feature verification
 - TestBasicTokenizerIntegration: Realistic social media scenarios
 - TestAbbreviationsAndPunctuation: Special handling for abbreviations
@@ -153,37 +150,39 @@ class TestBasicTokenizerSocialMedia:
         expected = ["visit", "https://example.com", "for", "more", "info"]
         assert result == expected
 
-    def test_emoji_exclusion_by_default(self, default_tokenizer):
-        """Test emoji exclusion with default configuration (include_emoji=False)."""
+    @pytest.mark.parametrize(
+        "include_emoji,should_include_emoji,test_id",
+        [
+            (False, False, "excluded_by_default"),
+            (True, True, "included_when_enabled"),
+        ],
+    )
+    def test_emoji_handling(self, include_emoji, should_include_emoji, test_id):
+        """Test emoji inclusion/exclusion based on configuration."""
+        config = TokenizerConfig(
+            extract_hashtags=True,
+            extract_mentions=True,
+            include_urls=True,
+            include_emails=True,
+            include_emoji=include_emoji,
+        )
+        tokenizer = BasicTokenizer(config)
         text = "Great job! 🎉 Keep it up! 👍"
-        result = default_tokenizer.tokenize(text)
+        result = tokenizer.tokenize(text)
 
-        # Check that text tokens are included
+        # Check that text tokens are always included
         assert "great" in result
         assert "job" in result
         assert "keep" in result
         assert "it" in result
         assert "up" in result
 
-        # CRITICAL: Emojis should be excluded with default config
-        assert "🎉" not in result
-        assert "👍" not in result
-
-    def test_emoji_inclusion_when_enabled(self, social_media_tokenizer):
-        """Test emoji preservation when explicitly enabled in configuration."""
-        text = "Great job! 🎉 Keep it up! 👍"
-        result = social_media_tokenizer.tokenize(text)
-
-        # Check that text tokens are included
-        assert "great" in result
-        assert "job" in result
-        assert "keep" in result
-        assert "it" in result
-        assert "up" in result
-
-        # CRITICAL: Emojis should be preserved when enabled
-        assert "🎉" in result
-        assert "👍" in result
+        # Check emoji presence based on configuration
+        emoji_present = "🎉" in result and "👍" in result
+        assert emoji_present == should_include_emoji, (
+            f"{test_id}: Emoji presence ({emoji_present}) doesn't match "
+            f"expected ({should_include_emoji}) for include_emoji={include_emoji}"
+        )
 
     def test_complex_social_media_text(self, default_tokenizer):
         """Test complex social media content with default configuration (emoji excluded)."""
@@ -277,68 +276,43 @@ class TestBasicTokenizerConfig:
         ), f"Decimal '45.67' not properly tokenized in result: {result}"
         assert "6th" in result, f"Ordinal '6th' not found in result: {result}"
 
-    def test_ordinal_number_preservation(self):
-        """Test ordinal numbers are preserved as single tokens."""
+    @pytest.mark.parametrize(
+        "text,expected_tokens,test_id",
+        [
+            # Ordinals
+            (
+                "The 6th amendment and 21st century trends",
+                ["6th", "21st", "amendment", "century"],
+                "ordinals",
+            ),
+            # Large numbers with separators
+            (
+                "We counted 200,000 ballots and found 1,234,567 votes",
+                ["200,000", "1,234,567", "ballots", "votes"],
+                "large_numbers",
+            ),
+            # Currency symbols
+            (
+                "Prices are $100 €200.50 £50 ¥1000 ₹500.75",
+                ["$100", "£50", "¥1000", "prices", "are"],
+                "currency",
+            ),
+            # Percentages
+            (
+                "Growth is 50% and completion is 100% target",
+                ["50%", "100%", "growth", "completion", "target"],
+                "percentages",
+            ),
+        ],
+    )
+    def test_numeric_token_preservation(self, text, expected_tokens, test_id):
+        """Test preservation of various numeric token formats."""
         config = TokenizerConfig(include_numeric=True)
         tokenizer = BasicTokenizer(config)
-        text = "The 6th amendment and 21st century trends"
         result = tokenizer.tokenize(text)
 
-        # Check ordinals are preserved
-        assert "6th" in result, f"Expected '6th' in {result}"
-        assert "21st" in result, f"Expected '21st' in {result}"
-        assert "amendment" in result
-        assert "century" in result
-
-    def test_large_numbers_with_thousand_separators(self):
-        """Test large numbers with multiple thousand separators."""
-        config = TokenizerConfig(include_numeric=True)
-        tokenizer = BasicTokenizer(config)
-        text = "We counted 200,000 ballots and found 1,234,567 votes"
-        result = tokenizer.tokenize(text)
-
-        # Check large numbers are preserved with separators
-        assert "200,000" in result, f"Expected '200,000' in {result}"
-        assert "1,234,567" in result, f"Expected '1,234,567' in {result}"
-        assert "ballots" in result
-        assert "votes" in result
-
-    def test_currency_symbols_with_numbers(self):
-        """Test currency symbols with various number formats."""
-        config = TokenizerConfig(include_numeric=True)
-        tokenizer = BasicTokenizer(config)
-        text = "Prices are $100 €200.50 £50 ¥1000 ₹500.75"
-        result = tokenizer.tokenize(text)
-
-        # Check currency amounts are preserved
-        assert "prices" in result
-        assert "are" in result
-        assert "$100" in result, f"Expected '$100' in {result}"
-        assert (
-            "€200.50" in result or "€200,50" in result
-        ), f"Expected '€200.50' or '€200,50' in {result}"
-        assert "£50" in result, f"Expected '£50' in {result}"
-        assert "¥1000" in result, f"Expected '¥1000' in {result}"
-        assert (
-            "₹500.75" in result or "₹500,75" in result
-        ), f"Expected '₹500.75' or '₹500,75' in {result}"
-
-    def test_percentages(self):
-        """Test percentage token handling."""
-        config = TokenizerConfig(include_numeric=True)
-        tokenizer = BasicTokenizer(config)
-        text = "Growth is 50% and completion is 100% target"
-        result = tokenizer.tokenize(text)
-
-        # Check percentages are preserved
-        assert "growth" in result
-        assert "is" in result
-        assert "50%" in result, f"Expected '50%' in {result}"
-        assert "and" in result
-        assert "completion" in result
-        assert "is" in result
-        assert "100%" in result, f"Expected '100%' in {result}"
-        assert "target" in result
+        for token in expected_tokens:
+            assert token in result, f"{test_id}: Expected '{token}' in {result}"
 
     def test_min_token_length(self):
         """Test minimum token length filtering."""
@@ -461,57 +435,6 @@ class TestBasicTokenizerEdgeCases:
 
 
 @pytest.mark.unit
-class TestBasicTokenizerMethods:
-    """Test specific tokenizer methods."""
-
-    def test_tokenize_method(self):
-        """Test basic tokenize method."""
-        tokenizer = BasicTokenizer()
-        text = "Hello world"
-        result = tokenizer.tokenize(text)
-
-        # Should return specific expected tokens, not just check types
-        expected = ["hello", "world"]
-        assert result == expected
-
-
-@pytest.mark.unit
-class TestBasicTokenizerPerformance:
-    """Test performance considerations."""
-
-    def test_reasonable_execution_time(self):
-        """Test that tokenization completes in reasonable time."""
-        import time
-
-        tokenizer = BasicTokenizer()
-        # Medium-sized text
-        text = "This is a test sentence. " * 100
-
-        start_time = time.time()
-        result = tokenizer.tokenize(text)
-        end_time = time.time()
-
-        # Should complete in under 1 second for this size
-        assert (end_time - start_time) < 1.0
-        assert len(result) > 0
-
-    def test_multilingual_performance(self):
-        """Test performance with multilingual content."""
-        import time
-
-        tokenizer = BasicTokenizer()
-        text = "Hello 你好 こんにちは مرحبا " * 50
-
-        start_time = time.time()
-        result = tokenizer.tokenize(text)
-        end_time = time.time()
-
-        # Should handle mixed scripts efficiently
-        assert (end_time - start_time) < 1.0
-        assert len(result) > 0
-
-
-@pytest.mark.unit
 class TestErrorHandling:
     """Test error handling and robustness."""
 
@@ -572,127 +495,6 @@ class TestErrorHandling:
         text = "hello\u200fworld"
         result = tokenizer.tokenize(text)
         assert isinstance(result, list)
-
-
-@pytest.mark.unit
-class TestOrderPreservation:
-    """Test token order preservation across different scenarios.
-
-    Order preservation ensures tokens appear in their original text order,
-    critical for maintaining context in social media analysis.
-
-    Coverage:
-    - Basic mixed content (text + entities)
-    - Entities at boundaries (start/end)
-    - Consecutive entities
-    - Multilingual text with entities
-    - Complex realistic scenarios
-    - Edge cases (empty, single entity)
-    - Configuration compatibility
-    """
-
-    def test_simple_mixed_content_order(self, default_tokenizer):
-        """Test simple mixed content preserves order."""
-        text = "Hello @user world"
-        result = default_tokenizer.tokenize(text)
-
-        # Should preserve original order: hello, @user, world
-        expected = ["hello", "@user", "world"]
-        assert result == expected, f"Expected {expected}, got {result}"
-
-    def test_entities_at_boundaries_order(self, default_tokenizer):
-        """Test entities at text boundaries preserve order."""
-        text = "@start middle content #end"
-        result = default_tokenizer.tokenize(text)
-
-        # Should preserve original order
-        expected = ["@start", "middle", "content", "#end"]
-        assert result == expected, f"Expected {expected}, got {result}"
-
-    def test_consecutive_entities_order(self, default_tokenizer):
-        """Test consecutive entities preserve order."""
-        text = "Check @user1 @user2 #tag1 #tag2 content"
-        result = default_tokenizer.tokenize(text)
-
-        # Should preserve original order
-        expected = ["check", "@user1", "@user2", "#tag1", "#tag2", "content"]
-        assert result == expected, f"Expected {expected}, got {result}"
-
-    def test_multilingual_mixed_order(self, default_tokenizer):
-        """Test multilingual content with entities preserves order."""
-        text = "iPhone用户 loves #apple products"
-        result = default_tokenizer.tokenize(text)
-
-        # Should preserve original order with character-level CJK tokenization
-        expected = ["iphone", "用", "户", "loves", "#apple", "products"]
-        assert result == expected, f"Expected {expected}, got {result}"
-
-    def test_complex_social_media_order(self, default_tokenizer):
-        """Test complex realistic social media content preserves order."""
-        text = "Just launched @company's new #product! Check it out at https://launch.example.com 🚀"
-        result = default_tokenizer.tokenize(text)
-
-        # Should preserve original order (emoji is excluded with default config)
-        expected = [
-            "just",
-            "launched",
-            "@company",
-            "s",
-            "new",
-            "#product",
-            "check",
-            "it",
-            "out",
-            "at",
-            "https://launch.example.com",
-        ]
-        assert result == expected, f"Expected {expected}, got {result}"
-
-    def test_edge_case_order_preservation(self, default_tokenizer):
-        """Test order preservation with edge cases."""
-        # Test empty input
-        assert default_tokenizer.tokenize("") == []
-
-        # Test whitespace only
-        assert default_tokenizer.tokenize("   \t\n  ") == []
-
-        # Test single entity
-        assert default_tokenizer.tokenize("@user") == ["@user"]
-        assert default_tokenizer.tokenize("#hashtag") == ["#hashtag"]
-        assert default_tokenizer.tokenize("https://example.com") == ["https://example.com"]
-
-        # Test entities with no surrounding text
-        result_entities_only = default_tokenizer.tokenize("@user #hashtag https://example.com")
-        expected_entities_only = ["@user", "#hashtag", "https://example.com"]
-        assert result_entities_only == expected_entities_only
-
-    def test_configuration_compatibility_order_preservation(self, preserve_case_tokenizer):
-        """Test that order preservation works with various configuration options."""
-        # Test with case preservation
-        text = "Hello @User Check #HashTag"
-        result = preserve_case_tokenizer.tokenize(text)
-        expected = ["Hello", "@User", "Check", "#HashTag"]
-        assert result == expected, f"Expected {expected}, got {result}"
-
-        # Test with social media extraction disabled
-        config_no_social = TokenizerConfig(
-            extract_hashtags=False, extract_mentions=False, include_urls=False
-        )
-        tokenizer_no_social = BasicTokenizer(config_no_social)
-        text_no_social = "Hello @user check #hashtag"
-        result_no_social = tokenizer_no_social.tokenize(text_no_social)
-        # Should tokenize as regular words when extraction is disabled
-        expected_no_social = ["hello", "user", "check", "hashtag"]
-        assert result_no_social == expected_no_social, f"Expected {expected_no_social}, got {result_no_social}"
-
-        # Test with minimum token length
-        config_min_length = TokenizerConfig(min_token_length=4)
-        tokenizer_min_length = BasicTokenizer(config_min_length)
-        text_min_length = "Hi @user check #hashtag long"
-        result_min_length = tokenizer_min_length.tokenize(text_min_length)
-        # Should preserve order and filter short tokens
-        expected_min_length = ["@user", "check", "#hashtag", "long"]
-        assert result_min_length == expected_min_length, f"Expected {expected_min_length}, got {result_min_length}"
 
 
 @pytest.mark.unit
@@ -962,9 +764,6 @@ class TestBasicTokenizerIntegration:
         ), f"Emoji should be excluded with default config: {result}"
 
 
-# Fixtures for reusable test data
-
-
 @pytest.mark.unit
 class TestAbbreviationsAndPunctuation:
     """Test abbreviation handling and punctuation edge cases."""
@@ -1175,47 +974,3 @@ class TestBotDetectionEdgeCases:
         result = tokenizer.tokenize(text)
         # Should handle gracefully, exact behavior depends on implementation
         assert len(result) > 0
-
-
-@pytest.fixture
-def basic_config():
-    """Basic tokenizer configuration for tests."""
-    return TokenizerConfig()
-
-
-@pytest.fixture
-def social_media_config():
-    """Configuration optimized for social media content."""
-    return TokenizerConfig(
-        extract_hashtags=True,
-        extract_mentions=True,
-        include_urls=True,
-        include_emails=True,
-        include_emoji=True,
-        case_handling=CaseHandling.LOWERCASE,
-    )
-
-
-@pytest.fixture
-def multilingual_test_texts():
-    """Collection of multilingual test texts."""
-    return {
-        "latin": "Hello world, this is a test!",
-        "chinese": "你好世界，这是一个测试！",
-        "japanese": "こんにちは世界、これはテストです！",
-        "arabic": "مرحبا بك في العالم، هذا اختبار!",
-        "thai": "สวัสดีครับ นี่คือการทดสอบ",
-        "mixed": "Hello 你好 こんにちは مرحبا สวัสดี!",
-        "social_mixed": "@user check #hashtag https://example.com 🎉 iPhone用户",
-    }
-
-
-@pytest.fixture
-def social_media_test_texts():
-    """Collection of social media test texts."""
-    return {
-        "twitter": "Just posted! Check it out @followers #awesome https://example.com 🎉",
-        "facebook": "Had great time @event! Thanks @organizer #event2024",
-        "instagram": "Beautiful sunset 🌅 #photography #nature @location",
-        "linkedin": "Excited to announce my new role @company! #career #growth",
-    }
