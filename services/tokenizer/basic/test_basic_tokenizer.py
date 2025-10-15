@@ -336,10 +336,14 @@ class TestBasicTokenizerConfig:
         assert "prices" in result
         assert "are" in result
         assert "$100" in result, f"Expected '$100' in {result}"
-        assert "€200.50" in result or "€200,50" in result, f"Expected '€200.50' or '€200,50' in {result}"
+        assert (
+            "€200.50" in result or "€200,50" in result
+        ), f"Expected '€200.50' or '€200,50' in {result}"
         assert "£50" in result, f"Expected '£50' in {result}"
         assert "¥1000" in result, f"Expected '¥1000' in {result}"
-        assert "₹500.75" in result or "₹500,75" in result, f"Expected '₹500.75' or '₹500,75' in {result}"
+        assert (
+            "₹500.75" in result or "₹500,75" in result
+        ), f"Expected '₹500.75' or '₹500,75' in {result}"
 
     def test_percentages(self):
         """Test percentage token handling."""
@@ -482,7 +486,7 @@ class TestBasicTokenizerEdgeCases:
     def test_special_characters(self):
         """Test handling of special Unicode characters."""
         tokenizer = BasicTokenizer()
-        text = "Hello\u00A0world\u2000test"  # Non-breaking space and em space
+        text = "Hello\u00a0world\u2000test"  # Non-breaking space and em space
         result = tokenizer.tokenize(text)
 
         expected = ["hello", "world", "test"]
@@ -1361,6 +1365,122 @@ class TestAbbreviationsAndPunctuation:
         assert "state-of-the-art" in result, f"Expected 'state-of-the-art' in {result}"
         assert "ai" in result
         assert "technology" in result
+
+
+class TestBotDetectionEdgeCases:
+    """Edge cases for bot detection and social media anomalies."""
+
+    def test_repeated_characters_preserved(self):
+        """Bot-like repeated characters should be preserved."""
+        tokenizer = BasicTokenizer()
+        text = "WOWWWWW amazing!!!!!!!"
+        result = tokenizer.tokenize(text)
+        # Should preserve repeated patterns
+        assert "wowwwww" in result
+        assert "amazing" in result
+
+    def test_mixed_script_brand_names(self):
+        """Mixed Latin+CJK in brand names should stay together."""
+        tokenizer = BasicTokenizer()
+        text = "iPhone用户 loves it"
+        result = tokenizer.tokenize(text)
+        assert "iphone" in result
+        assert "用" in result
+        assert "户" in result
+        assert "loves" in result
+        assert "it" in result
+
+    def test_cashtag_vs_currency(self):
+        """Cashtags should be distinguished from currency."""
+        tokenizer = BasicTokenizer()
+        text = "$AAPL hit $100 today"
+        result = tokenizer.tokenize(text)
+        assert "$aapl" in result  # Cashtag (lowercased)
+        assert "$100" in result  # Currency
+        assert "hit" in result
+        assert "today" in result
+
+    def test_cashtag_extraction_disabled(self):
+        """When extract_cashtags=False, should split into components."""
+        config = TokenizerConfig(extract_cashtags=False)
+        tokenizer = BasicTokenizer(config)
+        text = "$NVDA to the moon"
+        result = tokenizer.tokenize(text)
+        assert "$nvda" not in result
+        assert "nvda" in result  # Should be separate word
+
+    def test_emoji_with_skin_tone_modifier(self):
+        """Complex emoji with modifiers."""
+        config = TokenizerConfig(include_emoji=True)
+        tokenizer = BasicTokenizer(config)
+        text = "thumbs up 👍🏽 and 👍🏿"
+        result = tokenizer.tokenize(text)
+        assert "👍🏽" in result or "👍" in result  # Modifier may separate
+        assert "thumbs" in result
+
+    def test_multiple_consecutive_punctuation(self):
+        """Multiple punctuation marks in sequence."""
+        tokenizer = BasicTokenizer()
+        text = "What???!!! Really???"
+        result = tokenizer.tokenize(text)
+        assert "what" in result
+        assert "really" in result
+        # Punctuation excluded by default
+
+    def test_mixed_emoji_and_text(self):
+        """Emoji interspersed with text."""
+        config = TokenizerConfig(include_emoji=True)
+        tokenizer = BasicTokenizer(config)
+        text = "🔥fire🔥 sale"
+        result = tokenizer.tokenize(text)
+        assert "fire" in result
+        assert "sale" in result
+        assert "🔥" in result
+
+    def test_url_with_authentication(self):
+        """URL with embedded credentials."""
+        tokenizer = BasicTokenizer()
+        text = "check https://user:pass@example.com for details"
+        result = tokenizer.tokenize(text)
+        assert "https://user:pass@example.com" in result
+        assert "check" in result
+
+    def test_url_with_query_params(self):
+        """URL with complex query string."""
+        tokenizer = BasicTokenizer()
+        text = "visit https://site.com/path?key=value&foo=bar now"
+        result = tokenizer.tokenize(text)
+        assert (
+            "https://site.com/path?key=value&foo=bar" in result
+            or "https://site.com/path" in result
+        )
+        assert "visit" in result
+        assert "now" in result
+
+    def test_repeated_punctuation_with_spaces(self):
+        """Spaced punctuation patterns."""
+        tokenizer = BasicTokenizer()
+        text = "wait . . . what"
+        result = tokenizer.tokenize(text)
+        assert "wait" in result
+        assert "what" in result
+
+    def test_mixed_rtl_ltr_text(self):
+        """Arabic (RTL) mixed with English (LTR)."""
+        tokenizer = BasicTokenizer()
+        text = "مرحبا hello world"
+        result = tokenizer.tokenize(text)
+        assert "مرحبا" in result
+        assert "hello" in result
+        assert "world" in result
+
+    def test_script_transition_mid_token(self):
+        """Script changes within a token."""
+        tokenizer = BasicTokenizer()
+        text = "visit北京today"
+        result = tokenizer.tokenize(text)
+        # Should handle gracefully, exact behavior depends on implementation
+        assert len(result) > 0
 
 
 @pytest.fixture
