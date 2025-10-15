@@ -3374,9 +3374,9 @@ presenters.</p>
 <span class="normal">148</span>
 <span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">InputTableReader</span><span class="p">(</span><span class="n">TableReader</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">[</span><span class="n">PolarsDataFrameLike</span><span class="p">](</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">PolarsDataFrameLike</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolarsDataFrameLike</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">[</span>
+        <span class="n">PolarsDataFrameLike</span>
+    <span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">PolarsDataFrameLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolarsDataFrameLike</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given the manually loaded user input dataframe, apply column mapping and</span>
 <span class="sd">        semantic transformations to give the input dataframe that the analyzer</span>
@@ -3431,9 +3431,9 @@ expects.</p>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
-<span class="k">def</span> <span class="nf">preprocess</span><span class="p">[</span><span class="n">PolarsDataFrameLike</span><span class="p">](</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">PolarsDataFrameLike</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolarsDataFrameLike</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">preprocess</span><span class="p">[</span>
+    <span class="n">PolarsDataFrameLike</span>
+<span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">PolarsDataFrameLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolarsDataFrameLike</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given the manually loaded user input dataframe, apply column mapping and</span>
 <span class="sd">    semantic transformations to give the input dataframe that the analyzer</span>
