@@ -34,7 +34,7 @@ class TestTokenizerConfig:
 
         # Text preprocessing defaults
         assert config.case_handling == CaseHandling.LOWERCASE
-        assert config.normalize_unicode is True
+        assert config.normalize_unicode is False
 
         # Social media defaults
         assert config.extract_hashtags is True
