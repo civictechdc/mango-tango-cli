@@ -12,6 +12,7 @@
 <a href="https://github.com/Textualize/rich"><img alt="style: black" src="https://img.shields.io/badge/Rich-14.0.0-gold?logo=Rich"></a>
 <a href="https://civictechdc.github.io/mango-tango-cli/"><img alt="style: black" src="https://img.shields.io/badge/docs-website-blue"></a>
 <a href="https://black.readthedocs.io/en/stable/"><img alt="style: black" src="https://img.shields.io/badge/style-Black-black?logo=Black"></a>
+<a href="https://black.readthedocs.io/en/stable/"><img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
 </p>
 
 ---
@@ -49,7 +50,7 @@ python -m cibmangotree
 
 ## Development Guide and Documentation
 
-[Development Guide](./docs/dev-guide.md)
+[Development Guide](./docs/guides/contributing/contributing.md)
 
 ## AI Development Assistant Setup
 
@@ -76,16 +77,8 @@ The AI documentation provides:
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/license/mit)).
-
-### Summary
-
-You are free to use, modify, and distribute this software for **non-commercial purposes**. For **commercial use**, please [contact us](mailto:sandobenjamin@gmail.com) to obtain a commercial license.
+This project is licensed under the [MIT License](https://opensource.org/license/mit).
 
 ### Required Notice
 
 Required Notice: © [CIB Mango Tree](https://github.com/CIB-Mango-Tree)
-
----
-
-By using this software, you agree to the terms and conditions of the PolyForm Noncommercial License 1.0.0.
