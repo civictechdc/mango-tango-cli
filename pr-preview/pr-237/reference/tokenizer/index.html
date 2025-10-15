@@ -7107,14 +7107,14 @@ for different script families.</p>
 
         <span class="c1"># Compile regex pattern for character-level script detection (performance optimization)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_CHAR_LEVEL_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s1">&#39;[\u4e00-\u9fff&#39;</span>  <span class="c1"># CJK Unified Ideographs</span>
-            <span class="sa">r</span><span class="s1">&#39;\u3400-\u4dbf&#39;</span>   <span class="c1"># CJK Extension A</span>
-            <span class="sa">r</span><span class="s1">&#39;\u3040-\u309f&#39;</span>   <span class="c1"># Hiragana</span>
-            <span class="sa">r</span><span class="s1">&#39;\u30a0-\u30ff&#39;</span>   <span class="c1"># Katakana</span>
-            <span class="sa">r</span><span class="s1">&#39;\u0e00-\u0e7f&#39;</span>   <span class="c1"># Thai</span>
-            <span class="sa">r</span><span class="s1">&#39;\u0e80-\u0eff&#39;</span>   <span class="c1"># Lao</span>
-            <span class="sa">r</span><span class="s1">&#39;\u1000-\u109f&#39;</span>   <span class="c1"># Myanmar</span>
-            <span class="sa">r</span><span class="s1">&#39;\u1780-\u17ff]&#39;</span>  <span class="c1"># Khmer</span>
+            <span class="sa">r</span><span class="s2">&quot;[\u4e00-\u9fff&quot;</span>  <span class="c1"># CJK Unified Ideographs</span>
+            <span class="sa">r</span><span class="s2">&quot;\u3400-\u4dbf&quot;</span>  <span class="c1"># CJK Extension A</span>
+            <span class="sa">r</span><span class="s2">&quot;\u3040-\u309f&quot;</span>  <span class="c1"># Hiragana</span>
+            <span class="sa">r</span><span class="s2">&quot;\u30a0-\u30ff&quot;</span>  <span class="c1"># Katakana</span>
+            <span class="sa">r</span><span class="s2">&quot;\u0e00-\u0e7f&quot;</span>  <span class="c1"># Thai</span>
+            <span class="sa">r</span><span class="s2">&quot;\u0e80-\u0eff&quot;</span>  <span class="c1"># Lao</span>
+            <span class="sa">r</span><span class="s2">&quot;\u1000-\u109f&quot;</span>  <span class="c1"># Myanmar</span>
+            <span class="sa">r</span><span class="s2">&quot;\u1780-\u17ff]&quot;</span>  <span class="c1"># Khmer</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenList</span><span class="p">:</span>
@@ -7348,7 +7348,7 @@ for different script families.</p>
         <span class="n">has_cjk</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
 
         <span class="c1"># Don&#39;t apply mixed-script preservation to social media entities</span>
-        <span class="n">is_social_entity</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;$&#39;</span><span class="p">))</span>
+        <span class="n">is_social_entity</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;$&quot;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">has_latin</span> <span class="ow">and</span> <span class="n">has_cjk</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_social_entity</span><span class="p">:</span>
             <span class="c1"># Mixed script - keep intact (brand names, bot tricks)</span>
@@ -7499,14 +7499,14 @@ for different script families.</p>
 
     <span class="c1"># Compile regex pattern for character-level script detection (performance optimization)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_CHAR_LEVEL_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-        <span class="sa">r</span><span class="s1">&#39;[\u4e00-\u9fff&#39;</span>  <span class="c1"># CJK Unified Ideographs</span>
-        <span class="sa">r</span><span class="s1">&#39;\u3400-\u4dbf&#39;</span>   <span class="c1"># CJK Extension A</span>
-        <span class="sa">r</span><span class="s1">&#39;\u3040-\u309f&#39;</span>   <span class="c1"># Hiragana</span>
-        <span class="sa">r</span><span class="s1">&#39;\u30a0-\u30ff&#39;</span>   <span class="c1"># Katakana</span>
-        <span class="sa">r</span><span class="s1">&#39;\u0e00-\u0e7f&#39;</span>   <span class="c1"># Thai</span>
-        <span class="sa">r</span><span class="s1">&#39;\u0e80-\u0eff&#39;</span>   <span class="c1"># Lao</span>
-        <span class="sa">r</span><span class="s1">&#39;\u1000-\u109f&#39;</span>   <span class="c1"># Myanmar</span>
-        <span class="sa">r</span><span class="s1">&#39;\u1780-\u17ff]&#39;</span>  <span class="c1"># Khmer</span>
+        <span class="sa">r</span><span class="s2">&quot;[\u4e00-\u9fff&quot;</span>  <span class="c1"># CJK Unified Ideographs</span>
+        <span class="sa">r</span><span class="s2">&quot;\u3400-\u4dbf&quot;</span>  <span class="c1"># CJK Extension A</span>
+        <span class="sa">r</span><span class="s2">&quot;\u3040-\u309f&quot;</span>  <span class="c1"># Hiragana</span>
+        <span class="sa">r</span><span class="s2">&quot;\u30a0-\u30ff&quot;</span>  <span class="c1"># Katakana</span>
+        <span class="sa">r</span><span class="s2">&quot;\u0e00-\u0e7f&quot;</span>  <span class="c1"># Thai</span>
+        <span class="sa">r</span><span class="s2">&quot;\u0e80-\u0eff&quot;</span>  <span class="c1"># Lao</span>
+        <span class="sa">r</span><span class="s2">&quot;\u1000-\u109f&quot;</span>  <span class="c1"># Myanmar</span>
+        <span class="sa">r</span><span class="s2">&quot;\u1780-\u17ff]&quot;</span>  <span class="c1"># Khmer</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -10218,14 +10218,14 @@ for different script families.</p>
 
         <span class="c1"># Compile regex pattern for character-level script detection (performance optimization)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_CHAR_LEVEL_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-            <span class="sa">r</span><span class="s1">&#39;[\u4e00-\u9fff&#39;</span>  <span class="c1"># CJK Unified Ideographs</span>
-            <span class="sa">r</span><span class="s1">&#39;\u3400-\u4dbf&#39;</span>   <span class="c1"># CJK Extension A</span>
-            <span class="sa">r</span><span class="s1">&#39;\u3040-\u309f&#39;</span>   <span class="c1"># Hiragana</span>
-            <span class="sa">r</span><span class="s1">&#39;\u30a0-\u30ff&#39;</span>   <span class="c1"># Katakana</span>
-            <span class="sa">r</span><span class="s1">&#39;\u0e00-\u0e7f&#39;</span>   <span class="c1"># Thai</span>
-            <span class="sa">r</span><span class="s1">&#39;\u0e80-\u0eff&#39;</span>   <span class="c1"># Lao</span>
-            <span class="sa">r</span><span class="s1">&#39;\u1000-\u109f&#39;</span>   <span class="c1"># Myanmar</span>
-            <span class="sa">r</span><span class="s1">&#39;\u1780-\u17ff]&#39;</span>  <span class="c1"># Khmer</span>
+            <span class="sa">r</span><span class="s2">&quot;[\u4e00-\u9fff&quot;</span>  <span class="c1"># CJK Unified Ideographs</span>
+            <span class="sa">r</span><span class="s2">&quot;\u3400-\u4dbf&quot;</span>  <span class="c1"># CJK Extension A</span>
+            <span class="sa">r</span><span class="s2">&quot;\u3040-\u309f&quot;</span>  <span class="c1"># Hiragana</span>
+            <span class="sa">r</span><span class="s2">&quot;\u30a0-\u30ff&quot;</span>  <span class="c1"># Katakana</span>
+            <span class="sa">r</span><span class="s2">&quot;\u0e00-\u0e7f&quot;</span>  <span class="c1"># Thai</span>
+            <span class="sa">r</span><span class="s2">&quot;\u0e80-\u0eff&quot;</span>  <span class="c1"># Lao</span>
+            <span class="sa">r</span><span class="s2">&quot;\u1000-\u109f&quot;</span>  <span class="c1"># Myanmar</span>
+            <span class="sa">r</span><span class="s2">&quot;\u1780-\u17ff]&quot;</span>  <span class="c1"># Khmer</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenList</span><span class="p">:</span>
@@ -10459,7 +10459,7 @@ for different script families.</p>
         <span class="n">has_cjk</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_char_level_script</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">token</span><span class="p">)</span>
 
         <span class="c1"># Don&#39;t apply mixed-script preservation to social media entities</span>
-        <span class="n">is_social_entity</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;$&#39;</span><span class="p">))</span>
+        <span class="n">is_social_entity</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;$&quot;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">has_latin</span> <span class="ow">and</span> <span class="n">has_cjk</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_social_entity</span><span class="p">:</span>
             <span class="c1"># Mixed script - keep intact (brand names, bot tricks)</span>
@@ -10610,14 +10610,14 @@ for different script families.</p>
 
     <span class="c1"># Compile regex pattern for character-level script detection (performance optimization)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_CHAR_LEVEL_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-        <span class="sa">r</span><span class="s1">&#39;[\u4e00-\u9fff&#39;</span>  <span class="c1"># CJK Unified Ideographs</span>
-        <span class="sa">r</span><span class="s1">&#39;\u3400-\u4dbf&#39;</span>   <span class="c1"># CJK Extension A</span>
-        <span class="sa">r</span><span class="s1">&#39;\u3040-\u309f&#39;</span>   <span class="c1"># Hiragana</span>
-        <span class="sa">r</span><span class="s1">&#39;\u30a0-\u30ff&#39;</span>   <span class="c1"># Katakana</span>
-        <span class="sa">r</span><span class="s1">&#39;\u0e00-\u0e7f&#39;</span>   <span class="c1"># Thai</span>
-        <span class="sa">r</span><span class="s1">&#39;\u0e80-\u0eff&#39;</span>   <span class="c1"># Lao</span>
-        <span class="sa">r</span><span class="s1">&#39;\u1000-\u109f&#39;</span>   <span class="c1"># Myanmar</span>
-        <span class="sa">r</span><span class="s1">&#39;\u1780-\u17ff]&#39;</span>  <span class="c1"># Khmer</span>
+        <span class="sa">r</span><span class="s2">&quot;[\u4e00-\u9fff&quot;</span>  <span class="c1"># CJK Unified Ideographs</span>
+        <span class="sa">r</span><span class="s2">&quot;\u3400-\u4dbf&quot;</span>  <span class="c1"># CJK Extension A</span>
+        <span class="sa">r</span><span class="s2">&quot;\u3040-\u309f&quot;</span>  <span class="c1"># Hiragana</span>
+        <span class="sa">r</span><span class="s2">&quot;\u30a0-\u30ff&quot;</span>  <span class="c1"># Katakana</span>
+        <span class="sa">r</span><span class="s2">&quot;\u0e00-\u0e7f&quot;</span>  <span class="c1"># Thai</span>
+        <span class="sa">r</span><span class="s2">&quot;\u0e80-\u0eff&quot;</span>  <span class="c1"># Lao</span>
+        <span class="sa">r</span><span class="s2">&quot;\u1000-\u109f&quot;</span>  <span class="c1"># Myanmar</span>
+        <span class="sa">r</span><span class="s2">&quot;\u1780-\u17ff]&quot;</span>  <span class="c1"># Khmer</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
