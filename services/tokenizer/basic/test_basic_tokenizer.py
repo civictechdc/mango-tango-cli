@@ -211,12 +211,10 @@ class TestBasicTokenizerSocialMedia:
 class TestBasicTokenizerConfig:
     """Test configurable tokenizer behavior."""
 
-    def test_case_handling_preserve(self):
+    def test_case_handling_preserve(self, preserve_case_tokenizer):
         """Test case preservation."""
-        config = TokenizerConfig(case_handling=CaseHandling.PRESERVE)
-        tokenizer = BasicTokenizer(config)
         text = "Hello World"
-        result = tokenizer.tokenize(text)
+        result = preserve_case_tokenizer.tokenize(text)
 
         expected = ["Hello", "World"]
         assert result == expected

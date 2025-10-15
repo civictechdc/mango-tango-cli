@@ -1,8 +1,16 @@
 """
 Shared pytest fixtures for tokenizer tests.
 
-This module provides common tokenizer configurations and helper functions
-to reduce duplication across test files.
+Provides pre-configured tokenizer fixtures to reduce boilerplate:
+- default_tokenizer: Standard configuration (lowercase, social media enabled)
+- social_media_tokenizer: Full social media extraction (includes emoji)
+- clean_text_tokenizer: No social entities, clean text only
+- preserve_case_tokenizer: Case-preserving tokenization
+
+Use fixtures in tests by adding them as function parameters:
+    def test_my_feature(self, default_tokenizer):
+        result = default_tokenizer.tokenize("test text")
+        assert result == ["test", "text"]
 """
 
 import pytest
@@ -38,7 +46,15 @@ def social_media_tokenizer():
 
 @pytest.fixture
 def clean_text_tokenizer():
-    """Tokenizer configured for clean text (no social entities)."""
+    """Tokenizer configured for clean text (no social entities).
+
+    Example:
+        def test_my_feature(self, clean_text_tokenizer):
+            result = clean_text_tokenizer.tokenize("@user #hashtag")
+            # Social entities removed, only words remain
+            assert "user" in result
+            assert "hashtag" in result
+    """
     config = TokenizerConfig(
         extract_hashtags=False,
         extract_mentions=False,
@@ -54,91 +70,12 @@ def clean_text_tokenizer():
 
 @pytest.fixture
 def preserve_case_tokenizer():
-    """Tokenizer that preserves original case."""
+    """Tokenizer that preserves original case.
+
+    Example:
+        def test_my_feature(self, preserve_case_tokenizer):
+            result = preserve_case_tokenizer.tokenize("Hello World")
+            assert result == ["Hello", "World"]
+    """
     config = TokenizerConfig(case_handling=CaseHandling.PRESERVE)
     return BasicTokenizer(config)
-
-
-# =============================================================================
-# Test Data Fixtures
-# =============================================================================
-
-
-@pytest.fixture
-def multilingual_test_data():
-    """Common multilingual test texts."""
-    return {
-        "latin": ("Hello world", ["hello", "world"]),
-        "chinese": ("你好世界", ["你", "好", "世", "界"]),
-        "japanese": ("こんにちは世界", ["こ", "ん", "に", "ち", "は", "世", "界"]),
-        "arabic": ("مرحبا بك في العالم", ["مرحبا", "بك", "في", "العالم"]),
-        "thai": ("สวัสดีครับ", ["ส", "ว", "ั", "ส", "ด", "ี", "ค", "ร", "ั", "บ"]),
-        "korean": ("안녕하세요 세계", ["안녕하세요", "세계"]),
-    }
-
-
-@pytest.fixture
-def social_media_test_data():
-    """Common social media test texts."""
-    return {
-        "basic": "@user check #hashtag",
-        "with_url": "Visit https://example.com for info",
-        "complex": "@user check #hashtag https://example.com 🎉",
-    }
-
-
-# =============================================================================
-# Helper Assertion Functions
-# =============================================================================
-
-
-def assert_tokens_present(result, *expected):
-    """Assert that all expected tokens are present in result.
-
-    Args:
-        result: List of tokens from tokenizer
-        *expected: Tokens that should be present
-    """
-    for token in expected:
-        assert token in result, f"Token '{token}' not found in result: {result}"
-
-
-def assert_tokens_ordered(result, *expected):
-    """Assert that tokens appear in expected order.
-
-    Args:
-        result: List of tokens from tokenizer
-        *expected: Tokens in expected order
-    """
-    indices = []
-    for token in expected:
-        if token in result:
-            indices.append(result.index(token))
-        else:
-            raise AssertionError(f"Token '{token}' not found in result: {result}")
-
-    assert indices == sorted(
-        indices
-    ), f"Tokens not in expected order. Expected order: {expected}, Got: {result}"
-
-
-def assert_social_entities_preserved(result, mentions=None, hashtags=None, urls=None):
-    """Assert that social media entities are preserved.
-
-    Args:
-        result: List of tokens from tokenizer
-        mentions: List of @mentions to check (optional)
-        hashtags: List of #hashtags to check (optional)
-        urls: List of URLs to check (optional)
-    """
-    if mentions:
-        for mention in mentions:
-            assert mention in result, f"Mention '{mention}' not preserved in: {result}"
-
-    if hashtags:
-        for hashtag in hashtags:
-            assert hashtag in result, f"Hashtag '{hashtag}' not preserved in: {result}"
-
-    if urls:
-        for url in urls:
-            assert url in result, f"URL '{url}' not preserved in: {result}"
