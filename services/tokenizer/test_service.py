@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 """
-Comprehensive tests for the tokenizer service.
+Service-level tests for tokenizer API.
 
-This module tests the tokenizer service API, including:
-- Service-level functionality
-- Multilingual text handling
-- Social media entity extraction
-- Configuration options
-- Integration with n-gram processing
+This module tests the high-level tokenizer service API functions,
+including factory functions, configuration handling, and integration
+with downstream processing (n-grams).
+
+Test Organization:
+- TestTokenizerService: Core API functions (tokenize_text, create_basic_tokenizer)
+- TestMultilingualTokenization: Multilingual smoke tests via API
+- TestSocialMediaEntities: Social media entity smoke tests via API
+- TestTokenizerConfiguration: Configuration options via API
+- TestNgramParameterValidation: N-gram parameter validation
+- TestTokenizerIntegration: Integration with n-gram processing
+
+Running Tests:
+    pytest services/tokenizer/test_service.py
 """
 
 from typing import Dict, List
@@ -21,6 +29,7 @@ from .core import AbstractTokenizer, LanguageFamily, TokenizerConfig, TokenType
 from .core.types import CaseHandling
 
 
+@pytest.mark.unit
 class TestTokenizerService:
     """Test the main tokenizer service API functions."""
 
@@ -67,6 +76,7 @@ class TestTokenizerService:
         assert len(result) > 0
 
 
+@pytest.mark.unit
 class TestMultilingualTokenization:
     """Test basic multilingual tokenization through service API (smoke tests)."""
 
@@ -100,6 +110,7 @@ class TestMultilingualTokenization:
         assert "好" in result, f"Chinese character '好' not found in result: {result}"
 
 
+@pytest.mark.unit
 class TestSocialMediaEntities:
     """Test basic social media entity extraction through service API (smoke test)."""
 
@@ -158,6 +169,7 @@ class TestSocialMediaEntities:
         ), "Entity content should be tokenized as words"
 
 
+@pytest.mark.unit
 class TestTokenizerConfiguration:
     """Test basic configuration options through service API."""
 
@@ -192,6 +204,7 @@ class TestTokenizerConfiguration:
         assert "ccc" in result_3
 
 
+@pytest.mark.unit
 class TestNgramParameterValidation:
     """Test n-gram parameter validation and edge cases."""
 
@@ -265,6 +278,7 @@ class TestNgramParameterValidation:
                 pass
 
 
+@pytest.mark.integration
 class TestTokenizerIntegration:
     """Test integration between tokenizer and n-gram processing."""
 
