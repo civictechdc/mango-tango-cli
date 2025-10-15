@@ -69,9 +69,7 @@ class TestBasicTokenizerMultilingual:
             ("안녕하세요 세계", ["안녕하세요", "세계"], "Korean"),
         ],
     )
-    def test_script_tokenization(
-        self, default_tokenizer, text, expected, script_name
-    ):
+    def test_script_tokenization(self, default_tokenizer, text, expected, script_name):
         """Test tokenization for different language scripts."""
         result = default_tokenizer.tokenize(text)
         assert (

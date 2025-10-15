@@ -34,14 +34,14 @@ class BasicTokenizer(AbstractTokenizer):
 
         # Compile regex pattern for character-level script detection (performance optimization)
         self._CHAR_LEVEL_PATTERN = re.compile(
-            r'[\u4e00-\u9fff'  # CJK Unified Ideographs
-            r'\u3400-\u4dbf'   # CJK Extension A
-            r'\u3040-\u309f'   # Hiragana
-            r'\u30a0-\u30ff'   # Katakana
-            r'\u0e00-\u0e7f'   # Thai
-            r'\u0e80-\u0eff'   # Lao
-            r'\u1000-\u109f'   # Myanmar
-            r'\u1780-\u17ff]'  # Khmer
+            r"[\u4e00-\u9fff"  # CJK Unified Ideographs
+            r"\u3400-\u4dbf"  # CJK Extension A
+            r"\u3040-\u309f"  # Hiragana
+            r"\u30a0-\u30ff"  # Katakana
+            r"\u0e00-\u0e7f"  # Thai
+            r"\u0e80-\u0eff"  # Lao
+            r"\u1000-\u109f"  # Myanmar
+            r"\u1780-\u17ff]"  # Khmer
         )
 
     def tokenize(self, text: str) -> TokenList:
@@ -275,7 +275,7 @@ class BasicTokenizer(AbstractTokenizer):
         has_cjk = any(self._is_char_level_script(c) for c in token)
 
         # Don't apply mixed-script preservation to social media entities
-        is_social_entity = token.startswith(('@', '#', '$'))
+        is_social_entity = token.startswith(("@", "#", "$"))
 
         if has_latin and has_cjk and not is_social_entity:
             # Mixed script - keep intact (brand names, bot tricks)

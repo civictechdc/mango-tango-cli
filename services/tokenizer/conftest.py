@@ -10,7 +10,6 @@ import pytest
 from services.tokenizer.basic import BasicTokenizer
 from services.tokenizer.core.types import CaseHandling, TokenizerConfig
 
-
 # =============================================================================
 # Tokenizer Fixtures
 # =============================================================================
