@@ -17,6 +17,9 @@ MANGO_DARK_GREEN = "#609949"
 MANGO_ORANGE = "#f3921e"
 ACCENT = "white"
 
+# Module-level state for native mode (single user)
+_selected_file_path = None
+
 
 def _set_colors():
     return ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
@@ -250,12 +253,14 @@ def gui_main(app: App):
 
             def navigate_to_preview():
                 """Navigate to preview page with selected file path."""
+                global _selected_file_path
+
                 if not selected_file_path:
                     ui.notify("No file selected", type="warning")
                     return
 
-                # Store file path in user storage for next page
-                app.storage.user["selected_file_path"] = selected_file_path
+                # Store file path in module-level variable (native mode, single user)
+                _selected_file_path = selected_file_path
                 ui.navigate.to("/data_preview")
 
             def _format_file_size(size_bytes: int) -> str:
@@ -283,6 +288,142 @@ def gui_main(app: App):
                     browse_btn.set_visibility(True),
                 ),
             )
+
+    @ui.page("/data_preview")
+    def data_preview_page():
+        global _selected_file_path
+
+        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+
+        # Retrieve file path from module-level variable
+        selected_file_path = _selected_file_path
+
+        if not selected_file_path:
+            ui.notify("No file selected. Redirecting...", type="warning")
+            ui.navigate.to("/dataset_importing")
+            return
+
+        with ui.header(elevated=True):
+            ui.button(
+                icon="arrow_back",
+                color="accent",
+                on_click=lambda: ui.navigate.to("/dataset_importing"),
+            ).props("flat")
+            ui.label("Data Preview")
+
+        # Auto-detect importer
+        importer = None
+        for imp in importers:
+            if imp.suggest(selected_file_path):
+                importer = imp
+                break
+
+        if not importer:
+            ui.notify("Could not detect file format", type="negative")
+            ui.navigate.to("/dataset_importing")
+            return
+
+        # Initialize import session and load preview
+        try:
+            import_session = importer.init_session(selected_file_path)
+            if not import_session:
+                raise ValueError("Failed to initialize import session")
+
+            import_preview = import_session.load_preview(10)
+
+            # Main content area
+            with ui.column().classes("items-center justify-start gap-4").style(
+                "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
+            ):
+
+                # Section 1: Import Configuration
+                with ui.card().classes("w-full"):
+                    ui.label("Import Settings").classes("text-h6 mb-3")
+                    ui.label(f"Format: {importer.name}").classes(
+                        "text-sm font-bold mb-2"
+                    )
+
+                    # Display configuration based on importer type
+                    from importing.csv import CsvImportSession
+                    from importing.excel import ExcelImportSession
+
+                    if isinstance(import_session, CsvImportSession):
+                        ui.label(
+                            f"• Column separator: {present_separator(import_session.separator)}"
+                        ).classes("text-sm")
+                        ui.label(
+                            f"• Quote character: {present_separator(import_session.quote_char)}"
+                        ).classes("text-sm")
+                        ui.label(
+                            f"• Has header: {'Yes' if import_session.has_header else 'No'}"
+                        ).classes("text-sm")
+                        ui.label(f"• Skip rows: {import_session.skip_rows}").classes(
+                            "text-sm"
+                        )
+                    elif isinstance(import_session, ExcelImportSession):
+                        ui.label(
+                            f"• Sheet name: {import_session.selected_sheet}"
+                        ).classes("text-sm")
+
+                # Section 2: Detected Columns
+                with ui.card().classes("w-full"):
+                    ui.label(
+                        f"Detected Columns ({len(import_preview.columns)} total)"
+                    ).classes("text-h6 mb-3")
+
+                    # Display as numbered list in columns for better space usage
+                    columns = import_preview.columns
+                    with ui.grid(columns=3).classes("w-full gap-2"):
+                        for i, col in enumerate(columns, 1):
+                            ui.label(f"{i}. {col}").classes("text-sm")
+
+                # Section 3: Data Preview
+                with ui.card().classes("w-full"):
+                    ui.label("Data Sample (first 10 rows)").classes("text-h6 mb-3")
+
+                    # Convert polars DataFrame to dict for aggrid
+                    preview_dict = import_preview.to_dict(as_series=False)
+
+                    # Create column definitions
+                    column_defs = [
+                        {"field": col, "sortable": True, "filter": True}
+                        for col in import_preview.columns
+                    ]
+
+                    # Create row data
+                    row_data = [
+                        {col: preview_dict[col][i] for col in import_preview.columns}
+                        for i in range(len(import_preview))
+                    ]
+
+                    ui.aggrid({"columnDefs": column_defs, "rowData": row_data}).classes(
+                        "w-full h-96"
+                    )
+
+                # Bottom Actions
+                with ui.row().classes("w-full justify-end gap-2 mt-4"):
+                    ui.button(
+                        "Change Import Options",
+                        icon="settings",
+                        on_click=lambda: ui.notify(
+                            "Coming soon: Change import options", type="info"
+                        ),
+                    ).props("outline")
+
+                    ui.button(
+                        "Import Dataset",
+                        icon="upload",
+                        color="primary",
+                        on_click=lambda: ui.notify(
+                            "Coming soon: Import dataset", type="info"
+                        ),
+                    )
+
+        except Exception as e:
+            ui.notify(f"Error loading preview: {str(e)}", type="negative")
+            print(f"Preview error:\n{format_exc()}")
+            ui.navigate.to("/dataset_importing")
+            return
 
     # Launch in native mode
     ui.run(
