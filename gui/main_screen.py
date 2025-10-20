@@ -44,8 +44,8 @@ def gui_main(app: App):
             with ui.row().classes("gap-4"):
 
                 def on_new_project():
-                    ui.notify("New Project clicked", color="secondary", type="info")
-                    # TODO: Implement new project workflow
+
+                    ui.navigate.to("/new_project")
 
                 ui.button(
                     "New Project",
@@ -124,6 +124,60 @@ def gui_main(app: App):
                         icon="arrow_forward",
                         color="primary",
                     ).classes("q-mt-md")
+
+    @ui.page("/new_project")
+    def new_project():
+
+        # Register custom colors FIRST, before any UI elements
+        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+
+        # Header
+        with ui.header(elevated=True):
+            ui.button(
+                icon="home", color="accent", on_click=lambda: ui.navigate.to("/")
+            ).props("flat")
+
+        with ui.column().classes("items-center center-justify").style(
+            "width: 100%; height: 100%"
+        ):
+            with ui.row(align_items="center"):
+                ui.input(
+                    label="New Project Name",
+                    placeholder="e.g. Twitter-2018-dataset",
+                )
+
+            with ui.row(align_items="center"):
+                ui.button(
+                    text="Data importing",
+                    icon="arrow_forward",
+                    on_click=lambda: ui.navigate.to("/dataset_importing"),
+                )
+
+    @ui.page("/dataset_importing")
+    def dataset_importing():
+
+        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+
+        with ui.header(elevated=True):
+            ui.button(
+                text="New Project",
+                icon="arrow_back",
+                color="accent",
+                on_click=lambda: ui.navigate.to("/new_project"),
+            ).props("flat")
+
+        with ui.column().classes("items-center center-justify").style(
+            "width: 100%; height: 100%"
+        ):
+            ui.label("Upload your dataset").classes("q-mb-md").style(
+                "font-size: 1.05rem"
+            )
+
+            ui.upload(
+                label="Select CSV or Excel file",
+                on_upload=lambda e: ui.notify(f"Uploaded: {e.name}", type="positive"),
+                auto_upload=True,
+            ).classes("q-mt-md")
 
     # Launch in native mode
     ui.run(
