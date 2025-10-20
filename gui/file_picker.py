@@ -147,7 +147,7 @@ class LocalFilePicker(ui.dialog):
             if self.upper_limit is None or self.path != self.upper_limit:
                 entries.append(
                     {
-                        "name": "📁 [..]",
+                        "name": "⬆️ Go up to parent folder",
                         "size": "",
                         "path": str(self.path.parent),
                         "is_dir": True,
