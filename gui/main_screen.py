@@ -4,11 +4,13 @@ Main GUI screen with title and project selection.
 
 import os
 from datetime import datetime
+from traceback import format_exc
 
 from nicegui import ui
 
 from app import App
 from gui.file_picker import LocalFilePicker
+from importing import importers
 
 # Mango Tree brand color
 MANGO_DARK_GREEN = "#609949"
@@ -18,6 +20,20 @@ ACCENT = "white"
 
 def _set_colors():
     return ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+
+
+def present_separator(value: str) -> str:
+    """Format separator/quote character for display."""
+    mapping = {
+        "\t": "Tab",
+        " ": "Space",
+        ",": ", (Comma)",
+        ";": "; (Semicolon)",
+        "'": "' (Single quote)",
+        '"': '" (Double quote)',
+        "|": "| (Pipe)",
+    }
+    return mapping.get(value, value)
 
 
 def gui_main(app: App):
@@ -178,7 +194,7 @@ def gui_main(app: App):
             ).props("flat")
 
         with ui.column().classes("items-center justify-center gap-4").style(
-            "width: 100%; max-width: 800px; margin: 0 auto; padding: 2rem;"
+            "width: 100%; max-width: 1000px; margin: 0 auto; padding: 2rem;"
         ):
             ui.label("Choose a dataset file.").classes("text-lg")
 
@@ -194,14 +210,12 @@ def gui_main(app: App):
                     change_file_btn = ui.button(
                         "Pick a different file", icon="edit", on_click=lambda: None
                     ).props("outline")
-                    ui.button(
-                        "Next: Data Preview", icon="arrow_forward", color="primary"
+                    preview_btn = ui.button(
+                        "Next: Preview Data", icon="arrow_forward", color="primary"
                     )
 
             # Browse button
             async def browse_for_file():
-
-                _set_colors()
                 nonlocal selected_file_path
 
                 picker = LocalFilePicker(
@@ -234,6 +248,16 @@ def gui_main(app: App):
                         type="positive",
                     )
 
+            def navigate_to_preview():
+                """Navigate to preview page with selected file path."""
+                if not selected_file_path:
+                    ui.notify("No file selected", type="warning")
+                    return
+
+                # Store file path in user storage for next page
+                app.storage.user["selected_file_path"] = selected_file_path
+                ui.navigate.to("/data_preview")
+
             def _format_file_size(size_bytes: int) -> str:
                 """Format file size in human-readable format."""
                 for unit in ["B", "KB", "MB", "GB", "TB"]:
@@ -249,7 +273,9 @@ def gui_main(app: App):
                 color="primary",
             ).classes("text-lg")
 
-            # Wire up change file button
+            # Wire up buttons
+            preview_btn.on("click", navigate_to_preview)
+
             change_file_btn.on(
                 "click",
                 lambda: (
