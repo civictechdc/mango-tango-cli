@@ -177,12 +177,10 @@ def gui_main(app: App):
                 on_click=lambda: ui.navigate.to("/new_project"),
             ).props("flat")
 
-            ui.label("Dataset Importing")
-
         with ui.column().classes("items-center justify-center gap-4").style(
             "width: 100%; max-width: 800px; margin: 0 auto; padding: 2rem;"
         ):
-            ui.label("Dataset file information review").classes("text-lg")
+            ui.label("Choose a dataset file.").classes("text-lg")
 
             # File info card (initially hidden)
             file_info_card = ui.card().classes("w-full").style("display: none;")
