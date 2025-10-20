@@ -163,37 +163,37 @@ def server(input, output, sessions):
     def get_search_filtered_data():
         """Filter data based on n-gram content search"""
         global data_full
-        
+
         # Get search value
         content_search = input.ngram_content_search() or ""
-        
+
         # If no search terms, return original data
         if not content_search.strip():
             return data_full
-        
+
         # Filter by n-gram content if provided
         filtered_data = data_full.filter(
             pl.col(COL_NGRAM_WORDS).str.contains(content_search.strip(), literal=False)
         )
-        
+
         return filtered_data
 
     @reactive.calc
     def get_search_filtered_stats():
         """Get n-gram statistics for search-filtered data"""
         search_data = get_search_filtered_data()
-        
+
         if search_data.is_empty():
             return data_stats.head(0)  # Return empty dataframe with same schema
-        
+
         # Get unique n-gram IDs from filtered data
         filtered_ngram_ids = search_data.select(COL_NGRAM_ID).unique()
-        
+
         # Filter stats data to only include n-grams that appear in search results
         filtered_stats = data_stats.filter(
             pl.col(COL_NGRAM_ID).is_in(filtered_ngram_ids[COL_NGRAM_ID])
         )
-        
+
         return filtered_stats
 
     # Store the figure widget reference
@@ -214,8 +214,6 @@ def server(input, output, sessions):
                     fig_widget = _remove_markers(figure_widget=fig_widget)
                 except Exception:
                     pass
-
-
 
     @reactive.calc
     def get_top_n_data():
@@ -316,12 +314,12 @@ def server(input, output, sessions):
         # Use search-filtered data if search is active, otherwise use regular filtered data
         content_search = input.ngram_content_search() or ""
         has_search = bool(content_search.strip())
-        
+
         if has_search:
             df = get_search_filtered_stats()
         else:
             df = get_data()
-            
+
         fig = plot_scatter(data=df)
 
         # Create FigureWidget directly from the figure
@@ -341,17 +339,19 @@ def server(input, output, sessions):
         # Get search values once to avoid multiple reactive calls
         content_search = input.ngram_content_search() or ""
         has_search = bool(content_search.strip())
-        
+
         if has_search:
             search_data = get_search_filtered_data()
             search_stats = get_search_filtered_stats()
-            
+
             if search_data.is_empty():
                 return "No results found for the current search criteria. Try adjusting your search."
             else:
                 total_ngrams = len(search_stats)
                 total_records = len(search_data)
-                content_text = f"Content: '{content_search}'" if content_search.strip() else ""
+                content_text = (
+                    f"Content: '{content_search}'" if content_search.strip() else ""
+                )
                 search_text = " and ".join(filter(None, [content_text]))
                 return f"Search results for {search_text}: {total_ngrams} unique n-grams, {total_records} total records."
         else:
@@ -368,29 +368,54 @@ def server(input, output, sessions):
         # Get search values once to avoid multiple reactive calls
         content_search = input.ngram_content_search() or ""
         has_search = bool(content_search.strip())
-        
+
         if has_search:
             # Show search results
             search_data = get_search_filtered_data()
             if search_data.is_empty():
                 # Show empty dataframe with proper columns
-                data_for_display = data_full.select([
-                    COL_AUTHOR_ID, COL_NGRAM_WORDS, COL_MESSAGE_TEXT, COL_MESSAGE_TIMESTAMP
-                ]).head(0).rename({
-                    COL_AUTHOR_ID: "Unique user ID",
-                    COL_NGRAM_WORDS: "N-gram content", 
-                    COL_MESSAGE_TEXT: "Post content",
-                    COL_MESSAGE_TIMESTAMP: "Timestamp"
-                })
+                data_for_display = (
+                    data_full.select(
+                        [
+                            COL_AUTHOR_ID,
+                            COL_NGRAM_WORDS,
+                            COL_MESSAGE_TEXT,
+                            COL_MESSAGE_TIMESTAMP,
+                        ]
+                    )
+                    .head(0)
+                    .rename(
+                        {
+                            COL_AUTHOR_ID: "Unique user ID",
+                            COL_NGRAM_WORDS: "N-gram content",
+                            COL_MESSAGE_TEXT: "Post content",
+                            COL_MESSAGE_TIMESTAMP: "Timestamp",
+                        }
+                    )
+                )
             else:
                 # Show search results
-                SEL_COLUMNS = [COL_AUTHOR_ID, COL_NGRAM_WORDS, COL_MESSAGE_TEXT, COL_MESSAGE_TIMESTAMP]
-                COL_RENAME = ["Unique user ID", "N-gram content", "Post content", "Timestamp"]
+                SEL_COLUMNS = [
+                    COL_AUTHOR_ID,
+                    COL_NGRAM_WORDS,
+                    COL_MESSAGE_TEXT,
+                    COL_MESSAGE_TIMESTAMP,
+                ]
+                COL_RENAME = [
+                    "Unique user ID",
+                    "N-gram content",
+                    "Post content",
+                    "Timestamp",
+                ]
                 old2new = {k: v for k, v in zip(SEL_COLUMNS, COL_RENAME)}
-                
-                data_for_display = search_data.with_columns(
-                    pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%B %d, %Y %I:%M %p")
-                ).select(SEL_COLUMNS).rename(old2new)
+
+                data_for_display = (
+                    search_data.with_columns(
+                        pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%B %d, %Y %I:%M %p")
+                    )
+                    .select(SEL_COLUMNS)
+                    .rename(old2new)
+                )
         else:
             # Original behavior - show clicked data or summary
             data_for_display = get_filtered_data()
