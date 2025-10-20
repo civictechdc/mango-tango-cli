@@ -2,9 +2,13 @@
 Main GUI screen with title and project selection.
 """
 
+import os
+from datetime import datetime
+
 from nicegui import ui
 
 from app import App
+from gui.file_picker import LocalFilePicker
 
 # Mango Tree brand color
 MANGO_DARK_GREEN = "#609949"
@@ -148,7 +152,7 @@ def gui_main(app: App):
 
             with ui.row(align_items="center"):
                 ui.button(
-                    text="Data importing",
+                    text="Next: Select Dataset",
                     icon="arrow_forward",
                     on_click=lambda: ui.navigate.to("/dataset_importing"),
                 )
@@ -158,6 +162,9 @@ def gui_main(app: App):
 
         ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
 
+        # Page state
+        selected_file_path = None
+
         with ui.header(elevated=True):
             ui.button(
                 text="New Project",
@@ -166,18 +173,82 @@ def gui_main(app: App):
                 on_click=lambda: ui.navigate.to("/new_project"),
             ).props("flat")
 
-        with ui.column().classes("items-center center-justify").style(
-            "width: 100%; height: 100%"
-        ):
-            ui.label("Upload your dataset").classes("q-mb-md").style(
-                "font-size: 1.05rem"
-            )
+            ui.label("Dataset Importing")
 
-            ui.upload(
-                label="Select CSV or Excel file",
-                on_upload=lambda e: ui.notify(f"Uploaded: {e.name}", type="positive"),
-                auto_upload=True,
-            ).classes("q-mt-md")
+        with ui.column().classes("items-center justify-center gap-4").style(
+            "width: 100%; max-width: 800px; margin: 0 auto; padding: 2rem;"
+        ):
+            ui.label("Select a dataset file from your computer").classes("text-lg")
+
+            # File info card (initially hidden)
+            file_info_card = ui.card().classes("w-full").style("display: none;")
+            with file_info_card:
+                file_name_label = ui.label().classes("text-h6")
+                file_path_label = ui.label().classes("text-sm text-gray-600")
+                file_size_label = ui.label().classes("text-sm")
+                file_modified_label = ui.label().classes("text-sm")
+
+                with ui.row().classes("gap-2 mt-2"):
+                    change_file_btn = ui.button(
+                        "Pick a different file", icon="edit", on_click=lambda: None
+                    ).props("outline")
+                    ui.button(
+                        "Next: Preview Data", icon="arrow_forward", color="primary"
+                    )
+
+            # Browse button
+            async def browse_for_file():
+                nonlocal selected_file_path
+
+                picker = LocalFilePicker(
+                    state=app.file_selector_state,
+                    file_extensions=[".csv", ".xlsx"],
+                )
+                result = await picker
+
+                if result:
+                    selected_file_path = result
+
+                    # Show file info
+                    file_stats = os.stat(result)
+                    file_size = _format_file_size(file_stats.st_size)
+                    file_modified = datetime.fromtimestamp(
+                        file_stats.st_mtime
+                    ).strftime("%Y-%m-%d %H:%M:%S")
+
+                    file_name_label.text = f"📄 {os.path.basename(result)}"
+                    file_path_label.text = f"Location: {result}"
+                    file_size_label.text = f"Size: {file_size}"
+                    file_modified_label.text = f"Modified: {file_modified}"
+
+                    file_info_card.style("display: block;")
+                    browse_btn.set_visibility(False)
+
+                    ui.notify("File selected successfully", type="positive")
+
+            def _format_file_size(size_bytes: int) -> str:
+                """Format file size in human-readable format."""
+                for unit in ["B", "KB", "MB", "GB", "TB"]:
+                    if size_bytes < 1024.0:
+                        return f"{size_bytes:.1f} {unit}"
+                    size_bytes /= 1024.0
+                return f"{size_bytes:.1f} PB"
+
+            browse_btn = ui.button(
+                "Browse dataset files",
+                icon="folder_open",
+                on_click=browse_for_file,
+                color="primary",
+            ).classes("text-lg")
+
+            # Wire up change file button
+            change_file_btn.on(
+                "click",
+                lambda: (
+                    file_info_card.style("display: none;"),
+                    browse_btn.set_visibility(True),
+                ),
+            )
 
     # Launch in native mode
     ui.run(
