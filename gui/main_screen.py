@@ -16,6 +16,10 @@ MANGO_ORANGE = "#f3921e"
 ACCENT = "white"
 
 
+def _set_colors():
+    return ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+
+
 def gui_main(app: App):
     """
     Launch the NiceGUI interface with a minimal single screen.
@@ -178,26 +182,28 @@ def gui_main(app: App):
         with ui.column().classes("items-center justify-center gap-4").style(
             "width: 100%; max-width: 800px; margin: 0 auto; padding: 2rem;"
         ):
-            ui.label("Select a dataset file from your computer").classes("text-lg")
+            ui.label("Dataset file information review").classes("text-lg")
 
             # File info card (initially hidden)
             file_info_card = ui.card().classes("w-full").style("display: none;")
             with file_info_card:
-                file_name_label = ui.label().classes("text-h6")
-                file_path_label = ui.label().classes("text-sm text-gray-600")
+                file_name_label = ui.label().classes("text-sm")
+                file_path_label = ui.label().classes("text-sm")
                 file_size_label = ui.label().classes("text-sm")
                 file_modified_label = ui.label().classes("text-sm")
 
-                with ui.row().classes("gap-2 mt-2"):
+                with ui.row().classes("w-full justify-end gap-2 mt-4"):
                     change_file_btn = ui.button(
                         "Pick a different file", icon="edit", on_click=lambda: None
                     ).props("outline")
                     ui.button(
-                        "Next: Preview Data", icon="arrow_forward", color="primary"
+                        "Next: Data Preview", icon="arrow_forward", color="primary"
                     )
 
             # Browse button
             async def browse_for_file():
+
+                _set_colors()
                 nonlocal selected_file_path
 
                 picker = LocalFilePicker(
@@ -216,7 +222,7 @@ def gui_main(app: App):
                         file_stats.st_mtime
                     ).strftime("%Y-%m-%d %H:%M:%S")
 
-                    file_name_label.text = f"📄 {os.path.basename(result)}"
+                    file_name_label.text = f"Dataset file: {os.path.basename(result)}"
                     file_path_label.text = f"Location: {result}"
                     file_size_label.text = f"Size: {file_size}"
                     file_modified_label.text = f"Modified: {file_modified}"
@@ -224,7 +230,11 @@ def gui_main(app: App):
                     file_info_card.style("display: block;")
                     browse_btn.set_visibility(False)
 
-                    ui.notify("File selected successfully", type="positive")
+                    ui.notify(
+                        message="File selected successfully",
+                        color="secondary",
+                        type="positive",
+                    )
 
             def _format_file_size(size_bytes: int) -> str:
                 """Format file size in human-readable format."""
@@ -235,7 +245,7 @@ def gui_main(app: App):
                 return f"{size_bytes:.1f} PB"
 
             browse_btn = ui.button(
-                "Browse dataset files",
+                "Browse files",
                 icon="folder_open",
                 on_click=browse_for_file,
                 color="primary",
