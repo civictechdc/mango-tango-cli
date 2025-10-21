@@ -10,6 +10,7 @@ from nicegui import ui
 
 from app import App
 from gui.file_picker import LocalFilePicker
+from gui.import_options import ImportOptionsDialog
 from importing import importers
 
 # Mango Tree brand color
@@ -297,7 +298,7 @@ def gui_main(app: App):
 
         def _make_preview_grid(data_frame):
             """Wraps elements of the preview data grid and labels"""
-            ui.label("Data Preview (first 10 rows)").classes("text-h6 mb-1")
+            ui.label("Data Preview (first 5 rows)").classes("text-h6 mb-1")
 
             n_empty = sum((c[0] == 0 for c in data_frame.count().iter_columns()))
             ui.label(
@@ -306,7 +307,7 @@ def gui_main(app: App):
 
             ui.aggrid.from_polars(
                 data_frame, theme="quartz", auto_size_columns=False
-            ).classes("w-full h-96")
+            ).classes("w-full h-64")
 
         # Retrieve file path from module-level variable
         selected_file_path = _selected_file_path
@@ -343,153 +344,54 @@ def gui_main(app: App):
             if not import_session:
                 raise ValueError("Failed to initialize import session")
 
-            N_ROWS_FOR_PREVIEW = 10
+            N_ROWS_FOR_PREVIEW = 5
             import_preview = import_session.load_preview(n_records=N_ROWS_FOR_PREVIEW)
 
             # Declare containers for dynamic updates
             data_preview_container = None
+
+            # Retry callback for dialog
+            async def handle_retry(updated_session):
+                """Handle retry from import options dialog."""
+                nonlocal import_session, import_preview
+
+                try:
+
+                    # Update session
+                    import_session = updated_session
+
+                    # Reload preview with new settings
+                    ui.notify("Reloading preview...", type="info")
+                    import_preview = import_session.load_preview(
+                        n_records=N_ROWS_FOR_PREVIEW
+                    )
+
+                    # Clear and rebuild data preview
+                    data_preview_container.clear()
+                    with data_preview_container:
+                        _make_preview_grid(data_frame=import_preview)
+
+                    ui.notify("Preview updated successfully!", type="positive")
+
+                except Exception as e:
+                    ui.notify(f"Error: {str(e)}", type="negative")
+                    print(f"Retry import error:\n{format_exc()}")
+
+            # Open import options dialog
+            async def open_import_options():
+                dialog = ImportOptionsDialog(
+                    import_session=import_session,
+                    selected_file_path=selected_file_path,
+                    on_retry=handle_retry,
+                )
+                await dialog
 
             # Main content area
             with ui.column().classes("items-center justify-start gap-4").style(
                 "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
             ):
 
-                # Section 1: Import Configuration
-                with ui.card().classes("w-full"):
-                    ui.label(f"Import Settings ({importer.name})").classes(
-                        "text-h6 mb-1"
-                    )
-
-                    # Display configuration based on importer type
-                    from importing.csv import CsvImportSession
-                    from importing.excel import ExcelImportSession
-
-                    if isinstance(import_session, CsvImportSession):
-
-                        ROW_LAYOUT_SPECS = "w-full items-center gap-4"
-                        # Row 1: Column Separator
-                        with ui.row().classes(ROW_LAYOUT_SPECS):
-                            ui.label("Column separator:").classes("text-base").style(
-                                "min-width: 150px"
-                            )
-                            separator_toggle = ui.toggle(
-                                {
-                                    ",": "Comma (,)",
-                                    ";": "Semicolon (;)",
-                                    "|": "Pipe (|)",
-                                    "\t": "Tab",
-                                },
-                                value=import_session.separator,
-                            )
-
-                        # Row 2: Quote Character
-                        with ui.row().classes(ROW_LAYOUT_SPECS):
-                            ui.label("Quote character:").classes("text-base").style(
-                                "min-width: 150px"
-                            )
-                            quote_toggle = ui.toggle(
-                                {
-                                    '"': 'Double quote (")',
-                                    "'": "Single quote (')",
-                                },
-                                value=import_session.quote_char,
-                            )
-
-                        # Row 3: Has Header
-                        with ui.row().classes(ROW_LAYOUT_SPECS):
-
-                            with ui.label("Has header:").classes("text-base").style(
-                                "min-width: 150px"
-                            ):
-                                ui.tooltip(
-                                    "Whether the dataset file has a line that contains column names."
-                                )
-                            header_toggle = ui.toggle(
-                                {True: "Yes", False: "No"},
-                                value=import_session.has_header,
-                            )
-
-                        # Row 4: Skip Rows (numeric input with validation)
-                        with ui.row().classes(ROW_LAYOUT_SPECS):
-                            ui.label("Skip rows:").classes("text-base").style(
-                                "min-width: 150px"
-                            )
-                            skip_rows_input = ui.number(
-                                label="Nr. rows to skip at start of file",
-                                value=import_session.skip_rows,
-                                min=0,
-                                max=100,
-                                step=1,
-                                precision=0,
-                                validation={
-                                    "Must be a non-negative integer": lambda v: v >= 0,
-                                    "Cannot skip more than 100 rows": lambda v: v
-                                    <= 100,
-                                },
-                            ).classes("w-42")
-
-                        # Retry Import Button
-                        async def retry_import():
-                            """Retry import with updated configuration from UI controls."""
-                            nonlocal import_session, import_preview, data_preview_container
-
-                            # Get current control values
-                            new_separator = separator_toggle.value
-                            new_quote_char = quote_toggle.value
-                            new_has_header = header_toggle.value
-                            new_skip_rows = int(skip_rows_input.value)
-
-                            # Validate skip_rows
-                            if new_skip_rows < 0 or new_skip_rows > 100:
-                                ui.notify("Invalid skip rows value", type="negative")
-                                return
-
-                            # Create new import session with updated config
-                            import_session = CsvImportSession(
-                                input_file=selected_file_path,
-                                separator=new_separator,
-                                quote_char=new_quote_char,
-                                has_header=new_has_header,
-                                skip_rows=new_skip_rows,
-                            )
-
-                            try:
-                                # Reload preview with new settings
-                                ui.notify("Reloading preview...", type="info")
-                                import_preview = import_session.load_preview(
-                                    n_records=N_ROWS_FOR_PREVIEW
-                                )
-
-                                # Clear and rebuild Sections 2 & 3
-                                data_preview_container.clear()
-
-                                # Rebuild Section 3: Data Preview
-                                with data_preview_container:
-
-                                    _make_preview_grid(data_frame=import_preview)
-
-                                ui.notify(
-                                    "Preview updated successfully!", type="positive"
-                                )
-
-                            except Exception as e:
-                                ui.notify(f"Error: {str(e)}", type="negative")
-                                print(f"Retry import error:\n{format_exc()}")
-
-                        with ui.row().classes("w-full justify-end mt-2"):
-                            ui.button(
-                                "Retry Import",
-                                icon="refresh",
-                                on_click=retry_import,
-                                color="secondary",
-                            ).props("outline")
-
-                    elif isinstance(import_session, ExcelImportSession):
-                        ui.label(
-                            f"• Sheet name: {import_session.selected_sheet}"
-                        ).classes("text-sm")
-
-                # Section 3: Data Preview (with container for dynamic updates)
+                # Data Preview (with container for dynamic updates)
                 with ui.card().classes("w-full"):
                     data_preview_container = ui.column().classes("w-full")
                     with data_preview_container:
@@ -498,6 +400,11 @@ def gui_main(app: App):
 
                 # Bottom Actions
                 with ui.row().classes("w-full justify-end gap-2 mt-4"):
+                    ui.button(
+                        "Change Import Options",
+                        icon="settings",
+                        on_click=open_import_options,
+                    ).props("outline")
 
                     ui.button(
                         "Import Dataset",
