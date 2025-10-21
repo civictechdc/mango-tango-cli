@@ -331,6 +331,10 @@ def gui_main(app: App):
 
             import_preview = import_session.load_preview(10)
 
+            # Declare containers for dynamic updates
+            columns_container = None
+            data_preview_container = None
+
             # Main content area
             with ui.column().classes("items-center justify-start gap-4").style(
                 "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
@@ -348,57 +352,196 @@ def gui_main(app: App):
                     from importing.excel import ExcelImportSession
 
                     if isinstance(import_session, CsvImportSession):
-                        ui.label(
-                            f"• Column separator: {present_separator(import_session.separator)}"
-                        ).classes("text-sm")
-                        ui.label(
-                            f"• Quote character: {present_separator(import_session.quote_char)}"
-                        ).classes("text-sm")
-                        ui.label(
-                            f"• Has header: {'Yes' if import_session.has_header else 'No'}"
-                        ).classes("text-sm")
-                        ui.label(f"• Skip rows: {import_session.skip_rows}").classes(
-                            "text-sm"
-                        )
+                        # Row 1: Column Separator
+                        with ui.row().classes("w-full items-center gap-4 mb-3"):
+                            ui.label("Column separator:").classes(
+                                "text-sm font-bold"
+                            ).style("min-width: 150px")
+                            separator_toggle = ui.toggle(
+                                {
+                                    ",": "Comma (,)",
+                                    ";": "Semicolon (;)",
+                                    "|": "Pipe (|)",
+                                    "\t": "Tab",
+                                },
+                                value=import_session.separator,
+                            )
+
+                        # Row 2: Quote Character
+                        with ui.row().classes("w-full items-center gap-4 mb-3"):
+                            ui.label("Quote character:").classes(
+                                "text-sm font-bold"
+                            ).style("min-width: 150px")
+                            quote_toggle = ui.toggle(
+                                {
+                                    '"': 'Double quote (")',
+                                    "'": "Single quote (')",
+                                },
+                                value=import_session.quote_char,
+                            )
+
+                        # Row 3: Has Header
+                        with ui.row().classes("w-full items-center gap-4 mb-3"):
+                            ui.label("Has header:").classes("text-sm font-bold").style(
+                                "min-width: 150px"
+                            )
+                            header_toggle = ui.toggle(
+                                {True: "Yes", False: "No"},
+                                value=import_session.has_header,
+                            )
+
+                        # Row 4: Skip Rows (numeric input with validation)
+                        with ui.row().classes("w-full items-center gap-4 mb-3"):
+                            ui.label("Skip rows:").classes("text-sm font-bold").style(
+                                "min-width: 150px"
+                            )
+                            skip_rows_input = ui.number(
+                                label="",
+                                value=import_session.skip_rows,
+                                min=0,
+                                max=100,
+                                step=1,
+                                precision=0,
+                                validation={
+                                    "Must be a non-negative integer": lambda v: v >= 0,
+                                    "Cannot skip more than 100 rows": lambda v: v
+                                    <= 100,
+                                },
+                            ).classes("w-32")
+
+                        # Retry Import Button
+                        async def retry_import():
+                            """Retry import with updated configuration from UI controls."""
+                            nonlocal import_session, import_preview, columns_container, data_preview_container
+
+                            # Get current control values
+                            new_separator = separator_toggle.value
+                            new_quote_char = quote_toggle.value
+                            new_has_header = header_toggle.value
+                            new_skip_rows = int(skip_rows_input.value)
+
+                            # Validate skip_rows
+                            if new_skip_rows < 0 or new_skip_rows > 100:
+                                ui.notify("Invalid skip rows value", type="negative")
+                                return
+
+                            # Create new import session with updated config
+                            import_session = CsvImportSession(
+                                input_file=selected_file_path,
+                                separator=new_separator,
+                                quote_char=new_quote_char,
+                                has_header=new_has_header,
+                                skip_rows=new_skip_rows,
+                            )
+
+                            try:
+                                # Reload preview with new settings
+                                ui.notify("Reloading preview...", type="info")
+                                import_preview = import_session.load_preview(10)
+
+                                # Clear and rebuild Sections 2 & 3
+                                columns_container.clear()
+                                data_preview_container.clear()
+
+                                # Rebuild Section 2: Columns
+                                with columns_container:
+                                    ui.label(
+                                        f"Detected Columns ({len(import_preview.columns)} total)"
+                                    ).classes("text-h6 mb-3")
+
+                                    columns = import_preview.columns
+                                    with ui.grid(columns=3).classes("w-full gap-2"):
+                                        for i, col in enumerate(columns, 1):
+                                            ui.label(f"{i}. {col}").classes("text-sm")
+
+                                # Rebuild Section 3: Data Preview
+                                with data_preview_container:
+                                    ui.label("Data Sample (first 10 rows)").classes(
+                                        "text-h6 mb-3"
+                                    )
+
+                                    # Convert DataFrame for aggrid
+                                    preview_dict = import_preview.to_dict(
+                                        as_series=False
+                                    )
+                                    column_defs = [
+                                        {"field": col, "sortable": True, "filter": True}
+                                        for col in import_preview.columns
+                                    ]
+                                    row_data = [
+                                        {
+                                            col: preview_dict[col][i]
+                                            for col in import_preview.columns
+                                        }
+                                        for i in range(len(import_preview))
+                                    ]
+
+                                    ui.aggrid(
+                                        {"columnDefs": column_defs, "rowData": row_data}
+                                    ).classes("w-full h-96")
+
+                                ui.notify(
+                                    "Preview updated successfully!", type="positive"
+                                )
+
+                            except Exception as e:
+                                ui.notify(f"Error: {str(e)}", type="negative")
+                                print(f"Retry import error:\n{format_exc()}")
+
+                        with ui.row().classes("w-full justify-end mt-4"):
+                            ui.button(
+                                "Retry Import",
+                                icon="refresh",
+                                on_click=retry_import,
+                                color="secondary",
+                            ).props("outline")
+
                     elif isinstance(import_session, ExcelImportSession):
                         ui.label(
                             f"• Sheet name: {import_session.selected_sheet}"
                         ).classes("text-sm")
 
-                # Section 2: Detected Columns
+                # Section 2: Detected Columns (with container for dynamic updates)
                 with ui.card().classes("w-full"):
-                    ui.label(
-                        f"Detected Columns ({len(import_preview.columns)} total)"
-                    ).classes("text-h6 mb-3")
+                    columns_container = ui.column().classes("w-full")
+                    with columns_container:
+                        ui.label(
+                            f"Detected Columns ({len(import_preview.columns)} total)"
+                        ).classes("text-h6 mb-3")
 
-                    # Display as numbered list in columns for better space usage
-                    columns = import_preview.columns
-                    with ui.grid(columns=3).classes("w-full gap-2"):
-                        for i, col in enumerate(columns, 1):
-                            ui.label(f"{i}. {col}").classes("text-sm")
+                        # Display as numbered list in columns for better space usage
+                        columns = import_preview.columns
+                        with ui.grid(columns=3).classes("w-full gap-2"):
+                            for i, col in enumerate(columns, 1):
+                                ui.label(f"{i}. {col}").classes("text-sm")
 
-                # Section 3: Data Preview
+                # Section 3: Data Preview (with container for dynamic updates)
                 with ui.card().classes("w-full"):
-                    ui.label("Data Sample (first 10 rows)").classes("text-h6 mb-3")
+                    data_preview_container = ui.column().classes("w-full")
+                    with data_preview_container:
+                        ui.label("Data Sample (first 10 rows)").classes("text-h6 mb-3")
 
-                    # Convert polars DataFrame to dict for aggrid
-                    preview_dict = import_preview.to_dict(as_series=False)
+                        # Convert polars DataFrame to dict for aggrid
+                        preview_dict = import_preview.to_dict(as_series=False)
 
-                    # Create column definitions
-                    column_defs = [
-                        {"field": col, "sortable": True, "filter": True}
-                        for col in import_preview.columns
-                    ]
+                        # Create column definitions
+                        column_defs = [
+                            {"field": col, "sortable": True, "filter": True}
+                            for col in import_preview.columns
+                        ]
 
-                    # Create row data
-                    row_data = [
-                        {col: preview_dict[col][i] for col in import_preview.columns}
-                        for i in range(len(import_preview))
-                    ]
+                        # Create row data
+                        row_data = [
+                            {
+                                col: preview_dict[col][i]
+                                for col in import_preview.columns
+                            }
+                            for i in range(len(import_preview))
+                        ]
 
-                    ui.aggrid({"columnDefs": column_defs, "rowData": row_data}).classes(
-                        "w-full h-96"
-                    )
+                        ui.aggrid(
+                            {"columnDefs": column_defs, "rowData": row_data}
+                        ).classes("w-full h-96")
 
                 # Bottom Actions
                 with ui.row().classes("w-full justify-end gap-2 mt-4"):
