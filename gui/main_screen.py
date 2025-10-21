@@ -304,24 +304,9 @@ def gui_main(app: App):
                 f"Nr. detected columns: {len(data_frame.columns)} ({n_empty} empty)"
             ).classes("text-sm")
 
-            # Convert polars DataFrame to dict for aggrid
-            preview_dict = data_frame.to_dict(as_series=False)
-
-            # Create column definitions
-            column_defs = [
-                {"field": col, "sortable": True, "filter": True}
-                for col in data_frame.columns
-            ]
-
-            # Create row data
-            row_data = [
-                {col: preview_dict[col][i] for col in data_frame.columns}
-                for i in range(len(data_frame))
-            ]
-
-            ui.aggrid({"columnDefs": column_defs, "rowData": row_data}).classes(
-                "w-full h-96"
-            )
+            ui.aggrid.from_polars(
+                data_frame, theme="quartz", auto_size_columns=False
+            ).classes("w-full h-96")
 
         # Retrieve file path from module-level variable
         selected_file_path = _selected_file_path
