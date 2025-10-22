@@ -305,7 +305,7 @@ def gui_main(app: App):
             ui.label("Choose a dataset file.").classes("text-lg")
 
             # File info card (initially hidden)
-            file_info_card = ui.card().classes("w-full").style("display: none;")
+            file_info_card = ui.card().style("display: none;")
             with file_info_card:
                 file_name_label = ui.label().classes("text-sm")
                 file_path_label = ui.label().classes("text-sm")
@@ -408,7 +408,7 @@ def gui_main(app: App):
 
         def _make_preview_grid(data_frame):
             """Wraps elements of the preview data grid and labels"""
-            ui.label("Data Preview (first 5 rows)").classes("text-lg text-bold")
+            ui.label("Data Preview (first 5 rows)").classes("text-lg")
 
             n_empty = sum((c[0] == 0 for c in data_frame.count().iter_columns()))
             ui.label(
@@ -462,7 +462,6 @@ def gui_main(app: App):
                     import_session = updated_session
 
                     # Reload preview with new settings
-                    ui.notify("Reloading preview...", type="info")
                     import_preview = import_session.load_preview(
                         n_records=N_ROWS_FOR_PREVIEW
                     )
@@ -472,7 +471,11 @@ def gui_main(app: App):
                     with data_preview_container:
                         _make_preview_grid(data_frame=import_preview)
 
-                    ui.notify("Preview updated successfully!", type="positive")
+                    ui.notify(
+                        "Preview updated successfully!",
+                        color="secondary",
+                        type="positive",
+                    )
 
                 except Exception as e:
                     ui.notify(f"Error: {str(e)}", type="negative")
@@ -493,11 +496,11 @@ def gui_main(app: App):
             ):
 
                 # Data Preview (with container for dynamic updates)
-                with ui.card().classes("w-full"):
-                    data_preview_container = ui.column().classes("w-full")
-                    with data_preview_container:
+                # with ui.card().classes("w-full"):
+                data_preview_container = ui.column().classes("w-full")
+                with data_preview_container:
 
-                        _make_preview_grid(import_preview)
+                    _make_preview_grid(import_preview)
 
                 # Bottom Actions
                 with ui.row().classes("w-full justify-end gap-2 mt-4"):
