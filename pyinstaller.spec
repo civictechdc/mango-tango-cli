@@ -40,6 +40,9 @@ a = Analysis(
         ('./app/web_static', 'app/web_static'),
         ('./app/web_templates', 'app/web_templates'),
 
+        # GUI icons (Simple Icons for footer links)
+        ('./gui/icons', 'gui/icons'),
+
         # NiceGUI static files (required for GUI mode)
         (os.path.join(site_packages_path, 'nicegui'), 'nicegui')
         # Note: pywebview data files are handled by custom hook in ./hooks/
