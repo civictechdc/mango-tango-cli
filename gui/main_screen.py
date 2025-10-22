@@ -267,22 +267,23 @@ def gui_main(app: App):
 
         # Header
         _make_header(title="New Project", back_icon="arrow_back", back_url="/")
+        _make_footer()
 
-        with ui.column().classes("items-center center-justify").style(
-            "width: 100%; height: 100%"
+        # Main content - centered vertically and horizontally
+        with ui.column().classes("items-center justify-center gap-6").style(
+            "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
         ):
-            with ui.row(align_items="center"):
-                ui.input(
-                    label="New Project Name",
-                    placeholder="e.g. Twitter-2018-dataset",
-                )
+            ui.input(
+                label="New Project Name",
+                placeholder="e.g. Twitter-2018-dataset",
+            )
 
-            with ui.row(align_items="center"):
-                ui.button(
-                    text="Next: Select Dataset",
-                    icon="arrow_forward",
-                    on_click=lambda: ui.navigate.to("/dataset_importing"),
-                )
+            ui.button(
+                text="Next: Select Dataset",
+                icon="arrow_forward",
+                on_click=lambda: ui.navigate.to("/dataset_importing"),
+                color="primary",
+            )
 
     @ui.page("/dataset_importing")
     def dataset_importing():
@@ -292,12 +293,14 @@ def gui_main(app: App):
         _make_header(
             title="Import Dataset", back_icon="arrow_back", back_url="/new_project"
         )
+        _make_footer()
 
         # Page state
         selected_file_path = None
 
-        with ui.column().classes("items-center justify-center gap-4").style(
-            "width: 100%; max-width: 1000px; margin: 0 auto; padding: 2rem;"
+        # Main content - centered vertically and horizontally
+        with ui.column().classes("items-center justify-center gap-6").style(
+            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
         ):
             ui.label("Choose a dataset file.").classes("text-lg")
 
@@ -379,7 +382,7 @@ def gui_main(app: App):
                 icon="folder_open",
                 on_click=browse_for_file,
                 color="primary",
-            ).classes("text-lg")
+            )
 
             # Wire up buttons
             preview_btn.on("click", navigate_to_preview)
@@ -401,10 +404,11 @@ def gui_main(app: App):
         _make_header(
             title="Data Preview", back_icon="arrow_back", back_url="/dataset_importing"
         )
+        _make_footer()
 
         def _make_preview_grid(data_frame):
             """Wraps elements of the preview data grid and labels"""
-            ui.label("Data Preview (first 5 rows)").classes("text-h6 mb-1")
+            ui.label("Data Preview (first 5 rows)").classes("text-lg text-bold")
 
             n_empty = sum((c[0] == 0 for c in data_frame.count().iter_columns()))
             ui.label(
@@ -483,9 +487,9 @@ def gui_main(app: App):
                 )
                 await dialog
 
-            # Main content area
-            with ui.column().classes("items-center justify-start gap-4").style(
-                "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
+            # Main content area - centered
+            with ui.column().classes("items-center justify-center gap-6").style(
+                "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; min-height: 70vh;"
             ):
 
                 # Data Preview (with container for dynamic updates)
