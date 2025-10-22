@@ -4,6 +4,7 @@ Main GUI screen with title and project selection.
 
 import os
 from datetime import datetime
+from pathlib import Path
 from traceback import format_exc
 
 from nicegui import ui
@@ -16,14 +17,125 @@ from importing import importers
 # Mango Tree brand color
 MANGO_DARK_GREEN = "#609949"
 MANGO_ORANGE = "#f3921e"
+MANGO_ORANGE_LIGHT = "#f9bc30"
 ACCENT = "white"
+
+# URLS
+GITHUB_URL = "https://github.com/civictechdc/mango-tango-cli"
+INSTAGRAM_URL = "https://www.instagram.com/civictechdc/"
 
 # Module-level state for native mode (single user)
 _selected_file_path = None
 
 
+def _load_svg_icon(icon_name: str) -> str:
+    """Load SVG icon from the icons directory."""
+    icon_path = Path(__file__).parent / "icons" / f"{icon_name}.svg"
+    return icon_path.read_text()
+
+
 def _set_colors():
-    return ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+    return ui.colors(
+        primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE_LIGHT, accent=ACCENT
+    )
+
+
+def _make_header(
+    title: str,
+    *,
+    back_url: str | None = None,
+    back_icon: str = "arrow_back",
+    back_text: str | None = None,
+) -> None:
+    """
+    Create a standardized header for GUI pages.
+
+    The header uses a 3-column layout:
+    - Left: Back button (if back_url provided)
+    - Center: Page title
+    - Right: Home button (if not on home page)
+
+    Args:
+        title: Page title displayed in center
+        back_url: URL to navigate when back button clicked (if None, no back button)
+        back_icon: Icon for back button (default: "arrow_back")
+        back_text: Optional text label for back button
+    """
+    with ui.header(elevated=True):
+        with ui.row().classes("w-full items-center").style(
+            "justify-content: space-between"
+        ):
+            # Left: Back button (or spacer if none)
+            with ui.element("div").classes("flex items-center"):
+                if back_url is not None:
+                    ui.button(
+                        text=back_text,
+                        icon=back_icon,
+                        color="accent",
+                        on_click=lambda: ui.navigate.to(back_url),
+                    ).props("flat")
+
+            # Center: Title
+            ui.label(title).classes("text-h6")
+
+            # Right: Home button (or spacer if on home page)
+            with ui.element("div").classes("flex items-center"):
+                # Only show home button if not already on home page
+                if back_url is not None:  # If there's a back button, we're not on home
+                    ui.button(
+                        icon="home",
+                        color="accent",
+                        on_click=lambda: ui.navigate.to("/"),
+                    ).props("flat")
+
+
+def _make_footer():
+    """
+    Create a standardized footer for GUI pages.
+
+    Layout:
+    - Left: License information
+    - Center: Project attribution
+    - Right: External links (GitHub, Instagram)
+    """
+    with ui.footer(elevated=True):
+        with ui.row().classes("w-full items-center").style(
+            "justify-content: space-between"
+        ):
+            # Left: License
+            with ui.element("div").classes("flex items-center"):
+                ui.label("MIT License").classes("text-sm text-bold")
+
+            # Center: Project attribution
+            ui.label("A Civic Tech DC Project").classes("text-sm text-bold")
+
+            # Right: External links
+            with ui.element("div").classes("flex items-center gap-2"):
+                # GitHub button
+                github_btn = ui.button(
+                    color="accent",
+                    on_click=lambda: ui.navigate.to(GITHUB_URL, new_tab=True),
+                ).props("flat round")
+                with github_btn:
+                    # Load and display GitHub SVG icon
+                    github_svg = _load_svg_icon("github")
+                    ui.html(github_svg).style(
+                        "width: 20px; height: 20px; fill: currentColor"
+                    )
+                    ui.tooltip("Visit our GitHub")
+
+                # Instagram button
+                instagram_btn = ui.button(
+                    color="accent",
+                    on_click=lambda: ui.navigate.to(INSTAGRAM_URL, new_tab=True),
+                ).props("flat round")
+                with instagram_btn:
+                    # Load and display Instagram SVG icon
+                    instagram_svg = _load_svg_icon("instagram")
+                    ui.html(instagram_svg).style(
+                        "width: 20px; height: 20px; fill: currentColor"
+                    )
+                    ui.tooltip("Follow us on Instagram")
 
 
 def present_separator(value: str) -> str:
@@ -52,11 +164,11 @@ def gui_main(app: App):
     def main_page():
 
         # Register custom colors FIRST, before any UI elements
-        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+        _set_colors()
 
         # Header
-        with ui.header(elevated=True):
-            ui.label("CIB Mango Tree")
+        _make_header(title="CIB Mango Tree")
+        _make_footer()
 
         # Main content area - centered vertically
         with ui.column().classes("items-center justify-center").style(
@@ -89,21 +201,15 @@ def gui_main(app: App):
                     color="primary",
                 )
 
-        with ui.footer():
-            ui.label("A Civic Tech DC Project")
-
     @ui.page("/projects")
     def projects_page():
         """Sub-page showing list of existing projects."""
 
         # Register custom colors FIRST, before any UI elements
-        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+        _set_colors()
 
         # Header
-        with ui.header(elevated=True):
-            ui.button(
-                icon="arrow_back", color="accent", on_click=lambda: ui.navigate.to("/")
-            ).props("flat")
+        _make_header(title="New Project", back_icon="arrow_back", back_url="/")
 
         # Projects list - centered
         with ui.row().classes("items-center center-justify").style(
@@ -157,13 +263,10 @@ def gui_main(app: App):
     def new_project():
 
         # Register custom colors FIRST, before any UI elements
-        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+        _set_colors()
 
         # Header
-        with ui.header(elevated=True):
-            ui.button(
-                icon="home", color="accent", on_click=lambda: ui.navigate.to("/")
-            ).props("flat")
+        _make_header(title="New Project", back_icon="arrow_back", back_url="/")
 
         with ui.column().classes("items-center center-justify").style(
             "width: 100%; height: 100%"
@@ -184,18 +287,14 @@ def gui_main(app: App):
     @ui.page("/dataset_importing")
     def dataset_importing():
 
-        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+        _set_colors()
+
+        _make_header(
+            title="Import Dataset", back_icon="arrow_back", back_url="/new_project"
+        )
 
         # Page state
         selected_file_path = None
-
-        with ui.header(elevated=True):
-            ui.button(
-                text="New Project",
-                icon="arrow_back",
-                color="accent",
-                on_click=lambda: ui.navigate.to("/new_project"),
-            ).props("flat")
 
         with ui.column().classes("items-center justify-center gap-4").style(
             "width: 100%; max-width: 1000px; margin: 0 auto; padding: 2rem;"
@@ -212,7 +311,10 @@ def gui_main(app: App):
 
                 with ui.row().classes("w-full justify-end gap-2 mt-4"):
                     change_file_btn = ui.button(
-                        "Pick a different file", icon="edit", on_click=lambda: None
+                        "Pick a different file",
+                        icon="edit",
+                        color="secondary",
+                        on_click=lambda: None,
                     ).props("outline")
                     preview_btn = ui.button(
                         "Next: Preview Data", icon="arrow_forward", color="primary"
@@ -294,7 +396,11 @@ def gui_main(app: App):
     def data_preview_page():
         global _selected_file_path
 
-        ui.colors(primary=MANGO_DARK_GREEN, secondary=MANGO_ORANGE, accent=ACCENT)
+        _set_colors()
+
+        _make_header(
+            title="Data Preview", back_icon="arrow_back", back_url="/dataset_importing"
+        )
 
         def _make_preview_grid(data_frame):
             """Wraps elements of the preview data grid and labels"""
@@ -316,15 +422,6 @@ def gui_main(app: App):
             ui.notify("No file selected. Redirecting...", type="warning")
             ui.navigate.to("/dataset_importing")
             return
-
-        # HEADER
-        with ui.header(elevated=True):
-            ui.button(
-                icon="arrow_back",
-                color="accent",
-                on_click=lambda: ui.navigate.to("/dataset_importing"),
-            ).props("flat")
-            ui.label("Data Preview")
 
         # Auto-detect importer
         importer = None
@@ -403,6 +500,7 @@ def gui_main(app: App):
                     ui.button(
                         "Change Import Options",
                         icon="settings",
+                        color="secondary",
                         on_click=open_import_options,
                     ).props("outline")
 
