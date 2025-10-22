@@ -854,6 +854,42 @@ class TestAbbreviationsAndPunctuation:
         assert "ai" in result
         assert "technology" in result
 
+    def test_contractions_with_curly_apostrophes(self):
+        """Test that contractions with curly apostrophes are preserved."""
+        tokenizer = BasicTokenizer()
+        # Note: Using actual U+2019 curly apostrophe character
+        text = "I don't think it's ready we're going"  # Curly apostrophes
+        result = tokenizer.tokenize(text)
+        expected = ["i", "don't", "think", "it's", "ready", "we're", "going"]  # Curly apostrophes preserved
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_contractions_mixed_apostrophe_types(self):
+        """Test contractions with mix of straight and curly apostrophes."""
+        tokenizer = BasicTokenizer()
+        # Mix of straight (') and curly (') apostrophes
+        text = "don't worry but don't panic"  # First is curly, second is straight
+        result = tokenizer.tokenize(text)
+        expected = ["don't", "worry", "but", "don't", "panic"]  # Preserves both types
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_possessives_with_apostrophes(self):
+        """Test possessive forms with apostrophes."""
+        tokenizer = BasicTokenizer()
+        text = "John's dog the dogs' owner Mary's place"  # Curly apostrophes
+        result = tokenizer.tokenize(text)
+        expected = ["john's", "dog", "the", "dogs'", "owner", "mary's", "place"]  # Curly apostrophes preserved
+        assert result == expected, f"Expected {expected}, got {result}"
+
+    def test_common_contractions_comprehensive(self):
+        """Test all common English contractions."""
+        tokenizer = BasicTokenizer()
+        # All common contractions with curly apostrophes
+        text = "I'm you're he's she's it's we're they're don't won't can't shouldn't"
+        result = tokenizer.tokenize(text)
+        expected = ["i'm", "you're", "he's", "she's", "it's", "we're", "they're",
+                    "don't", "won't", "can't", "shouldn't"]  # Curly apostrophes preserved
+        assert result == expected, f"Expected {expected}, got {result}"
+
 
 @pytest.mark.unit
 class TestBotDetectionEdgeCases:
