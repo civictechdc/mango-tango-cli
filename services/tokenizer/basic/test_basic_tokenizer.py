@@ -860,7 +860,15 @@ class TestAbbreviationsAndPunctuation:
         # Note: Using actual U+2019 curly apostrophe character
         text = "I don't think it's ready we're going"  # Curly apostrophes
         result = tokenizer.tokenize(text)
-        expected = ["i", "don't", "think", "it's", "ready", "we're", "going"]  # Curly apostrophes preserved
+        expected = [
+            "i",
+            "don't",
+            "think",
+            "it's",
+            "ready",
+            "we're",
+            "going",
+        ]  # Curly apostrophes preserved
         assert result == expected, f"Expected {expected}, got {result}"
 
     def test_contractions_mixed_apostrophe_types(self):
@@ -877,7 +885,15 @@ class TestAbbreviationsAndPunctuation:
         tokenizer = BasicTokenizer()
         text = "John's dog the dogs' owner Mary's place"  # Curly apostrophes
         result = tokenizer.tokenize(text)
-        expected = ["john's", "dog", "the", "dogs'", "owner", "mary's", "place"]  # Curly apostrophes preserved
+        expected = [
+            "john's",
+            "dog",
+            "the",
+            "dogs'",
+            "owner",
+            "mary's",
+            "place",
+        ]  # Curly apostrophes preserved
         assert result == expected, f"Expected {expected}, got {result}"
 
     def test_common_contractions_comprehensive(self):
@@ -886,8 +902,19 @@ class TestAbbreviationsAndPunctuation:
         # All common contractions with curly apostrophes
         text = "I'm you're he's she's it's we're they're don't won't can't shouldn't"
         result = tokenizer.tokenize(text)
-        expected = ["i'm", "you're", "he's", "she's", "it's", "we're", "they're",
-                    "don't", "won't", "can't", "shouldn't"]  # Curly apostrophes preserved
+        expected = [
+            "i'm",
+            "you're",
+            "he's",
+            "she's",
+            "it's",
+            "we're",
+            "they're",
+            "don't",
+            "won't",
+            "can't",
+            "shouldn't",
+        ]  # Curly apostrophes preserved
         assert result == expected, f"Expected {expected}, got {result}"
 
 
