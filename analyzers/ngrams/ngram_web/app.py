@@ -112,39 +112,34 @@ def _get_app_layout(ngram_choices_dict: dict):
     app_layout = [
         ui.card(
             ui.card_header("N-gram statistics"),
-            ui.row(
-                ui.column(
-                    6,
-                    ui.input_text(
-                        id="ngram_content_search",
-                        label="Search N-gram Content:",
-                        placeholder="Enter keywords to search",
-                    ),
+            ui.layout_columns(
+                ui.input_text(
+                    id="ngram_content_search",
+                    label="Search N-gram Content:",
+                    placeholder="Enter keywords to search",
                 ),
-                ui.column(
-                    6,
-                    ui.input_selectize(
-                        id="ngram_length_selector",
-                        label="Included n-grams:",
-                        choices=ngram_choices_dict,
-                        selected=list(ngram_choices_dict.keys()),
-                        multiple=True,
-                    ),
+                ui.input_selectize(
+                    id="ngram_length_selector",
+                    label="Included n-grams:",
+                    choices=ngram_choices_dict,
+                    selected=list(ngram_choices_dict.keys()),
+                    multiple=True,
                 ),
+                ui.div(
+                    ui.input_action_button(
+                        id="reset_button",
+                        label="Clear selection",
+                        fill=False,
+                    ),
+                    style="margin-top: 25px;",  # Align with labeled inputs
+                ),
+                col_widths=[4, 4, 4],  # Equal width columns
             ),
             output_widget("scatter_plot", height="400px"),
         ),
         ui.card(
             ui.card_header("Data viewer"),
             ui.output_text(id="data_info"),
-            ui.div(
-                ui.input_action_button(
-                    id="reset_button",
-                    label="Reset selection (show summary)",
-                    fill=False,
-                ),
-                style="display: inline-block; margin-bottom: 10px;",
-            ),
             ui.output_data_frame("data_viewer"),
         ),
     ]
@@ -408,6 +403,8 @@ def server(input, output, sessions):
         # Default: show summary message
         return "Showing summary (top 100 n-grams by frequency). Click a data point on the scatter plot to view all occurrences."
 
+    reset_click_count = reactive.value(0)
+
     @render.data_frame
     def data_viewer():
         """Display appropriate data based on user interactions.
@@ -424,6 +421,13 @@ def server(input, output, sessions):
         # Check if user has search term
         content_search = (input.ngram_content_search() or "").strip()
         has_search = bool(content_search)
+
+        # if a new click is detected, show summary
+        if input.reset_button.get() > reset_click_count.get():
+
+            reset_click_count.set(input.reset_button.get())
+
+            return render.DataGrid(get_top_n_stats(n=100), width="100%")
 
         if has_click:
             # Show individual posts for clicked n-gram
@@ -443,4 +447,4 @@ def server(input, output, sessions):
             return render.DataGrid(data_for_display, width="100%")
 
         # Default: show top 100 n-grams by frequency
-        return render.DataGrid(get_top_n_stats(), width="100%")
+        return render.DataGrid(get_top_n_stats(n=100), width="100%")
