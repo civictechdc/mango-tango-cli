@@ -400,12 +400,60 @@ def server(input, output, sessions):
 
     @render.data_frame
     def data_viewer():
-        # Always use get_filtered_data() for consistency
-        # It handles search, ngram size selection, and clicks
-        data_for_display = get_filtered_full_data()
+        """Display appropriate data based on user interactions.
 
-        # If empty (no click), show summary
-        if data_for_display.is_empty():
-            data_for_display = get_top_n_stats(n=100)
+        Three scenarios:
+        1. No filters: Show top 100 n-grams (stats summary)
+        2. Search/length filter only: Show top 100 filtered n-grams (stats summary)
+        3. Click on n-gram: Show all individual posts for that n-gram (full data)
+        """
+        # Check if user clicked on a specific n-gram
+        clicked = click_data()
+        has_click = clicked and isinstance(clicked, dict) and COL_NGRAM_ID in clicked
 
-        return render.DataGrid(data_for_display.head(100), width="100%")
+        # Check if user has search term
+        content_search = (input.ngram_content_search() or "").strip()
+        has_search = bool(content_search)
+
+        if has_click:
+            # Show individual posts for clicked n-gram
+            data_for_display = get_filtered_full_data()
+            return render.DataGrid(data_for_display, width="100%")
+
+        # No click: show n-gram statistics (top 100)
+        if has_search:
+            # Show filtered n-gram stats (search + length filters)
+            stats_filtered = get_search_filtered_stats()
+            if stats_filtered.is_empty():
+                # Return empty with proper column structure
+                return render.DataGrid(get_top_n_stats().head(0), width="100%")
+
+            # Sort and format filtered stats
+            data_for_display = (
+                stats_filtered.select(
+                    [
+                        COL_NGRAM_WORDS,
+                        COL_NGRAM_TOTAL_REPS,
+                        COL_NGRAM_DISTINCT_POSTER_COUNT,
+                        COL_NGRAM_LENGTH,
+                    ]
+                )
+                .sort(
+                    pl.col(COL_NGRAM_TOTAL_REPS),
+                    pl.col(COL_NGRAM_DISTINCT_POSTER_COUNT),
+                    descending=[True, True],
+                )
+                .rename(
+                    {
+                        COL_NGRAM_WORDS: "N-gram content",
+                        COL_NGRAM_TOTAL_REPS: "Nr. total repetitions",
+                        COL_NGRAM_DISTINCT_POSTER_COUNT: "Nr. unique posters",
+                        COL_NGRAM_LENGTH: "N-gram length",
+                    }
+                )
+                .head(100)
+            )
+            return render.DataGrid(data_for_display, width="100%")
+
+        # Default: show top 100 n-grams by frequency
+        return render.DataGrid(get_top_n_stats(), width="100%")
