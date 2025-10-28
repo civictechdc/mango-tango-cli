@@ -233,12 +233,22 @@ def server(input, output, sessions):
                 except Exception:
                     pass
 
-    @reactive.calc
-    def get_top_n_stats(n: int = 100) -> pl.DataFrame:
-        global data_stats
+    def get_top_n_stats(df: pl.DataFrame = None, n: int = 100) -> pl.DataFrame:
+        """Format and return top N n-gram statistics.
+
+        Args:
+            df: Optional dataframe to format. If None, uses global data_stats.
+            n: Number of top n-grams to return (default 100)
+
+        Returns:
+            Formatted dataframe with sorted and renamed columns
+        """
+        if df is None:
+            global data_stats
+            df = data_stats
 
         data_top_n = (
-            data_stats.select(
+            df.select(
                 [
                     COL_NGRAM_WORDS,
                     COL_NGRAM_TOTAL_REPS,
@@ -428,31 +438,8 @@ def server(input, output, sessions):
                 # Return empty with proper column structure
                 return render.DataGrid(get_top_n_stats().head(0), width="100%")
 
-            # Sort and format filtered stats
-            data_for_display = (
-                stats_filtered.select(
-                    [
-                        COL_NGRAM_WORDS,
-                        COL_NGRAM_TOTAL_REPS,
-                        COL_NGRAM_DISTINCT_POSTER_COUNT,
-                        COL_NGRAM_LENGTH,
-                    ]
-                )
-                .sort(
-                    pl.col(COL_NGRAM_TOTAL_REPS),
-                    pl.col(COL_NGRAM_DISTINCT_POSTER_COUNT),
-                    descending=[True, True],
-                )
-                .rename(
-                    {
-                        COL_NGRAM_WORDS: "N-gram content",
-                        COL_NGRAM_TOTAL_REPS: "Nr. total repetitions",
-                        COL_NGRAM_DISTINCT_POSTER_COUNT: "Nr. unique posters",
-                        COL_NGRAM_LENGTH: "N-gram length",
-                    }
-                )
-                .head(100)
-            )
+            # Format and return top 100 filtered stats
+            data_for_display = get_top_n_stats(df=stats_filtered, n=100)
             return render.DataGrid(data_for_display, width="100%")
 
         # Default: show top 100 n-grams by frequency
