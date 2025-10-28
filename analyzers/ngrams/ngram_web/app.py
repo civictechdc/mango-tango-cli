@@ -254,7 +254,8 @@ def server(input, output, sessions):
             .sort(
                 pl.col(COL_NGRAM_TOTAL_REPS),
                 pl.col(COL_NGRAM_DISTINCT_POSTER_COUNT),
-                descending=[True, True],
+                pl.col(COL_NGRAM_LENGTH),
+                descending=[True, True, False],
             )
             .rename(
                 {
@@ -382,7 +383,7 @@ def server(input, output, sessions):
             if not filtered_data.is_empty():
                 total_reps = len(filtered_data)
                 ngram_string = filtered_data["N-gram content"][0]
-                return f"N-gram: '{ngram_string}' — {total_reps} total repetitions"
+                return f"N-gram: '{ngram_string}' — {total_reps:,} total repetitions"
             else:
                 return "Selected n-gram not found in current filters. Try adjusting your search or n-gram length selection."
 
@@ -396,9 +397,9 @@ def server(input, output, sessions):
             total_ngrams = len(search_stats)
             if not filtered_data.is_empty():
                 total_records = len(filtered_data)
-                return f"Search results for '{content_search}': {total_ngrams} unique n-grams, {total_records} total occurrences"
+                return f"Search results for '{content_search}': {total_ngrams:,} unique n-grams (showing top 100) with {total_records:,} total occurrences"
             else:
-                return f"Search results for '{content_search}': {total_ngrams} unique n-grams"
+                return f"Search results for '{content_search}': {total_ngrams:,} unique n-grams"
 
         # Default: show summary message
         return "Showing summary (top 100 n-grams by frequency). Click a data point on the scatter plot to view all occurrences."
