@@ -124,7 +124,7 @@ def _get_app_layout(ngram_choices_dict: dict):
                 ui.column(
                     6,
                     ui.input_selectize(
-                        id="ngram_selector",
+                        id="ngram_length_selector",
                         label="Included n-grams:",
                         choices=ngram_choices_dict,
                         selected=list(ngram_choices_dict.keys()),
@@ -153,11 +153,28 @@ def _get_app_layout(ngram_choices_dict: dict):
 
 
 def server(input, output, sessions):
-    @reactive.calc
-    def get_data():
-        global data_stats
 
-        return data_stats.filter(pl.col("n").is_in(input.ngram_selector()))
+    def _format_data_for_display(df: pl.DataFrame) -> pl.DataFrame:
+        """Format dataframe for display with column selection and renaming"""
+        SEL_COLUMNS = [
+            COL_AUTHOR_ID,
+            COL_NGRAM_WORDS,
+            COL_MESSAGE_TEXT,
+            COL_MESSAGE_TIMESTAMP,
+        ]
+        COL_RENAME = ["Unique user ID", "N-gram content", "Post content", "Timestamp"]
+        old2new = {k: v for k, v in zip(SEL_COLUMNS, COL_RENAME)}
+
+        if df.is_empty():
+            return df.select(SEL_COLUMNS).head(0).rename(old2new)
+
+        return (
+            df.with_columns(
+                pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%B %d, %Y %I:%M %p")
+            )
+            .select(SEL_COLUMNS)
+            .rename(old2new)
+        )
 
     @reactive.calc
     def get_search_filtered_data():
@@ -173,28 +190,50 @@ def server(input, output, sessions):
 
         # Filter by n-gram content if provided
         filtered_data = data_full.filter(
-            pl.col(COL_NGRAM_WORDS).str.contains(content_search.strip(), literal=False)
+            pl.col(COL_NGRAM_WORDS).str.contains(content_search.strip(), literal=False),
         )
 
         return filtered_data
 
     @reactive.calc
     def get_search_filtered_stats():
-        """Get n-gram statistics for search-filtered data"""
-        search_data = get_search_filtered_data()
+        """Get n-gram statistics filtered by click, search term, and n-gram length"""
 
-        if search_data.is_empty():
-            return data_stats.head(0)  # Return empty dataframe with same schema
+        global data_stats
 
-        # Get unique n-gram IDs from filtered data
-        filtered_ngram_ids = search_data.select(COL_NGRAM_ID).unique()
+        # Start with full stats data
+        data_out = data_stats
 
-        # Filter stats data to only include n-grams that appear in search results
-        filtered_stats = data_stats.filter(
-            pl.col(COL_NGRAM_ID).is_in(filtered_ngram_ids[COL_NGRAM_ID])
-        )
+        # Get filter inputs
+        clicked = click_data()
+        ngram_search_term = (input.ngram_content_search() or "").strip()
+        ngram_lengths = (
+            input.ngram_length_selector()
+        )  # tuple[str] e.g. ('3', '5') or empty tuple
 
-        return filtered_stats
+        # Apply filters in order: click → search → length
+
+        # 1. Filter by clicked point (if any)
+        if clicked and isinstance(clicked, dict) and COL_NGRAM_ID in clicked:
+            ngram_id = clicked[COL_NGRAM_ID]
+            data_out = data_out.filter(pl.col(COL_NGRAM_ID) == ngram_id)
+
+        # 2. Filter by search term (if provided)
+        if ngram_search_term:
+            # Match the search term as whole word(s)
+            regex_pattern = f"\\b{ngram_search_term}\\b"
+            data_out = data_out.filter(
+                pl.col(COL_NGRAM_WORDS).str.contains(pattern=regex_pattern),
+            )
+
+        # 3. Filter by n-gram length (if any selected)
+        # If ngram_lengths is empty (user deselected all), return empty dataframe
+        if not ngram_lengths:
+            return data_out.head(0)
+
+        data_out = data_out.filter(pl.col(COL_NGRAM_LENGTH).is_in(ngram_lengths))
+
+        return data_out
 
     # Store the figure widget reference
     current_figure_widget = reactive.value(None)
@@ -248,31 +287,20 @@ def server(input, output, sessions):
     click_data = reactive.value(None)
 
     @reactive.calc
-    def get_filtered_data():
+    def get_click_selected_data():
+        """Get filtered data respecting search, ngram size selection, and clicks"""
+        # Start with search-filtered data
+        base_data = get_search_filtered_data()
+
+        # Check if a point was clicked
         clicked = click_data()
-
-        SEL_COLUMNS = [
-            COL_AUTHOR_ID,
-            COL_NGRAM_WORDS,
-            COL_MESSAGE_TEXT,
-            COL_MESSAGE_TIMESTAMP,
-        ]
-        COL_RENAME = ["Unique user ID", "N-gram content", "Post content", "Timestamp"]
-
-        old2new = {k: v for k, v in zip(SEL_COLUMNS, COL_RENAME)}
-
         if clicked and isinstance(clicked, dict) and COL_NGRAM_ID in clicked:
             ngram_id = clicked[COL_NGRAM_ID]
-            filtered = data_full.filter(pl.col(COL_NGRAM_ID) == ngram_id)
+            filtered = base_data.filter(pl.col(COL_NGRAM_ID) == ngram_id)
+            return _format_data_for_display(filtered)
 
-            filtered = filtered.with_columns(
-                pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%B %d, %Y %I:%M %p")
-            )
-            filtered = filtered.select(SEL_COLUMNS).rename(old2new)
-            return filtered
-        else:
-            # Return empty dataframe with the right columns when nothing is clicked
-            return data_full.select(SEL_COLUMNS).head(0)
+        # Return empty dataframe when nothing is clicked
+        return _format_data_for_display(base_data.head(0))
 
     def on_point_click(trace, points, state):
         if not hasattr(points, "point_inds") or not points.point_inds:
@@ -311,14 +339,8 @@ def server(input, output, sessions):
 
     @render_widget
     def scatter_plot():
-        # Use search-filtered data if search is active, otherwise use regular filtered data
-        content_search = input.ngram_content_search() or ""
-        has_search = bool(content_search.strip())
 
-        if has_search:
-            df = get_search_filtered_stats()
-        else:
-            df = get_data()
+        df = get_search_filtered_stats()
 
         fig = plot_scatter(data=df)
 
@@ -336,90 +358,46 @@ def server(input, output, sessions):
 
     @render.text
     def data_info():
-        # Get search values once to avoid multiple reactive calls
+        # Check if a point was clicked
+        clicked = click_data()
+        has_click = clicked and isinstance(clicked, dict) and COL_NGRAM_ID in clicked
+
+        # Check if there's a search
         content_search = input.ngram_content_search() or ""
         has_search = bool(content_search.strip())
 
-        if has_search:
-            search_data = get_search_filtered_data()
-            search_stats = get_search_filtered_stats()
-
-            if search_data.is_empty():
-                return "No results found for the current search criteria. Try adjusting your search."
-            else:
-                total_ngrams = len(search_stats)
-                total_records = len(search_data)
-                content_text = (
-                    f"Content: '{content_search}'" if content_search.strip() else ""
-                )
-                search_text = " and ".join(filter(None, [content_text]))
-                return f"Search results for {search_text}: {total_ngrams} unique n-grams, {total_records} total records."
-        else:
-            filtered = get_filtered_data()
-            if filtered.is_empty():
-                return "Showing summary (top 100 n-grams). Select a data point by clicking on the scatter plot above to show data for selected n-gram."
-            else:
+        if has_click:
+            # Show specific ngram info (respects all filters)
+            filtered = get_click_selected_data()
+            if not filtered.is_empty():
                 total_reps = len(filtered)
                 ngram_string = filtered["N-gram content"][0]
                 return f"Ngram: {ngram_string}, Nr. total repetitions: {total_reps}"
+            else:
+                return "Selected n-gram not found in current filters. Try adjusting your search or n-gram length selection."
+
+        if has_search:
+            # Show search results summary
+            search_stats = get_search_filtered_stats()
+
+            if search_stats.is_empty():
+                return "No results found for the current search criteria. Try adjusting your search."
+
+            total_ngrams = len(search_stats)
+            total_records = len(get_search_filtered_data())
+            return f"Search results for '{content_search}': {total_ngrams} unique n-grams, {total_records} total records."
+
+        # Default: show summary message
+        return "Showing summary (top 100 n-grams). Select a data point by clicking on the scatter plot above to show data for selected n-gram."
 
     @render.data_frame
     def data_viewer():
-        # Get search values once to avoid multiple reactive calls
-        content_search = input.ngram_content_search() or ""
-        has_search = bool(content_search.strip())
+        # Always use get_filtered_data() for consistency
+        # It handles search, ngram size selection, and clicks
+        data_for_display = get_click_selected_data()
 
-        if has_search:
-            # Show search results
-            search_data = get_search_filtered_data()
-            if search_data.is_empty():
-                # Show empty dataframe with proper columns
-                data_for_display = (
-                    data_full.select(
-                        [
-                            COL_AUTHOR_ID,
-                            COL_NGRAM_WORDS,
-                            COL_MESSAGE_TEXT,
-                            COL_MESSAGE_TIMESTAMP,
-                        ]
-                    )
-                    .head(0)
-                    .rename(
-                        {
-                            COL_AUTHOR_ID: "Unique user ID",
-                            COL_NGRAM_WORDS: "N-gram content",
-                            COL_MESSAGE_TEXT: "Post content",
-                            COL_MESSAGE_TIMESTAMP: "Timestamp",
-                        }
-                    )
-                )
-            else:
-                # Show search results
-                SEL_COLUMNS = [
-                    COL_AUTHOR_ID,
-                    COL_NGRAM_WORDS,
-                    COL_MESSAGE_TEXT,
-                    COL_MESSAGE_TIMESTAMP,
-                ]
-                COL_RENAME = [
-                    "Unique user ID",
-                    "N-gram content",
-                    "Post content",
-                    "Timestamp",
-                ]
-                old2new = {k: v for k, v in zip(SEL_COLUMNS, COL_RENAME)}
-
-                data_for_display = (
-                    search_data.with_columns(
-                        pl.col(COL_MESSAGE_TIMESTAMP).dt.strftime("%B %d, %Y %I:%M %p")
-                    )
-                    .select(SEL_COLUMNS)
-                    .rename(old2new)
-                )
-        else:
-            # Original behavior - show clicked data or summary
-            data_for_display = get_filtered_data()
-            if data_for_display.is_empty():
-                data_for_display = get_top_n_data()
+        # If empty (no click), show summary
+        if data_for_display.is_empty():
+            data_for_display = get_top_n_data()
 
         return render.DataGrid(data_for_display, width="100%")
