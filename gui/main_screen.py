@@ -160,6 +160,8 @@ def gui_main(app: App):
         app: The initialized App instance with storage and suite
     """
 
+    new_project_name = None
+
     @ui.page("/")
     def main_page():
 
@@ -269,19 +271,32 @@ def gui_main(app: App):
         _make_header(title="New Project", back_icon="arrow_back", back_url="/")
         _make_footer()
 
+        nonlocal new_project_name
+
         # Main content - centered vertically and horizontally
         with ui.column().classes("items-center justify-center gap-6").style(
             "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
         ):
-            ui.input(
+            new_project_name_input = ui.input(
                 label="New Project Name",
                 placeholder="e.g. Twitter-2018-dataset",
             )
 
+            def on_next():
+                nonlocal new_project_name
+                # Capture the input value when user clicks Next
+                new_project_name = new_project_name_input.value
+
+                if not new_project_name or not new_project_name.strip():
+                    ui.notify("Please enter a project name", type="warning")
+                    return
+
+                ui.navigate.to("/dataset_importing")
+
             ui.button(
                 text="Next: Select Dataset",
                 icon="arrow_forward",
-                on_click=lambda: ui.navigate.to("/dataset_importing"),
+                on_click=on_next,
                 color="primary",
             )
 
@@ -490,6 +505,29 @@ def gui_main(app: App):
                 )
                 await dialog
 
+            async def _import_data_create_project():
+                nonlocal new_project_name
+
+                try:
+                    # Call synchronous create_project
+                    app.create_project(
+                        name=new_project_name, importer_session=import_session
+                    )
+
+                    # Navigate FIRST
+                    ui.navigate.to("/select_analysis")
+
+                    # Then notify (will show on new page)
+                    ui.notify(
+                        f"Created project: {new_project_name}!",
+                        type="positive",
+                        color="secondary",
+                    )
+
+                except Exception as e:
+                    ui.notify(f"Error creating project: {str(e)}", type="negative")
+                    print(f"Project creation error:\n{format_exc()}")
+
             # Main content area - centered
             with ui.column().classes("items-center justify-center gap-6").style(
                 "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; min-height: 70vh;"
@@ -503,7 +541,7 @@ def gui_main(app: App):
                     _make_preview_grid(import_preview)
 
                 # Bottom Actions
-                with ui.row().classes("w-full justify-end gap-2 mt-4"):
+                with ui.row().classes("w-full justify-center gap-2 mt-4"):
                     ui.button(
                         "Change Import Options",
                         icon="settings",
@@ -512,12 +550,10 @@ def gui_main(app: App):
                     ).props("outline")
 
                     ui.button(
-                        "Import Dataset",
+                        "Import and Create Project",
                         icon="upload",
                         color="primary",
-                        on_click=lambda: ui.notify(
-                            "Coming soon: Import dataset", type="info"
-                        ),
+                        on_click=_import_data_create_project,
                     )
 
         except Exception as e:
@@ -525,6 +561,55 @@ def gui_main(app: App):
             print(f"Preview error:\n{format_exc()}")
             ui.navigate.to("/dataset_importing")
             return
+
+    # choose analysis page
+    @ui.page("/select_analysis")
+    def select_analysis():
+
+        nonlocal new_project_name
+
+        _set_colors()
+        _make_header(
+            title="Select Analysis", back_icon="arrow_back", back_url="/projects"
+        )
+        _make_footer()
+
+        # Main content - centered
+        with ui.column().classes("items-center justify-center gap-6").style(
+            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
+        ):
+            ui.label("Choose an analysis type").classes("text-lg")
+
+            # Get primary analyzers from suite
+            analyzers = app.context.suite.primary_anlyzers
+
+            if not analyzers:
+                ui.label("No analyzers available").classes("text-grey")
+            else:
+                # Create radio options from analyzers
+                analyzer_options = {
+                    f"{analyzer.name} - {analyzer.short_description}": analyzer.id
+                    for analyzer in analyzers
+                }
+
+                selected_analyzer = ui.radio(
+                    options=list(analyzer_options.keys()), value=None
+                ).props("left-label")
+
+                def on_proceed():
+                    if selected_analyzer.value:
+                        analyzer_id = analyzer_options[selected_analyzer.value]
+                        ui.notify(f"Selected analyzer: {analyzer_id}", type="positive")
+                        # TODO: Navigate to next step (configure analysis parameters)
+                    else:
+                        ui.notify("Please select an analyzer", type="warning")
+
+                ui.button(
+                    "Proceed",
+                    icon="arrow_forward",
+                    color="primary",
+                    on_click=on_proceed,
+                )
 
     # Launch in native mode
     ui.run(
