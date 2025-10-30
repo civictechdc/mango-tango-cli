@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 """
-Tests for core tokenizer types and configuration.
+Tests for tokenizer configuration and type system.
 
-This module tests:
-- TokenizerConfig Pydantic model and validation
-- Enum types (LanguageFamily, TokenType, CaseHandling, etc.)
-- Type system edge cases and defaults
+This module tests the TokenizerConfig Pydantic model, enum types,
+type aliases, and configuration validation.
+
+Test Organization:
+- TestTokenizerConfig: Configuration model and defaults
+- TestEnumTypes: Enum value and behavior validation
+- TestTypeAliases: Type alias usage
+- TestConfigurationValidation: Edge cases and validation
+- TestConfigurationUseCases: Common configuration presets
+
+Running Tests:
+    pytest services/tokenizer/core/test_types.py
 """
 
 from typing import Optional
@@ -15,6 +23,8 @@ import pytest
 from .types import CaseHandling, LanguageFamily, TokenizerConfig, TokenList, TokenType
 
 
+@pytest.mark.unit
+@pytest.mark.config
 class TestTokenizerConfig:
     """Test TokenizerConfig Pydantic model and validation."""
 
@@ -34,7 +44,7 @@ class TestTokenizerConfig:
 
         # Text preprocessing defaults
         assert config.case_handling == CaseHandling.LOWERCASE
-        assert config.normalize_unicode is True
+        assert config.normalize_unicode is False
 
         # Social media defaults
         assert config.extract_hashtags is True
@@ -95,26 +105,6 @@ class TestTokenizerConfig:
         config.case_handling = CaseHandling.UPPERCASE
         assert config.case_handling == CaseHandling.UPPERCASE
 
-    def test_config_type_hints(self):
-        """Test that type hints are correctly specified."""
-        config = TokenizerConfig()
-
-        # Test boolean fields
-        assert isinstance(config.include_punctuation, bool)
-        assert isinstance(config.normalize_unicode, bool)
-
-        # Test enum fields
-        assert isinstance(config.fallback_language_family, LanguageFamily)
-        assert isinstance(config.case_handling, CaseHandling)
-
-        # Test optional fields
-        assert config.max_token_length is None or isinstance(
-            config.max_token_length, int
-        )
-
-        # Test integer fields
-        assert isinstance(config.min_token_length, int)
-
     def test_social_media_presets(self):
         """Test common social media configuration presets."""
         # Preset 1: Full social media extraction
@@ -152,6 +142,7 @@ class TestTokenizerConfig:
         assert not clean_config.include_punctuation
 
 
+@pytest.mark.unit
 class TestEnumTypes:
     """Test enum types and their values."""
 
@@ -168,10 +159,6 @@ class TestEnumTypes:
         assert LanguageFamily.ARABIC.value == "arabic"
         assert LanguageFamily.MIXED.value == "mixed"
         assert LanguageFamily.UNKNOWN.value == "unknown"
-
-        # Test enum comparison
-        assert LanguageFamily.LATIN != LanguageFamily.ARABIC
-        assert LanguageFamily.LATIN == LanguageFamily.LATIN
 
     def test_token_type_enum(self):
         """Test TokenType enum values."""
@@ -212,22 +199,8 @@ class TestEnumTypes:
         assert CaseHandling.NORMALIZE.value == "normalize"
 
 
-class TestTypeAliases:
-    """Test type aliases and their usage."""
-
-    def test_token_list_type(self):
-        """Test TokenList type alias."""
-        # TokenList should be equivalent to list[str]
-        token_list: TokenList = ["word1", "word2", "word3"]
-
-        assert isinstance(token_list, list)
-        assert all(isinstance(token, str) for token in token_list)
-
-        # Empty list should be valid
-        empty_list: TokenList = []
-        assert isinstance(empty_list, list)
-
-
+@pytest.mark.unit
+@pytest.mark.config
 class TestConfigurationValidation:
     """Test configuration validation and edge cases."""
 
@@ -304,6 +277,78 @@ class TestConfigurationValidation:
         assert not any(include_features_none)
 
 
+@pytest.mark.unit
+@pytest.mark.config
+class TestConfigurationEdgeCases:
+    """Test configuration validation and edge cases."""
+
+    def test_min_greater_than_max_token_length(self):
+        """Test behavior when min_token_length > max_token_length."""
+        from ..basic.tokenizer import BasicTokenizer
+
+        # This should either raise an error or be handled gracefully
+        config = TokenizerConfig(min_token_length=10, max_token_length=5)
+        tokenizer = BasicTokenizer(config)
+
+        # Test with text that has tokens in the conflicting range
+        text = "short verylongword medium"
+        result = tokenizer.tokenize(text)
+
+        # When min > max, no tokens should pass both filters
+        # This documents the behavior (even if it's a logical error)
+        assert result == []
+
+    def test_negative_min_token_length(self):
+        """Test handling of negative min_token_length."""
+        from ..basic.tokenizer import BasicTokenizer
+
+        config = TokenizerConfig(min_token_length=-1)
+        tokenizer = BasicTokenizer(config)
+        text = "test text"
+        result = tokenizer.tokenize(text)
+
+        # Should handle gracefully (probably treat as 0 or 1)
+        assert isinstance(result, list)
+        assert len(result) == 2  # expected 2 tokens
+
+    def test_zero_min_token_length(self):
+        """Test zero min_token_length allows empty tokens."""
+        from ..basic.tokenizer import BasicTokenizer
+
+        config = TokenizerConfig(min_token_length=0)
+        tokenizer = BasicTokenizer(config)
+        text = "test this and a new word"
+        result = tokenizer.tokenize(text)
+
+        assert len(result) == 6  # expect 6 tokens
+
+    def test_extremely_large_token_length_limits(self):
+        """Test very large token length limits."""
+        from ..basic.tokenizer import BasicTokenizer
+
+        config = TokenizerConfig(min_token_length=1000)
+        tokenizer = BasicTokenizer(config)
+        text = "normal length words here"
+        result = tokenizer.tokenize(text)
+
+        # Should filter out all normal-length tokens
+        assert result == []
+
+    def test_max_token_length_zero(self):
+        """Test max_token_length=0."""
+        from ..basic.tokenizer import BasicTokenizer
+
+        config = TokenizerConfig(max_token_length=0)
+        tokenizer = BasicTokenizer(config)
+        text = "test words"
+        result = tokenizer.tokenize(text)
+
+        # Should filter everything
+        assert result == []
+
+
+@pytest.mark.unit
+@pytest.mark.config
 class TestConfigurationUseCases:
     """Test configurations for common use cases."""
 

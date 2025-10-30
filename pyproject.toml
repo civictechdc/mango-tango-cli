@@ -3,3 +3,10 @@ profile = "black"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+markers = [
+    "unit: Fast unit tests (< 1s each)",
+    "integration: Integration tests with realistic scenarios",
+    "config: Configuration and validation tests",
+    "multilingual: Language-specific tokenization tests",
+    "slow: Tests that take > 1s to run",
+]

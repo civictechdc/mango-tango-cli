@@ -33,19 +33,22 @@ URL_PATTERN = (
 # Email patterns
 EMAIL_PATTERN = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
 
-# Social media mentions and hashtags
-MENTION_PATTERN = r"@[A-Za-z0-9_]+"
-HASHTAG_PATTERN = r"#[A-Za-z0-9_]+"
+# Social media mentions and hashtags (support Unicode including Korean, Arabic, etc.)
+MENTION_PATTERN = r"@[\w]+"
+HASHTAG_PATTERN = r"#[\w]+"
 
 # Numeric patterns (including decimals, percentages, etc.)
 NUMERIC_PATTERN = (
     r"(?:"
-    r"\d+\.?\d*%?|"  # Basic numbers with optional percentage
-    r"[$€£¥₹₽¥¢]\d+\.?\d*|"  # Money amounts with common currency symbols
-    r"\d+[.,]\d+|"  # Numbers with comma/period separators
-    r"\d+(?:st|nd|rd|th)?"  # Ordinals
+    r"\d+(?:st|nd|rd|th)(?!\w)|"  # Ordinals with word boundary (6th, 21st)
+    r"[$€£¥₹₽¥¢]\d+(?:[.,]\d+)*|"  # Currency with multiple separators
+    r"\d+(?:[.,]\d+)+|"  # Numbers with one or more separator groups (200,000)
+    r"\d+\.?\d*%?"  # Basic numbers with optional decimals/percentages
     r")"
 )
+
+# Cashtag pattern (stock tickers like $AAPL, $SPY)
+CASHTAG_PATTERN = r"\$[A-Z]{1,5}\b"
 
 # Emoji pattern (basic Unicode ranges)
 EMOJI_PATTERN = (
@@ -99,9 +102,12 @@ SEA_PATTERN = (
 
 # Word patterns for different script types
 
-LATIN_WORD_PATTERN = r"[a-zA-Z]+(?:\.[a-zA-Z]+)+\.?|[a-zA-Z]+(?:\'[a-zA-Z]+)*"  # Handle abbreviations and contractions
+LATIN_WORD_PATTERN = r"[a-zA-Z]+(?:\.[a-zA-Z]+)+\.?|[a-zA-Z]+(?:[-'\u2019\u0060][a-zA-Z]+)*[-'\u2019\u0060]?"  # Handle abbreviations, contractions, and possessives
 
-WORD_PATTERN = f"(?:{LATIN_WORD_PATTERN}|{CJK_PATTERN}+|{ARABIC_PATTERN}+|{THAI_PATTERN}+|{SEA_PATTERN}+)"
+# Korean Hangul (space-separated, NOT character-level like Chinese/Japanese)
+KOREAN_WORD_PATTERN = r"[\uac00-\ud7af]+"
+
+WORD_PATTERN = f"(?:{LATIN_WORD_PATTERN}|{KOREAN_WORD_PATTERN}|{CJK_PATTERN}+|{ARABIC_PATTERN}+|{THAI_PATTERN}+|{SEA_PATTERN}+)"
 
 # Punctuation (preserve some, group others)
 PUNCTUATION_PATTERN = r'[.!?;:,\-\(\)\[\]{}"\']'
@@ -177,6 +183,11 @@ class TokenizerPatterns:
         Returns:
             Compiled regex pattern that matches all desired token types in priority order
         """
+        # Check cache first
+        cache_key = hash(frozenset(config.model_dump().items()))
+        if cache_key in _comprehensive_pattern_cache:
+            return _comprehensive_pattern_cache[cache_key]
+
         pattern_parts = []
 
         # Conditionally add URL and email patterns based on configuration
@@ -192,6 +203,10 @@ class TokenizerPatterns:
 
         if config.extract_hashtags:
             pattern_parts.append(self.get_pattern("hashtag").pattern)
+
+        # Cashtag pattern BEFORE numeric pattern (priority matters)
+        if config.extract_cashtags:
+            pattern_parts.append(self.get_pattern("cashtag").pattern)
 
         if config.include_emoji:
             pattern_parts.append(self.get_pattern("emoji").pattern)
@@ -211,17 +226,23 @@ class TokenizerPatterns:
         comprehensive_pattern = "(?:" + "|".join(pattern_parts) + ")"
 
         try:
-            return REGEX_MODULE.compile(comprehensive_pattern, REGEX_MODULE.IGNORECASE)
+            compiled_pattern = REGEX_MODULE.compile(
+                comprehensive_pattern, REGEX_MODULE.IGNORECASE
+            )
         except Exception:
             # Fallback to standard re module
             if REGEX_AVAILABLE and REGEX_MODULE is not re:
                 try:
-                    return re.compile(comprehensive_pattern, re.IGNORECASE)
+                    compiled_pattern = re.compile(comprehensive_pattern, re.IGNORECASE)
                 except Exception:
                     # Ultimate fallback - just match words
-                    return re.compile(r"\S+", re.IGNORECASE)
+                    compiled_pattern = re.compile(r"\S+", re.IGNORECASE)
             else:
-                return re.compile(r"\S+", re.IGNORECASE)
+                compiled_pattern = re.compile(r"\S+", re.IGNORECASE)
+
+        # Store in cache
+        _comprehensive_pattern_cache[cache_key] = compiled_pattern
+        return compiled_pattern
 
     def get_exclusion_pattern(self, config) -> Any:
         """
@@ -237,6 +258,11 @@ class TokenizerPatterns:
         Returns:
             Compiled regex pattern that matches excluded entities, or None if no exclusions
         """
+        # Check cache first
+        cache_key = hash(frozenset(config.model_dump().items()))
+        if cache_key in _exclusion_pattern_cache:
+            return _exclusion_pattern_cache[cache_key]
+
         exclusion_parts = []
 
         if not config.include_urls:
@@ -249,22 +275,28 @@ class TokenizerPatterns:
             exclusion_parts.append(self.get_pattern("numeric").pattern)
 
         if not exclusion_parts:
+            # Cache None result
+            _exclusion_pattern_cache[cache_key] = None
             return None
 
         # Combine exclusion patterns
         exclusion_pattern = "(?:" + "|".join(exclusion_parts) + ")"
 
         try:
-            return REGEX_MODULE.compile(exclusion_pattern, REGEX_MODULE.IGNORECASE)
+            result = REGEX_MODULE.compile(exclusion_pattern, REGEX_MODULE.IGNORECASE)
         except Exception:
             # Fallback to standard re module
             if REGEX_AVAILABLE and REGEX_MODULE is not re:
                 try:
-                    return re.compile(exclusion_pattern, re.IGNORECASE)
+                    result = re.compile(exclusion_pattern, re.IGNORECASE)
                 except Exception:
-                    return None
+                    result = None
             else:
-                return None
+                result = None
+
+        # Store in cache
+        _exclusion_pattern_cache[cache_key] = result
+        return result
 
     def list_patterns(self) -> List[str]:
         """Get list of available pattern names."""
@@ -279,6 +311,7 @@ class TokenizerPatterns:
             "email": EMAIL_PATTERN,
             "mention": MENTION_PATTERN,
             "hashtag": HASHTAG_PATTERN,
+            "cashtag": CASHTAG_PATTERN,
             "emoji": EMOJI_PATTERN,
             "numeric": NUMERIC_PATTERN,
             "word": WORD_PATTERN,
@@ -311,6 +344,10 @@ class TokenizerPatterns:
 
 # Global instance for easy access
 _global_patterns = None
+
+# Separate module-level caches for pattern compilation
+_comprehensive_pattern_cache = {}
+_exclusion_pattern_cache = {}
 
 
 def get_patterns() -> TokenizerPatterns:

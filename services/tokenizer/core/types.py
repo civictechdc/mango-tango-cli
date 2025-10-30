@@ -73,8 +73,8 @@ class TokenizerConfig(BaseModel):
     case_handling: CaseHandling = CaseHandling.LOWERCASE
     """How to handle character case during tokenization."""
 
-    normalize_unicode: bool = True
-    """Whether to apply Unicode NFKC normalization for consistent character representation."""
+    normalize_unicode: bool = False
+    """Whether to apply Unicode NFKC normalization. Default False to preserve unicode tricks for bot detection."""
 
     # Social media features
     extract_hashtags: bool = True
@@ -82,6 +82,9 @@ class TokenizerConfig(BaseModel):
 
     extract_mentions: bool = True
     """Whether to preserve @mentions as single tokens. If False, splits into component words."""
+
+    extract_cashtags: bool = True
+    """Whether to preserve cashtags ($AAPL) as single tokens. If False, splits into components."""
 
     include_urls: bool = True
     """Whether to include URLs as tokens. If False, URLs are completely excluded (not fragmented)."""
