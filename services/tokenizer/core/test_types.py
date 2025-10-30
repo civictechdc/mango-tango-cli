@@ -296,7 +296,7 @@ class TestConfigurationEdgeCases:
 
         # When min > max, no tokens should pass both filters
         # This documents the behavior (even if it's a logical error)
-        assert isinstance(result, list)
+        assert result == []
 
     def test_negative_min_token_length(self):
         """Test handling of negative min_token_length."""
@@ -309,7 +309,7 @@ class TestConfigurationEdgeCases:
 
         # Should handle gracefully (probably treat as 0 or 1)
         assert isinstance(result, list)
-        assert len(result) > 0
+        assert len(result) == 2  # expected 2 tokens
 
     def test_zero_min_token_length(self):
         """Test zero min_token_length allows empty tokens."""
@@ -317,10 +317,10 @@ class TestConfigurationEdgeCases:
 
         config = TokenizerConfig(min_token_length=0)
         tokenizer = BasicTokenizer(config)
-        text = "test"
+        text = "test this and a new word"
         result = tokenizer.tokenize(text)
 
-        assert isinstance(result, list)
+        assert len(result) == 6  # expect 6 tokens
 
     def test_extremely_large_token_length_limits(self):
         """Test very large token length limits."""
