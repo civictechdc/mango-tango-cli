@@ -8,5 +8,10 @@ __private__
 VERSION
 *.DS_Store
 .env*
-.serena/cache
-.specify/
+.serena
+.specify
+
+# In Memoria
+in-memoria.db
+.in-memoria/cache/
+.in-memoria/.env
