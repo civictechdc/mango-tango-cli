@@ -32,12 +32,13 @@ class SeriesSemantic(BaseModel):
         if isinstance(self.column_type, type):
             return isinstance(series.dtype, self.column_type)
         return self.column_type(series.dtype)
-    
+
+
 def parse_time_flexible(s: pl.Series) -> pl.Series:
     """Parse time strings with multiple format attempts"""
     # Try different time formats
     formats_to_try = ["%H:%M:%S", "%H:%M", "%I:%M:%S %p", "%I:%M %p"]
-    
+
     for fmt in formats_to_try:
         try:
             result = s.str.strptime(pl.Time, format=fmt, strict=False)
@@ -45,9 +46,10 @@ def parse_time_flexible(s: pl.Series) -> pl.Series:
                 return result
         except:
             continue
-    
+
     # If all formats fail, return nulls
     return pl.Series([None] * s.len(), dtype=pl.Time)
+
 
 def parse_datetime_with_tz(s: pl.Series) -> pl.Series:
     """Parse datetime strings with timezone info (both abbreviations and offsets)"""
@@ -113,11 +115,11 @@ native_datetime = SeriesSemantic(
 )
 
 time_flexible = SeriesSemantic(
-    semantic_name = "time_flexible", 
+    semantic_name="time_flexible",
     column_type=pl.String,
     try_convert=parse_time_flexible,
     validate_result=lambda s: s.is_not_null(),
-    data_type="datetime"
+    data_type="datetime",
 )
 
 datetime_string = SeriesSemantic(
