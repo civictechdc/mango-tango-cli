@@ -229,11 +229,9 @@ all_semantics = [
 def infer_series_semantic(
     series: pl.Series, *, threshold: float = 0.8, sample_size=100
 ):
-    
     for semantic in all_semantics:
         if semantic.check(series, threshold=threshold, sample_size=sample_size):
             return semantic
-    
     return None
 
 
