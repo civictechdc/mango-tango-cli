@@ -16,23 +16,44 @@ class SeriesSemantic(BaseModel):
     data_type: DataType
 
     def check(self, series: pl.Series, threshold: float = 0.8, sample_size: int = 100):
+        print(f"🔍 Checking semantic '{self.semantic_name}' for series with dtype: {series.dtype}")
+        
         if not self.check_type(series):
+            print(f"❌ '{self.semantic_name}' failed type check")
             return False
 
         sample = sample_series(series, sample_size)
         try:
             if not self.prevalidate(sample):
+                print(f"❌ '{self.semantic_name}' failed prevalidation")
                 return False
             result = self.try_convert(sample)
         except Exception:
+            print(f"❌ '{self.semantic_name}' failed conversion: {e}")
             return False
         return self.validate_result(result).sum() / sample.len() > threshold
+
 
     def check_type(self, series: pl.Series):
         if isinstance(self.column_type, type):
             return isinstance(series.dtype, self.column_type)
         return self.column_type(series.dtype)
-
+    
+def parse_time_flexible(s: pl.Series) -> pl.Series:
+    """Parse time strings with multiple format attempts"""
+    # Try different time formats
+    formats_to_try = ["%H:%M:%S", "%H:%M", "%I:%M:%S %p", "%I:%M %p"]
+    
+    for fmt in formats_to_try:
+        try:
+            result = s.str.strptime(pl.Time, format=fmt, strict=False)
+            if result.is_not_null().sum() > 0:  # If any parsed successfully
+                return result
+        except:
+            continue
+    
+    # If all formats fail, return nulls
+    return pl.Series([None] * s.len(), dtype=pl.Time)
 
 def parse_datetime_with_tz(s: pl.Series) -> pl.Series:
     """Parse datetime strings with timezone info (both abbreviations and offsets)"""
@@ -95,6 +116,14 @@ native_datetime = SeriesSemantic(
     try_convert=lambda s: s,  # No conversion needed
     validate_result=lambda s: constant_series(s, True),  # Always valid
     data_type="datetime",
+)
+
+native_time = SeriesSemantic(
+    semantic_name = "time_flexible", 
+    column_type=pl.String,
+    try_convert=parse_time_flexible,
+    validate_result=lambda s: s.is_not_null(),
+    data_type="datetime"
 )
 
 datetime_string = SeriesSemantic(
@@ -188,6 +217,7 @@ boolean_catch_all = SeriesSemantic(
 all_semantics = [
     native_datetime,
     native_date,
+    native_time,
     datetime_string,
     date_string,
     time_string,
@@ -205,9 +235,16 @@ all_semantics = [
 def infer_series_semantic(
     series: pl.Series, *, threshold: float = 0.8, sample_size=100
 ):
+    print(f"\n🚀 Starting semantic inference for series '{series.name}' with {series.len()} rows")
+    print(f"   Column dtype: {series.dtype}")
+    print(f"   Sample values: {series.head(3).to_list()}")
+    
     for semantic in all_semantics:
         if semantic.check(series, threshold=threshold, sample_size=sample_size):
+            print(f"🎯 MATCH FOUND: '{semantic.semantic_name}' -> data_type: '{semantic.data_type}'\n")
             return semantic
+    
+    print("💀 NO SEMANTIC MATCH FOUND\n")
     return None
 
 
