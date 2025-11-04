@@ -16,7 +16,6 @@ class SeriesSemantic(BaseModel):
     data_type: DataType
 
     def check(self, series: pl.Series, threshold: float = 0.8, sample_size: int = 100):
-        
         if not self.check_type(series):
             return False
 
@@ -28,7 +27,6 @@ class SeriesSemantic(BaseModel):
         except Exception:
             return False
         return self.validate_result(result).sum() / sample.len() > threshold
-
 
     def check_type(self, series: pl.Series):
         if isinstance(self.column_type, type):
@@ -114,7 +112,7 @@ native_datetime = SeriesSemantic(
     data_type="datetime",
 )
 
-native_time = SeriesSemantic(
+time_flexible = SeriesSemantic(
     semantic_name = "time_flexible", 
     column_type=pl.String,
     try_convert=parse_time_flexible,
@@ -213,7 +211,7 @@ boolean_catch_all = SeriesSemantic(
 all_semantics = [
     native_datetime,
     native_date,
-    native_time,
+    time_flexible,
     datetime_string,
     date_string,
     time_string,
