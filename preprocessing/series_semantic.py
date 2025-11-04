@@ -16,20 +16,16 @@ class SeriesSemantic(BaseModel):
     data_type: DataType
 
     def check(self, series: pl.Series, threshold: float = 0.8, sample_size: int = 100):
-        print(f"🔍 Checking semantic '{self.semantic_name}' for series with dtype: {series.dtype}")
         
         if not self.check_type(series):
-            print(f"❌ '{self.semantic_name}' failed type check")
             return False
 
         sample = sample_series(series, sample_size)
         try:
             if not self.prevalidate(sample):
-                print(f"❌ '{self.semantic_name}' failed prevalidation")
                 return False
             result = self.try_convert(sample)
         except Exception:
-            print(f"❌ '{self.semantic_name}' failed conversion: {e}")
             return False
         return self.validate_result(result).sum() / sample.len() > threshold
 
@@ -235,16 +231,11 @@ all_semantics = [
 def infer_series_semantic(
     series: pl.Series, *, threshold: float = 0.8, sample_size=100
 ):
-    print(f"\n🚀 Starting semantic inference for series '{series.name}' with {series.len()} rows")
-    print(f"   Column dtype: {series.dtype}")
-    print(f"   Sample values: {series.head(3).to_list()}")
     
     for semantic in all_semantics:
         if semantic.check(series, threshold=threshold, sample_size=sample_size):
-            print(f"🎯 MATCH FOUND: '{semantic.semantic_name}' -> data_type: '{semantic.data_type}'\n")
             return semantic
     
-    print("💀 NO SEMANTIC MATCH FOUND\n")
     return None
 
 
