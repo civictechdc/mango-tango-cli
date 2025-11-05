@@ -10,6 +10,8 @@ from traceback import format_exc
 from nicegui import ui
 
 from app import App
+from components.select_analysis import analysis_label
+from gui.components import ToggleButtonGroup
 from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
 from importing import importers
@@ -26,6 +28,7 @@ INSTAGRAM_URL = "https://www.instagram.com/civictechdc/"
 
 # Module-level state for native mode (single user)
 _selected_file_path = None
+project = None
 
 
 def _load_svg_icon(icon_name: str) -> str:
@@ -245,6 +248,9 @@ def gui_main(app: App):
                     )
 
                     def on_project_selected():
+
+                        global project
+
                         if selected_project.value:
                             project = project_options[selected_project.value]
                             ui.notify(
@@ -252,7 +258,7 @@ def gui_main(app: App):
                                 type="positive",
                                 color="secondary",
                             )
-                            # TODO: Navigate to project detail page
+                        ui.navigate.to("/select_analyzer")
 
                     ui.button(
                         "Open Project",
@@ -507,22 +513,16 @@ def gui_main(app: App):
 
             async def _import_data_create_project():
                 nonlocal new_project_name
+                global project
 
                 try:
                     # Call synchronous create_project
-                    app.create_project(
+                    project = app.create_project(
                         name=new_project_name, importer_session=import_session
                     )
 
                     # Navigate FIRST
-                    ui.navigate.to("/select_analysis")
-
-                    # Then notify (will show on new page)
-                    ui.notify(
-                        f"Created project: {new_project_name}!",
-                        type="positive",
-                        color="secondary",
-                    )
+                    ui.navigate.to("/select_analyzer")
 
                 except Exception as e:
                     ui.notify(f"Error creating project: {str(e)}", type="negative")
@@ -563,8 +563,8 @@ def gui_main(app: App):
             return
 
     # choose analysis page
-    @ui.page("/select_analysis")
-    def select_analysis():
+    @ui.page("/select_analyzer")
+    def select_analyzer():
 
         nonlocal new_project_name
 
@@ -573,6 +573,13 @@ def gui_main(app: App):
             title="Select Analysis", back_icon="arrow_back", back_url="/projects"
         )
         _make_footer()
+
+        # Then notify (will show on new page)
+        ui.notify(
+            f"Created project: {new_project_name}!",
+            type="positive",
+            color="secondary",
+        )
 
         # Main content - centered
         with ui.column().classes("items-center justify-center gap-6").style(
@@ -588,28 +595,48 @@ def gui_main(app: App):
             else:
                 # Create radio options from analyzers
                 analyzer_options = {
-                    f"{analyzer.name} - {analyzer.short_description}": analyzer.id
-                    for analyzer in analyzers
+                    analyzer.name: analyzer.short_description for analyzer in analyzers
                 }
 
-                selected_analyzer = ui.radio(
-                    options=list(analyzer_options.keys()), value=None
-                ).props("left-label")
+                # Create toggle button group for analyzer selection
+                button_group = ToggleButtonGroup()
+                with ui.row().classes("gap-4"):
+                    for analyzer_name, description in analyzer_options.items():
+                        button_group.add_button(analyzer_name)
 
-                def on_proceed():
-                    if selected_analyzer.value:
-                        analyzer_id = analyzer_options[selected_analyzer.value]
-                        ui.notify(f"Selected analyzer: {analyzer_id}", type="positive")
-                        # TODO: Navigate to next step (configure analysis parameters)
-                    else:
-                        ui.notify("Please select an analyzer", type="warning")
-
-                ui.button(
-                    "Proceed",
-                    icon="arrow_forward",
-                    color="primary",
-                    on_click=on_proceed,
+                now = datetime.now()
+                analysis_options = sorted(
+                    [
+                        (
+                            analysis_label(analysis, now),
+                            analysis,
+                        )
+                        for analysis in project.list_analyses()
+                    ],
+                    key=lambda option: option[0],
                 )
+
+                with ui.card():
+
+                    ui.select(
+                        label="Review previous analyses",
+                        options=[e[0] for e in analysis_options],
+                    )
+
+                # def on_proceed():
+                #    if selected_analyzer.value:
+                #        analyzer_id = analyzer_options[selected_analyzer.value]
+                #        ui.notify(f"Selected analyzer: {analyzer_id}", type="positive")
+                #        # TODO: Navigate to next step (configure analysis parameters)
+                #    else:
+                #        ui.notify("Please select an analyzer", type="warning")
+
+                # ui.button(
+                #    "Proceed",
+                #    icon="arrow_forward",
+                #    color="primary",
+                #    on_click=on_proceed,
+                # )
 
     # Launch in native mode
     ui.run(
