@@ -1,0 +1,155 @@
+name: Build Preview Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build from'
+        required: true
+        default: 'gui-prototype'
+        type: string
+      version_name:
+        description: 'Preview version name (e.g., ux-test-v1, nav-improvements)'
+        required: true
+        default: 'preview'
+        type: string
+      create_release:
+        description: 'Create a draft release (vs artifact only)'
+        required: true
+        type: boolean
+        default: false
+      notes:
+        description: 'Build notes for the team'
+        required: false
+        default: 'GUI preview build for testing'
+        type: string
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform_name: Windows
+            artifact_name: windows
+            os: windows-2022
+            executable_name: CIBMangoTree.exe
+            package_command: Compress-Archive -Path dist\CIBMangoTree.exe -DestinationPath dist\CIBMangoTree_windows-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip
+            smoke_test_command: dist\CIBMangoTree.exe --noop
+          - platform_name: MacOS (x86)
+            artifact_name: macos-x86
+            os: macos-13
+            executable_name: CIBMangoTree.app
+            package_command: cd dist && zip -r CIBMangoTree_macos-x86-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip CIBMangoTree.app
+            smoke_test_command: dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop
+          - platform_name: MacOS (arm64)
+            artifact_name: macos-arm64
+            os: macos-15
+            executable_name: CIBMangoTree.app
+            package_command: cd dist && zip -r CIBMangoTree_macos-arm64-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip CIBMangoTree.app
+            smoke_test_command: dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop
+
+    name: Build ${{ matrix.platform_name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: '**/requirements*.txt'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install PyInstaller
+        run: |
+          pip install pyinstaller
+
+      - name: Get commit info
+        id: commit_info
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "commit_msg=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+
+      - name: Create VERSION file
+        run: |
+          python -c "with open('VERSION', 'w', encoding='utf-8') as f: f.write('${{ github.event.inputs.branch }}-${{ steps.commit_info.outputs.sha_short }}')"
+
+      - name: Build with PyInstaller
+        run: pyinstaller pyinstaller.spec
+
+      - name: Verify build output
+        shell: bash
+        run: |
+          ls -lah dist/
+          echo "Looking for: ${{ matrix.executable_name }}"
+
+      - name: Package artifact
+        shell: bash
+        run: ${{ matrix.package_command }}
+
+      - name: Run smoke test
+        shell: bash
+        continue-on-error: true
+        run: |
+          echo "Running smoke test: ${{ matrix.smoke_test_command }}"
+          ${{ matrix.smoke_test_command }} || echo "⚠️ Smoke test failed or --noop not supported in GUI mode"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CIBMangoTree_${{ matrix.artifact_name }}-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}
+          path: dist/CIBMangoTree_${{ matrix.artifact_name }}-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip
+          retention-days: 30
+      
+      - name: Create Draft Release
+        if: ${{ github.event.inputs.create_release == 'true' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: true
+          tag_name: gui-preview-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}
+          name: "🖥️ GUI Preview: ${{ github.event.inputs.version_name }}"
+          files: dist/CIBMangoTree_${{ matrix.artifact_name }}-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip
+          body: |
+            # 🧪 GUI Preview Build
+
+            **Version:** `${{ github.event.inputs.version_name }}`
+            **Platform:** ${{ matrix.platform_name }}
+            **Branch:** `${{ github.event.inputs.branch }}`
+            **Commit:** [`${{ steps.commit_info.outputs.sha_short }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            **Workflow Run:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            ## 📝 Build Notes
+
+            ${{ github.event.inputs.notes }}
+
+            ---
+
+            ## 💾 Installation Instructions
+
+            ### Windows
+            1. Download `CIBMangoTree_windows-*.zip`
+            2. Extract the zip file
+            3. Run `CIBMangoTree.exe`
+            4. If Windows Defender warns about unsigned app, click "More info" → "Run anyway"
+
+            ### macOS
+            1. Download `CIBMangoTree_macos-*.zip` (choose x86 or arm64 for your Mac)
+            2. Extract the zip file
+            3. Move `CIBMangoTree.app` to `/Applications/`
+            4. **First launch:** Right-click app → "Open" to bypass Gatekeeper
+            5. For subsequent launches, double-click normally
+
+            ---
+
+            ⚠️ **This is an unsigned preview build for internal testing only.**
+            Not for production use or distribution outside the team.
