@@ -604,6 +604,7 @@ def gui_main(app: App):
                     for analyzer_name, description in analyzer_options.items():
                         button_group.add_button(analyzer_name)
 
+                # populate a list of existing options
                 now = datetime.now()
                 analysis_options = sorted(
                     [
@@ -616,27 +617,56 @@ def gui_main(app: App):
                     key=lambda option: option[0],
                 )
 
+                previous_analyzer = None
                 with ui.card():
+                    if analysis_options:
+                        previous_analyzer = ui.select(
+                            label="Review previous analyses",
+                            options=[e[0] for e in analysis_options],
+                        )
+                    else:
+                        ui.label("No previous tests have been found.").classes(
+                            "text-base"
+                        )
 
-                    ui.select(
-                        label="Review previous analyses",
-                        options=[e[0] for e in analysis_options],
+                def on_proceed():
+                    # Get current selections
+                    new_selection = button_group.get_selected_text()
+                    prev_selection = (
+                        previous_analyzer.value if previous_analyzer else None
                     )
 
-                # def on_proceed():
-                #    if selected_analyzer.value:
-                #        analyzer_id = analyzer_options[selected_analyzer.value]
-                #        ui.notify(f"Selected analyzer: {analyzer_id}", type="positive")
-                #        # TODO: Navigate to next step (configure analysis parameters)
-                #    else:
-                #        ui.notify("Please select an analyzer", type="warning")
+                    # Validation: both selected
+                    if new_selection and prev_selection:
+                        ui.notify(
+                            "Please choose either a new analyzer OR a previous analysis, not both",
+                            type="warning",
+                        )
+                        return
 
-                # ui.button(
-                #    "Proceed",
-                #    icon="arrow_forward",
-                #    color="primary",
-                #    on_click=on_proceed,
-                # )
+                    # Validation: none selected
+                    if not new_selection and not prev_selection:
+                        ui.notify("Please select an analyzer", type="warning")
+                        return
+
+                    # Valid selection - proceed
+                    if new_selection:
+                        ui.notify(f"New analyzer: {new_selection}", type="positive")
+                        # TODO: Navigate to /configure_analysis with new analyzer
+                        # ui.navigate.to("/configure_analysis")
+                    else:
+                        ui.notify(
+                            f"Previous analysis: {prev_selection}", type="positive"
+                        )
+                        # TODO: Navigate to /view_analysis with previous results
+                        # ui.navigate.to("/view_analysis")
+
+                ui.button(
+                    "Proceed",
+                    icon="arrow_forward",
+                    color="primary",
+                    on_click=on_proceed,
+                )
 
     # Launch in native mode
     ui.run(
