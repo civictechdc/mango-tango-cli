@@ -33,20 +33,14 @@ jobs:
             artifact_name: windows
             os: windows-2022
             executable_name: CIBMangoTree.exe
-            package_command: Compress-Archive -Path dist\CIBMangoTree.exe -DestinationPath dist\CIBMangoTree_windows-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip
-            smoke_test_command: dist\CIBMangoTree.exe --noop
           - platform_name: MacOS (x86)
             artifact_name: macos-x86
             os: macos-13
             executable_name: CIBMangoTree.app
-            package_command: cd dist && zip -r CIBMangoTree_macos-x86-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip CIBMangoTree.app
-            smoke_test_command: dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop
           - platform_name: MacOS (arm64)
             artifact_name: macos-arm64
             os: macos-15
             executable_name: CIBMangoTree.app
-            package_command: cd dist && zip -r CIBMangoTree_macos-arm64-${{ github.event.inputs.version_name }}-${{ steps.commit_info.outputs.sha_short }}.zip CIBMangoTree.app
-            smoke_test_command: dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop
 
     name: Build ${{ matrix.platform_name }}
     runs-on: ${{ matrix.os }}
@@ -94,14 +88,28 @@ jobs:
 
       - name: Package artifact
         shell: bash
-        run: ${{ matrix.package_command }}
+        run: |
+          VERSION="${{ github.event.inputs.version_name }}"
+          SHA="${{ steps.commit_info.outputs.sha_short }}"
+          ARTIFACT_NAME="${{ matrix.artifact_name }}"
+
+          if [ "${{ matrix.os }}" = "windows-2022" ]; then
+            powershell -Command "Compress-Archive -Path dist\CIBMangoTree.exe -DestinationPath dist\CIBMangoTree_${ARTIFACT_NAME}-${VERSION}-${SHA}.zip"
+          else
+            cd dist && zip -r "CIBMangoTree_${ARTIFACT_NAME}-${VERSION}-${SHA}.zip" CIBMangoTree.app
+          fi
 
       - name: Run smoke test
         shell: bash
         continue-on-error: true
         run: |
-          echo "Running smoke test: ${{ matrix.smoke_test_command }}"
-          ${{ matrix.smoke_test_command }} || echo "⚠️ Smoke test failed or --noop not supported in GUI mode"
+          if [ "${{ matrix.os }}" = "windows-2022" ]; then
+            echo "Running smoke test: dist\CIBMangoTree.exe --noop"
+            dist/CIBMangoTree.exe --noop || echo "⚠️ Smoke test failed or --noop not supported in GUI mode"
+          else
+            echo "Running smoke test: dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop"
+            dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop || echo "⚠️ Smoke test failed or --noop not supported in GUI mode"
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
