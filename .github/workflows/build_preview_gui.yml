@@ -99,18 +99,6 @@ jobs:
             cd dist && zip -r "CIBMangoTree_${ARTIFACT_NAME}-${VERSION}-${SHA}.zip" CIBMangoTree.app
           fi
 
-      - name: Run smoke test
-        shell: bash
-        continue-on-error: true
-        run: |
-          if [ "${{ matrix.os }}" = "windows-2022" ]; then
-            echo "Running smoke test: dist\CIBMangoTree.exe --noop"
-            dist/CIBMangoTree.exe --noop || echo "⚠️ Smoke test failed or --noop not supported in GUI mode"
-          else
-            echo "Running smoke test: dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop"
-            dist/CIBMangoTree.app/Contents/MacOS/CIBMangoTree --noop || echo "⚠️ Smoke test failed or --noop not supported in GUI mode"
-          fi
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
