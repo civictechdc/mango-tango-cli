@@ -34,6 +34,23 @@ class SeriesSemantic(BaseModel):
         return self.column_type(series.dtype)
 
 
+def parse_time_military(s: pl.Series) -> pl.Series:
+    """Parse time strings with multiple format attempts"""
+    # Try different time formats
+    FORMATS_TO_TRY = ["%H:%M:%S", "%H:%M", "%I:%M:%S %p", "%I:%M %p"]
+
+    for fmt in FORMATS_TO_TRY:
+        try:
+            result = s.str.strptime(pl.Time, format=fmt, strict=False)
+            if result.is_not_null().sum() > 0:  # If any parsed successfully
+                return result
+        except:
+            continue
+
+    # If all formats fail, return nulls
+    return pl.Series([None] * s.len(), dtype=pl.Time)
+
+
 def parse_datetime_with_tz(s: pl.Series) -> pl.Series:
     """Parse datetime strings with timezone info (both abbreviations and offsets)"""
     import warnings
@@ -94,6 +111,14 @@ native_datetime = SeriesSemantic(
     column_type=pl.Datetime,  # Matches native DateTime columns
     try_convert=lambda s: s,  # No conversion needed
     validate_result=lambda s: constant_series(s, True),  # Always valid
+    data_type="datetime",
+)
+
+time_military = SeriesSemantic(
+    semantic_name="time_military",
+    column_type=pl.String,
+    try_convert=parse_time_military,
+    validate_result=lambda s: s.is_not_null(),
     data_type="datetime",
 )
 
@@ -191,6 +216,7 @@ all_semantics = [
     datetime_string,
     date_string,
     time_string,
+    time_military,
     timestamp_seconds,
     timestamp_milliseconds,
     url,
