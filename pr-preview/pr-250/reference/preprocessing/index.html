@@ -1162,9 +1162,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#preprocessing.series_semantic.parse_time_flexible" class="md-nav__link">
+  <a href="#preprocessing.series_semantic.parse_time_military" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;parse_time_flexible
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;parse_time_military
     </span>
   </a>
   
@@ -1430,9 +1430,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#preprocessing.series_semantic.parse_time_flexible" class="md-nav__link">
+  <a href="#preprocessing.series_semantic.parse_time_military" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;parse_time_flexible
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;parse_time_military
     </span>
   </a>
   
@@ -1582,7 +1582,7 @@
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;parse_time_flexible&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt; (&lt;code&gt;preprocessing.series_semantic.parse_time_flexible&lt;/code&gt;)" href="#preprocessing.series_semantic.parse_time_flexible">parse_time_flexible</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-function&quot;&gt;&lt;/code&gt;            &lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;parse_time_military&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt; (&lt;code&gt;preprocessing.series_semantic.parse_time_military&lt;/code&gt;)" href="#preprocessing.series_semantic.parse_time_military">parse_time_military</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Parse time strings with multiple format attempts</p>
@@ -1748,8 +1748,8 @@
 <div class="doc doc-object doc-function">
 
 
-<h6 id="preprocessing.series_semantic.parse_time_flexible" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">parse_time_flexible</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></code>
+<h6 id="preprocessing.series_semantic.parse_time_military" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">parse_time_military</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></code>
 
 </h6>
 
@@ -1775,12 +1775,12 @@
 <span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span>
-<span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parse_time_flexible</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parse_time_military</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse time strings with multiple format attempts&quot;&quot;&quot;</span>
     <span class="c1"># Try different time formats</span>
-    <span class="n">formats_to_try</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">,</span> <span class="s2">&quot;%H:%M&quot;</span><span class="p">,</span> <span class="s2">&quot;%I:%M:%S %p&quot;</span><span class="p">,</span> <span class="s2">&quot;%I:%M %p&quot;</span><span class="p">]</span>
+    <span class="n">FORMATS_TO_TRY</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">,</span> <span class="s2">&quot;%H:%M&quot;</span><span class="p">,</span> <span class="s2">&quot;%I:%M:%S %p&quot;</span><span class="p">,</span> <span class="s2">&quot;%I:%M %p&quot;</span><span class="p">]</span>
 
-    <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="n">formats_to_try</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="n">FORMATS_TO_TRY</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Time</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">is_not_null</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># If any parsed successfully</span>
