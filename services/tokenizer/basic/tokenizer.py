@@ -32,6 +32,18 @@ class BasicTokenizer(AbstractTokenizer):
         super().__init__(config)
         self._patterns = get_patterns()
 
+        # Compile regex pattern for character-level script detection (performance optimization)
+        self._CHAR_LEVEL_PATTERN = re.compile(
+            r"[\u4e00-\u9fff"  # CJK Unified Ideographs
+            r"\u3400-\u4dbf"  # CJK Extension A
+            r"\u3040-\u309f"  # Hiragana
+            r"\u30a0-\u30ff"  # Katakana
+            r"\u0e00-\u0e7f"  # Thai
+            r"\u0e80-\u0eff"  # Lao
+            r"\u1000-\u109f"  # Myanmar
+            r"\u1780-\u17ff]"  # Khmer
+        )
+
     def tokenize(self, text: str) -> TokenList:
         """
         Tokenize input text into a list of tokens.
@@ -73,19 +85,8 @@ class BasicTokenizer(AbstractTokenizer):
         return self._extract_tokens_ordered(text, LanguageFamily.MIXED)
 
     def _is_char_level_script(self, char: str) -> bool:
-        """Check if character belongs to a script that uses character-level tokenization (scriptio continua)."""
-        code_point = ord(char)
-        return (
-            (0x4E00 <= code_point <= 0x9FFF)  # CJK Unified Ideographs
-            or (0x3400 <= code_point <= 0x4DBF)  # CJK Extension A
-            or (0x3040 <= code_point <= 0x309F)  # Hiragana
-            or (0x30A0 <= code_point <= 0x30FF)  # Katakana
-            or (0xAC00 <= code_point <= 0xD7AF)  # Hangul Syllables
-            or (0x0E00 <= code_point <= 0x0E7F)  # Thai
-            or (0x0E80 <= code_point <= 0x0EFF)  # Lao
-            or (0x1000 <= code_point <= 0x109F)  # Myanmar
-            or (0x1780 <= code_point <= 0x17FF)  # Khmer
-        )
+        """Check if character belongs to a character-level script."""
+        return bool(self._CHAR_LEVEL_PATTERN.match(char))
 
     def _get_char_script(self, char: str) -> str:
         """
@@ -106,6 +107,10 @@ class BasicTokenizer(AbstractTokenizer):
             or (0x1E00 <= code_point <= 0x1EFF)
         ):
             return "latin"
+
+        # Korean Hangul (space-separated, NOT character-level!)
+        elif 0xAC00 <= code_point <= 0xD7AF:
+            return "korean"
 
         # Character-level scripts (CJK, Thai, etc.)
         elif self._is_char_level_script(char):
@@ -265,6 +270,18 @@ class BasicTokenizer(AbstractTokenizer):
         if not self._contains_char_level_chars(token):
             return [token]
 
+        # Check if token mixes Latin with CJK
+        has_latin = any(c.isascii() and c.isalpha() for c in token)
+        has_cjk = any(self._is_char_level_script(c) for c in token)
+
+        # Don't apply mixed-script preservation to social media entities
+        is_social_entity = token.startswith(("@", "#", "$"))
+
+        if has_latin and has_cjk and not is_social_entity:
+            # Mixed script - keep intact (brand names, bot tricks)
+            return [token]
+
+        # Rest of existing logic for pure CJK tokens...
         result = []
         current_token = ""
         current_is_cjk = None
