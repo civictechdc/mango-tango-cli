@@ -34,12 +34,12 @@ class SeriesSemantic(BaseModel):
         return self.column_type(series.dtype)
 
 
-def parse_time_flexible(s: pl.Series) -> pl.Series:
+def parse_time_military(s: pl.Series) -> pl.Series:
     """Parse time strings with multiple format attempts"""
     # Try different time formats
-    formats_to_try = ["%H:%M:%S", "%H:%M", "%I:%M:%S %p", "%I:%M %p"]
+    FORMATS_TO_TRY = ["%H:%M:%S", "%H:%M", "%I:%M:%S %p", "%I:%M %p"]
 
-    for fmt in formats_to_try:
+    for fmt in FORMATS_TO_TRY:
         try:
             result = s.str.strptime(pl.Time, format=fmt, strict=False)
             if result.is_not_null().sum() > 0:  # If any parsed successfully
@@ -114,10 +114,10 @@ native_datetime = SeriesSemantic(
     data_type="datetime",
 )
 
-time_flexible = SeriesSemantic(
-    semantic_name="time_flexible",
+time_military = SeriesSemantic(
+    semantic_name="time_military",
     column_type=pl.String,
-    try_convert=parse_time_flexible,
+    try_convert=parse_time_military,
     validate_result=lambda s: s.is_not_null(),
     data_type="datetime",
 )
@@ -213,10 +213,10 @@ boolean_catch_all = SeriesSemantic(
 all_semantics = [
     native_datetime,
     native_date,
-    time_flexible,
     datetime_string,
     date_string,
     time_string,
+    time_military,
     timestamp_seconds,
     timestamp_milliseconds,
     url,
