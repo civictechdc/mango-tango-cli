@@ -141,11 +141,6 @@ class GuiSession(BaseModel):
         return bool(self.new_project_name and self.new_project_name.strip())
 
 
-# ============================================================================
-# Abstract Base Page
-# ============================================================================
-
-
 class GuiPage(BaseModel, abc.ABC):
     """
     Abstract base class for all GUI pages.
@@ -188,7 +183,7 @@ class GuiPage(BaseModel, abc.ABC):
         ```
     """
 
-    # Core state
+    # Link to main session state/variables
     session: GuiSession
 
     # Page configuration
@@ -207,10 +202,7 @@ class GuiPage(BaseModel, abc.ABC):
     # Allow arbitrary types
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    # ========================================================================
-    # Main Rendering Lifecycle
-    # ========================================================================
-
+    # main rendering function
     def render(self) -> None:
         """
         Main rendering method implementing template pattern.
@@ -345,10 +337,7 @@ class GuiPage(BaseModel, abc.ABC):
                 )
                 ui.tooltip("Follow us on Instagram")
 
-    # ========================================================================
-    # Navigation Helpers
-    # ========================================================================
-
+    # Navigation helpers
     def navigate_to(self, route: str) -> None:
         """
         Navigate to another page in the application.
@@ -376,10 +365,7 @@ class GuiPage(BaseModel, abc.ABC):
         """Navigate to home page."""
         self.navigate_to("/")
 
-    # ========================================================================
-    # Utility Methods
-    # ========================================================================
-
+    # utilities
     def _load_svg_icon(self, icon_name: str) -> str:
         """
         Load SVG icon from the icons directory.
@@ -404,3 +390,55 @@ class GuiPage(BaseModel, abc.ABC):
     def notify_error(self, message: str) -> None:
         """Show error notification."""
         ui.notify(message, type="negative")
+
+
+# standalone uitility functions
+def format_file_size(size_bytes: int) -> str:
+    """
+    Format file size in human-readable format.
+
+    Args:
+        size_bytes: File size in bytes
+
+    Returns:
+        Formatted string (e.g., "1.5 MB", "3.2 GB")
+
+    Example:
+        >>> format_file_size(1536)
+        '1.5 KB'
+        >>> format_file_size(1048576)
+        '1.0 MB'
+    """
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.1f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.1f} PB"
+
+
+def present_separator(value: str) -> str:
+    """
+    Format separator/quote character for display.
+
+    Args:
+        value: Separator character
+
+    Returns:
+        Human-readable representation
+
+    Example:
+        >>> present_separator("\\t")
+        'Tab'
+        >>> present_separator(",")
+        ', (Comma)'
+    """
+    mapping = {
+        "\t": "Tab",
+        " ": "Space",
+        ",": ", (Comma)",
+        ";": "; (Semicolon)",
+        "'": "' (Single quote)",
+        '"': '" (Double quote)',
+        "|": "| (Pipe)",
+    }
+    return mapping.get(value, value)
