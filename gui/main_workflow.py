@@ -16,7 +16,7 @@ from gui.components import ToggleButtonGroup
 from gui.context import GUIContext
 from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
-from gui.pages import ProjectsPage, StartPage
+from gui.pages import SelectProjectPage, StartPage
 from importing import importers
 
 # Mango Tree brand color
@@ -179,10 +179,10 @@ def gui_main(app: App):
         page = StartPage(session=gui_session)
         page.render()
 
-    @ui.page("/projects")
-    def projects_page():
+    @ui.page("/select_project")
+    def select_project_page():
         """Sub-page showing list of existing projects using GuiPage abstraction."""
-        page = ProjectsPage(session=gui_session)
+        page = SelectProjectPage(session=gui_session)
         page.render()
 
     @ui.page("/new_project")
@@ -488,7 +488,7 @@ def gui_main(app: App):
 
         _set_colors()
         _make_header(
-            title="Select Analysis", back_icon="arrow_back", back_url="/projects"
+            title="Select Analysis", back_icon="arrow_back", back_url="/select_project"
         )
         _make_footer()
 
