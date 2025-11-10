@@ -162,7 +162,7 @@ def present_separator(value: str) -> str:
 # ============================================================================
 
 
-class MainPage(GuiPage):
+class StartPage(GuiPage):
     """
     Main/home page of the application.
 
@@ -222,14 +222,14 @@ def gui_main(app: App):
 
     # Initialize GUI session for state management
     gui_context = GUIContext(app=app)
-    session = GuiSession(context=gui_context)
+    gui_session = GuiSession(context=gui_context)
 
     new_project_name = None
 
     @ui.page("/")
-    def main_page():
+    def start_page():
         """Main/home page using GuiPage abstraction."""
-        page = MainPage(session)
+        page = StartPage(session=gui_session)
         page.render()
 
     @ui.page("/projects")
