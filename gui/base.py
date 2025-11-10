@@ -240,10 +240,6 @@ class GuiPage(BaseModel, abc.ABC):
         """
         raise NotImplementedError
 
-    # ========================================================================
-    # Protected Rendering Methods
-    # ========================================================================
-
     def _setup_colors(self) -> None:
         """Setup Mango Tree brand colors for NiceGUI."""
         ui.colors(
