@@ -10,6 +10,10 @@ from traceback import format_exc
 from nicegui import ui
 
 from app import App
+from components.select_analysis import analysis_label
+from gui.base import GuiPage, GuiSession
+from gui.components import ToggleButtonGroup
+from gui.context import GUIContext
 from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
 from importing import importers
@@ -26,6 +30,7 @@ INSTAGRAM_URL = "https://www.instagram.com/civictechdc/"
 
 # Module-level state for native mode (single user)
 _selected_file_path = None
+project = None
 
 
 def _load_svg_icon(icon_name: str) -> str:
@@ -152,6 +157,61 @@ def present_separator(value: str) -> str:
     return mapping.get(value, value)
 
 
+# ============================================================================
+# Page Classes
+# ============================================================================
+
+
+class StartPage(GuiPage):
+    """
+    Main/home page of the application.
+
+    Displays welcome message and primary navigation buttons for
+    creating a new project or viewing existing projects.
+    """
+
+    def __init__(self, session: GuiSession):
+        super().__init__(
+            session=session,
+            route="/",
+            title="CIB Mango Tree",
+            show_back_button=False,  # Home page - no back navigation
+            show_footer=True,
+        )
+
+    def render_content(self) -> None:
+        """Render main page content with action buttons."""
+        # Main content area - centered vertically
+        with ui.column().classes("items-center justify-center").style(
+            "height: 80vh; width: 100%"
+        ):
+            # Prompt label
+            ui.label("Let's get started! What do you want to do?").classes(
+                "q-mb-lg"
+            ).style("font-size: 1.05rem")
+
+            # Action buttons row
+            with ui.row().classes("gap-4"):
+                ui.button(
+                    "New Project",
+                    on_click=lambda: self.navigate_to("/new_project"),
+                    icon="add",
+                    color="primary",
+                )
+
+                ui.button(
+                    "Show Existing Projects",
+                    on_click=lambda: self.navigate_to("/projects"),
+                    icon="folder",
+                    color="primary",
+                )
+
+
+# ============================================================================
+# Main GUI Entry Point
+# ============================================================================
+
+
 def gui_main(app: App):
     """
     Launch the NiceGUI interface with a minimal single screen.
@@ -160,46 +220,17 @@ def gui_main(app: App):
         app: The initialized App instance with storage and suite
     """
 
+    # Initialize GUI session for state management
+    gui_context = GUIContext(app=app)
+    gui_session = GuiSession(context=gui_context)
+
+    new_project_name = None
+
     @ui.page("/")
-    def main_page():
-
-        # Register custom colors FIRST, before any UI elements
-        _set_colors()
-
-        # Header
-        _make_header(title="CIB Mango Tree")
-        _make_footer()
-
-        # Main content area - centered vertically
-        with ui.column().classes("items-center justify-center").style(
-            "height: 80vh; width: 100%"
-        ):
-
-            # Prompt label
-            ui.label("Let's get started! What do you want to do?").classes(
-                "q-mb-lg"
-            ).style("font-size: 1.05rem")
-
-            # Action buttons row
-            with ui.row().classes("gap-4"):
-
-                def on_new_project():
-
-                    ui.navigate.to("/new_project")
-
-                ui.button(
-                    "New Project",
-                    on_click=on_new_project,
-                    icon="add",
-                    color="primary",
-                )
-
-                ui.button(
-                    "Show Existing Projects",
-                    on_click=lambda: ui.navigate.to("/projects"),
-                    icon="folder",
-                    color="primary",
-                )
+    def start_page():
+        """Main/home page using GuiPage abstraction."""
+        page = StartPage(session=gui_session)
+        page.render()
 
     @ui.page("/projects")
     def projects_page():
@@ -243,6 +274,9 @@ def gui_main(app: App):
                     )
 
                     def on_project_selected():
+
+                        global project
+
                         if selected_project.value:
                             project = project_options[selected_project.value]
                             ui.notify(
@@ -250,7 +284,7 @@ def gui_main(app: App):
                                 type="positive",
                                 color="secondary",
                             )
-                            # TODO: Navigate to project detail page
+                        ui.navigate.to("/select_analyzer")
 
                     ui.button(
                         "Open Project",
@@ -269,19 +303,32 @@ def gui_main(app: App):
         _make_header(title="New Project", back_icon="arrow_back", back_url="/")
         _make_footer()
 
+        nonlocal new_project_name
+
         # Main content - centered vertically and horizontally
         with ui.column().classes("items-center justify-center gap-6").style(
             "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
         ):
-            ui.input(
+            new_project_name_input = ui.input(
                 label="New Project Name",
                 placeholder="e.g. Twitter-2018-dataset",
             )
 
+            def on_next():
+                nonlocal new_project_name
+                # Capture the input value when user clicks Next
+                new_project_name = new_project_name_input.value
+
+                if not new_project_name or not new_project_name.strip():
+                    ui.notify("Please enter a project name", type="warning")
+                    return
+
+                ui.navigate.to("/dataset_importing")
+
             ui.button(
                 text="Next: Select Dataset",
                 icon="arrow_forward",
-                on_click=lambda: ui.navigate.to("/dataset_importing"),
+                on_click=on_next,
                 color="primary",
             )
 
@@ -490,6 +537,23 @@ def gui_main(app: App):
                 )
                 await dialog
 
+            async def _import_data_create_project():
+                nonlocal new_project_name
+                global project
+
+                try:
+                    # Call synchronous create_project
+                    project = app.create_project(
+                        name=new_project_name, importer_session=import_session
+                    )
+
+                    # Navigate FIRST
+                    ui.navigate.to("/select_analyzer")
+
+                except Exception as e:
+                    ui.notify(f"Error creating project: {str(e)}", type="negative")
+                    print(f"Project creation error:\n{format_exc()}")
+
             # Main content area - centered
             with ui.column().classes("items-center justify-center gap-6").style(
                 "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; min-height: 70vh;"
@@ -503,7 +567,7 @@ def gui_main(app: App):
                     _make_preview_grid(import_preview)
 
                 # Bottom Actions
-                with ui.row().classes("w-full justify-end gap-2 mt-4"):
+                with ui.row().classes("w-full justify-center gap-2 mt-4"):
                     ui.button(
                         "Change Import Options",
                         icon="settings",
@@ -512,12 +576,10 @@ def gui_main(app: App):
                     ).props("outline")
 
                     ui.button(
-                        "Import Dataset",
+                        "Import and Create Project",
                         icon="upload",
                         color="primary",
-                        on_click=lambda: ui.notify(
-                            "Coming soon: Import dataset", type="info"
-                        ),
+                        on_click=_import_data_create_project,
                     )
 
         except Exception as e:
@@ -525,6 +587,112 @@ def gui_main(app: App):
             print(f"Preview error:\n{format_exc()}")
             ui.navigate.to("/dataset_importing")
             return
+
+    # choose analysis page
+    @ui.page("/select_analyzer")
+    def select_analyzer():
+
+        nonlocal new_project_name
+
+        _set_colors()
+        _make_header(
+            title="Select Analysis", back_icon="arrow_back", back_url="/projects"
+        )
+        _make_footer()
+
+        # Then notify (will show on new page)
+        ui.notify(
+            f"Created project: {new_project_name}!",
+            type="positive",
+            color="secondary",
+        )
+
+        # Main content - centered
+        with ui.column().classes("items-center justify-center gap-6").style(
+            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
+        ):
+            ui.label("Choose an analysis type").classes("text-lg")
+
+            # Get primary analyzers from suite
+            analyzers = app.context.suite.primary_anlyzers
+
+            if not analyzers:
+                ui.label("No analyzers available").classes("text-grey")
+            else:
+                # Create radio options from analyzers
+                analyzer_options = {
+                    analyzer.name: analyzer.short_description for analyzer in analyzers
+                }
+
+                # Create toggle button group for analyzer selection
+                button_group = ToggleButtonGroup()
+                with ui.row().classes("gap-4"):
+                    for analyzer_name, description in analyzer_options.items():
+                        button_group.add_button(analyzer_name)
+
+                # populate a list of existing options
+                now = datetime.now()
+                analysis_options = sorted(
+                    [
+                        (
+                            analysis_label(analysis, now),
+                            analysis,
+                        )
+                        for analysis in project.list_analyses()
+                    ],
+                    key=lambda option: option[0],
+                )
+
+                previous_analyzer = None
+                with ui.card():
+                    if analysis_options:
+                        previous_analyzer = ui.select(
+                            label="Review previous analyses",
+                            options=[e[0] for e in analysis_options],
+                        )
+                    else:
+                        ui.label("No previous tests have been found.").classes(
+                            "text-base"
+                        )
+
+                def on_proceed():
+                    # Get current selections
+                    new_selection = button_group.get_selected_text()
+                    prev_selection = (
+                        previous_analyzer.value if previous_analyzer else None
+                    )
+
+                    # Validation: both selected
+                    if new_selection and prev_selection:
+                        ui.notify(
+                            "Please choose either a new analyzer OR a previous analysis, not both",
+                            type="warning",
+                        )
+                        return
+
+                    # Validation: none selected
+                    if not new_selection and not prev_selection:
+                        ui.notify("Please select an analyzer", type="warning")
+                        return
+
+                    # Valid selection - proceed
+                    if new_selection:
+                        ui.notify(f"New analyzer: {new_selection}", type="positive")
+                        # TODO: Navigate to /configure_analysis with new analyzer
+                        # ui.navigate.to("/configure_analysis")
+                    else:
+                        ui.notify(
+                            f"Previous analysis: {prev_selection}", type="positive"
+                        )
+                        # TODO: Navigate to /view_analysis with previous results
+                        # ui.navigate.to("/view_analysis")
+
+                ui.button(
+                    "Proceed",
+                    icon="arrow_forward",
+                    color="primary",
+                    on_click=on_proceed,
+                )
 
     # Launch in native mode
     ui.run(
