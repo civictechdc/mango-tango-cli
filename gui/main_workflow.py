@@ -10,13 +10,11 @@ from traceback import format_exc
 from nicegui import ui
 
 from app import App
-from components.select_analysis import analysis_label
 from gui.base import GuiSession
-from gui.components import ToggleButtonGroup
 from gui.context import GUIContext
 from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
-from gui.pages import SelectProjectPage, StartPage
+from gui.pages import SelectAnalyzerPage, SelectProjectPage, StartPage
 from importing import importers
 
 # Mango Tree brand color
@@ -483,108 +481,9 @@ def gui_main(app: App):
     # choose analysis page
     @ui.page("/select_analyzer")
     def select_analyzer():
-
-        nonlocal new_project_name
-
-        _set_colors()
-        _make_header(
-            title="Select Analysis", back_icon="arrow_back", back_url="/select_project"
-        )
-        _make_footer()
-
-        # Then notify (will show on new page)
-        ui.notify(
-            f"Created project: {new_project_name}!",
-            type="positive",
-            color="secondary",
-        )
-
-        # Main content - centered
-        with ui.column().classes("items-center justify-center gap-6").style(
-            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
-        ):
-            ui.label("Choose an analysis type").classes("text-lg")
-
-            # Get primary analyzers from suite
-            analyzers = app.context.suite.primary_anlyzers
-
-            if not analyzers:
-                ui.label("No analyzers available").classes("text-grey")
-            else:
-                # Create radio options from analyzers
-                analyzer_options = {
-                    analyzer.name: analyzer.short_description for analyzer in analyzers
-                }
-
-                # Create toggle button group for analyzer selection
-                button_group = ToggleButtonGroup()
-                with ui.row().classes("gap-4"):
-                    for analyzer_name, description in analyzer_options.items():
-                        button_group.add_button(analyzer_name)
-
-                # populate a list of existing options
-                now = datetime.now()
-                analysis_options = sorted(
-                    [
-                        (
-                            analysis_label(analysis, now),
-                            analysis,
-                        )
-                        for analysis in project.list_analyses()
-                    ],
-                    key=lambda option: option[0],
-                )
-
-                previous_analyzer = None
-                with ui.card():
-                    if analysis_options:
-                        previous_analyzer = ui.select(
-                            label="Review previous analyses",
-                            options=[e[0] for e in analysis_options],
-                        )
-                    else:
-                        ui.label("No previous tests have been found.").classes(
-                            "text-base"
-                        )
-
-                def on_proceed():
-                    # Get current selections
-                    new_selection = button_group.get_selected_text()
-                    prev_selection = (
-                        previous_analyzer.value if previous_analyzer else None
-                    )
-
-                    # Validation: both selected
-                    if new_selection and prev_selection:
-                        ui.notify(
-                            "Please choose either a new analyzer OR a previous analysis, not both",
-                            type="warning",
-                        )
-                        return
-
-                    # Validation: none selected
-                    if not new_selection and not prev_selection:
-                        ui.notify("Please select an analyzer", type="warning")
-                        return
-
-                    # Valid selection - proceed
-                    if new_selection:
-                        ui.notify(f"New analyzer: {new_selection}", type="positive")
-                        # TODO: Navigate to /configure_analysis with new analyzer
-                        # ui.navigate.to("/configure_analysis")
-                    else:
-                        ui.notify(
-                            f"Previous analysis: {prev_selection}", type="positive"
-                        )
-                        # TODO: Navigate to /view_analysis with previous results
-                        # ui.navigate.to("/view_analysis")
-
-                ui.button(
-                    "Proceed",
-                    icon="arrow_forward",
-                    color="primary",
-                    on_click=on_proceed,
-                )
+        """Analyzer selection page using GuiPage abstraction."""
+        page = SelectAnalyzerPage(session=gui_session)
+        page.render()
 
     # Launch in native mode
     ui.run(
