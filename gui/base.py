@@ -16,9 +16,8 @@ from importing import ImporterSession
 from storage import AnalysisModel, ProjectModel
 
 
-# Class for Managing Constants (colors and links)
-class GuiConstants(BaseModel):
-    """Mango Tree brand colors and UI constants."""
+class GuiColors(BaseModel):
+    """Mango Tree brand colors"""
 
     model_config = ConfigDict(frozen=True)
 
@@ -28,6 +27,13 @@ class GuiConstants(BaseModel):
 
     # Additional colors for reference
     mango_orange: str = Field(default="#f3921e", description="Mango orange")
+
+
+# Class for Managing Constants (colors and links)
+class GuiURLS(BaseModel):
+    """UI URL constants."""
+
+    model_config = ConfigDict(frozen=True)
 
     # External URLs
     github_url: str = Field(
@@ -40,8 +46,19 @@ class GuiConstants(BaseModel):
     )
 
 
+class GuiConstants(BaseModel):
+    """Container for both colors and urls"""
+
+    model_config = ConfigDict(frozen=True)
+
+    colors = GuiColors()
+    urls = GuiURLS()
+
+
 # Singleton instance for easy access
-GUI_COLORS_LINKS = GuiConstants()
+GUI_COLORS = GuiColors()
+GUI_URLS = GuiURLS()
+GUI_CONSTANTS = GuiConstants()
 
 
 # Class for handling information that
