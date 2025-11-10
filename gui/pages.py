@@ -42,13 +42,13 @@ class StartPage(GuiPage):
 
                 ui.button(
                     "Show Existing Projects",
-                    on_click=lambda: self.navigate_to("/projects"),
+                    on_click=lambda: self.navigate_to("/select_project"),
                     icon="folder",
                     color="primary",
                 )
 
 
-class ProjectsPage(GuiPage):
+class SelectProjectPage(GuiPage):
     """
     Projects list page showing existing projects.
 
@@ -58,7 +58,7 @@ class ProjectsPage(GuiPage):
     def __init__(self, session: GuiSession):
         super().__init__(
             session=session,
-            route="/projects",
+            route="/select_project",
             title="CIB Mango Tree",
             show_back_button=True,
             back_route="/",
