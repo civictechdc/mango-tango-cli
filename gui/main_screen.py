@@ -11,7 +11,9 @@ from nicegui import ui
 
 from app import App
 from components.select_analysis import analysis_label
+from gui.base import GuiPage, GuiSession
 from gui.components import ToggleButtonGroup
+from gui.context import GUIContext
 from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
 from importing import importers
@@ -155,6 +157,61 @@ def present_separator(value: str) -> str:
     return mapping.get(value, value)
 
 
+# ============================================================================
+# Page Classes
+# ============================================================================
+
+
+class MainPage(GuiPage):
+    """
+    Main/home page of the application.
+
+    Displays welcome message and primary navigation buttons for
+    creating a new project or viewing existing projects.
+    """
+
+    def __init__(self, session: GuiSession):
+        super().__init__(
+            session=session,
+            route="/",
+            title="CIB Mango Tree",
+            show_back_button=False,  # Home page - no back navigation
+            show_footer=True,
+        )
+
+    def render_content(self) -> None:
+        """Render main page content with action buttons."""
+        # Main content area - centered vertically
+        with ui.column().classes("items-center justify-center").style(
+            "height: 80vh; width: 100%"
+        ):
+            # Prompt label
+            ui.label("Let's get started! What do you want to do?").classes(
+                "q-mb-lg"
+            ).style("font-size: 1.05rem")
+
+            # Action buttons row
+            with ui.row().classes("gap-4"):
+                ui.button(
+                    "New Project",
+                    on_click=lambda: self.navigate_to("/new_project"),
+                    icon="add",
+                    color="primary",
+                )
+
+                ui.button(
+                    "Show Existing Projects",
+                    on_click=lambda: self.navigate_to("/projects"),
+                    icon="folder",
+                    color="primary",
+                )
+
+
+# ============================================================================
+# Main GUI Entry Point
+# ============================================================================
+
+
 def gui_main(app: App):
     """
     Launch the NiceGUI interface with a minimal single screen.
@@ -163,48 +220,17 @@ def gui_main(app: App):
         app: The initialized App instance with storage and suite
     """
 
+    # Initialize GUI session for state management
+    gui_context = GUIContext(app=app)
+    session = GuiSession(context=gui_context)
+
     new_project_name = None
 
     @ui.page("/")
     def main_page():
-
-        # Register custom colors FIRST, before any UI elements
-        _set_colors()
-
-        # Header
-        _make_header(title="CIB Mango Tree")
-        _make_footer()
-
-        # Main content area - centered vertically
-        with ui.column().classes("items-center justify-center").style(
-            "height: 80vh; width: 100%"
-        ):
-
-            # Prompt label
-            ui.label("Let's get started! What do you want to do?").classes(
-                "q-mb-lg"
-            ).style("font-size: 1.05rem")
-
-            # Action buttons row
-            with ui.row().classes("gap-4"):
-
-                def on_new_project():
-
-                    ui.navigate.to("/new_project")
-
-                ui.button(
-                    "New Project",
-                    on_click=on_new_project,
-                    icon="add",
-                    color="primary",
-                )
-
-                ui.button(
-                    "Show Existing Projects",
-                    on_click=lambda: ui.navigate.to("/projects"),
-                    icon="folder",
-                    color="primary",
-                )
+        """Main/home page using GuiPage abstraction."""
+        page = MainPage(session)
+        page.render()
 
     @ui.page("/projects")
     def projects_page():
