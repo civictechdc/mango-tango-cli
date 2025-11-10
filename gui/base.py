@@ -52,16 +52,16 @@ class GuiURLS(BaseModel):
 class GuiConstants(BaseModel):
     """Container for both colors and urls"""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    colors = GuiColors()
-    urls = GuiURLS()
+    colors: GuiColors
+    urls: GuiURLS
 
 
 # Singleton instance for easy access
 GUI_COLORS = GuiColors()
 GUI_URLS = GuiURLS()
-GUI_CONSTANTS = GuiConstants()
+GUI_CONSTANTS = GuiConstants(colors=GUI_COLORS, urls=GUI_URLS)
 
 
 # Class for handling information that
