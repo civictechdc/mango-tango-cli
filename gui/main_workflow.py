@@ -14,7 +14,7 @@ from gui.base import GuiSession
 from gui.context import GUIContext
 from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
-from gui.pages import SelectAnalyzerPage, SelectProjectPage, StartPage
+from gui.pages import NewProjectPage, SelectAnalyzerPage, SelectProjectPage, StartPage
 from importing import importers
 
 # Mango Tree brand color
@@ -185,42 +185,9 @@ def gui_main(app: App):
 
     @ui.page("/new_project")
     def new_project():
-
-        # Register custom colors FIRST, before any UI elements
-        _set_colors()
-
-        # Header
-        _make_header(title="New Project", back_icon="arrow_back", back_url="/")
-        _make_footer()
-
-        nonlocal new_project_name
-
-        # Main content - centered vertically and horizontally
-        with ui.column().classes("items-center justify-center gap-6").style(
-            "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
-        ):
-            new_project_name_input = ui.input(
-                label="New Project Name",
-                placeholder="e.g. Twitter-2018-dataset",
-            )
-
-            def on_next():
-                nonlocal new_project_name
-                # Capture the input value when user clicks Next
-                new_project_name = new_project_name_input.value
-
-                if not new_project_name or not new_project_name.strip():
-                    ui.notify("Please enter a project name", type="warning")
-                    return
-
-                ui.navigate.to("/dataset_importing")
-
-            ui.button(
-                text="Next: Select Dataset",
-                icon="arrow_forward",
-                on_click=on_next,
-                color="primary",
-            )
+        """Sub-page for creating a new project name before importing dataset"""
+        page = NewProjectPage(session=gui_session)
+        page.render()
 
     @ui.page("/dataset_importing")
     def dataset_importing():
