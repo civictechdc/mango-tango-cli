@@ -193,7 +193,6 @@ class ImportDatasetPage(GuiPage):
         """Render file selection interface."""
         import os
         from datetime import datetime
-        from pathlib import Path
 
         from gui.base import format_file_size
         from gui.file_picker import LocalFilePicker

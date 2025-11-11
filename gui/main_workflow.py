@@ -2,17 +2,13 @@
 Main GUI screen with title and project selection.
 """
 
-import os
-from datetime import datetime
 from pathlib import Path
-from traceback import format_exc
 
 from nicegui import ui
 
 from app import App
 from gui.base import GuiSession, gui_routes
 from gui.context import GUIContext
-from gui.import_options import ImportOptionsDialog
 from gui.pages import (
     ImportDatasetPage,
     NewProjectPage,
@@ -21,7 +17,6 @@ from gui.pages import (
     SelectProjectPage,
     StartPage,
 )
-from importing import importers
 
 # Mango Tree brand color
 MANGO_DARK_GREEN = "#609949"
