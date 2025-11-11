@@ -19,6 +19,17 @@ from importing import ImporterSession
 from storage import AnalysisModel, ProjectModel
 
 
+class GuiRoutes(BaseModel):
+    """Container for"""
+
+    root: str = "/"
+    import_dataset: str = "/import_dataset"
+    new_project: str = "/new_project"
+    select_project: str = "/select_project"
+    select_analyzer: str = "/select_analyzer"
+    preview_dataset: str = "/preview_dataset"
+
+
 class GuiColors(BaseModel):
     """Mango Tree brand colors"""
 
@@ -58,10 +69,11 @@ class GuiConstants(BaseModel):
     urls: GuiURLS
 
 
-# Singleton instance for easy access
-GUI_COLORS = GuiColors()
-GUI_URLS = GuiURLS()
-GUI_CONSTANTS = GuiConstants(colors=GUI_COLORS, urls=GUI_URLS)
+# Singleton instances for easy access in other modules
+gui_colors = GuiColors()
+gui_urls = GuiURLS()
+gui_constants = GuiConstants(colors=gui_colors, urls=gui_urls)
+gui_routes = GuiRoutes()
 
 
 # Class for handling information that
@@ -243,9 +255,9 @@ class GuiPage(BaseModel, abc.ABC):
     def _setup_colors(self) -> None:
         """Setup Mango Tree brand colors for NiceGUI."""
         ui.colors(
-            primary=GUI_COLORS.primary,
-            secondary=GUI_COLORS.secondary,
-            accent=GUI_COLORS.accent,
+            primary=gui_colors.primary,
+            secondary=gui_colors.secondary,
+            accent=gui_colors.accent,
         )
 
     def _render_header(self) -> None:
@@ -312,7 +324,7 @@ class GuiPage(BaseModel, abc.ABC):
             # GitHub button
             github_btn = ui.button(
                 color="accent",
-                on_click=lambda: self.navigate_to_external(GUI_URLS.github_url),
+                on_click=lambda: self.navigate_to_external(gui_urls.github_url),
             ).props("flat round")
             with github_btn:
                 github_svg = self._load_svg_icon("github")
@@ -324,7 +336,7 @@ class GuiPage(BaseModel, abc.ABC):
             # Instagram button
             instagram_btn = ui.button(
                 color="accent",
-                on_click=lambda: self.navigate_to_external(GUI_URLS.instagram_url),
+                on_click=lambda: self.navigate_to_external(gui_urls.instagram_url),
             ).props("flat round")
             with instagram_btn:
                 instagram_svg = self._load_svg_icon("instagram")
