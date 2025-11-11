@@ -10,9 +10,8 @@ from traceback import format_exc
 from nicegui import ui
 
 from app import App
-from gui.base import GuiSession
+from gui.base import GuiSession, gui_routes
 from gui.context import GUIContext
-from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
 from gui.pages import (
     ImportDatasetPage,
@@ -177,31 +176,31 @@ def gui_main(app: App):
 
     new_project_name = None
 
-    @ui.page("/")
+    @ui.page(gui_routes.root)
     def start_page():
         """Main/home page using GuiPage abstraction."""
         page = StartPage(session=gui_session)
         page.render()
 
-    @ui.page("/select_project")
+    @ui.page(gui_routes.select_project)
     def select_project_page():
         """Sub-page showing list of existing projects using GuiPage abstraction."""
         page = SelectProjectPage(session=gui_session)
         page.render()
 
-    @ui.page("/new_project")
+    @ui.page(gui_routes.new_project)
     def new_project():
         """Sub-page for creating a new project name before importing dataset"""
         page = NewProjectPage(session=gui_session)
         page.render()
 
-    @ui.page("/dataset_importing")
+    @ui.page(gui_routes.import_dataset)
     def dataset_importing():
         """Sub-page for importing dataset using GuiPage abstraction."""
         page = ImportDatasetPage(session=gui_session)
         page.render()
 
-    @ui.page("/data_preview")
+    @ui.page(gui_routes.preview_dataset)
     def data_preview_page():
         global _selected_file_path
 

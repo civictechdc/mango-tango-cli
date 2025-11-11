@@ -3,7 +3,7 @@ from datetime import datetime
 from nicegui import ui
 
 from components.select_analysis import analysis_label
-from gui.base import GuiPage, GuiSession
+from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import ToggleButtonGroup
 
 
@@ -157,7 +157,7 @@ class NewProjectPage(GuiPage):
 
                 # Store validated value in session
                 self.session.new_project_name = project_name
-                self.navigate_to("/dataset_importing")
+                self.navigate_to(gui_routes.import_dataset)
 
             ui.button(
                 text="Next: Select Dataset",
@@ -180,10 +180,10 @@ class ImportDatasetPage(GuiPage):
     def __init__(self, session: GuiSession):
         super().__init__(
             session=session,
-            route="/dataset_importing",
+            route=gui_routes.import_dataset,
             title="Import Dataset",
             show_back_button=True,
-            back_route="/new_project",
+            back_route=gui_routes.new_project,
             show_footer=True,
         )
 
@@ -262,7 +262,7 @@ class ImportDatasetPage(GuiPage):
 
                 # Store file path in session
                 self.session.selected_file_path = Path(selected_file_path)
-                self.navigate_to("/data_preview")
+                self.navigate_to("/preview_dataset")
 
             browse_btn = ui.button(
                 "Browse files",
