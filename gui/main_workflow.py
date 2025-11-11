@@ -14,7 +14,13 @@ from gui.base import GuiSession
 from gui.context import GUIContext
 from gui.file_picker import LocalFilePicker
 from gui.import_options import ImportOptionsDialog
-from gui.pages import NewProjectPage, SelectAnalyzerPage, SelectProjectPage, StartPage
+from gui.pages import (
+    ImportDatasetPage,
+    NewProjectPage,
+    SelectAnalyzerPage,
+    SelectProjectPage,
+    StartPage,
+)
 from importing import importers
 
 # Mango Tree brand color
@@ -191,113 +197,9 @@ def gui_main(app: App):
 
     @ui.page("/dataset_importing")
     def dataset_importing():
-
-        _set_colors()
-
-        _make_header(
-            title="Import Dataset", back_icon="arrow_back", back_url="/new_project"
-        )
-        _make_footer()
-
-        # Page state
-        selected_file_path = None
-
-        # Main content - centered vertically and horizontally
-        with ui.column().classes("items-center justify-center gap-6").style(
-            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
-        ):
-            ui.label("Choose a dataset file.").classes("text-lg")
-
-            # File info card (initially hidden)
-            file_info_card = ui.card().style("display: none;")
-            with file_info_card:
-                file_name_label = ui.label().classes("text-sm")
-                file_path_label = ui.label().classes("text-sm")
-                file_size_label = ui.label().classes("text-sm")
-                file_modified_label = ui.label().classes("text-sm")
-
-                with ui.row().classes("w-full justify-end gap-2 mt-4"):
-                    change_file_btn = ui.button(
-                        "Pick a different file",
-                        icon="edit",
-                        color="secondary",
-                        on_click=lambda: None,
-                    ).props("outline")
-                    preview_btn = ui.button(
-                        "Next: Preview Data", icon="arrow_forward", color="primary"
-                    )
-
-            # Browse button
-            async def browse_for_file():
-                nonlocal selected_file_path
-
-                picker = LocalFilePicker(
-                    state=app.file_selector_state,
-                    file_extensions=[".csv", ".xlsx"],
-                )
-                result = await picker
-
-                if result:
-                    selected_file_path = result
-
-                    # Show file info
-                    file_stats = os.stat(result)
-                    file_size = _format_file_size(file_stats.st_size)
-                    file_modified = datetime.fromtimestamp(
-                        file_stats.st_mtime
-                    ).strftime("%Y-%m-%d %H:%M:%S")
-
-                    file_name_label.text = f"Dataset file: {os.path.basename(result)}"
-                    file_path_label.text = f"Location: {result}"
-                    file_size_label.text = f"Size: {file_size}"
-                    file_modified_label.text = f"Modified: {file_modified}"
-
-                    file_info_card.style("display: block;")
-                    browse_btn.set_visibility(False)
-
-                    ui.notify(
-                        message="File selected successfully",
-                        color="secondary",
-                        type="positive",
-                    )
-
-            def navigate_to_preview():
-                """Navigate to preview page with selected file path."""
-                global _selected_file_path
-
-                if not selected_file_path:
-                    ui.notify("No file selected", type="warning")
-                    return
-
-                # Store file path in module-level variable (native mode, single user)
-                _selected_file_path = selected_file_path
-                ui.navigate.to("/data_preview")
-
-            def _format_file_size(size_bytes: int) -> str:
-                """Format file size in human-readable format."""
-                for unit in ["B", "KB", "MB", "GB", "TB"]:
-                    if size_bytes < 1024.0:
-                        return f"{size_bytes:.1f} {unit}"
-                    size_bytes /= 1024.0
-                return f"{size_bytes:.1f} PB"
-
-            browse_btn = ui.button(
-                "Browse files",
-                icon="folder_open",
-                on_click=browse_for_file,
-                color="primary",
-            )
-
-            # Wire up buttons
-            preview_btn.on("click", navigate_to_preview)
-
-            change_file_btn.on(
-                "click",
-                lambda: (
-                    file_info_card.style("display: none;"),
-                    browse_btn.set_visibility(True),
-                ),
-            )
+        """Sub-page for importing dataset using GuiPage abstraction."""
+        page = ImportDatasetPage(session=gui_session)
+        page.render()
 
     @ui.page("/data_preview")
     def data_preview_page():
