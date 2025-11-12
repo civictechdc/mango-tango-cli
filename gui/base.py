@@ -328,7 +328,7 @@ class GuiPage(BaseModel, abc.ABC):
             ).props("flat round")
             with github_btn:
                 github_svg = self._load_svg_icon("github")
-                ui.html(github_svg).style(
+                ui.html(github_svg, sanitize=False).style(
                     "width: 20px; height: 20px; fill: currentColor"
                 )
                 ui.tooltip("Visit our GitHub")
@@ -340,7 +340,7 @@ class GuiPage(BaseModel, abc.ABC):
             ).props("flat round")
             with instagram_btn:
                 instagram_svg = self._load_svg_icon("instagram")
-                ui.html(instagram_svg).style(
+                ui.html(instagram_svg, sanitize=False).style(
                     "width: 20px; height: 20px; fill: currentColor"
                 )
                 ui.tooltip("Follow us on Instagram")
