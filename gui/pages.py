@@ -93,7 +93,9 @@ class SelectProjectPage(GuiPage):
                     project.display_name: project for project in projects
                 }
 
-                with ui.column().classes("items-center").style("width: 100%"):
+                with ui.column().classes("items-center justify-center gap-6").style(
+                    "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
+                ):
                     selected_project = (
                         ui.select(
                             label="Select a project",
@@ -116,12 +118,33 @@ class SelectProjectPage(GuiPage):
                             )
                             self.navigate_to("/select_analyzer")
 
-                    ui.button(
-                        "Open Project",
-                        on_click=on_project_selected,
-                        icon="arrow_forward",
-                        color="primary",
-                    ).classes("q-mt-md")
+                    async def open_manage_projects():
+                        """Open the Manage Projects dialog."""
+                        from gui.projects import ManageProjectsDialog
+
+                        dialog = ManageProjectsDialog(session=self.session)
+                        result = await dialog
+
+                        # If projects were deleted, refresh the page
+                        if result:
+                            self.notify_success("Projects updated. Refreshing...")
+                            ui.navigate.reload()
+
+                    with ui.row().classes("items-center center-justify"):
+
+                        ui.button(
+                            "Manage Projects",
+                            on_click=open_manage_projects,
+                            icon="settings",
+                            color="secondary",
+                        ).props("outline").classes("q-mt-md")
+
+                        ui.button(
+                            "Open Project",
+                            on_click=on_project_selected,
+                            icon="arrow_forward",
+                            color="primary",
+                        ).classes("q-mt-md")
 
 
 class NewProjectPage(GuiPage):
