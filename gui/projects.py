@@ -66,9 +66,6 @@ class ManageProjectsDialog(ui.dialog):
         # Get selected row
         selected_rows = await self.grid.get_selected_rows()
 
-        # Debug: print what we got
-        print(f"Selected rows: {selected_rows}")
-
         if not selected_rows:
             ui.notify("Please select a project to delete", type="warning")
             return
@@ -78,13 +75,13 @@ class ManageProjectsDialog(ui.dialog):
         project_name = selected_row["project_name"]
 
         # Show confirmation dialog
-        confirmed = await self._show_delete_confirmation(project_name)
+        confirmed = await self._show_delete_confirmation(project_name, project_id)
 
         if not confirmed:
             return
 
         try:
-            # Find the project context
+            # Find the project context or fetch None if not found
             project_context = next(
                 (p for p in self.project_contexts if p.id == project_id), None
             )
@@ -93,17 +90,18 @@ class ManageProjectsDialog(ui.dialog):
                 ui.notify("Project not found", type="negative")
                 return
 
-            # Delete the project
+            # Delete the project via ProjectContext API
             project_context.delete()
 
-            # Notify success and close dialog
-            ui.notify(f"Deleted project: {project_name}", type="positive")
-            self.submit(True)  # Return True to indicate changes were made
+            # Close dialog and return information for notification pop up
+            self.submit(
+                (project_context.is_deleted, project_name, project_id)
+            )  # Return True to indicate changes were made
 
         except Exception as e:
             ui.notify(f"Error deleting project: {str(e)}", type="negative")
 
-    async def _show_delete_confirmation(self, project_name: str) -> bool:
+    async def _show_delete_confirmation(self, project_name: str, project_id) -> bool:
         """
         Show confirmation dialog before deleting a project.
 
@@ -113,9 +111,10 @@ class ManageProjectsDialog(ui.dialog):
         Returns:
             True if user confirmed deletion, False otherwise
         """
+
         with ui.dialog() as dialog, ui.card():
             ui.label(
-                f"Are you sure you want to delete project '{project_name}'?"
+                f"Are you sure you want to delete project '{project_name}' (ID: {project_id})?"
             ).classes("q-mb-md")
             ui.label("This action cannot be undone.").classes("text-warning q-mb-lg")
 
