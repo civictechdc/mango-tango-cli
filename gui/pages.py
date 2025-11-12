@@ -125,10 +125,12 @@ class SelectProjectPage(GuiPage):
                         dialog = ManageProjectsDialog(session=self.session)
                         result = await dialog
 
-                        # If projects were deleted, refresh the page
-                        if result:
-                            self.notify_success("Projects updated. Refreshing...")
-                            ui.navigate.reload()
+                        # If a project_id exists, show notification and refresh
+                        # result -> (is_deleted, project_name, project_id)
+                        if result[0]:
+                            self.notify_success(
+                                f"Successfully deleted project: {result[1]} (ID: {result[2]})"
+                            )
 
                     with ui.row().classes("items-center center-justify"):
 
