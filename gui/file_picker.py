@@ -89,6 +89,7 @@ class LocalFilePicker(ui.dialog):
                         ],
                         "rowSelection": "single",
                     },
+                    theme="quartz",
                     html_columns=[0],
                 )
                 .classes("w-full h-96")
