@@ -5,7 +5,7 @@ from typing import Optional
 from nicegui import ui
 
 from app import AnalysisContext
-from components.select_analysis import analysis_label
+from components.select_analysis import analysis_label, present_timestamp
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import ToggleButtonGroup
 from gui.import_options import ImportOptionsDialog
@@ -502,26 +502,26 @@ class SelectPreviousAnalyzerPage(GuiPage):
             async def _on_proceed():
                 """Handle proceed button click."""
                 # Get selected previous analysis if grid exists
-                prev_selection = None
+                selected_name = None
                 if analysis_list:
                     selected_rows = await self.grid.get_selected_rows()
                     if selected_rows:
-                        prev_selection = selected_rows[0]["name"]
+                        selected_name = selected_rows[0]["name"]
 
                 # Validation: none selected
-                if not prev_selection:
+                if not selected_name:
                     self.notify_warning("Please select a previous analysis")
                     return
 
                 # Store selected analysis in session
-                # Find the analysis object from the label
+                # Find the analysis object by display_name
                 selected_analysis = next(
-                    (a for label, a in analysis_list if label == prev_selection),
+                    (a for _, a in analysis_list if a.display_name == selected_name),
                     None,
                 )
                 if selected_analysis:
                     self.session.current_analysis = selected_analysis
-                    self.notify_success(f"Previous analysis: {prev_selection}")
+                    self.notify_success(f"Previous analysis: {selected_name}")
                     # TODO: Navigate to /view_analysis with previous results
                     # self.navigate_to("/view_analysis")
 
@@ -536,15 +536,23 @@ class SelectPreviousAnalyzerPage(GuiPage):
         self, entries: list[tuple[str, AnalysisContext]]
     ):
         """Render grid of previous analyses."""
+        now = datetime.now()
+
         data = {
             "columnDefs": [
-                {"headerName": "Name", "field": "name"},
+                {"headerName": "Analyzer Name", "field": "name"},
+                {"headerName": "Date Created", "field": "date"},
             ],
             "rowData": [
                 {
-                    "name": analysis[0],
+                    "name": analysis_context.display_name,
+                    "date": (
+                        present_timestamp(analysis_context.create_time, now)
+                        if analysis_context.create_time
+                        else "Unknown"
+                    ),
                 }
-                for analysis in entries
+                for label, analysis_context in entries
             ],
             "rowSelection": {"mode": "singleRow"},
         }
@@ -552,7 +560,7 @@ class SelectPreviousAnalyzerPage(GuiPage):
         self.grid = ui.aggrid(
             data,
             theme="quartz",
-        )
+        ).classes("w-full h-64")
 
 
 class PreviewDatasetPage(GuiPage):
