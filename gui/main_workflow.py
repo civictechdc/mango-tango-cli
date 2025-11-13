@@ -11,7 +11,9 @@ from gui.pages import (
     ImportDatasetPage,
     NewProjectPage,
     PreviewDatasetPage,
-    SelectAnalyzerPage,
+    SelectAnalyzerForkPage,
+    SelectNewAnalyzerPage,
+    SelectPreviousAnalyzerPage,
     SelectProjectPage,
     StartPage,
 )
@@ -60,11 +62,21 @@ def gui_main(app: App):
         page = PreviewDatasetPage(session=gui_session)
         page.render()
 
-    # choose analysis page
+    @ui.page(gui_routes.select_analyzer_fork)
+    def select_analyzer_fork():
+        page = SelectAnalyzerForkPage(session=gui_session)
+        page.render()
+
     @ui.page(gui_routes.select_analyzer)
     def select_analyzer():
-        """Analyzer selection page using GuiPage abstraction."""
-        page = SelectAnalyzerPage(session=gui_session)
+        """New analyzer selection page using GuiPage abstraction."""
+        page = SelectNewAnalyzerPage(session=gui_session)
+        page.render()
+
+    @ui.page(gui_routes.select_previous_analyzer)
+    def select_previous_analyzer():
+        """Previous analyzer selection page using GuiPage abstraction."""
+        page = SelectPreviousAnalyzerPage(session=gui_session)
         page.render()
 
     # Launch in native mode
