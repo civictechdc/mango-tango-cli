@@ -1,12 +1,49 @@
 from datetime import datetime
 from traceback import format_exc
+from typing import Optional
 
 from nicegui import ui
 
+from app import AnalysisContext
 from components.select_analysis import analysis_label
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import ToggleButtonGroup
 from gui.import_options import ImportOptionsDialog
+
+
+# wrapper function to create a page with two buttons
+def _two_button_choice_fork_content(
+    prompt: str,
+    left_button_label: str,
+    left_button_on_click: callable,
+    left_button_icon: str,
+    right_button_label: str,
+    right_button_on_click: callable,
+    right_button_icon: str,
+):
+
+    # Main content area - centered vertically
+    with ui.column().classes("items-center justify-center").style(
+        "height: 80vh; width: 100%"
+    ):
+        # Prompt label
+        ui.label(prompt).classes("q-mb-lg").style("font-size: 1.05rem")
+
+        # Action buttons row
+        with ui.row().classes("gap-4"):
+            ui.button(
+                left_button_label,
+                on_click=left_button_on_click,
+                icon=left_button_icon,
+                color="primary",
+            )
+
+            ui.button(
+                right_button_label,
+                on_click=right_button_on_click,
+                icon=right_button_icon,
+                color="primary",
+            )
 
 
 class StartPage(GuiPage):
@@ -41,14 +78,14 @@ class StartPage(GuiPage):
             with ui.row().classes("gap-4"):
                 ui.button(
                     "New Project",
-                    on_click=lambda: self.navigate_to("/new_project"),
+                    on_click=lambda: self.navigate_to(gui_routes.new_project),
                     icon="add",
                     color="primary",
                 )
 
                 ui.button(
                     "Show Existing Projects",
-                    on_click=lambda: self.navigate_to("/select_project"),
+                    on_click=lambda: self.navigate_to(gui_routes.select_project),
                     icon="folder",
                     color="primary",
                 )
@@ -116,7 +153,7 @@ class SelectProjectPage(GuiPage):
                             self.notify_success(
                                 f"Selected project: {self.session.current_project.display_name}"
                             )
-                            self.navigate_to("/select_analyzer")
+                            self.navigate_to(gui_routes.select_analyzer_fork)
 
                     async def open_manage_projects():
                         """Open the Manage Projects dialog."""
@@ -309,27 +346,51 @@ class ImportDatasetPage(GuiPage):
             )
 
 
-class SelectAnalyzerPage(GuiPage):
-    """
-    Analyzer selection page for a project.
+class SelectAnalyzerForkPage(GuiPage):
+    """A forking page with two buttons for either advancing to start a new analysis or selecting an old one"""
 
-    Allows users to either:
-    1. Select a new analyzer to run
-    2. Review a previous analysis
+    def __init__(self, session: GuiSession):
+        super().__init__(
+            session=session,
+            route=gui_routes.select_analyzer_fork,
+            title=f"{session.current_project.display_name}",
+            show_back_button=True,
+            back_route=gui_routes.select_project,
+            show_footer=True,
+        )
+
+    def render_content(self):
+
+        _two_button_choice_fork_content(
+            prompt="What do you want to do next?",
+            left_button_label="Start a New Test",
+            left_button_icon="computer",
+            left_button_on_click=lambda: self.navigate_to(gui_routes.select_analyzer),
+            right_button_label="Review a Previous Test",
+            right_button_on_click=lambda: self.navigate_to(
+                gui_routes.select_previous_analyzer
+            ),
+            right_button_icon="refresh",
+        )
+
+
+class SelectNewAnalyzerPage(GuiPage):
+    """
+    Page for selecting a new analyzer to run.
     """
 
     def __init__(self, session: GuiSession):
         super().__init__(
             session=session,
-            route="/select_analyzer",
-            title=f"{session.current_project.display_name}: Select Analysis",
+            route=gui_routes.select_analyzer,
+            title=f"{session.current_project.display_name}: Select New Analyzer",
             show_back_button=True,
-            back_route="/select_project",
+            back_route=gui_routes.select_analyzer_fork,
             show_footer=True,
         )
 
     def render_content(self) -> None:
-        """Render analyzer selection interface."""
+        """Render new analyzer selection interface."""
         # Show success message if project was just created
         if self.session.new_project_name:
             self.notify_success(f"Created project: {self.session.new_project_name}!")
@@ -346,93 +407,40 @@ class SelectAnalyzerPage(GuiPage):
         with ui.column().classes("items-center justify-center gap-6").style(
             "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
         ):
+            ui.label("Start a New Analysis").classes("text-lg")
 
-            with ui.card().classes("items-center justify-center").style("width: 100%"):
-                ui.label("Start a New Analysis").classes("text-lg")
+            # Get primary analyzers from suite
+            analyzers = self.session.app.context.suite.primary_anlyzers
 
-                # Get primary analyzers from suite
-                analyzers = self.session.app.context.suite.primary_anlyzers
+            if not analyzers:
+                ui.label("No analyzers available").classes("text-grey")
+            else:
+                # Create radio options from analyzers
+                analyzer_options = {
+                    analyzer.name: analyzer.short_description for analyzer in analyzers
+                }
 
-                if not analyzers:
-                    ui.label("No analyzers available").classes("text-grey")
-                else:
-                    # Create radio options from analyzers
-                    analyzer_options = {
-                        analyzer.name: analyzer.short_description
-                        for analyzer in analyzers
-                    }
-
-                    # Create toggle button group for analyzer selection
-                    button_group = ToggleButtonGroup()
-                    with ui.row().classes("items-center justify-center gap-4"):
-                        for analyzer_name in analyzer_options.keys():
-                            button_group.add_button(analyzer_name)
-
-            ui.label("OR").classes("text-bold-lg")
-
-            with ui.card().classes("items-center justify-center").style("width: 100%"):
-                ui.label("Review a Previous Analysis").classes("text-lg")
-
-                # Populate list of existing analyses
-                now = datetime.now()
-                analysis_options = sorted(
-                    [
-                        (
-                            analysis_label(analysis, now),
-                            analysis,
-                        )
-                        for analysis in self.session.current_project.list_analyses()
-                    ],
-                    key=lambda option: option[0],
-                )
-
-                previous_analyzer = None
-
-                if analysis_options:
-                    previous_analyzer = ui.select(
-                        label="Select analysis",
-                        options=[e[0] for e in analysis_options],
-                    )
-                else:
-                    ui.label("No previous tests have been found.").classes("text-grey")
+                # Create toggle button group for analyzer selection
+                button_group = ToggleButtonGroup()
+                with ui.row().classes("items-center justify-center gap-4"):
+                    for analyzer_name in analyzer_options.keys():
+                        button_group.add_button(analyzer_name)
 
             def _on_proceed():
                 """Handle proceed button click."""
-                # Get current selections
+                # Get current selection
                 new_selection = button_group.get_selected_text()
-                prev_selection = previous_analyzer.value if previous_analyzer else None
-
-                # Validation: both selected
-                if new_selection and prev_selection:
-                    self.notify_warning(
-                        "Please choose either a new analyzer OR a previous analysis, not both"
-                    )
-                    return
 
                 # Validation: none selected
-                if not new_selection and not prev_selection:
+                if not new_selection:
                     self.notify_warning("Please select an analyzer")
                     return
 
-                # Valid selection - proceed
-                if new_selection:
-                    # Store selected analyzer in session
-                    self.session.selected_analyzer = new_selection
-                    self.notify_success(f"New analyzer: {new_selection}")
-                    # TODO: Navigate to /configure_analysis with new analyzer
-                    # self.navigate_to("/configure_analysis")
-                else:
-                    # Store selected analysis in session
-                    # Find the analysis object from the label
-                    selected_analysis = next(
-                        (a for label, a in analysis_options if label == prev_selection),
-                        None,
-                    )
-                    if selected_analysis:
-                        self.session.current_analysis = selected_analysis
-                        self.notify_success(f"Previous analysis: {prev_selection}")
-                        # TODO: Navigate to /view_analysis with previous results
-                        # self.navigate_to("/view_analysis")
+                # Store selected analyzer in session
+                self.session.selected_analyzer = new_selection
+                self.notify_success(f"New analyzer: {new_selection}")
+                # TODO: Navigate to /configure_analysis with new analyzer
+                # self.navigate_to("/configure_analysis")
 
             ui.button(
                 "Proceed",
@@ -440,6 +448,111 @@ class SelectAnalyzerPage(GuiPage):
                 color="primary",
                 on_click=_on_proceed,
             )
+
+
+class SelectPreviousAnalyzerPage(GuiPage):
+    """
+    Page for selecting a previous analysis to review.
+    """
+
+    grid: Optional[ui.aggrid] = None
+
+    def __init__(self, session: GuiSession):
+        super().__init__(
+            session=session,
+            route=gui_routes.select_previous_analyzer,
+            title=f"{session.current_project.display_name}: Select Previous Analysis",
+            show_back_button=True,
+            back_route=gui_routes.select_analyzer_fork,
+            show_footer=True,
+        )
+
+    def render_content(self) -> None:
+        """Render previous analysis selection interface."""
+        # Ensure a project is selected
+        if not self.session.current_project:
+            self.notify_warning("No project selected. Redirecting...")
+            self.navigate_to("/select_project")
+            return
+
+        # Main content - centered
+        with ui.column().classes("items-center justify-center gap-6").style(
+            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
+        ):
+            ui.label("Review a Previous Analysis").classes("text-lg")
+
+            # Populate list of existing analyses
+            now = datetime.now()
+            analysis_list = sorted(
+                [
+                    (
+                        analysis_label(analysis, now),
+                        analysis,
+                    )
+                    for analysis in self.session.current_project.list_analyses()
+                ],
+                key=lambda option: option[0],
+            )
+
+            if analysis_list:
+                self._render_previous_analyses_grid(entries=analysis_list)
+            else:
+                ui.label("No previous tests have been found.").classes("text-grey")
+
+            async def _on_proceed():
+                """Handle proceed button click."""
+                # Get selected previous analysis if grid exists
+                prev_selection = None
+                if analysis_list:
+                    selected_rows = await self.grid.get_selected_rows()
+                    if selected_rows:
+                        prev_selection = selected_rows[0]["name"]
+
+                # Validation: none selected
+                if not prev_selection:
+                    self.notify_warning("Please select a previous analysis")
+                    return
+
+                # Store selected analysis in session
+                # Find the analysis object from the label
+                selected_analysis = next(
+                    (a for label, a in analysis_list if label == prev_selection),
+                    None,
+                )
+                if selected_analysis:
+                    self.session.current_analysis = selected_analysis
+                    self.notify_success(f"Previous analysis: {prev_selection}")
+                    # TODO: Navigate to /view_analysis with previous results
+                    # self.navigate_to("/view_analysis")
+
+            ui.button(
+                "Proceed",
+                icon="arrow_forward",
+                color="primary",
+                on_click=_on_proceed,
+            )
+
+    def _render_previous_analyses_grid(
+        self, entries: list[tuple[str, AnalysisContext]]
+    ):
+        """Render grid of previous analyses."""
+        data = {
+            "columnDefs": [
+                {"headerName": "Name", "field": "name"},
+            ],
+            "rowData": [
+                {
+                    "name": analysis[0],
+                }
+                for analysis in entries
+            ],
+            "rowSelection": {"mode": "singleRow"},
+        }
+
+        self.grid = ui.aggrid(
+            data,
+            theme="quartz",
+        )
 
 
 class PreviewDatasetPage(GuiPage):
