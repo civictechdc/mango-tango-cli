@@ -56,11 +56,16 @@ class GuiURLS(BaseModel):
         default="https://github.com/civictechdc/mango-tango-cli",
         description="GitHub repository URL",
     )
+
     instagram_url: str = Field(
-        default="https://www.instagram.com/civictechdc/",
+        default="https://www.instagram.com/cibmangotree",
         description="Instagram profile URL",
     )
 
+    linkdlin_url:  str = Field(
+        default="https://www.linkedin.com/company/cib-mango-tree",
+        description="Linkdlin profile ",
+    )
 
 class GuiConstants(BaseModel):
     """Container for both colors and urls"""
@@ -346,6 +351,18 @@ class GuiPage(BaseModel, abc.ABC):
                     "width: 20px; height: 20px; fill: currentColor"
                 )
                 ui.tooltip("Follow us on Instagram")
+            
+            # Linkdin button
+            linkdin_btn = ui.button(
+                color="accent",
+                on_click=lambda: self.navigate_to_external(gui_urls.linkdlin_url),
+            ).props("flat round")
+            with linkdin_btn:
+                linkdin_svg = self._load_svg_icon("instagram")
+                ui.html(linkdin_svg, sanitize=False).style(
+                    "width: 20px; height: 20px; fill: currentColor"
+                )
+                ui.tooltip("Visit our Linkdin")
 
     # Navigation helpers
     def navigate_to(self, route: str) -> None:
