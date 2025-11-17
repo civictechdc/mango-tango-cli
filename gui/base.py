@@ -309,7 +309,7 @@ class GuiPage(BaseModel, abc.ABC):
         Layout:
         - Left: License information
         - Center: Project attribution
-        - Right: External links (GitHub, Instagram)
+        - Right: External links (GitHub, Instagram,Linkdin)
         """
         with ui.footer(elevated=True):
             with ui.row().classes("w-full items-center").style(
