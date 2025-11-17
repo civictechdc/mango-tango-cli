@@ -423,31 +423,47 @@ class SelectNewAnalyzerPage(GuiPage):
                 # Create toggle button group for analyzer selection
                 button_group = ToggleButtonGroup()
                 with ui.row().classes("items-center justify-center gap-4"):
+
+                    # add a button for each analyzer
                     for analyzer_name in analyzer_options.keys():
                         button_group.add_button(analyzer_name)
 
-            def _on_proceed():
-                """Handle proceed button click."""
-                # Get current selection
-                new_selection = button_group.get_selected_text()
+                with ui.card().classes("w-full no-shadow"):
 
-                # Validation: none selected
-                if not new_selection:
-                    self.notify_warning("Please select an analyzer")
-                    return
+                    DEFAULT_TEXT = (
+                        "No analyzer selected. Click button above to select it."
+                    )
 
-                # Store selected analyzer in session
-                self.session.selected_analyzer = new_selection
-                self.notify_success(f"New analyzer: {new_selection}")
-                # TODO: Navigate to /configure_analysis with new analyzer
-                # self.navigate_to("/configure_analysis")
+                    ui.label().bind_text_from(
+                        target_object=button_group,
+                        target_name="selected_text",
+                        backward=lambda text: analyzer_options.get(text, DEFAULT_TEXT),
+                    ).classes("text-center w-full")
 
-            ui.button(
-                "Proceed",
-                icon="arrow_forward",
-                color="primary",
-                on_click=_on_proceed,
-            )
+                with ui.row().classes("w-full justify-end mt-6"):
+
+                    def _on_proceed():
+                        """Handle proceed button click."""
+                        # Get current selection
+                        new_selection = button_group.get_selected_text()
+
+                        # Validation: none selected
+                        if not new_selection:
+                            self.notify_warning("Please select an analyzer")
+                            return
+
+                        # Store selected analyzer in session
+                        self.session.selected_analyzer = new_selection
+                        self.notify_success(f"Selected: {new_selection}")
+                        # TODO: Navigate to /configure_analysis with new analyzer
+                        # self.navigate_to("/configure_analysis")
+
+                    ui.button(
+                        "Configure Analysis",
+                        icon="arrow_forward",
+                        color="primary",
+                        on_click=_on_proceed,
+                    )
 
 
 class SelectPreviousAnalyzerPage(GuiPage):
