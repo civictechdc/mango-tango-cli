@@ -47,6 +47,7 @@ class ToggleButtonGroup:
     def __init__(self):
         self.buttons = []
         self.selected = None
+        self.selected_text = None
 
     def add_button(self, text: str, **kwargs) -> ToggleButton:
         """Add a button to the group."""
@@ -60,6 +61,7 @@ class ToggleButtonGroup:
             btn.set_active(False)
         button.set_active(True)
         self.selected = button
+        self.selected_text = button.text
 
     def get_selected(self) -> ToggleButton | None:
         """Get the currently selected button."""
