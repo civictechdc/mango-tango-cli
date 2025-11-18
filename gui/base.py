@@ -143,6 +143,8 @@ class GuiSession(BaseModel):
     def reset_analysis_workflow(self) -> None:
         """Clear analysis workflow state."""
         self.selected_analyzer = None
+        self.selected_analyzer_name = None
+        self.column_mapping = None
         self.current_analysis = None
 
     def validate_project_selected(self) -> bool:
