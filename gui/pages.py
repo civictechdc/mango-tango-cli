@@ -762,12 +762,15 @@ class ConfigureAnalysis(GuiPage):
         )
 
     def render_content(self) -> None:
+        import polars as pl
+
         from analyzer_interface import column_automap, get_data_type_compatibility_score
 
         # Get analyzer input requirements and user dataset columns
         analyzer = self.session.selected_analyzer
         input_columns = analyzer.input.columns
         user_columns = self.session.current_project.columns
+        project = self.session.current_project
 
         # Generate initial auto-mapping
         draft_column_mapping = column_automap(user_columns, input_columns)
@@ -779,6 +782,52 @@ class ConfigureAnalysis(GuiPage):
 
             # Store dropdown widgets for later access
             column_dropdowns = {}
+
+            # Helper function to build preview DataFrame
+            def build_preview_df():
+                """Build preview DataFrame with currently mapped columns."""
+                # Get current mapping from dropdowns
+                current_mapping = {}
+                for input_col_name, (dropdown, options) in column_dropdowns.items():
+                    if dropdown.value:
+                        current_mapping[input_col_name] = options[dropdown.value]
+
+                # If no columns mapped, return None
+                if not current_mapping:
+                    return None
+
+                # Build DataFrame with renamed columns (similar to terminal version)
+                preview_data = {}
+                for analyzer_col in analyzer.input.columns:
+                    user_col_name = current_mapping.get(analyzer_col.name)
+                    if user_col_name and user_col_name in project.column_dict:
+                        user_col = project.column_dict[user_col_name]
+                        preview_data[analyzer_col.human_readable_name_or_fallback()] = (
+                            user_col.head(5).apply_semantic_transform()
+                        )
+
+                return pl.DataFrame(preview_data) if preview_data else None
+
+            # Preview container placeholder (will be created after grid)
+            preview_container = None
+
+            def update_preview():
+                """Rebuild preview when dropdown changes."""
+                if preview_container is not None:
+                    preview_container.clear()
+                    with preview_container:
+                        preview_df = build_preview_df()
+                        if preview_df is not None:
+                            ui.label("Data Preview (first 5 rows)").classes(
+                                "text-sm text-grey-7"
+                            )
+                            ui.aggrid.from_polars(preview_df, theme="quartz").classes(
+                                "w-full h-64"
+                            )
+                        else:
+                            ui.label("Select columns to see data preview").classes(
+                                "text-grey"
+                            )
 
             # Create column mapping UI using grid
             with ui.grid(columns=2).classes("w-full gap-4"):
@@ -827,12 +876,13 @@ class ConfigureAnalysis(GuiPage):
                             None,
                         )
 
-                    # Create dropdown
+                    # Create dropdown with on_change handler
                     dropdown = (
                         ui.select(
                             options=list(dropdown_options.keys()),
                             label="Select dataset column",
                             value=default_value,
+                            on_change=lambda: update_preview(),
                         )
                         .classes("w-full")
                         .props("use-chips")
@@ -840,6 +890,13 @@ class ConfigureAnalysis(GuiPage):
 
                     # Store reference for later
                     column_dropdowns[input_col.name] = (dropdown, dropdown_options)
+
+            # Preview section (created after grid)
+            ui.separator()
+            preview_container = ui.column().classes("w-full")
+
+            # Initial preview render
+            update_preview()
 
             # Action button
             with ui.row().classes("w-full justify-end"):
@@ -856,7 +913,7 @@ class ConfigureAnalysis(GuiPage):
                     self.notify_success("Column mapping saved!")
 
                 ui.button(
-                    "Next",
+                    "Configure Parameters",
                     icon="arrow_forward",
                     color="primary",
                     on_click=_on_proceed,
