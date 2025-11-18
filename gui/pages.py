@@ -452,11 +452,20 @@ class SelectNewAnalyzerPage(GuiPage):
                             self.notify_warning("Please select an analyzer")
                             return
 
-                        # Store selected analyzer in session
-                        self.session.selected_analyzer = new_selection
-                        self.notify_success(f"Selected: {new_selection}")
-                        # TODO: Navigate to /configure_analysis with new analyzer
-                        # self.navigate_to("/configure_analysis")
+                        # Find the analyzer interface by name
+                        selected_analyzer = next(
+                            (a for a in analyzers if a.name == new_selection), None
+                        )
+
+                        if not selected_analyzer:
+                            self.notify_error("Could not find selected analyzer")
+                            return
+
+                        # Store selected analyzer interface and name in session
+                        self.session.selected_analyzer = selected_analyzer
+                        self.session.selected_analyzer_name = new_selection
+
+                        self.navigate_to("/configure_analysis")
 
                     ui.button(
                         "Configure Analysis",
@@ -529,17 +538,16 @@ class SelectPreviousAnalyzerPage(GuiPage):
                     self.notify_warning("Please select a previous analysis")
                     return
 
-                # Store selected analysis in session
                 # Find the analysis object by display_name
                 selected_analysis = next(
                     (a for _, a in analysis_list if a.display_name == selected_name),
                     None,
                 )
-                if selected_analysis:
-                    self.session.current_analysis = selected_analysis
-                    self.notify_success(f"Previous analysis: {selected_name}")
-                    # TODO: Navigate to /view_analysis with previous results
-                    # self.navigate_to("/view_analysis")
+
+                # Store selected analysis in session
+                # if selected_analysis:
+                #    self.session.current_analysis = selected_analysis
+                #    self.navigate_to("/show_output_options")
 
             ui.button(
                 "Proceed",
@@ -739,3 +747,117 @@ class PreviewDatasetPage(GuiPage):
         ui.aggrid.from_polars(
             data_frame, theme="quartz", auto_size_columns=False
         ).classes("w-full h-64")
+
+
+class ConfigureAnalysis(GuiPage):
+
+    def __init__(self, session: GuiSession):
+        super().__init__(
+            session=session,
+            route="/configure_analysis",
+            title=f"{session.current_project.display_name}: Configure Analysis",
+            show_back_button=True,
+            back_route=gui_routes.select_analyzer_fork,
+            show_footer=True,
+        )
+
+    def render_content(self) -> None:
+        from analyzer_interface import column_automap, get_data_type_compatibility_score
+
+        # Get analyzer input requirements and user dataset columns
+        analyzer = self.session.selected_analyzer
+        input_columns = analyzer.input.columns
+        user_columns = self.session.current_project.columns
+
+        # Generate initial auto-mapping
+        draft_column_mapping = column_automap(user_columns, input_columns)
+
+        # Main content area
+        with ui.column().classes("items-center justify-start gap-6").style(
+            "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
+        ):
+
+            # Store dropdown widgets for later access
+            column_dropdowns = {}
+
+            # Create column mapping UI using grid
+            with ui.grid(columns=2).classes("w-full gap-4"):
+
+                ui.label("Input Columns")
+                ui.label("Dataset Columns")
+                for input_col in input_columns:
+                    # Left column: Input column info card
+                    with ui.card():
+                        ui.label(input_col.human_readable_name_or_fallback()).classes(
+                            "text-bold text-lg"
+                        )
+                        if input_col.description:
+                            ui.label(input_col.description).classes(
+                                "text-sm text-grey-7"
+                            )
+                        # ui.label(f"Type: {input_col.data_type}").classes("text-sm")
+
+                    # Right column: Dropdown for column selection
+                    # Get compatible user columns
+                    compatible_columns = [
+                        user_col
+                        for user_col in user_columns
+                        if get_data_type_compatibility_score(
+                            input_col.data_type, user_col.data_type
+                        )
+                        is not None
+                    ]
+
+                    # Create dropdown options
+                    dropdown_options = {
+                        f"{user_col.name} [{user_col.data_type}]": user_col.name
+                        for user_col in compatible_columns
+                    }
+
+                    # Pre-select the auto-mapped column
+                    default_value = None
+                    if input_col.name in draft_column_mapping:
+                        mapped_col_name = draft_column_mapping[input_col.name]
+                        default_value = next(
+                            (
+                                k
+                                for k, v in dropdown_options.items()
+                                if v == mapped_col_name
+                            ),
+                            None,
+                        )
+
+                    # Create dropdown
+                    dropdown = (
+                        ui.select(
+                            options=list(dropdown_options.keys()),
+                            label="Select dataset column",
+                            value=default_value,
+                        )
+                        .classes("w-full")
+                        .props("use-chips")
+                    )
+
+                    # Store reference for later
+                    column_dropdowns[input_col.name] = (dropdown, dropdown_options)
+
+            # Action button
+            with ui.row().classes("w-full justify-end"):
+
+                def _on_proceed():
+                    """Build column mapping and proceed."""
+                    final_mapping = {}
+                    for input_col_name, (dropdown, options) in column_dropdowns.items():
+                        if dropdown.value:
+                            final_mapping[input_col_name] = options[dropdown.value]
+
+                    # Store mapping in session
+                    self.session.column_mapping = final_mapping
+                    self.notify_success("Column mapping saved!")
+
+                ui.button(
+                    "Next",
+                    icon="arrow_forward",
+                    color="primary",
+                    on_click=_on_proceed,
+                )
