@@ -8,6 +8,7 @@ from app import App
 from gui.base import GuiSession, gui_routes
 from gui.context import GUIContext
 from gui.pages import (
+    ConfigureAnalysis,
     ImportDatasetPage,
     NewProjectPage,
     PreviewDatasetPage,
@@ -77,6 +78,11 @@ def gui_main(app: App):
     def select_previous_analyzer():
         """Previous analyzer selection page using GuiPage abstraction."""
         page = SelectPreviousAnalyzerPage(session=gui_session)
+        page.render()
+
+    @ui.page("/configure_analysis")
+    def configure_analysis():
+        page = ConfigureAnalysis(session=gui_session)
         page.render()
 
     # Launch in native mode
