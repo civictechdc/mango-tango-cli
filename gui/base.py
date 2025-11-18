@@ -14,6 +14,7 @@ from typing import Optional
 from nicegui import ui
 from pydantic import BaseModel, ConfigDict, Field
 
+from analyzer_interface import AnalyzerInterface
 from gui.context import GUIContext
 from importing import ImporterSession
 from storage import AnalysisModel, ProjectModel
@@ -120,7 +121,9 @@ class GuiSession(BaseModel):
     import_session: Optional[ImporterSession] = None
 
     # Workflow state - analysis
-    selected_analyzer: Optional[str] = None
+    selected_analyzer: Optional[AnalyzerInterface] = None
+    selected_analyzer_name: Optional[str] = None
+    column_mapping: Optional[dict[str, str]] = None
     current_analysis: Optional[AnalysisModel] = None
 
     # Allow arbitrary types (for NiceGUI components, ImporterSession, etc.)
