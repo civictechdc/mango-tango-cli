@@ -784,7 +784,7 @@ class ConfigureAnalysis(GuiPage):
             column_dropdowns = {}
 
             # Helper function to build preview DataFrame
-            def build_preview_df():
+            def _build_preview_df():
                 """Build preview DataFrame with currently mapped columns."""
                 # Get current mapping from dropdowns
                 current_mapping = {}
@@ -792,21 +792,23 @@ class ConfigureAnalysis(GuiPage):
                     if dropdown.value:
                         current_mapping[input_col_name] = options[dropdown.value]
 
-                # If no columns mapped, return None
-                if not current_mapping:
-                    return None
-
-                # Build DataFrame with renamed columns (similar to terminal version)
+                # Initialize preview_data with all analyzer columns (empty by default)
                 preview_data = {}
                 for analyzer_col in analyzer.input.columns:
+                    col_name = analyzer_col.human_readable_name_or_fallback()
                     user_col_name = current_mapping.get(analyzer_col.name)
-                    if user_col_name and user_col_name in project.column_dict:
-                        user_col = project.column_dict[user_col_name]
-                        preview_data[analyzer_col.human_readable_name_or_fallback()] = (
-                            user_col.head(5).apply_semantic_transform()
-                        )
 
-                return pl.DataFrame(preview_data) if preview_data else None
+                    if user_col_name and user_col_name in project.column_dict:
+                        # Column is mapped - use actual data
+                        user_col = project.column_dict[user_col_name]
+                        preview_data[col_name] = user_col.head(
+                            5
+                        ).apply_semantic_transform()
+                    else:
+                        # Column not mapped - create empty column with 5 null values
+                        preview_data[col_name] = [None] * 5
+
+                return pl.DataFrame(preview_data)
 
             # Preview container placeholder (will be created after grid)
             preview_container = None
@@ -816,24 +818,22 @@ class ConfigureAnalysis(GuiPage):
                 if preview_container is not None:
                     preview_container.clear()
                     with preview_container:
-                        preview_df = build_preview_df()
-                        if preview_df is not None:
-                            ui.label("Data Preview (first 5 rows)").classes(
-                                "text-sm text-grey-7"
-                            )
-                            ui.aggrid.from_polars(preview_df, theme="quartz").classes(
-                                "w-full h-64"
-                            )
-                        else:
-                            ui.label("Select columns to see data preview").classes(
-                                "text-grey"
-                            )
+                        preview_df = _build_preview_df()
+                        ui.label("Data Preview (first 5 rows)").classes(
+                            "text-sm text-grey-7"
+                        )
+                        ui.aggrid.from_polars(preview_df, theme="quartz").classes(
+                            "w-full h-64"
+                        )
 
             # Create column mapping UI using grid
             with ui.grid(columns=2).classes("w-full gap-4"):
 
-                ui.label("Input Columns")
-                ui.label("Dataset Columns")
+                # create labels for grid header
+                ui.label("Required Input Information")  # populates row 1, column 1
+                ui.label("Imported Dataset Columns")  # pupolates row 1, column 2
+
+                # this then fills the rows with column information
                 for input_col in input_columns:
                     # Left column: Input column info card
                     with ui.card():
@@ -844,7 +844,6 @@ class ConfigureAnalysis(GuiPage):
                             ui.label(input_col.description).classes(
                                 "text-sm text-grey-7"
                             )
-                        # ui.label(f"Type: {input_col.data_type}").classes("text-sm")
 
                     # Right column: Dropdown for column selection
                     # Get compatible user columns
@@ -859,7 +858,7 @@ class ConfigureAnalysis(GuiPage):
 
                     # Create dropdown options
                     dropdown_options = {
-                        f"{user_col.name} [{user_col.data_type}]": user_col.name
+                        f"{user_col.name}": user_col.name
                         for user_col in compatible_columns
                     }
 
@@ -884,7 +883,7 @@ class ConfigureAnalysis(GuiPage):
                             value=default_value,
                             on_change=lambda: update_preview(),
                         )
-                        .classes("w-full")
+                        .classes("w-40")
                         .props("use-chips")
                     )
 
