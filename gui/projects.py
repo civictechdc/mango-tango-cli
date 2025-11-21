@@ -131,6 +131,6 @@ class ManageProjectsDialog(ui.dialog):
 
         return await dialog
 
-    async def _handle_cancel(self):
+    def _handle_cancel(self):
         """Handle cancel button click - close dialog without changes."""
         self.submit(False)  # Return False to indicate no changes
