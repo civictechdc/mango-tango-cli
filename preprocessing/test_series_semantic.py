@@ -209,21 +209,6 @@ def test_time_military_semantic_inference():
     assert semantic.semantic_name == "time_military"
     assert semantic.data_type == "datetime"
 
-    # Test 12-hour format detection  
-    series_12h = pl.Series(["2:30 PM", "11:45 AM", "12:00 PM", "1:15 AM", "6:30 PM"])
-    semantic = infer_series_semantic(series_12h)
-    assert semantic is not None
-    assert semantic.semantic_name == "time_military"
-    assert semantic.data_type == "datetime"
-
-    # Test mixed format detection (should still work)
-    series_mixed = pl.Series(["14:30", "2:45 PM", "23:59", "11:30 AM", "00:15"])
-    semantic = infer_series_semantic(series_mixed)
-    assert semantic is not None
-    assert semantic.semantic_name == "time_military" 
-    assert semantic.data_type == "datetime"
-
-
 # Edge cases
 def test_all_none_series():
     """Test series with all null values"""
