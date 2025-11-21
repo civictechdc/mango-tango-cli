@@ -465,7 +465,7 @@ class SelectNewAnalyzerPage(GuiPage):
                         self.session.selected_analyzer = selected_analyzer
                         self.session.selected_analyzer_name = new_selection
 
-                        self.navigate_to("/configure_analysis")
+                        self.navigate_to(gui_routes.configure_analysis)
 
                     ui.button(
                         "Configure Analysis",
@@ -754,7 +754,7 @@ class ConfigureAnalysis(GuiPage):
     def __init__(self, session: GuiSession):
         super().__init__(
             session=session,
-            route="/configure_analysis",
+            route=gui_routes.configure_analysis,
             title=f"{session.current_project.display_name}: Configure Analysis",
             show_back_button=True,
             back_route=gui_routes.select_analyzer_fork,
