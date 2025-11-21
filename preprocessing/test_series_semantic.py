@@ -9,6 +9,7 @@ from preprocessing.series_semantic import (
     native_date,
     native_datetime,
     parse_datetime_with_tz,
+    parse_time_military,
     text_catch_all,
     time_string,
 )
@@ -122,6 +123,21 @@ def test_parse_datetime_with_tz():
     assert result.is_not_null().all()
 
 
+def test_parse_time_military():
+    """Test military time parsing function with various formats"""
+    # Test 24-hour format without seconds (HH:MM)
+    series_24h = pl.Series(["23:39", "12:45", "00:30"])
+    result = parse_time_military(series_24h)
+    assert result.dtype == pl.Time
+    assert result.is_not_null().all()
+
+    # Test 24-hour format with seconds (HH:MM:SS)
+    series_24h_sec = pl.Series(["14:30:15", "09:15:30", "23:59:59"])
+    result = parse_time_military(series_24h_sec)
+    assert result.dtype == pl.Time
+    assert result.is_not_null().all()
+
+
 def test_parse_datetime_with_tz_no_timezone():
     """Test datetime parsing without timezone suffix"""
     series = pl.Series(["2025-02-28 00:36:15", "2025-02-28 00:36:13"])
@@ -184,6 +200,16 @@ def test_parse_datetime_mixed_timezones_warning():
     # But parsing should still work
     assert result.dtype == pl.Datetime
     assert result.is_not_null().all()
+
+
+def test_time_military_semantic_inference():
+    """Test that time_military semantic gets properly detected"""
+    # Test 24-hour format detection
+    series_24h = pl.Series(["23:47", "14:30", "09:15", "00:00", "12:45"])
+    semantic = infer_series_semantic(series_24h)
+    assert semantic is not None
+    assert semantic.semantic_name == "time_military"
+    assert semantic.data_type == "datetime"
 
 
 # Edge cases
