@@ -164,7 +164,7 @@ class SelectProjectPage(GuiPage):
 
                         # If a project_id exists, show notification and refresh
                         # result -> (is_deleted, project_name, project_id)
-                        if result[0]:
+                        if isinstance(result, tuple) and result[0]:
                             self.notify_success(
                                 f"Successfully deleted project: {result[1]} (ID: {result[2]})"
                             )
