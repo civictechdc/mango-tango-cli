@@ -79,15 +79,15 @@ class LocalFilePicker(ui.dialog):
                 ui.aggrid(
                     {
                         "columnDefs": [
-                            {"field": "name", "headerName": "Name", "flex": 2},
+                            {"field": "name", "headerName": "Name"},
                             {
                                 "field": "size",
                                 "headerName": "Size",
-                                "flex": 1,
                                 "sortable": True,
                             },
                         ],
-                        "rowSelection": "single",
+                        "rowData": [],
+                        "rowSelection": {"mode": "singleRow"},
                     },
                     theme="quartz",
                     html_columns=[0],
