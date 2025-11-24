@@ -106,7 +106,6 @@ class AnalysisParamsCard:
     def _build_card(self):
         """Build the parameter configuration card."""
         with ui.card().classes("w-full"):
-            ui.label("Analysis Parameters").classes("text-h6 mb-4")
 
             if not self.params:
                 ui.label("This analyzer has no configurable parameters.").classes(
@@ -120,7 +119,7 @@ class AnalysisParamsCard:
 
     def _build_param_control(self, param: AnalyzerParam):
         """Build UI control for a single parameter."""
-        with ui.column().classes("w-full mb-4"):
+        with ui.column().classes("w-full mb-2"):
             # Parameter label with description
             with ui.row().classes("items-center gap-2"):
                 ui.label(param.print_name).classes("text-base font-bold")
@@ -128,14 +127,14 @@ class AnalysisParamsCard:
                     with ui.icon("info").classes("text-grey-6 cursor-pointer"):
                         ui.tooltip(param.description)
 
-            # Parameter input control based on type
-            param_type = param.type
-            default_value = self.default_values.get(param.id)
+                # Parameter input control based on type
+                param_type = param.type
+                default_value = self.default_values.get(param.id)
 
-            if param_type.type == "integer":
-                self._build_integer_control(param, param_type, default_value)
-            elif param_type.type == "time_binning":
-                self._build_time_binning_control(param, default_value)
+                if param_type.type == "integer":
+                    self._build_integer_control(param, param_type, default_value)
+                elif param_type.type == "time_binning":
+                    self._build_time_binning_control(param, default_value)
 
     def _build_integer_control(
         self,
@@ -145,7 +144,7 @@ class AnalysisParamsCard:
     ):
         """Build integer parameter control."""
         number_input = ui.number(
-            label=f"Value (between {param_type.min} and {param_type.max})",
+            label=f"Enter value between {param_type.min} and {param_type.max}",
             value=default_value if default_value is not None else param_type.min,
             min=param_type.min,
             max=param_type.max,
@@ -155,7 +154,7 @@ class AnalysisParamsCard:
                 f"Must be at least {param_type.min}": lambda v: v >= param_type.min,
                 f"Must be at most {param_type.max}": lambda v: v <= param_type.max,
             },
-        ).classes("w-64")
+        ).classes("w-40")
 
         self.param_widgets[param.id] = ("integer", number_input)
 
@@ -180,7 +179,7 @@ class AnalysisParamsCard:
 
             # Amount input
             amount_input = ui.number(
-                label="Amount",
+                label="How many?",
                 value=default_value.amount if default_value else 1,
                 min=1,
                 max=1000,
