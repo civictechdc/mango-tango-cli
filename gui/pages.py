@@ -537,17 +537,10 @@ class SelectPreviousAnalyzerPage(GuiPage):
                 if not selected_name:
                     self.notify_warning("Please select a previous analysis")
                     return
-
-                # Find the analysis object by display_name
-                selected_analysis = next(
-                    (a for _, a in analysis_list if a.display_name == selected_name),
-                    None,
-                )
-
-                # Store selected analysis in session
-                # if selected_analysis:
-                #    self.session.current_analysis = selected_analysis
-                #    self.navigate_to("/show_output_options")
+                else:
+                    self.notify("Coming soon!")
+                #   self.session.current_analysis = selected_analysis
+                #   self.navigate_to("/show_output_options")
 
             ui.button(
                 "Proceed",
