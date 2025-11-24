@@ -1022,10 +1022,9 @@ class ConfigureAnalaysisParams(GuiPage):
 
                     # Store parameters in session
                     self.session.analysis_params = final_params
-                    self.notify_success("Parameters configured successfully!")
 
                     # TODO: Navigate to next step (run analysis or review page)
-                    self.notify_success("Ready to run analysis!")
+                    self.notify_success("Coming soon!")
 
                 ui.button(
                     "Proceed to Run Analysis",
