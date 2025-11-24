@@ -8,6 +8,7 @@ from app import App
 from gui.base import GuiSession, gui_routes
 from gui.context import GUIContext
 from gui.pages import (
+    ConfigureAnalaysisParams,
     ConfigureAnalysis,
     ImportDatasetPage,
     NewProjectPage,
@@ -80,9 +81,14 @@ def gui_main(app: App):
         page = SelectPreviousAnalyzerPage(session=gui_session)
         page.render()
 
-    @ui.page("/configure_analysis")
+    @ui.page(gui_routes.configure_analysis)
     def configure_analysis():
         page = ConfigureAnalysis(session=gui_session)
+        page.render()
+
+    @ui.page(gui_routes.configure_analysis_parameters)
+    def configure_analysis_parameters():
+        page = ConfigureAnalaysisParams(session=gui_session)
         page.render()
 
     # Launch in native mode
