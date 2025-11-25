@@ -4,7 +4,7 @@ from typing import Optional
 
 import polars as pl
 
-from importing import Importer, ImporterSession, importers
+from importing import Importer, ImporterSession, terminal_importers
 from terminal_tools import draw_box, prompts, wait_for_key
 from terminal_tools.inception import Scope
 from terminal_tools.utils import print_message, smart_print_data_frame
@@ -27,7 +27,7 @@ def new_project(context: ViewContext):
 
     with terminal.nest(draw_box("2. Import Options", padding_lines=0)) as scope:
         importer: Optional[ImporterSession] = importer_flow(
-            selected_file, importers, scope
+            selected_file, terminal_importers, scope
         )
         if importer is None:
             print("Canceled")
