@@ -150,6 +150,208 @@ class CSVImporter(Importer["CsvImportSession"]):
         )
 
 
+class CSVImporterTerminal(CSVImporter):
+    """
+    Terminal-specific CSV importer with interactive UI methods.
+    Extends CSVImporter with manual configuration and modification capabilities.
+    """
+
+    def manual_init_session(self, input_path: str):
+        from typing import Optional
+
+        import terminal_tools.prompts as prompts
+
+        separator = self._separator_option(None)
+        if separator is None:
+            return None
+
+        quote_char = self._quote_char_option(None)
+        if quote_char is None:
+            return None
+
+        has_header = self._header_option(None)
+        if has_header is None:
+            return None
+
+        skip_rows = self._skip_rows_option(None)
+        if skip_rows is None:
+            return None
+
+        return CsvImportSession(
+            input_file=input_path,
+            separator=separator,
+            quote_char=quote_char,
+            has_header=has_header,
+            skip_rows=skip_rows,
+        )
+
+    def modify_session(
+        self, input_path: str, import_session: "CsvImportSession", reset_screen
+    ):
+        from typing import Callable
+
+        import terminal_tools.prompts as prompts
+
+        is_first_time = True
+        while True:
+            reset_screen(import_session)
+            action = prompts.list_input(
+                "What would you like to change?",
+                choices=[
+                    ("Column separator", "separator"),
+                    ("Quote character", "quote_char"),
+                    ("Header", "header"),
+                    ("Skip rows", "skip_rows"),
+                    ("Done. Use these options.", "done"),
+                ],
+                default=None if is_first_time else "done",
+            )
+            is_first_time = False
+            if action is None:
+                return None
+
+            if action == "done":
+                return import_session
+
+            if action == "separator":
+                separator = self._separator_option(import_session.separator)
+                if separator is None:
+                    continue
+                import_session.separator = separator
+
+            if action == "quote_char":
+                quote_char = self._quote_char_option(import_session.quote_char)
+                if quote_char is None:
+                    continue
+                import_session.quote_char = quote_char
+
+            if action == "header":
+                has_header = self._header_option(import_session.has_header)
+                if has_header is None:
+                    continue
+                import_session.has_header = has_header
+
+            if action == "skip_rows":
+                skip_rows = self._skip_rows_option(import_session.skip_rows)
+                if skip_rows is None:
+                    continue
+                import_session.skip_rows = skip_rows
+
+    @staticmethod
+    def _separator_option(previous_value):
+        from typing import Optional
+
+        import terminal_tools.prompts as prompts
+
+        input: Optional[str] = prompts.list_input(
+            "Select the column separator",
+            choices=[
+                ("comma (,)", ","),
+                ("semicolon (;)", ";"),
+                ("Pipe (|)", "|"),
+                ("Tab", "\t"),
+                ("Other", "other"),
+            ],
+            default=(
+                previous_value
+                if previous_value in [",", ";", "\t"]
+                else "other" if previous_value is not None else None
+            ),
+        )
+        if input is None:
+            return None
+        if input != "other":
+            return input
+
+        input = prompts.text("Enter the separator")
+        if input is None:
+            return None
+        input = input.strip()
+        if len(input) == 0:
+            return None
+        return input
+
+    @staticmethod
+    def _quote_char_option(previous_value):
+        from typing import Optional
+
+        import terminal_tools.prompts as prompts
+
+        input: Optional[str] = prompts.list_input(
+            "Select the quote character",
+            choices=[
+                ('Double quote (")', '"'),
+                ("Single quote (')", "'"),
+                ("Other", "other"),
+            ],
+            default=(
+                previous_value
+                if previous_value in ['"', "'"]
+                else "other" if previous_value is not None else None
+            ),
+        )
+        if input is None:
+            return None
+        if input != "other":
+            return input
+
+        input = prompts.text("Enter the quote character")
+        if input is None:
+            return None
+        input = input.strip()
+        if len(input) == 0:
+            return None
+        return input
+
+    def _header_option(self, previous_value):
+        from typing import Optional
+
+        import terminal_tools.prompts as prompts
+
+        return prompts.list_input(
+            "Does the file have a header?",
+            choices=[
+                ("Yes", True),
+                ("No", False),
+            ],
+            default=previous_value,
+        )
+
+    @staticmethod
+    def _skip_rows_option(previous_value):
+        from typing import Optional
+
+        import terminal_tools.prompts as prompts
+        from terminal_tools.utils import print_message
+
+        while True:
+            input_str = prompts.text(
+                f"Number of rows to skip at the beginning of file (current: {previous_value or 0}).",
+                default=str(previous_value) if previous_value is not None else "0",
+            )
+            if input_str is None:  # User cancelled
+                return None
+
+            try:
+                skip_rows = int(input_str.strip())
+                if skip_rows < 0:
+                    print_message(
+                        "Skip rows cannot be negative. Please try again.", "error"
+                    )
+                    continue
+                if skip_rows > 10:
+                    confirm = prompts.confirm(
+                        f"Skip {skip_rows} rows? This seems high. Continue?",
+                        default=True,
+                    )
+                    if not confirm:
+                        continue  # Ask for input again instead of returning None
+                return skip_rows
+            except ValueError:
+                print_message("Please enter a valid number.", "error")
+                continue
+
+
 class CsvImportSession(ImporterSession, BaseModel):
     input_file: str
     separator: str
