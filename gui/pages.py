@@ -785,6 +785,14 @@ class ConfigureAnalysis(GuiPage):
                     if dropdown.value:
                         current_mapping[input_col_name] = options[dropdown.value]
 
+                # determine N_PREVIEW here (in most cases,
+                # this will be much larger than 5)
+                # but in case of demos, let's handle < 5 cases too
+                tmp_col = list(project.column_dict.values())[
+                    0
+                ]  # fetch the first column length
+                N_PREVIEW_ROWS = min(5, tmp_col.data.len())
+
                 # Initialize preview_data with all analyzer columns (empty by default)
                 preview_data = {}
                 for analyzer_col in analyzer.input.columns:
@@ -795,11 +803,11 @@ class ConfigureAnalysis(GuiPage):
                         # Column is mapped - use actual data
                         user_col = project.column_dict[user_col_name]
                         preview_data[col_name] = user_col.head(
-                            5
+                            N_PREVIEW_ROWS
                         ).apply_semantic_transform()
                     else:
                         # Column not mapped - create empty column with 5 null values
-                        preview_data[col_name] = [None] * 5
+                        preview_data[col_name] = [None] * N_PREVIEW_ROWS
 
                 return pl.DataFrame(preview_data)
 
@@ -812,9 +820,12 @@ class ConfigureAnalysis(GuiPage):
                     preview_container.clear()
                     with preview_container:
                         preview_df = _build_preview_df()
-                        ui.label("Data Preview (first 5 rows)").classes(
-                            "text-sm text-grey-7"
+                        preview_title = (
+                            "Data Preview (first 5 rows)"
+                            if len(preview_df) > 5
+                            else "Data Preview (all rows)"
                         )
+                        ui.label(preview_title).classes("text-sm text-grey-7")
                         ui.aggrid.from_polars(preview_df, theme="quartz").classes(
                             "w-full h-64"
                         )
