@@ -157,9 +157,6 @@ class CSVImporterTerminal(CSVImporter):
     """
 
     def manual_init_session(self, input_path: str):
-        from typing import Optional
-
-        import terminal_tools.prompts as prompts
 
         separator = self._separator_option(None)
         if separator is None:
@@ -185,10 +182,7 @@ class CSVImporterTerminal(CSVImporter):
             skip_rows=skip_rows,
         )
 
-    def modify_session(
-        self, input_path: str, import_session: "CsvImportSession", reset_screen
-    ):
-        from typing import Callable
+    def modify_session(self, import_session: "CsvImportSession", reset_screen):
 
         import terminal_tools.prompts as prompts
 
@@ -304,7 +298,6 @@ class CSVImporterTerminal(CSVImporter):
         return input
 
     def _header_option(self, previous_value):
-        from typing import Optional
 
         import terminal_tools.prompts as prompts
 
@@ -319,7 +312,6 @@ class CSVImporterTerminal(CSVImporter):
 
     @staticmethod
     def _skip_rows_option(previous_value):
-        from typing import Optional
 
         import terminal_tools.prompts as prompts
         from terminal_tools.utils import print_message
