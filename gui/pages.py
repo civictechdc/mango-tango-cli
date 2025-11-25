@@ -831,7 +831,7 @@ class ConfigureAnalysis(GuiPage):
                         )
 
             # Create column mapping UI using grid
-            with ui.grid(columns=2).classes("w-full gap-4"):
+            with ui.grid(columns=2).classes("gap-2"):
 
                 # create labels for grid header
                 ui.label("Required Input Information")  # populates row 1, column 1
@@ -840,14 +840,13 @@ class ConfigureAnalysis(GuiPage):
                 # this then fills the rows with column information
                 for input_col in input_columns:
                     # Left column: Input column info card
-                    with ui.card():
+                    with ui.row().classes("items-center gap-1"):
                         ui.label(input_col.human_readable_name_or_fallback()).classes(
                             "text-bold text-lg"
                         )
                         if input_col.description:
-                            ui.label(input_col.description).classes(
-                                "text-sm text-grey-7"
-                            )
+                            with ui.icon("info").classes("text-grey-6 cursor-pointer"):
+                                ui.tooltip(input_col.description)
 
                     # Right column: Dropdown for column selection
                     # Get compatible user columns
