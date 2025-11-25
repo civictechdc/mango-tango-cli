@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Optional, TypeVar
+from typing import Optional, TypeVar
 
 import polars as pl
 
@@ -69,24 +69,5 @@ class Importer[SessionType](ABC):
         import parameters. This doesn't necessarily mean that the file cannot be
         loaded; the UI will force the user to customize the import session if the
         user wants to proceed with this importer.
-        """
-        pass
-
-    @abstractmethod
-    def manual_init_session(self, input_path: str) -> Optional[SessionType]:
-        pass
-
-    @abstractmethod
-    def modify_session(
-        self,
-        input_path: str,
-        import_session: SessionType,
-        reset_screen: Callable[[SessionType], None],
-    ) -> Optional[SessionType]:
-        """
-        Performs the interactive UI sequence that customizes the import session
-        from the initial one.
-
-        Return None here if the user interrupts the customization process.
         """
         pass
