@@ -360,6 +360,9 @@ class CsvImportSession(ImporterSession, BaseModel):
     skip_rows: int = 0
 
     def print_config(self):
+        """Print configuration to terminal. Only for terminal UI use."""
+        from terminal_tools.utils import smart_print_data_frame
+
         def present_separator(value: str) -> str:
             if value == "\t":
                 return "(Tab)"
