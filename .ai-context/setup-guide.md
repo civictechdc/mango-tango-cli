@@ -58,7 +58,7 @@ The bootstrap script will:
 ### 4. Verify Installation
 
 ```bash
-python -m mangotango --noop
+python -m cibmangotree --noop
 ```
 
 Should output: "No-op flag detected. Exiting successfully."
@@ -118,7 +118,7 @@ mango-tango-cli/
 ├── storage/                # Data persistence
 ├── importing/              # Data import modules
 ├── requirements*.txt       # Dependencies
-└── mangotango.py          # Main entry point
+└── cibmangotree.py         # Main entry point
 ```
 
 ## Database and Storage Setup
@@ -149,14 +149,14 @@ source venv/bin/activate  # macOS/Linux
 venv\Scripts\activate     # Windows
 
 # Start the application
-python -m mangotango
+python -m cibmangotree
 ```
 
 ### Development Mode
 
 ```bash
 # Run with debugging/development flags
-python -m mangotango --noop  # Test mode, exits immediately
+python -m cibmangotree --noop  # Test mode, exits immediately
 ```
 
 ## Testing Setup

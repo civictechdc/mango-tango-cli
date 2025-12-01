@@ -15,10 +15,10 @@ python -m venv venv
 
 ```bash
 # Start the application
-python -m mangotango
+python -m cibmangotree
 
 # Run with no-op flag (for testing)
-python -m mangotango --noop
+python -m cibmangotree --noop
 ```
 
 ## Development Commands

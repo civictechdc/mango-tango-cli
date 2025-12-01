@@ -179,7 +179,7 @@ read_memory("task_completion_checklist") # Before committing
 
 ```markdown
 # Find app entry point
-find_symbol("main", relative_path="mangotango.py")
+find_symbol("main", relative_path="cibmangotree.py")
 
 # Explore analyzer system
 get_symbols_overview("analyzers/")
@@ -203,7 +203,7 @@ find_symbol("main_menu", include_body=True)
 
 ### Key Architecture References
 
-- **Entry Point**: `mangotango.py` - Application bootstrap
+- **Entry Point**: `cibmangotree.py` - Application bootstrap
 - **Core App**: `app/app.py:App` - Main application controller
 - **Storage**: `storage/__init__.py:Storage` - Data persistence
 - **UI Components**: `components/main_menu.py:main_menu()` - Terminal interface
