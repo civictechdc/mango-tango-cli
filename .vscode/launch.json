@@ -8,7 +8,7 @@
       "name": "Debug",
       "type": "debugpy",
       "request": "launch",
-      "module": "mangotango"
+      "module": "cibmangotree"
     }
   ]
 }

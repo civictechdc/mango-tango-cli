@@ -221,7 +221,7 @@ Core tokenizer implementation with Unicode awareness:
 
 ### Main Application
 
-- `mangotango.py` - Application bootstrap and initialization
+- `cibmangotree.py` - Application bootstrap and initialization
   - `freeze_support()` - Multiprocessing setup
   - `enable_windows_ansi_support()` - Terminal color support
   - Storage initialization with app metadata
@@ -229,8 +229,8 @@ Core tokenizer implementation with Unicode awareness:
 
 ### Module Entry Point
 
-- `python -m mangotango` - Standard execution command
-- `python -m mangotango --noop` - No-operation mode for testing
+- `python -m cibmangotree` - Standard execution command
+- `python -m cibmangotree --noop` - No-operation mode for testing
 
 ## Integration Points
 

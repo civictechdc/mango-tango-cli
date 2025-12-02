@@ -69,7 +69,7 @@ python -m venv venv
 ### 3. Verify Installation
 
 ```bash
-python -m mangotango --noop
+python -m cibmangotree --noop
 # Should output: "No-op flag detected. Exiting successfully."
 ```
 

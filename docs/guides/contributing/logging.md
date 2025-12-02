@@ -114,13 +114,13 @@ Users can control log verbosity when running the application:
 
 ```shell
 # Default INFO level
-python -m mangotango
+python -m cibmangotree
 
 # Verbose DEBUG level for troubleshooting
-python -m mangotango --log-level DEBUG
+python -m cibmangotree --log-level DEBUG
 
 # Only show warnings and errors in log file
-python -m mangotango --log-level WARNING
+python -m cibmangotree --log-level WARNING
 ```
 
 ### Log File Management

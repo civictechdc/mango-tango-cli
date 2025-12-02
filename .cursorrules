@@ -50,7 +50,7 @@ Mango Tango CLI is a Python terminal-based tool for social media data analysis w
 
 ### Key Entry Points
 
-- `mangotango.py` - Application bootstrap and initialization
+- `cibmangotree.py` - Application bootstrap and initialization
 - `app/app.py:App` - Main application controller
 - `components/main_menu.py:main_menu()` - Terminal UI entry point
 - `analyzers/__init__.py:suite` - Analyzer registry
@@ -96,15 +96,15 @@ python -m venv venv
 ./bootstrap.ps1 # Windows
 
 # Run application
-python -m mangotango
+python -m cibmangotree
 ```
 
 ## Common Commands
 
 ### Development
 
-- `python -m mangotango` - Start application
-- `python -m mangotango --noop` - Test mode
+- `python -m cibmangotree` - Start application
+- `python -m cibmangotree --noop` - Test mode
 - `isort . && black .` - Format code
 - `pytest` - Run tests
 - `pytest analyzers/[name]/` - Test specific analyzer
