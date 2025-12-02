@@ -174,7 +174,7 @@ mango-tango-cli/
 ├── storage/                # Data persistence
 ├── importing/              # Data import modules
 ├── requirements*.txt       # Dependencies
-└── mangotango.py          # Main entry point
+└── cibmangotree.py         # Main entry point
 ```
 
 # Database and Storage Setup
@@ -201,14 +201,14 @@ No manual database setup required.
 
 ```bash
 # Start the application
-python -m mangotango
+python -m cibmangotree
 ```
 
 ## Development Mode
 
 ```bash
 # Run with debugging/development flags
-python -m mangotango --noop  # Test mode, exits immediately
+python -m cibmangotree --noop  # Test mode, exits immediately
 ```
 
 ## Development Mode for The React Dashboards

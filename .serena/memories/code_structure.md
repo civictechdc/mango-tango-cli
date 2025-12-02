@@ -2,7 +2,7 @@
 
 ## Entry Point
 
-- `mangotango.py` - Main entry point, bootstraps the application with Storage, App, and terminal components
+- `cibmangotree.py` - Main entry point, bootstraps the application with Storage, App, and terminal components
 
 ## Core Modules
 

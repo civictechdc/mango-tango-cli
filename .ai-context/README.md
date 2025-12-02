@@ -28,8 +28,8 @@ consistent UX while allowing easy contribution of new analyzers.
 
 ### Entry Points
 
-- `mangotango.py` - Main application bootstrap
-- `python -m mangotango` - Standard execution command
+- `cibmangotree.py` - Main application bootstrap
+- `python -m cibmangotree` - Standard execution command
 
 ### Core Architecture (MVC-like)
 
