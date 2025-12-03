@@ -9,7 +9,7 @@ This module provides:
 
 import abc
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from nicegui import ui
 from pydantic import BaseModel, ConfigDict, Field
@@ -179,6 +179,7 @@ class GuiPage(BaseModel, abc.ABC):
         back_route: Route to navigate when back button clicked
         back_icon: Icon for back button (default: "arrow_back")
         back_text: Optional text label for back button
+        on_page_exit: Optional callback invoked before navigation (back/home buttons)
         show_footer: Whether to render footer
 
     Usage:
@@ -217,6 +218,7 @@ class GuiPage(BaseModel, abc.ABC):
     back_route: Optional[str] = None
     back_icon: str = "arrow_back"
     back_text: Optional[str] = None
+    on_page_exit: Optional[Callable[[], None]] = None
 
     # Footer configuration
     show_footer: bool = True
