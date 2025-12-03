@@ -292,7 +292,7 @@ class GuiPage(BaseModel, abc.ABC):
                             text=self.back_text,
                             icon=self.back_icon,
                             color="accent",
-                            on_click=lambda: self.navigate_to(self.back_route),
+                            on_click=self._handle_back_click,
                         ).props("flat")
 
                 # Center: Title
@@ -304,8 +304,20 @@ class GuiPage(BaseModel, abc.ABC):
                         ui.button(
                             icon="home",
                             color="accent",
-                            on_click=lambda: self.navigate_to("/"),
+                            on_click=self._handle_home_click,
                         ).props("flat")
+
+    def _handle_back_click(self) -> None:
+        """Handle back button click with optional page exit callback."""
+        if self.on_page_exit:
+            self.on_page_exit()
+        self.navigate_to(self.back_route)
+
+    def _handle_home_click(self) -> None:
+        """Handle home button click with optional page exit callback."""
+        if self.on_page_exit:
+            self.on_page_exit()
+        self.navigate_to("/")
 
     def _render_footer(self) -> None:
         """
