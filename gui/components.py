@@ -162,36 +162,37 @@ class AnalysisParamsCard:
         self, param: AnalyzerParam, default_value: Optional[TimeBinningValue]
     ):
         """Build time binning parameter control."""
-        # with ui.row().classes("gap-2"):
-        # Unit selector
-        unit_toggle = ui.toggle(
-            {
-                "year": "Year",
-                "month": "Month",
-                "week": "Week",
-                "day": "Day",
-                "hour": "Hour",
-                "minute": "Minute",
-                "second": "Second",
-            },
-            value=default_value.unit if default_value else "day",
-        )
+        with ui.row().classes("gap-2"):
+            # Unit selector
+            unit_select = ui.select(
+                {
+                    "year": "Year",
+                    "month": "Month",
+                    "week": "Week",
+                    "day": "Day",
+                    "hour": "Hour",
+                    "minute": "Minute",
+                    "second": "Second",
+                },
+                label="Pick a time unit",
+                value=default_value.unit if default_value else "day",
+            ).classes("w-32")
 
-        # Amount input
-        amount_input = ui.number(
-            label="How many?",
-            value=default_value.amount if default_value else 1,
-            min=1,
-            max=1000,
-            step=1,
-            precision=0,
-            validation={
-                "Must be at least 1": lambda v: v >= 1,
-                "Cannot exceed 1000": lambda v: v <= 1000,
-            },
-        ).classes("w-48")
+            # Amount input
+            amount_input = ui.number(
+                label="How many?",
+                value=default_value.amount if default_value else 1,
+                min=1,
+                max=1000,
+                step=1,
+                precision=0,
+                validation={
+                    "Must be at least 1": lambda v: v >= 1,
+                    "Cannot exceed 1000": lambda v: v <= 1000,
+                },
+            ).classes("w-32")
 
-        self.param_widgets[param.id] = ("time_binning", unit_toggle, amount_input)
+        self.param_widgets[param.id] = ("time_binning", unit_select, amount_input)
 
     def get_param_values(self) -> dict[str, ParamValue]:
         """
