@@ -15,9 +15,10 @@ from nicegui import ui
 from pydantic import BaseModel, ConfigDict, Field
 
 from analyzer_interface import AnalyzerInterface, ParamValue
+from app.project_context import ProjectContext
 from gui.context import GUIContext
 from importing import ImporterSession
-from storage import AnalysisModel, ProjectModel
+from storage import AnalysisModel
 
 
 class GuiRoutes(BaseModel):
@@ -117,7 +118,7 @@ class GuiSession(BaseModel):
     context: GUIContext
 
     # Workflow state - project creation
-    current_project: Optional[ProjectModel] = None
+    current_project: Optional[ProjectContext] = None
     selected_file_path: Optional[Path] = None
     new_project_name: Optional[str] = None
     import_session: Optional[ImporterSession] = None
