@@ -121,7 +121,7 @@ class AnalysisParamsCard:
         """Build UI control for a single parameter."""
         with ui.column().classes("w-full mb-2"):
             # Parameter label with description
-            with ui.row().classes("items-center gap-2"):
+            with ui.row().classes("items-center gap-4"):
                 ui.label(param.print_name).classes("text-base font-bold")
                 if param.description:
                     with ui.icon("info").classes("text-grey-6 cursor-pointer"):
@@ -162,36 +162,36 @@ class AnalysisParamsCard:
         self, param: AnalyzerParam, default_value: Optional[TimeBinningValue]
     ):
         """Build time binning parameter control."""
-        with ui.column().classes("gap-2"):
-            # Unit selector
-            unit_toggle = ui.toggle(
-                {
-                    "year": "Year",
-                    "month": "Month",
-                    "week": "Week",
-                    "day": "Day",
-                    "hour": "Hour",
-                    "minute": "Minute",
-                    "second": "Second",
-                },
-                value=default_value.unit if default_value else "day",
-            )
+        # with ui.row().classes("gap-2"):
+        # Unit selector
+        unit_toggle = ui.toggle(
+            {
+                "year": "Year",
+                "month": "Month",
+                "week": "Week",
+                "day": "Day",
+                "hour": "Hour",
+                "minute": "Minute",
+                "second": "Second",
+            },
+            value=default_value.unit if default_value else "day",
+        )
 
-            # Amount input
-            amount_input = ui.number(
-                label="How many?",
-                value=default_value.amount if default_value else 1,
-                min=1,
-                max=1000,
-                step=1,
-                precision=0,
-                validation={
-                    "Must be at least 1": lambda v: v >= 1,
-                    "Cannot exceed 1000": lambda v: v <= 1000,
-                },
-            ).classes("w-48")
+        # Amount input
+        amount_input = ui.number(
+            label="How many?",
+            value=default_value.amount if default_value else 1,
+            min=1,
+            max=1000,
+            step=1,
+            precision=0,
+            validation={
+                "Must be at least 1": lambda v: v >= 1,
+                "Cannot exceed 1000": lambda v: v <= 1000,
+            },
+        ).classes("w-48")
 
-            self.param_widgets[param.id] = ("time_binning", unit_toggle, amount_input)
+        self.param_widgets[param.id] = ("time_binning", unit_toggle, amount_input)
 
     def get_param_values(self) -> dict[str, ParamValue]:
         """
