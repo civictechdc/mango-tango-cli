@@ -1,7 +1,7 @@
 from functools import cached_property
 
 import polars as pl
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from analyzer_interface import ParamValue
 from analyzer_interface import UserInputColumn as BaseUserInputColumn
@@ -12,6 +12,9 @@ from .app_context import AppContext
 
 
 class ProjectContext(BaseModel):
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     model: ProjectModel
     app_context: AppContext
     is_deleted: bool = False
