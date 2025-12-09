@@ -25,22 +25,22 @@ The application has three "domains":
 
 ```mermaid
 flowchart TD
-    terminal["Terminal (core)"]
-    application["Application (core)"]
-    storage["Storage (core)"]
+  terminal["Terminal (core)"]
+  application["Application (core)"]
+  storage["Storage (core)"]
 
-    importers["Importers (edge)"]
-    semantic["Semantic Preprocessor (edge)"]
+  importers["Importers (edge)"]
+  semantic["Semantic Preprocessor (edge)"]
 
-    content["Analyzers/Web Presenters (content)"]
+  content["Analyzers/Web Presenters (content)"]
 
-    terminal --> application
-    application --> storage
+  terminal --> application
+  application --> storage
 
-    application --> importers
-    application --> semantic
+  application --> importers
+  application --> semantic
 
-    application --> content
+  application --> content
 ```
 
 # Questions, Comments, and Feedback
