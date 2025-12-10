@@ -94,8 +94,7 @@ def gui_main(app: App):
     # Launch in native mode
     ui.run(
         native=True,
-        # window_size=(800, 600),
-        uvicorn_logging_level="debug",
+        window_size=(800, 600),
         title="CIB Mango Tree",
         favicon="🥭",
         reload=False,
