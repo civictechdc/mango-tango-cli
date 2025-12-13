@@ -172,6 +172,7 @@ def test_ngram_analyzer():
                 COL_MESSAGE_TIMESTAMP: datetime_string,
             },
         ),
+        params={"min_n": 3, "max_n": 4},
         outputs={
             OUTPUT_MESSAGE_NGRAMS: ParquetTestData(
                 filepath=str(Path(test_data_dir, OUTPUT_MESSAGE_NGRAMS + ".parquet"))
