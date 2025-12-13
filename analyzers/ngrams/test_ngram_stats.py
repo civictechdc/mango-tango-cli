@@ -12,8 +12,6 @@ from .ngrams_base.interface import (
 from .test_data import test_data_dir
 
 
-# This example shows you how to test a secondary analyzer.
-# It runs on pytest.
 def test_ngram_stats():
     # You use this test function.
     test_secondary_analyzer(
