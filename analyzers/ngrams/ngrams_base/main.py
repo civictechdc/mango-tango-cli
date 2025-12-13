@@ -8,7 +8,6 @@ from terminal_tools import ProgressReporter
 from .interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
-    COL_MESSAGE_NGRAM_COUNT,
     COL_MESSAGE_SURROGATE_ID,
     COL_MESSAGE_TEXT,
     COL_MESSAGE_TIMESTAMP,
@@ -55,16 +54,30 @@ def main(context: PrimaryAnalyzerContext):
     with ProgressReporter("Detecting n-grams") as progress:
 
         def get_ngram_rows(ngrams_by_id: dict[str, int]):
+
             nonlocal progress
             num_rows = df_input.height
             current_row = 0
+
             for row in df_input.iter_rows(named=True):
                 tokens = tokenize_text(row[COL_MESSAGE_TEXT], tokenizer_config)
+
+                # this will track within message repetitions
+                seen_ngrams_in_message = set()
+
                 for ngram in ngrams(tokens, min_n, max_n):
                     serialized_ngram = serialize_ngram(ngram)
+
+                    # skip repetitions of already detected ngrams
+                    if serialized_ngram in seen_ngrams_in_message:
+                        continue
+                    seen_ngrams_in_message.add(serialized_ngram)
+
+                    # generate ngram ids (by counting)
                     if serialized_ngram not in ngrams_by_id:
                         ngrams_by_id[serialized_ngram] = len(ngrams_by_id)
                     ngram_id = ngrams_by_id[serialized_ngram]
+
                     yield {
                         COL_MESSAGE_SURROGATE_ID: row[COL_MESSAGE_SURROGATE_ID],
                         COL_NGRAM_ID: ngram_id,
@@ -76,11 +89,9 @@ def main(context: PrimaryAnalyzerContext):
         ngrams_by_id: dict[str, int] = {}
         df_ngram_instances = pl.DataFrame(get_ngram_rows(ngrams_by_id))
 
-    with ProgressReporter("Computing per-message n-gram statistics"):
+    with ProgressReporter("Fetching n-gram statistics"):
         (
             pl.DataFrame(df_ngram_instances)
-            .group_by(COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID)
-            .agg(pl.len().alias(COL_MESSAGE_NGRAM_COUNT))
             .sort(by=[COL_MESSAGE_SURROGATE_ID, COL_NGRAM_ID])
             .write_parquet(context.output(OUTPUT_MESSAGE_NGRAMS).parquet_path)
         )
