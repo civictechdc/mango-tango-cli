@@ -8,7 +8,6 @@ from terminal_tools import ProgressReporter
 from ..ngrams_base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_ID,
-    COL_MESSAGE_NGRAM_COUNT,
     COL_MESSAGE_SURROGATE_ID,
     COL_MESSAGE_TEXT,
     COL_MESSAGE_TIMESTAMP,
@@ -42,21 +41,17 @@ def main(context: SecondaryAnalyzerContext):
 
     with ProgressReporter("Computing ngram statistics"):
         df_ngram_stats = (
-            df_message_ngrams.with_columns(
-                pl.col(COL_MESSAGE_NGRAM_COUNT)
-                .sum()
-                .over([COL_NGRAM_ID])
-                .alias(COL_NGRAM_TOTAL_REPS)
-            )
-            .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
-            .group_by(COL_NGRAM_ID)
+            df_message_ngrams.group_by(COL_NGRAM_ID)
             .agg(
-                pl.first(COL_NGRAM_TOTAL_REPS).alias(COL_NGRAM_TOTAL_REPS),
+                pl.count().alias(
+                    COL_NGRAM_TOTAL_REPS
+                ),  # count nr. times ngram detected
                 pl.col(COL_MESSAGE_SURROGATE_ID)
                 .replace_strict(dict_authors_by_message)
                 .n_unique()
                 .alias(COL_NGRAM_DISTINCT_POSTER_COUNT),
             )
+            .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
         )
 
     with ProgressReporter("Creating the summary table"):
@@ -112,9 +107,9 @@ def main(context: SecondaryAnalyzerContext):
                             df_message_ngrams, on=COL_NGRAM_ID
                         ).join(df_messages, on=COL_MESSAGE_SURROGATE_ID)
                     )
+                    # count how many times a user posted distint ngrams
                     .with_columns(
-                        pl.col(COL_MESSAGE_NGRAM_COUNT)
-                        .sum()
+                        pl.count()
                         .over([COL_NGRAM_ID, COL_AUTHOR_ID])
                         .alias(COL_NGRAM_REPS_PER_USER)
                         .cast(pl.Int32)
@@ -146,6 +141,7 @@ def main(context: SecondaryAnalyzerContext):
                         descending=[True, True, True, True, False, False],
                     )
                 )
+
                 writer.write_table(df_output.to_arrow())
                 report_total_processed += df_ngram_summary_slice.height
                 progress.update(report_total_processed / df_ngram_summary.height)
