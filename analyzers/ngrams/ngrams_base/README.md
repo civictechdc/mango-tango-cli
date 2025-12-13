@@ -5,7 +5,16 @@ This is the module for base n-gram analysis (copy pasta test).
 
 ## Main data tables
 
-The tables below are written to disk in `main.py`
+Assuming the input dataframe:
+
+|user_id|message_id|message_text|timestamp
+|------|------|------|------|
+|alice|msg_001|go go go now|2024-01-01T10:00:00Z|
+|bob|msg_002|go go go it's very bad|2024-01-01T10:05:00Z|
+|alice|msg_003|go go go it's very bad it's very bad|2024-01-01T10:10:00Z|
+
+
+`main_.py` will write the tables with the following schemas to disk.
 
 ### `OUTPUT_MESSAGE_NGRAMS`
 
