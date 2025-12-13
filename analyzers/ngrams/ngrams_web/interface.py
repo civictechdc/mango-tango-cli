@@ -1,7 +1,7 @@
 from analyzer_interface import WebPresenterInterface
 
-from ..ngram_stats import interface as ngram_stats_interface
 from ..ngrams_base import interface as ngrams_interface
+from ..ngrams_stats import interface as ngram_stats_interface
 
 interface = WebPresenterInterface(
     id="ngram_repetition_by_poster",

@@ -4,17 +4,17 @@ import polars as pl
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
-from ..ngram_stats.interface import (
-    COL_NGRAM_DISTINCT_POSTER_COUNT,
-    COL_NGRAM_TOTAL_REPS,
-    COL_NGRAM_WORDS,
-)
 from ..ngrams_base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_TEXT,
     COL_MESSAGE_TIMESTAMP,
     COL_NGRAM_ID,
     COL_NGRAM_LENGTH,
+)
+from ..ngrams_stats.interface import (
+    COL_NGRAM_DISTINCT_POSTER_COUNT,
+    COL_NGRAM_TOTAL_REPS,
+    COL_NGRAM_WORDS,
 )
 
 MANGO_DARK_GREEN = "#609949"

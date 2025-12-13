@@ -9,8 +9,8 @@ from analyzer_interface.context import (
 )
 from app.shiny import page_dependencies
 
-from ..ngram_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS
-from ..ngram_stats.interface import interface as ngram_stats
+from ..ngrams_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS
+from ..ngrams_stats.interface import interface as ngram_stats
 from .app import _get_app_layout, _set_global_state_vars, server
 
 data_stats = None
