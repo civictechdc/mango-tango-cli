@@ -1,4 +1,4 @@
-Before following this workflow please refer to our [**Getting Started**](./overview.md) page for instructions on installing dependencies and setting up your development environment.
+Before following this workflow please refer to our [**New Contributor Guide**](./new_contributor_guide.md) page for instructions on installing dependencies and setting up your development environment.
 
 # Contributor Workflow
 
