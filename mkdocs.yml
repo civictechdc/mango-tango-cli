@@ -13,6 +13,7 @@ nav:
           - "Overview": "guides/get-started/overview.md"
           - "Installation": "guides/get-started/installation.md"
       - "Contributing":
+          - "New Contributor Guide": "guides/contributing/new_contributor_guide.md"
           - "Contributor Workflow": "guides/contributing/contributing.md"
           - "Implementing Analyzers": "guides/contributing/analyzers.md"
           - "Dashboards":
@@ -89,4 +90,9 @@ markdown_extensions:
         format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.blocks.caption
   - footnotes
+  - attr_list  # for grids
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - md_in_html # for grids
 
