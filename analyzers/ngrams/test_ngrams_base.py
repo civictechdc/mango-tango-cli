@@ -1,6 +1,9 @@
 import types
 from pathlib import Path
 
+import polars as pl
+import pytest
+
 from preprocessing.series_semantic import datetime_string, identifier, text_catch_all
 from services.tokenizer.basic import TokenizerConfig, tokenize_text
 from services.tokenizer.core.types import CaseHandling
@@ -157,6 +160,49 @@ def test_serialize_ngram():
     test_ngram_serialized_actual = serialize_ngram(test_ngrams[0])
 
     assert NGRAM_SERIALIZED_EXPECTED_FIRST == test_ngram_serialized_actual
+
+
+# Fixtures for unit testing
+
+
+@pytest.fixture
+def df_raw_input():
+    """Load raw CSV test input"""
+    return pl.read_csv(Path(test_data_dir, TEST_CSV_FILENAME))
+
+
+@pytest.fixture
+def tokenizer_config_fixture():
+    """Standard tokenizer config for n-gram analysis"""
+    return TokenizerConfig(
+        case_handling=CaseHandling.LOWERCASE,
+        normalize_unicode=True,
+        extract_hashtags=True,
+        extract_mentions=True,
+        include_urls=True,
+        min_token_length=1,
+    )
+
+
+@pytest.fixture
+def expected_message_ngrams():
+    """Load expected message_ngrams output"""
+    return pl.read_parquet(Path(test_data_dir, "message_ngrams.parquet"))
+
+
+@pytest.fixture
+def expected_ngram_defs():
+    """Load expected ngram definitions output"""
+    return pl.read_parquet(Path(test_data_dir, "ngrams.parquet"))
+
+
+@pytest.fixture
+def expected_messages():
+    """Load expected message authors output"""
+    return pl.read_parquet(Path(test_data_dir, "message_authors.parquet"))
+
+
+# Integration test
 
 
 def test_ngram_analyzer():
