@@ -22,6 +22,31 @@ from .interface import (
 )
 
 
+def _preprocess_messages(df_input: pl.DataFrame) -> pl.DataFrame:
+    """
+    Add surrogate IDs and filter invalid messages.
+
+    Args:
+        df_input: Raw input dataframe with message data
+
+    Returns:
+        Preprocessed dataframe with:
+        - message_surrogate_id column added (1-indexed)
+        - null/empty message_text filtered out
+        - null/empty author_id filtered out
+    """
+    df_input = df_input.with_columns(
+        (pl.int_range(pl.len()) + 1).alias(COL_MESSAGE_SURROGATE_ID)
+    )
+    df_input = df_input.filter(
+        pl.col(COL_MESSAGE_TEXT).is_not_null()
+        & (pl.col(COL_MESSAGE_TEXT) != "")
+        & pl.col(COL_AUTHOR_ID).is_not_null()
+        & (pl.col(COL_AUTHOR_ID) != "")
+    )
+    return df_input
+
+
 def main(context: PrimaryAnalyzerContext):
     # Get parameters with defaults
     parameters = context.params
@@ -41,15 +66,7 @@ def main(context: PrimaryAnalyzerContext):
     input_reader = context.input()
     df_input = input_reader.preprocess(pl.read_parquet(input_reader.parquet_path))
     with ProgressReporter("Preprocessing messages"):
-        df_input = df_input.with_columns(
-            (pl.int_range(pl.len()) + 1).alias(COL_MESSAGE_SURROGATE_ID)
-        )
-        df_input = df_input.filter(
-            pl.col(COL_MESSAGE_TEXT).is_not_null()
-            & (pl.col(COL_MESSAGE_TEXT) != "")
-            & pl.col(COL_AUTHOR_ID).is_not_null()
-            & (pl.col(COL_AUTHOR_ID) != "")
-        )
+        df_input = _preprocess_messages(df_input)
 
     with ProgressReporter("Detecting n-grams") as progress:
 
