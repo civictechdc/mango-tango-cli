@@ -29,7 +29,7 @@ Contributing a new test consists of several steps.
 !!! example
     If you really enjoy diving into a new domain, open-ended problems, and reading papers, you can help us out by doing research and proposing a new test. If instead, you prefer tasks with more clearly defined outputs, you are welcome to review the documentation or implement a currently proposed test.
 
-# I want to...
+# I am interested in...
 
 Depending on you interestes and availability, you might want to jump to the section relevant to your goals.
 
@@ -46,7 +46,7 @@ Depending on you interestes and availability, you might want to jump to the sect
 
 -   __2. Research__
     
-    Brainstorming, open-ended problems.
+    Brainstorming, solve open-ended problems.
 
     --- 
 
@@ -112,6 +112,7 @@ It all starts here. CIB Mango Tree wants to make analyses described peer-reviewe
     Some of the references that can get you started:
 
     - Mancocci et al. 2024. Detection and Characterization of Coordinated Online Behavior: A Survey. [https://doi.org/10.48550/arXiv.2408.01257](https://doi.org/10.48550/arXiv.2408.01257)
+    - EU DisinfoLab. 2024. [CIB Detection Tree](https://www.disinfo.eu/publications/coordinated-inauthentic-behaviour-detection-tree/)
 
 **Hand-off**: You should fill out the Test Outline document on our Google Drive. This will help us have a record of what was done, the key references, and it will provide a good starting point for a new volunteer.
 
