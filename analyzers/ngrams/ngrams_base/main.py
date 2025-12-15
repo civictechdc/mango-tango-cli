@@ -47,6 +47,66 @@ def _preprocess_messages(df_input: pl.DataFrame) -> pl.DataFrame:
     return df_input
 
 
+def _extract_ngrams_from_messages(
+    df_input: pl.DataFrame,
+    min_n: int,
+    max_n: int,
+    tokenizer_config: TokenizerConfig,
+    progress_callback=None,
+) -> tuple[pl.DataFrame, dict[str, int]]:
+    """
+    Extract n-grams from messages with within-message deduplication.
+
+    Args:
+        df_input: Preprocessed dataframe with messages
+        min_n: Minimum n-gram length
+        max_n: Maximum n-gram length
+        tokenizer_config: Configuration for text tokenization
+        progress_callback: Optional callback for progress reporting
+
+    Returns:
+        Tuple of (df_message_ngrams, ngrams_by_id) where:
+        - df_message_ngrams: DataFrame with columns [message_surrogate_id, ngram_id]
+        - ngrams_by_id: Dict mapping serialized n-gram strings to n-gram IDs
+    """
+
+    def get_ngram_rows(ngrams_by_id: dict[str, int]):
+        num_rows = df_input.height
+        current_row = 0
+
+        for row in df_input.iter_rows(named=True):
+            tokens = tokenize_text(row[COL_MESSAGE_TEXT], tokenizer_config)
+
+            # this will track within message repetitions
+            seen_ngrams_in_message = set()
+
+            for ngram in ngrams(tokens, min_n, max_n):
+                serialized_ngram = serialize_ngram(ngram)
+
+                # skip repetitions of already detected ngrams
+                if serialized_ngram in seen_ngrams_in_message:
+                    continue
+                seen_ngrams_in_message.add(serialized_ngram)
+
+                # generate ngram ids (by counting)
+                if serialized_ngram not in ngrams_by_id:
+                    ngrams_by_id[serialized_ngram] = len(ngrams_by_id)
+                ngram_id = ngrams_by_id[serialized_ngram]
+
+                yield {
+                    COL_MESSAGE_SURROGATE_ID: row[COL_MESSAGE_SURROGATE_ID],
+                    COL_NGRAM_ID: ngram_id,
+                }
+            current_row = current_row + 1
+            if current_row % 100 == 0 and progress_callback:
+                progress_callback(current_row / num_rows)
+
+    ngrams_by_id: dict[str, int] = {}
+    df_ngram_instances = pl.DataFrame(get_ngram_rows(ngrams_by_id))
+
+    return df_ngram_instances, ngrams_by_id
+
+
 def main(context: PrimaryAnalyzerContext):
     # Get parameters with defaults
     parameters = context.params
@@ -69,42 +129,9 @@ def main(context: PrimaryAnalyzerContext):
         df_input = _preprocess_messages(df_input)
 
     with ProgressReporter("Detecting n-grams") as progress:
-
-        def get_ngram_rows(ngrams_by_id: dict[str, int]):
-
-            nonlocal progress
-            num_rows = df_input.height
-            current_row = 0
-
-            for row in df_input.iter_rows(named=True):
-                tokens = tokenize_text(row[COL_MESSAGE_TEXT], tokenizer_config)
-
-                # this will track within message repetitions
-                seen_ngrams_in_message = set()
-
-                for ngram in ngrams(tokens, min_n, max_n):
-                    serialized_ngram = serialize_ngram(ngram)
-
-                    # skip repetitions of already detected ngrams
-                    if serialized_ngram in seen_ngrams_in_message:
-                        continue
-                    seen_ngrams_in_message.add(serialized_ngram)
-
-                    # generate ngram ids (by counting)
-                    if serialized_ngram not in ngrams_by_id:
-                        ngrams_by_id[serialized_ngram] = len(ngrams_by_id)
-                    ngram_id = ngrams_by_id[serialized_ngram]
-
-                    yield {
-                        COL_MESSAGE_SURROGATE_ID: row[COL_MESSAGE_SURROGATE_ID],
-                        COL_NGRAM_ID: ngram_id,
-                    }
-                current_row = current_row + 1
-                if current_row % 100 == 0:
-                    progress.update(current_row / num_rows)
-
-        ngrams_by_id: dict[str, int] = {}
-        df_ngram_instances = pl.DataFrame(get_ngram_rows(ngrams_by_id))
+        df_ngram_instances, ngrams_by_id = _extract_ngrams_from_messages(
+            df_input, min_n, max_n, tokenizer_config, progress.update
+        )
 
     with ProgressReporter("Fetching n-gram statistics"):
         (
