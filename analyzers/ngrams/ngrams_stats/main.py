@@ -27,6 +27,38 @@ from .interface import (
 )
 
 
+def _compute_ngram_statistics(
+    df_message_ngrams: pl.DataFrame, df_messages: pl.DataFrame
+) -> pl.DataFrame:
+    """
+    Compute basic statistics for each n-gram.
+
+    Args:
+        df_message_ngrams: DataFrame with message_surrogate_id and ngram_id
+        df_messages: DataFrame with message_surrogate_id and user_id
+
+    Returns:
+        DataFrame with columns [ngram_id, ngram_total_reps, ngram_distinct_poster_count]
+        Filters out n-grams with only 1 repetition.
+    """
+    dict_authors_by_message = {
+        row[COL_MESSAGE_SURROGATE_ID]: row[COL_AUTHOR_ID]
+        for row in df_messages.iter_rows(named=True)
+    }
+
+    return (
+        df_message_ngrams.group_by(COL_NGRAM_ID)
+        .agg(
+            pl.len().alias(COL_NGRAM_TOTAL_REPS),  # count nr. times ngram detected
+            pl.col(COL_MESSAGE_SURROGATE_ID)
+            .replace_strict(dict_authors_by_message)
+            .n_unique()
+            .alias(COL_NGRAM_DISTINCT_POSTER_COUNT),
+        )
+        .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
+    )
+
+
 def main(context: SecondaryAnalyzerContext):
     df_message_ngrams = pl.read_parquet(
         context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
@@ -34,23 +66,8 @@ def main(context: SecondaryAnalyzerContext):
     df_ngrams = pl.read_parquet(context.base.table(OUTPUT_NGRAM_DEFS).parquet_path)
     df_messages = pl.read_parquet(context.base.table(OUTPUT_MESSAGE).parquet_path)
 
-    dict_authors_by_message = {
-        row[COL_MESSAGE_SURROGATE_ID]: row[COL_AUTHOR_ID]
-        for row in df_messages.iter_rows(named=True)
-    }
-
     with ProgressReporter("Computing ngram statistics"):
-        df_ngram_stats = (
-            df_message_ngrams.group_by(COL_NGRAM_ID)
-            .agg(
-                pl.len().alias(COL_NGRAM_TOTAL_REPS),  # count nr. times ngram detected
-                pl.col(COL_MESSAGE_SURROGATE_ID)
-                .replace_strict(dict_authors_by_message)
-                .n_unique()
-                .alias(COL_NGRAM_DISTINCT_POSTER_COUNT),
-            )
-            .filter(pl.col(COL_NGRAM_TOTAL_REPS) > 1)
-        )
+        df_ngram_stats = _compute_ngram_statistics(df_message_ngrams, df_messages)
 
     with ProgressReporter("Creating the summary table"):
         df_ngram_summary = df_ngrams.join(
