@@ -107,6 +107,26 @@ def _extract_ngrams_from_messages(
     return df_ngram_instances, ngrams_by_id
 
 
+def _create_ngram_definitions(ngrams_by_id: dict[str, int]) -> pl.DataFrame:
+    """
+    Create n-gram definitions table with IDs, words, and lengths.
+
+    Args:
+        ngrams_by_id: Dict mapping serialized n-gram strings to n-gram IDs
+
+    Returns:
+        DataFrame with columns [ngram_id, ngram_words, ngram_length]
+    """
+    return pl.DataFrame(
+        {
+            COL_NGRAM_ID: list(ngrams_by_id.values()),
+            COL_NGRAM_WORDS: list(ngrams_by_id.keys()),
+        }
+    ).with_columns(
+        [pl.col(COL_NGRAM_WORDS).str.split(" ").list.len().alias(COL_NGRAM_LENGTH)]
+    )
+
+
 def main(context: PrimaryAnalyzerContext):
     # Get parameters with defaults
     parameters = context.params
@@ -141,23 +161,8 @@ def main(context: PrimaryAnalyzerContext):
         )
 
     with ProgressReporter("Outputting n-gram definitions"):
-        (
-            pl.DataFrame(
-                {
-                    COL_NGRAM_ID: list(ngrams_by_id.values()),
-                    COL_NGRAM_WORDS: list(ngrams_by_id.keys()),
-                }
-            )
-            .with_columns(
-                [
-                    pl.col(COL_NGRAM_WORDS)
-                    .str.split(" ")
-                    .list.len()
-                    .alias(COL_NGRAM_LENGTH)
-                ]
-            )
-            .write_parquet(context.output(OUTPUT_NGRAM_DEFS).parquet_path)
-        )
+        df_ngram_defs = _create_ngram_definitions(ngrams_by_id)
+        df_ngram_defs.write_parquet(context.output(OUTPUT_NGRAM_DEFS).parquet_path)
 
     with ProgressReporter("Outputting messages"):
         (
