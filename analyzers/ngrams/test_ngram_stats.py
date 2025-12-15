@@ -14,9 +14,8 @@ from .ngrams_stats.interface import OUTPUT_NGRAM_FULL, OUTPUT_NGRAM_STATS, inter
 from .ngrams_stats.main import _compute_ngram_statistics, main
 from .test_data import test_data_dir
 
+
 # Fixtures for unit testing
-
-
 @pytest.fixture
 def df_message_ngrams():
     """Load message_ngrams (output from ngrams_base)"""
@@ -35,21 +34,7 @@ def df_messages():
     return pl.read_parquet(Path(test_data_dir, "message_authors.parquet"))
 
 
-@pytest.fixture
-def expected_ngram_stats():
-    """Load expected ngram statistics output"""
-    return pl.read_parquet(Path(test_data_dir, "ngram_stats.parquet"))
-
-
-@pytest.fixture
-def expected_ngram_full():
-    """Load expected full ngram report"""
-    return pl.read_parquet(Path(test_data_dir, "ngram_full.parquet"))
-
-
 # Unit tests for extracted functions
-
-
 def test_compute_ngram_statistics(df_message_ngrams, df_messages, df_ngrams):
     """Test basic n-gram statistics computation"""
     result = _compute_ngram_statistics(df_message_ngrams, df_messages)
@@ -89,8 +74,6 @@ def test_compute_ngram_statistics(df_message_ngrams, df_messages, df_ngrams):
 
 
 # Integration test
-
-
 def test_ngram_stats():
     # You use this test function.
     test_secondary_analyzer(
