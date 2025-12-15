@@ -179,30 +179,6 @@ cd ./app/web_templates
 pnpm dev
 ```
 
-## Testing Setup
-
-## Run Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run specific test file
-pytest analyzers/hashtags/test_hashtags_analyzer.py
-
-# Run with verbose output
-pytest -v
-
-# Run specific test function
-pytest analyzers/hashtags/test_hashtags_analyzer.py::test_gini
-```
-
-## Test Data
-
-- Test data is co-located with analyzers in `test_data/` directories
-- Each analyzer should include its own test files
-- Tests use sample data to verify functionality
-
 # Build Setup (Optional)
 
 ## Executable Building
