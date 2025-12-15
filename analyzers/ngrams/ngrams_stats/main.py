@@ -43,9 +43,7 @@ def main(context: SecondaryAnalyzerContext):
         df_ngram_stats = (
             df_message_ngrams.group_by(COL_NGRAM_ID)
             .agg(
-                pl.count().alias(
-                    COL_NGRAM_TOTAL_REPS
-                ),  # count nr. times ngram detected
+                pl.len().alias(COL_NGRAM_TOTAL_REPS),  # count nr. times ngram detected
                 pl.col(COL_MESSAGE_SURROGATE_ID)
                 .replace_strict(dict_authors_by_message)
                 .n_unique()
@@ -109,7 +107,7 @@ def main(context: SecondaryAnalyzerContext):
                     )
                     # count how many times a user posted distint ngrams
                     .with_columns(
-                        pl.count()
+                        pl.len()
                         .over([COL_NGRAM_ID, COL_AUTHOR_ID])
                         .alias(COL_NGRAM_REPS_PER_USER)
                         .cast(pl.Int32)
