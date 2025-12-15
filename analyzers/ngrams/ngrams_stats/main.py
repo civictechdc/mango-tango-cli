@@ -78,6 +78,64 @@ def _create_summary_table(
     )
 
 
+def _create_full_report_slice(
+    df_ngram_summary_slice: pl.DataFrame,
+    df_message_ngrams: pl.DataFrame,
+    df_messages: pl.DataFrame,
+) -> pl.DataFrame:
+    """
+    Create detailed report for a slice of n-grams with message details.
+
+    Args:
+        df_ngram_summary_slice: Slice of summary DataFrame
+        df_message_ngrams: DataFrame with message_surrogate_id and ngram_id
+        df_messages: DataFrame with message details
+
+    Returns:
+        Detailed report DataFrame with per-user repetition counts, sorted
+    """
+    return (
+        (
+            df_ngram_summary_slice.join(df_message_ngrams, on=COL_NGRAM_ID).join(
+                df_messages, on=COL_MESSAGE_SURROGATE_ID
+            )
+        )
+        # count how many times a user posted distint ngrams
+        .with_columns(
+            pl.len()
+            .over([COL_NGRAM_ID, COL_AUTHOR_ID])
+            .alias(COL_NGRAM_REPS_PER_USER)
+            .cast(pl.Int32)
+        )
+        .select(
+            [
+                COL_NGRAM_ID,
+                COL_NGRAM_LENGTH,
+                COL_NGRAM_WORDS,
+                COL_NGRAM_TOTAL_REPS,
+                COL_NGRAM_DISTINCT_POSTER_COUNT,
+                COL_AUTHOR_ID,
+                COL_NGRAM_REPS_PER_USER,
+                COL_MESSAGE_SURROGATE_ID,
+                COL_MESSAGE_ID,
+                COL_MESSAGE_TEXT,
+                COL_MESSAGE_TIMESTAMP,
+            ]
+        )
+        .sort(
+            [
+                COL_NGRAM_LENGTH,
+                COL_NGRAM_TOTAL_REPS,
+                COL_NGRAM_DISTINCT_POSTER_COUNT,
+                COL_NGRAM_REPS_PER_USER,
+                COL_AUTHOR_ID,
+                COL_MESSAGE_SURROGATE_ID,
+            ],
+            descending=[True, True, True, True, False, False],
+        )
+    )
+
+
 def main(context: SecondaryAnalyzerContext):
     df_message_ngrams = pl.read_parquet(
         context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
@@ -129,45 +187,8 @@ def main(context: SecondaryAnalyzerContext):
                 )
                 report_total_processed += df_ngram_summary_slice.height
 
-                df_output = (
-                    (
-                        df_ngram_summary_slice.join(
-                            df_message_ngrams, on=COL_NGRAM_ID
-                        ).join(df_messages, on=COL_MESSAGE_SURROGATE_ID)
-                    )
-                    # count how many times a user posted distint ngrams
-                    .with_columns(
-                        pl.len()
-                        .over([COL_NGRAM_ID, COL_AUTHOR_ID])
-                        .alias(COL_NGRAM_REPS_PER_USER)
-                        .cast(pl.Int32)
-                    )
-                    .select(
-                        [
-                            COL_NGRAM_ID,
-                            COL_NGRAM_LENGTH,
-                            COL_NGRAM_WORDS,
-                            COL_NGRAM_TOTAL_REPS,
-                            COL_NGRAM_DISTINCT_POSTER_COUNT,
-                            COL_AUTHOR_ID,
-                            COL_NGRAM_REPS_PER_USER,
-                            COL_MESSAGE_SURROGATE_ID,
-                            COL_MESSAGE_ID,
-                            COL_MESSAGE_TEXT,
-                            COL_MESSAGE_TIMESTAMP,
-                        ]
-                    )
-                    .sort(
-                        [
-                            COL_NGRAM_LENGTH,
-                            COL_NGRAM_TOTAL_REPS,
-                            COL_NGRAM_DISTINCT_POSTER_COUNT,
-                            COL_NGRAM_REPS_PER_USER,
-                            COL_AUTHOR_ID,
-                            COL_MESSAGE_SURROGATE_ID,
-                        ],
-                        descending=[True, True, True, True, False, False],
-                    )
+                df_output = _create_full_report_slice(
+                    df_ngram_summary_slice, df_message_ngrams, df_messages
                 )
 
                 writer.write_table(df_output.to_arrow())
