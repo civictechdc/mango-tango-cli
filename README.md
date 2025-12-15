@@ -19,7 +19,7 @@
 
 ## Technical Documentation
 
-For in-depth technical docs related to this repository please visit: [https://civictechdc.github.io/mango-tango-cli](https://civictechdc.github.io/mango-tango-cli)
+For in-depth technical docs related to this repository please visit: [https://civictechdc.github.io/cib-mango-tree](https://civictechdc.github.io/cib-mango-tree)
 
 ## Requirements
 
@@ -47,33 +47,6 @@ python -m venv venv
 ```shell
 python -m cibmangotree
 ```
-
-## Development Guide and Documentation
-
-[Development Guide](./docs/guides/contributing/contributing.md)
-
-## AI Development Assistant Setup
-
-This repository includes hybrid AI documentation enhanced with semantic code analysis:
-
-- **For Claude Code users**: See `CLAUDE.md` + Serena MCP integration
-  - **Important**: Always start sessions with "Read the initial instructions"
-- **For Cursor users**: See `.cursorrules` + `.ai-context/`
-- **For other AI tools**: See `.ai-context/README.md`
-- **For deep semantic analysis**: Serena memories in `.serena/memories/`
-
-### Quick Start for Contributors
-
-1. **Claude Code**: Start with "Read the initial instructions", then follow CLAUDE.md
-2. **Cursor**: Reference .cursorrules for quick setup
-3. **Other tools**: Begin with .ai-context/README.md
-
-The AI documentation provides:
-
-- **Symbol-level code navigation** with precise file locations
-- **Architectural insights** from semantic analysis
-- **Context-efficient documentation** for faster onboarding
-- **Cross-tool compatibility** for different AI assistants
 
 ## License
 
