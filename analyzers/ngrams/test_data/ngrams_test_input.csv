@@ -1,13 +1,4 @@
 user_id,message_id,message_text,timestamp
-user_004,msg_001,Urgent action needed before it's late.,2024-01-15T09:03:00Z
-user_005,msg_002,Climate emergency requires urgent action.,2024-01-15T12:12:00Z
-user_004,msg_003,Urgent action needed to save planet.,2024-01-15T13:15:00Z
-user_004,msg_004,"Climate emergency requires immediate response.",2024-01-15T14:18:00Z
-user_005,msg_005,Urgent action needed to save planet.,2024-01-15T15:21:00Z
-user_004,msg_006,Climate emergency requires massive investment.,2024-01-15T16:24:00Z
-user_004,msg_007,Climate emergency requires global cooperation.,2024-01-15T19:33:00Z
-user_005,msg_008,Someone needs fight the system soon.,2024-01-15T20:36:00Z
-user_004,msg_009,We must get up and fight the system.,2024-01-15T21:39:00Z
-user_001,msg_010,Just discovered this amazing new coffee shop downtown! The atmosphere is incredible and the barista really knows their craft.,2024-01-16T22:51:00Z
-user_002,msg_011,Working from home has its perks but I miss the office dynamics sometimes. Finding balance is key.,2024-01-16T23:54:00Z
-user_003,msg_012,Sunday morning thoughts: grateful for family time and peaceful moments. Life's simple pleasures matter most.,2024-01-17T00:57:00Z
+alice,msg_001,go go go now,2024-01-01T10:00:00Z
+bob,msg_002,go go go it's very bad,2024-01-01T10:05:00Z
+alice,msg_003,go go go it's very bad it's very bad,2024-01-01T10:10:00Z
