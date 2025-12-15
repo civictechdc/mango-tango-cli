@@ -59,6 +59,25 @@ def _compute_ngram_statistics(
     )
 
 
+def _create_summary_table(
+    df_ngrams: pl.DataFrame, df_ngram_stats: pl.DataFrame
+) -> pl.DataFrame:
+    """
+    Join n-gram definitions with statistics and sort by frequency.
+
+    Args:
+        df_ngrams: DataFrame with ngram_id, ngram_words, ngram_length
+        df_ngram_stats: DataFrame with ngram_id, ngram_total_reps, ngram_distinct_poster_count
+
+    Returns:
+        Joined and sorted DataFrame
+    """
+    return df_ngrams.join(df_ngram_stats, on=COL_NGRAM_ID, how="inner").sort(
+        [COL_NGRAM_LENGTH, COL_NGRAM_TOTAL_REPS, COL_NGRAM_DISTINCT_POSTER_COUNT],
+        descending=True,
+    )
+
+
 def main(context: SecondaryAnalyzerContext):
     df_message_ngrams = pl.read_parquet(
         context.base.table(OUTPUT_MESSAGE_NGRAMS).parquet_path
@@ -70,13 +89,7 @@ def main(context: SecondaryAnalyzerContext):
         df_ngram_stats = _compute_ngram_statistics(df_message_ngrams, df_messages)
 
     with ProgressReporter("Creating the summary table"):
-        df_ngram_summary = df_ngrams.join(
-            df_ngram_stats, on=COL_NGRAM_ID, how="inner"
-        ).sort(
-            [COL_NGRAM_LENGTH, COL_NGRAM_TOTAL_REPS, COL_NGRAM_DISTINCT_POSTER_COUNT],
-            descending=True,
-        )
-
+        df_ngram_summary = _create_summary_table(df_ngrams, df_ngram_stats)
         df_ngram_summary.write_parquet(context.output(OUTPUT_NGRAM_STATS).parquet_path)
 
     df_messages_schema = df_messages.to_arrow().schema
