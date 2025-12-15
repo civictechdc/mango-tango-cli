@@ -3,8 +3,6 @@ from analyzer_interface import AnalyzerOutput, OutputColumn, SecondaryAnalyzerIn
 from ..ngrams_base import interface as ngrams_interface
 from ..ngrams_base.interface import (
     COL_AUTHOR_ID,
-    COL_MESSAGE_ID,
-    COL_MESSAGE_NGRAM_COUNT,
     COL_MESSAGE_SURROGATE_ID,
     COL_MESSAGE_TEXT,
     COL_MESSAGE_TIMESTAMP,
@@ -61,7 +59,7 @@ interface = SecondaryAnalyzerInterface(
                 OutputColumn(
                     name=COL_NGRAM_TOTAL_REPS,
                     data_type="integer",
-                    human_readable_name="ngram frequency",
+                    human_readable_name="ngram frequency across posts",
                 ),
                 OutputColumn(
                     name=COL_NGRAM_DISTINCT_POSTER_COUNT,

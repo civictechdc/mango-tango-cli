@@ -35,7 +35,7 @@ jobs:
             check_command: dist\cibmangotree_windows.exe --noop
           - platform_name: MacOS (x86)
             artifact_name: macos-x86
-            os: macos-13
+            os: macos-15-intel
             move_command: mv dist/cibmangotree dist/cibmangotree_macos-x86
             sha_command: shasum -a 1 dist/cibmangotree_macos-x86 > dist/cibmangotree_macos-x86.sha1
             sha_command_pkg: shasum -a 1 dist/cibmangotree_macos-x86.pkg > dist/cibmangotree_macos-x86.pkg.sha1
