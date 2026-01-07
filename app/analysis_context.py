@@ -3,7 +3,7 @@ from functools import cached_property
 from tempfile import TemporaryDirectory
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from analyzer_interface import (
     AnalyzerDeclaration,
@@ -27,6 +27,9 @@ class AnalysisRunProgressEvent(BaseModel):
 
 
 class AnalysisContext(BaseModel):
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     app_context: AppContext
     project_context: ProjectContext
     model: AnalysisModel

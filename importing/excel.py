@@ -1,11 +1,6 @@
-from typing import Callable
-
 import polars as pl
 from fastexcel import read_excel
 from pydantic import BaseModel
-
-import terminal_tools.prompts as prompts
-from terminal_tools.utils import wait_for_key
 
 from .importer import Importer, ImporterSession
 
@@ -19,6 +14,12 @@ class ExcelImporter(Importer["ExcelImportSession"]):
         return input_path.endswith(".xlsx")
 
     def init_session(self, input_path: str):
+        """
+        Initialize Excel import session.
+
+        For single-sheet files, automatically selects the sheet.
+        For multi-sheet files, returns None (caller must provide sheet selection).
+        """
         reader = read_excel(input_path)
         sheet_names = reader.sheet_names
 
@@ -31,6 +32,35 @@ class ExcelImporter(Importer["ExcelImportSession"]):
                 sheet_names=sheet_names,
             )
 
+        # Multi-sheet file: return None, let caller handle sheet selection
+        return None
+
+
+class ExcelImporterTerminal(ExcelImporter):
+    """
+    Terminal-specific Excel importer with interactive UI methods.
+    Extends ExcelImporter with sheet selection and modification capabilities.
+    """
+
+    def init_session(self, input_path: str):
+        """
+        Initialize Excel import session with terminal prompts for multi-sheet files.
+        """
+        import terminal_tools.prompts as prompts
+
+        reader = read_excel(input_path)
+        sheet_names = reader.sheet_names
+
+        if not sheet_names:
+            return None
+        if len(sheet_names) == 1:
+            return ExcelImportSession(
+                input_file=input_path,
+                selected_sheet=sheet_names[0],
+                sheet_names=sheet_names,
+            )
+
+        # Multi-sheet file: prompt user for selection
         sheet_name = prompts.list_input(
             "Which sheet would you like to import?", choices=sheet_names
         )
@@ -47,11 +77,11 @@ class ExcelImporter(Importer["ExcelImportSession"]):
         return self.init_session(input_path)
 
     def modify_session(
-        self,
-        input_path: str,
-        import_session: "ExcelImportSession",
-        reset_screen: Callable[[], None],
+        self, input_path: str, import_session: "ExcelImportSession", reset_screen
     ):
+        import terminal_tools.prompts as prompts
+        from terminal_tools.utils import wait_for_key
+
         reset_screen(import_session)
         if len(import_session.sheet_names) == 1:
             print("This Excel file only has one sheet.\nThere's nothing to modify.\n\n")

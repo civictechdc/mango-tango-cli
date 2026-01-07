@@ -1,12 +1,8 @@
 import csv
 from csv import Sniffer
-from typing import Callable, Optional
 
 import polars as pl
 from pydantic import BaseModel
-
-import terminal_tools.prompts as prompts
-from terminal_tools.utils import print_message, smart_print_data_frame
 
 from .importer import Importer, ImporterSession
 
@@ -153,7 +149,15 @@ class CSVImporter(Importer["CsvImportSession"]):
             skip_rows=skip_rows,
         )
 
+
+class CSVImporterTerminal(CSVImporter):
+    """
+    Terminal-specific CSV importer with interactive UI methods.
+    Extends CSVImporter with manual configuration and modification capabilities.
+    """
+
     def manual_init_session(self, input_path: str):
+
         separator = self._separator_option(None)
         if separator is None:
             return None
@@ -178,12 +182,10 @@ class CSVImporter(Importer["CsvImportSession"]):
             skip_rows=skip_rows,
         )
 
-    def modify_session(
-        self,
-        input_path: str,
-        import_session: "CsvImportSession",
-        reset_screen: Callable[[], None],
-    ):
+    def modify_session(self, import_session: "CsvImportSession", reset_screen):
+
+        import terminal_tools.prompts as prompts
+
         is_first_time = True
         while True:
             reset_screen(import_session)
@@ -230,7 +232,11 @@ class CSVImporter(Importer["CsvImportSession"]):
                 import_session.skip_rows = skip_rows
 
     @staticmethod
-    def _separator_option(previous_value: Optional[str]) -> Optional[str]:
+    def _separator_option(previous_value):
+        from typing import Optional
+
+        import terminal_tools.prompts as prompts
+
         input: Optional[str] = prompts.list_input(
             "Select the column separator",
             choices=[
@@ -257,9 +263,14 @@ class CSVImporter(Importer["CsvImportSession"]):
         input = input.strip()
         if len(input) == 0:
             return None
+        return input
 
     @staticmethod
-    def _quote_char_option(previous_value: Optional[str]) -> Optional[str]:
+    def _quote_char_option(previous_value):
+        from typing import Optional
+
+        import terminal_tools.prompts as prompts
+
         input: Optional[str] = prompts.list_input(
             "Select the quote character",
             choices=[
@@ -284,8 +295,12 @@ class CSVImporter(Importer["CsvImportSession"]):
         input = input.strip()
         if len(input) == 0:
             return None
+        return input
 
-    def _header_option(self, previous_value: Optional[bool]) -> Optional[bool]:
+    def _header_option(self, previous_value):
+
+        import terminal_tools.prompts as prompts
+
         return prompts.list_input(
             "Does the file have a header?",
             choices=[
@@ -296,7 +311,11 @@ class CSVImporter(Importer["CsvImportSession"]):
         )
 
     @staticmethod
-    def _skip_rows_option(previous_value: Optional[int]) -> Optional[int]:
+    def _skip_rows_option(previous_value):
+
+        import terminal_tools.prompts as prompts
+        from terminal_tools.utils import print_message
+
         while True:
             input_str = prompts.text(
                 f"Number of rows to skip at the beginning of file (current: {previous_value or 0}).",
@@ -333,6 +352,9 @@ class CsvImportSession(ImporterSession, BaseModel):
     skip_rows: int = 0
 
     def print_config(self):
+        """Print configuration to terminal. Only for terminal UI use."""
+        from terminal_tools.utils import smart_print_data_frame
+
         def present_separator(value: str) -> str:
             if value == "\t":
                 return "(Tab)"

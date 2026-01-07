@@ -7,7 +7,7 @@ from nicegui import ui
 from app import AnalysisContext
 from components.select_analysis import analysis_label, present_timestamp
 from gui.base import GuiPage, GuiSession, gui_routes
-from gui.components import ToggleButtonGroup
+from gui.components import AnalysisParamsCard, ToggleButtonGroup
 from gui.import_options import ImportOptionsDialog
 
 
@@ -164,7 +164,7 @@ class SelectProjectPage(GuiPage):
 
                         # If a project_id exists, show notification and refresh
                         # result -> (is_deleted, project_name, project_id)
-                        if result[0]:
+                        if isinstance(result, tuple) and result[0]:
                             self.notify_success(
                                 f"Successfully deleted project: {result[1]} (ID: {result[2]})"
                             )
@@ -196,6 +196,7 @@ class NewProjectPage(GuiPage):
             show_back_button=True,
             back_route="/",
             show_footer=True,
+            on_page_exit=lambda: session.reset_project_workflow(),
         )
 
     def render_content(self) -> None:
@@ -423,31 +424,56 @@ class SelectNewAnalyzerPage(GuiPage):
                 # Create toggle button group for analyzer selection
                 button_group = ToggleButtonGroup()
                 with ui.row().classes("items-center justify-center gap-4"):
+
+                    # add a button for each analyzer
                     for analyzer_name in analyzer_options.keys():
                         button_group.add_button(analyzer_name)
 
-            def _on_proceed():
-                """Handle proceed button click."""
-                # Get current selection
-                new_selection = button_group.get_selected_text()
+                with ui.card().classes("w-full no-shadow"):
 
-                # Validation: none selected
-                if not new_selection:
-                    self.notify_warning("Please select an analyzer")
-                    return
+                    DEFAULT_TEXT = (
+                        "No analyzer selected. Click button above to select it."
+                    )
 
-                # Store selected analyzer in session
-                self.session.selected_analyzer = new_selection
-                self.notify_success(f"New analyzer: {new_selection}")
-                # TODO: Navigate to /configure_analysis with new analyzer
-                # self.navigate_to("/configure_analysis")
+                    ui.label().bind_text_from(
+                        target_object=button_group,
+                        target_name="selected_text",
+                        backward=lambda text: analyzer_options.get(text, DEFAULT_TEXT),
+                    ).classes("text-center w-full")
 
-            ui.button(
-                "Proceed",
-                icon="arrow_forward",
-                color="primary",
-                on_click=_on_proceed,
-            )
+                with ui.row().classes("w-full justify-end mt-6"):
+
+                    def _on_proceed():
+                        """Handle proceed button click."""
+                        # Get current selection
+                        new_selection = button_group.get_selected_text()
+
+                        # Validation: none selected
+                        if not new_selection:
+                            self.notify_warning("Please select an analyzer")
+                            return
+
+                        # Find the analyzer interface by name
+                        selected_analyzer = next(
+                            (a for a in analyzers if a.name == new_selection), None
+                        )
+
+                        if not selected_analyzer:
+                            self.notify_error("Could not find selected analyzer")
+                            return
+
+                        # Store selected analyzer interface and name in session
+                        self.session.selected_analyzer = selected_analyzer
+                        self.session.selected_analyzer_name = new_selection
+
+                        self.navigate_to(gui_routes.configure_analysis)
+
+                    ui.button(
+                        "Configure Analysis",
+                        icon="arrow_forward",
+                        color="primary",
+                        on_click=_on_proceed,
+                    )
 
 
 class SelectPreviousAnalyzerPage(GuiPage):
@@ -512,18 +538,10 @@ class SelectPreviousAnalyzerPage(GuiPage):
                 if not selected_name:
                     self.notify_warning("Please select a previous analysis")
                     return
-
-                # Store selected analysis in session
-                # Find the analysis object by display_name
-                selected_analysis = next(
-                    (a for _, a in analysis_list if a.display_name == selected_name),
-                    None,
-                )
-                if selected_analysis:
-                    self.session.current_analysis = selected_analysis
-                    self.notify_success(f"Previous analysis: {selected_name}")
-                    # TODO: Navigate to /view_analysis with previous results
-                    # self.navigate_to("/view_analysis")
+                else:
+                    self.notify("Coming soon!")
+                #   self.session.current_analysis = selected_analysis
+                #   self.navigate_to("/show_output_options")
 
             ui.button(
                 "Proceed",
@@ -723,3 +741,298 @@ class PreviewDatasetPage(GuiPage):
         ui.aggrid.from_polars(
             data_frame, theme="quartz", auto_size_columns=False
         ).classes("w-full h-64")
+
+
+class ConfigureAnalysis(GuiPage):
+
+    def __init__(self, session: GuiSession):
+        super().__init__(
+            session=session,
+            route=gui_routes.configure_analysis,
+            title=f"{session.current_project.display_name}: Configure Analysis",
+            show_back_button=True,
+            back_route=gui_routes.select_analyzer_fork,
+            show_footer=True,
+        )
+
+    def render_content(self) -> None:
+        import polars as pl
+
+        from analyzer_interface import column_automap, get_data_type_compatibility_score
+
+        # Get analyzer input requirements and user dataset columns
+        analyzer = self.session.selected_analyzer
+        input_columns = analyzer.input.columns
+        user_columns = self.session.current_project.columns
+        project = self.session.current_project
+
+        # Generate initial auto-mapping
+        draft_column_mapping = column_automap(user_columns, input_columns)
+
+        # Main content area
+        with ui.column().classes("items-center justify-start gap-6").style(
+            "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
+        ):
+
+            # Store dropdown widgets for later access
+            column_dropdowns = {}
+
+            # Helper function to build preview DataFrame
+            def _build_preview_df():
+                """Build preview DataFrame with currently mapped columns."""
+                # Get current mapping from dropdowns
+                current_mapping = {}
+                for input_col_name, (dropdown, options) in column_dropdowns.items():
+                    if dropdown.value:
+                        current_mapping[input_col_name] = options[dropdown.value]
+
+                # determine N_PREVIEW here (in most cases,
+                # this will be much larger than 5)
+                # but in case of demos, let's handle < 5 cases too
+                tmp_col = list(project.column_dict.values())[
+                    0
+                ]  # fetch the first column length
+                N_PREVIEW_ROWS = min(5, tmp_col.data.len())
+
+                # Initialize preview_data with all analyzer columns (empty by default)
+                preview_data = {}
+                for analyzer_col in analyzer.input.columns:
+                    col_name = analyzer_col.human_readable_name_or_fallback()
+                    user_col_name = current_mapping.get(analyzer_col.name)
+
+                    if user_col_name and user_col_name in project.column_dict:
+                        # Column is mapped - use actual data
+                        user_col = project.column_dict[user_col_name]
+                        preview_data[col_name] = user_col.head(
+                            N_PREVIEW_ROWS
+                        ).apply_semantic_transform()
+                    else:
+                        # Column not mapped - create empty column with 5 null values
+                        preview_data[col_name] = [None] * N_PREVIEW_ROWS
+
+                return pl.DataFrame(preview_data)
+
+            # Preview container placeholder (will be created after grid)
+            preview_container = None
+
+            def update_preview():
+                """Rebuild preview when dropdown changes."""
+                if preview_container is not None:
+                    preview_container.clear()
+                    with preview_container:
+                        preview_df = _build_preview_df()
+                        preview_title = (
+                            "Data Preview (first 5 rows)"
+                            if len(preview_df) > 5
+                            else "Data Preview (all rows)"
+                        )
+                        ui.label(preview_title).classes("text-sm text-grey-7")
+                        ui.aggrid.from_polars(preview_df, theme="quartz").classes(
+                            "w-full h-64"
+                        )
+
+            # Create column mapping UI using grid
+            with ui.grid(columns=2).classes("gap-2"):
+
+                # create labels for grid header
+                ui.label("Required Input Information")  # populates row 1, column 1
+                ui.label("Imported Dataset Columns")  # pupolates row 1, column 2
+
+                # this then fills the rows with column information
+                for input_col in input_columns:
+                    # Left column: Input column info card
+                    with ui.row().classes("items-center gap-1"):
+                        ui.label(input_col.human_readable_name_or_fallback()).classes(
+                            "text-bold text-lg"
+                        )
+                        if input_col.description:
+                            with ui.icon("info").classes("text-grey-6 cursor-pointer"):
+                                ui.tooltip(input_col.description)
+
+                    # Right column: Dropdown for column selection
+                    # Get compatible user columns
+                    compatible_columns = [
+                        user_col
+                        for user_col in user_columns
+                        if get_data_type_compatibility_score(
+                            input_col.data_type, user_col.data_type
+                        )
+                        is not None
+                    ]
+
+                    # Create dropdown options
+                    dropdown_options = {
+                        f"{user_col.name}": user_col.name
+                        for user_col in compatible_columns
+                    }
+
+                    # Pre-select the auto-mapped column
+                    default_value = None
+                    if input_col.name in draft_column_mapping:
+                        mapped_col_name = draft_column_mapping[input_col.name]
+                        default_value = next(
+                            (
+                                k
+                                for k, v in dropdown_options.items()
+                                if v == mapped_col_name
+                            ),
+                            None,
+                        )
+
+                    # Create dropdown with on_change handler
+                    dropdown = (
+                        ui.select(
+                            options=list(dropdown_options.keys()),
+                            label="Select dataset column",
+                            value=default_value,
+                            on_change=lambda: update_preview(),
+                        )
+                        .classes("w-40")
+                        .props("use-chips")
+                    )
+
+                    # Store reference for later
+                    column_dropdowns[input_col.name] = (dropdown, dropdown_options)
+
+            # Preview section (created after grid)
+            ui.separator()
+            preview_container = ui.column().classes("w-full")
+
+            # Initial preview render
+            update_preview()
+
+            # Action button
+            with ui.row().classes("w-full justify-end"):
+
+                def _on_proceed():
+                    """Build column mapping and proceed."""
+                    final_mapping = {}
+                    for input_col_name, (dropdown, options) in column_dropdowns.items():
+                        if dropdown.value:
+                            final_mapping[input_col_name] = options[dropdown.value]
+
+                    # Store mapping in session
+                    self.session.column_mapping = final_mapping
+                    self.notify_success("Column mapping saved!")
+
+                    # Navigate to parameters configuration page
+                    self.navigate_to(gui_routes.configure_analysis_parameters)
+
+                ui.button(
+                    "Configure Parameters",
+                    icon="arrow_forward",
+                    color="primary",
+                    on_click=_on_proceed,
+                )
+
+
+class ConfigureAnalaysisParams(GuiPage):
+
+    def __init__(self, session: GuiSession):
+        super().__init__(
+            session=session,
+            route=gui_routes.configure_analysis_parameters,
+            title=f"{session.current_project.display_name}: Configure Parameters",
+            show_back_button=True,
+            back_route=gui_routes.configure_analysis,
+            show_footer=True,
+        )
+
+    def render_content(self):
+        from tempfile import TemporaryDirectory
+
+        from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
+
+        # Validate required session data
+        if not self.session.selected_analyzer:
+            self.notify_warning("No analyzer selected. Redirecting...")
+            self.navigate_to(gui_routes.select_analyzer)
+            return
+
+        if not self.session.column_mapping:
+            self.notify_warning("Column mapping not configured. Redirecting...")
+            self.navigate_to(gui_routes.configure_analysis)
+            return
+
+        analyzer = self.session.selected_analyzer
+        project = self.session.current_project
+        column_mapping = self.session.column_mapping
+
+        # If analyzer has no parameters, skip to next step
+        if not analyzer.params:
+            self.notify_success("This analyzer has no configurable parameters.")
+            self.session.analysis_params = {}
+            # TODO: Navigate to next step (run analysis or review page)
+            self.notify_success("Ready to run analysis!")
+            return
+
+        # Compute default parameter values using backend logic
+        with TemporaryDirectory() as temp_dir:
+            default_parameters_context = PrimaryAnalyzerDefaultParametersContext(
+                analyzer=analyzer,
+                store=self.session.app.context.storage,
+                temp_dir=temp_dir,
+                input_columns={
+                    analyzer_column_name: InputColumnProvider(
+                        user_column_name=user_column_name,
+                        semantic=project.column_dict[user_column_name].semantic,
+                    )
+                    for analyzer_column_name, user_column_name in column_mapping.items()
+                },
+            )
+
+            analyzer_decl = self.session.app.context.suite.get_primary_analyzer(
+                analyzer.id
+            )
+            if not analyzer_decl:
+                self.notify_error(f"Analyzer `{analyzer.id}` not found")
+                self.navigate_to(gui_routes.select_analyzer)
+                return
+
+            # Combine static defaults with data-dependent defaults
+            param_values = {
+                **{
+                    param_spec.id: static_param_default_value
+                    for param_spec in analyzer_decl.params
+                    if (static_param_default_value := param_spec.default) is not None
+                },
+                # Data-dependent defaults can override static defaults
+                **analyzer_decl.default_params(default_parameters_context),
+            }
+            # Remove None values
+            param_values = {
+                param_id: param_value
+                for param_id, param_value in param_values.items()
+                if param_value is not None
+            }
+
+        # Main content area
+        with ui.column().classes("items-center justify-start gap-6").style(
+            "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
+        ):
+            ui.label(f"Configure {analyzer.name} Parameters").classes("text-xl")
+
+            # Create parameter configuration card
+            params_card = AnalysisParamsCard(
+                params=analyzer.params, default_values=param_values
+            )
+
+            # Action button
+            with ui.row().classes("w-full justify-end mt-6"):
+
+                def _on_proceed():
+                    """Retrieve parameter values and proceed."""
+                    final_params = params_card.get_param_values()
+
+                    # Store parameters in session
+                    self.session.analysis_params = final_params
+
+                    # TODO: Navigate to next step (run analysis or review page)
+                    self.notify_success("Coming soon!")
+
+                ui.button(
+                    "Proceed to Run Analysis",
+                    icon="arrow_forward",
+                    color="primary",
+                    on_click=_on_proceed,
+                )
