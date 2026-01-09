@@ -9,14 +9,16 @@ This module provides:
 
 import abc
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from nicegui import ui
 from pydantic import BaseModel, ConfigDict, Field
 
+from analyzer_interface import AnalyzerInterface, ParamValue
+from app.project_context import ProjectContext
 from gui.context import GUIContext
 from importing import ImporterSession
-from storage import AnalysisModel, ProjectModel
+from storage import AnalysisModel
 
 
 class GuiRoutes(BaseModel):
@@ -29,6 +31,8 @@ class GuiRoutes(BaseModel):
     select_analyzer_fork: str = "/select_analyzer_fork"
     select_analyzer: str = "/select_analyzer"
     select_previous_analyzer: str = "/select_previous_analyzer"
+    configure_analysis: str = "/configure_analysis"
+    configure_analysis_parameters: str = "/configure_analysis_parameters"
     preview_dataset: str = "/preview_dataset"
 
 
@@ -119,14 +123,17 @@ class GuiSession(BaseModel):
     context: GUIContext
 
     # Workflow state - project creation
-    current_project: Optional[ProjectModel] = None
+    current_project: Optional[ProjectContext] = None
     selected_file_path: Optional[Path] = None
     new_project_name: Optional[str] = None
     import_session: Optional[ImporterSession] = None
 
     # Workflow state - analysis
-    selected_analyzer: Optional[str] = None
+    selected_analyzer: Optional[AnalyzerInterface] = None
+    selected_analyzer_name: Optional[str] = None
+    column_mapping: Optional[dict[str, str]] = None
     current_analysis: Optional[AnalysisModel] = None
+    analysis_params: Optional[dict[str, ParamValue]] = None
 
     # Allow arbitrary types (for NiceGUI components, ImporterSession, etc.)
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -145,6 +152,8 @@ class GuiSession(BaseModel):
     def reset_analysis_workflow(self) -> None:
         """Clear analysis workflow state."""
         self.selected_analyzer = None
+        self.selected_analyzer_name = None
+        self.column_mapping = None
         self.current_analysis = None
 
     def validate_project_selected(self) -> bool:
@@ -176,6 +185,7 @@ class GuiPage(BaseModel, abc.ABC):
         back_route: Route to navigate when back button clicked
         back_icon: Icon for back button (default: "arrow_back")
         back_text: Optional text label for back button
+        on_page_exit: Optional callback invoked before navigation (back/home buttons)
         show_footer: Whether to render footer
 
     Usage:
@@ -214,6 +224,7 @@ class GuiPage(BaseModel, abc.ABC):
     back_route: Optional[str] = None
     back_icon: str = "arrow_back"
     back_text: Optional[str] = None
+    on_page_exit: Optional[Callable[[], None]] = None
 
     # Footer configuration
     show_footer: bool = True
@@ -287,7 +298,7 @@ class GuiPage(BaseModel, abc.ABC):
                             text=self.back_text,
                             icon=self.back_icon,
                             color="accent",
-                            on_click=lambda: self.navigate_to(self.back_route),
+                            on_click=self._handle_back_click,
                         ).props("flat")
 
                 # Center: Title
@@ -299,8 +310,20 @@ class GuiPage(BaseModel, abc.ABC):
                         ui.button(
                             icon="home",
                             color="accent",
-                            on_click=lambda: self.navigate_to("/"),
+                            on_click=self._handle_home_click,
                         ).props("flat")
+
+    def _handle_back_click(self) -> None:
+        """Handle back button click with optional page exit callback."""
+        if self.on_page_exit:
+            self.on_page_exit()
+        self.navigate_to(self.back_route)
+
+    def _handle_home_click(self) -> None:
+        """Handle home button click with optional page exit callback."""
+        if self.on_page_exit:
+            self.on_page_exit()
+        self.navigate_to("/")
 
     def _render_footer(self) -> None:
         """

@@ -8,6 +8,8 @@ from app import App
 from gui.base import GuiSession, gui_routes
 from gui.context import GUIContext
 from gui.pages import (
+    ConfigureAnalaysisParams,
+    ConfigureAnalysis,
     ImportDatasetPage,
     NewProjectPage,
     PreviewDatasetPage,
@@ -79,10 +81,21 @@ def gui_main(app: App):
         page = SelectPreviousAnalyzerPage(session=gui_session)
         page.render()
 
+    @ui.page(gui_routes.configure_analysis)
+    def configure_analysis():
+        page = ConfigureAnalysis(session=gui_session)
+        page.render()
+
+    @ui.page(gui_routes.configure_analysis_parameters)
+    def configure_analysis_parameters():
+        page = ConfigureAnalaysisParams(session=gui_session)
+        page.render()
+
     # Launch in native mode
     ui.run(
         native=True,
-        window_size=(800, 600),
+        # window_size=(800, 600),
+        uvicorn_logging_level="debug",
         title="CIB Mango Tree",
         favicon="🥭",
         reload=False,
