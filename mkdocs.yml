@@ -14,13 +14,14 @@ nav:
           - "Installation": "guides/get-started/installation.md"
       - "Contributing":
           - "New Contributor Guide": "guides/contributing/new_contributor_guide.md"
-          - "Contributor Workflow": "guides/contributing/contributing.md"
-          - "Implementing Analyzers": "guides/contributing/analyzers.md"
-          - "Dashboards":
+          - "Technical Guides":
+            - "Contributing Changes": "guides/contributing/contributing.md"
+            - "Implementing Analyzers": "guides/contributing/analyzers.md"
+            - "Implementing Dashboards":
               - "Shiny": "guides/contributing/dashboards/shiny.md"
               - "React (WIP)": "guides/contributing/dashboards/react.md"
-          - "Logging": "guides/contributing/logging.md"
-          - "Testing": "guides/contributing/testing.md"
+            - "Logging": "guides/contributing/logging.md"
+            - "Testing": "guides/contributing/testing.md"
       - "Design Philosophy":
           - "Architecture": "guides/design-philosophy/architecture.md"
           - "Core Domain": "guides/design-philosophy/core-domain.md"
