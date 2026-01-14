@@ -2,6 +2,6 @@ mkdocs
 mkdocstrings[python]
 mkdocs-material
 markdown
-pymdown-extensions
+pymdown-extensions>=10.0
 mkdocs-mermaid2-plugin
 griffe_pydantic
