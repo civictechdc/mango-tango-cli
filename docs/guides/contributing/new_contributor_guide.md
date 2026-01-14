@@ -86,7 +86,7 @@ Depending on you interestes and availability, you might want to jump to the sect
 
     ---
 
-    [:octicons-arrow-right-24: Improving the code base](#help-with-improving-code-base)
+    [:octicons-arrow-right-24: Improving the code base](#helping-with-general-software-engineering)
     { .card }
 
 </div>
@@ -169,10 +169,14 @@ This is possibly the most technically involved part of the entire process as it 
 **Hand-off**: The hand-off here is a pull request (PR) to our main repository which introduces the code for the new analyzer.
 
 
-## Help with improving code base.
+## Helping with general software engineering
 
 You might not be interested in any specific parts of new test development, but are instead driven by general software engineering problems. We always welcome help in any of the following areas:
 
 - Reviewing pull requests
-- 
-- Improving our Storage system (backend)
+- Improving our [test suite](./testing.md)
+- Testing the general performance of analyzers (speed, memory, data science code)
+- Helping with the interactive side (terminal, GUI, other frontend)
+- Improving the application's storage system (backend, databases)
+
+**Getting help:** There are no ready tickets here. You are welcome to ask around on Slack for more information or find/open an issue on GitHub.
