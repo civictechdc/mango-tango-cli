@@ -8,7 +8,7 @@ The purpose of this guide is to provide a big-picture overview of how to contrib
 !!! info
     This guide is intended for contributing a new test to the library. If this is not your primary area of interest, there are other ways to contribute to the CIB Mango Project, for example in engagment and outreach activities and project management. See our Engagement Guide for mor information on that (or ask us on Slack).
 
-# Overview of the process
+# Overview
 
 ## A library of tests
 
@@ -17,7 +17,7 @@ There is no single test that can provide definitive evidence whether any snapsho
 !!! example
     **Test A** might focus on finding post content that is copied verbatim a large number of times by different accounts (signaling coordination). On the other hand, **Test B** ignores the post contents and instead analyzes trending hashtags. The two test are complementary since they analyze different aspects (post content vs. hashtag usage) of the same data.
 
-## Contribution steps
+## Contribution cycle
 
 The entire contribution cycle, from idea to implementation, requires sustained commitment. We recognize that not every contributor will have that bandwidth available. Hence the contribution process is broken down into separate stages. Each of these stages has a concrete hand-off, such that you can focus on the concrete deliverable for the specific stage without worrying about the next steps. 
 
@@ -35,22 +35,22 @@ Depending on you interestes and availability, you might want to jump to the sect
 
 <div class="grid cards" markdown>
 
--   __1. Not sure yet?__
+-   __1. Learning more__
 
-    Not sure yet, but I'd like to learn more.
+    Getting to know the community.
 
     ---
     
-    [:octicons-arrow-right-24: Learning more & resources](#learning-more-and-community-resources)
+    [:octicons-arrow-right-24: Learning more & community resources](#note-sure-yet-i-want-to-learn-more)
     { .card }
 
 -   __2. Research__
     
-    Brainstorming, solve open-ended problems.
+    Discovering new tests.
 
     --- 
 
-    [:octicons-arrow-right-24: Researching a new test](#researching-a-new-test)
+    [:octicons-arrow-right-24: Researching a new test](#doing-research)
     { .card }
 
 -   __3. Design__
@@ -77,7 +77,7 @@ Depending on you interestes and availability, you might want to jump to the sect
 
     ---
 
-    [:octicons-arrow-right-24: Implementing and integrating](#implementing-and-integrating-into-library)
+    [:octicons-arrow-right-24: Implementing and integrating](#implementing-a-test-into-the-library)
     { .card }
 
 -   __6. General software engineering__
@@ -91,7 +91,7 @@ Depending on you interestes and availability, you might want to jump to the sect
 
 </div>
 
-## Learning more and community resources
+## Note sure yet, I want to learn more.
 
 That is absolutely fine, we've all been there. If you can, the best way to find your way around the project is to join an in-person event in Washington, DC. If in-person is not an option, you can join us virtually too. You'll need to first [join our Slack space](https://www.civictechdc.org/slack), where you can learn more.
 
@@ -104,7 +104,7 @@ That is absolutely fine, we've all been there. If you can, the best way to find 
     | [Civic Tech DC Lu.ma](https://lu.ma/civictechdc) | Following upcoming in-person events |
         
 
-## Researching a new test
+## Doing research
 
 It all starts here. CIB Mango Tree wants to make analyses described peer-reviewed research broadly available. There are no set-in-stone processes here, the Internet, literature, and the community are your friends! However, if computational social science and social media data analysis are new domains to you, we provide some of the recent review articles that we think are a good starting point and the relevant communities to keep an eye on below.
 
@@ -153,14 +153,14 @@ There are no specific requirments here other that the exploration should be ligh
     - Describe the dependencies used in the analysis (if applicable)
     - Concise description of the analysis, one or two main figures, and any of the outstanding issues
 
-## Implementing and integrating into library
+## Implementing a test into the library
 
-This step involves implementing the new test using the prototyped test as a reference. The idea here is to take the code that was used to prototype (see [Prototype a test](#prototype-a-test) section) and integrate it into our main repository code base. In our parlance, that means implementing an analyzer.
+This step involves implementing the new test using the prototyped test as a reference. The idea here is to take the code that was used to prototype (see [Prototype a test](#prototype-a-test) section) and integrate it into our main repository code base. In our parlance, that means implementing _an analyzer_.
 
 This is possibly the most technically involved part of the entire process as it requires understanding the data science logic behind the test as well as getting to know the CIB Mango Tree code base and its requirements. We have dedicated guides to help you along the way.
 
 !!! tip
-    You can start by following these guides:
+    You can start by following these more specific guides:
 
     1. [Setting up development environment](../get-started/installation.md)
     1. [Contributing new changes](../contributing/contributing.md) (opening a pull request)
@@ -171,4 +171,8 @@ This is possibly the most technically involved part of the entire process as it 
 
 ## Help with improving code base.
 
-You might not be interested in any specific parts of new test development, but instead you are driven by general software engineering problems. We always welcome help.
+You might not be interested in any specific parts of new test development, but are instead driven by general software engineering problems. We always welcome help in any of the following areas:
+
+- Reviewing pull requests
+- 
+- Improving our Storage system (backend)
