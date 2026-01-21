@@ -163,7 +163,9 @@ def server(input, output, sessions):
         old2new = {k: v for k, v in zip(SEL_COLUMNS, COL_RENAME)}
 
         if df.is_empty():
-            return df.select(SEL_COLUMNS).head(0).rename(old2new)
+            return df.select(SEL_COLUMNS).head(0).rename(old2new).with_row_count(
+                name="#", offset=1
+            )
 
         return (
             df.with_columns(
@@ -171,6 +173,7 @@ def server(input, output, sessions):
             )
             .select(SEL_COLUMNS)
             .rename(old2new)
+            .with_row_count(name="#", offset=1)
         )
 
     @reactive.calc
