@@ -66,7 +66,7 @@ class GuiURLS(BaseModel):
         description="Instagram profile URL",
     )
 
-    linkdlin_url:  str = Field(
+    linkedin_url:  str = Field(
         default="https://www.linkedin.com/company/cib-mango-tree",
         description="Linkdlin profile ",
     )
