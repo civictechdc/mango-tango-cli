@@ -35,7 +35,7 @@ jobs:
             executable_name: CIBMangoTree.exe
           - platform_name: MacOS (x86)
             artifact_name: macos-x86
-            os: macos-13
+            os: macos-15-intel
             executable_name: CIBMangoTree.app
           - platform_name: MacOS (arm64)
             artifact_name: macos-arm64
