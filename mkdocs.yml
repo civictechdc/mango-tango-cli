@@ -13,13 +13,15 @@ nav:
           - "Overview": "guides/get-started/overview.md"
           - "Installation": "guides/get-started/installation.md"
       - "Contributing":
-          - "Contributor Workflow": "guides/contributing/contributing.md"
-          - "Implementing Analyzers": "guides/contributing/analyzers.md"
-          - "Dashboards":
+          - "New Contributor Guide": "guides/contributing/new_contributor_guide.md"
+          - "Technical Guides":
+            - "Contributing Changes": "guides/contributing/contributing.md"
+            - "Implementing Analyzers": "guides/contributing/analyzers.md"
+            - "Implementing Dashboards":
               - "Shiny": "guides/contributing/dashboards/shiny.md"
               - "React (WIP)": "guides/contributing/dashboards/react.md"
-          - "Logging": "guides/contributing/logging.md"
-          - "Testing": "guides/contributing/testing.md"
+            - "Logging": "guides/contributing/logging.md"
+            - "Testing": "guides/contributing/testing.md"
       - "Design Philosophy":
           - "Architecture": "guides/design-philosophy/architecture.md"
           - "Core Domain": "guides/design-philosophy/core-domain.md"
@@ -82,4 +84,18 @@ markdown_extensions:
   - pymdownx.snippets
   - admonition
   - pymdownx.highlight
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+      - name: mermaid
+        class: mermaid
+        format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.blocks.caption
+  - footnotes
+  - attr_list  # for grids
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - md_in_html # for grids
+  - pymdownx.tabbed:
+      alternate_style: true
+
