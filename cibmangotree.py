@@ -47,7 +47,9 @@ if __name__ == "__main__":
     from analyzers import suite
     from app import App, AppContext
     from app.logger import setup_logging
-    from components import ViewContext, main_menu, splash
+    from components.context import ViewContext
+    from components.main_menu import main_menu
+    from components.splash import splash
     from meta import get_version
     from storage import Storage
     from terminal_tools.inception import TerminalContext
