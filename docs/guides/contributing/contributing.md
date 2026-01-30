@@ -4,7 +4,7 @@ Before following this workflow please refer to our [**New Contributor Guide**](.
 
 ## Overview
 
-All changes should be made in a forked repository, submitted via pull request to the upstream `develop` branch, and later merged into `main` for a new release.
+All changes should be made in a forked repository, submitted via pull request to the upstream `develop` branch which will be later merged into `main` for a new release by maintainers.
 
 
 ## Opening a Pull Request (PR)
@@ -12,7 +12,7 @@ All changes should be made in a forked repository, submitted via pull request to
 1. **Fork the repository**   
 
     - Navigate to the [main repository](https://www.github.com/civictechdc/cib-mango-tree) on GitHub.
-    - Click the **Fork** button in the upper right corner.
+    - Click the *Fork* button in the upper right corner.
     - This creates a copy of the repository under your GitHub account.
 
 2. **Clone your fork**  
@@ -43,7 +43,7 @@ All changes should be made in a forked repository, submitted via pull request to
       git checkout -b feature/new-feature
       ```
 
-5. **Make changes & push to fork**
+5. **Make changes & push to your fork**
 
     - Commit changes with clear messages.
     - Push the branch to your forked repository.
@@ -57,11 +57,11 @@ All changes should be made in a forked repository, submitted via pull request to
 6. **Create a pull request**
 
     - Navigate to the original repository on GitHub.
-    - Click **Pull requests** > **New pull request**.
-    - Click **compare across forks**.
+    - Click *Pull requests* --> *New pull request*.
+    - Click *Compare across forks*.
     - Set the base repository to `ORIGINAL-OWNER/REPOSITORY-NAME` and base branch to `develop`.
     - Set the head repository to `YOUR-USERNAME/REPOSITORY-NAME` and compare branch to `feature/new-feature`.
-    - Click **Create pull request** and fill in the details.
+    - Click *Create pull request* and fill in the details.
     - Address any review feedback.
 
 7. **Keep your fork updated**   
@@ -69,9 +69,9 @@ All changes should be made in a forked repository, submitted via pull request to
       Regularly sync your fork with the upstream repository:
 
       ```shell
-      git checkout develop
-      git pull upstream develop
-      git push origin develop
+      git checkout develop.       # switch to local develop branch
+      git pull upstream develop   # sync the original branch with your local branch
+      git push origin develop     # update branch on your remote fork with synced local branch
       ```
 
 8. **After merge & clean up**
@@ -84,7 +84,7 @@ All changes should be made in a forked repository, submitted via pull request to
       git push origin --delete feature/new-feature
       ```
 
-9. Release
+9. **Release**
 
-      - When `develop` is clean and ready for a new major release, maintainers will merge `develop` into `main`.
+      - When `develop` is clean and ready for a new major release, maintainers will merge `develop` into `main` and create a new release (with your contributions included).
 
