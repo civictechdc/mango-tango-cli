@@ -1744,14 +1744,14 @@
 <h2 id="github-contribution-workflow-fork-based">GitHub Contribution Workflow (Fork-Based)</h2>
 <p>Before following this workflow please refer to our <a href="../new_contributor_guide/"><strong>New Contributor Guide</strong></a> page for instructions on installing dependencies and setting up your development environment.</p>
 <h3 id="overview">Overview</h3>
-<p>All changes should be made in a forked repository, submitted via pull request to the upstream <code>develop</code> branch, and later merged into <code>main</code> for a new release.</p>
+<p>All changes should be made in a forked repository, submitted via pull request to the upstream <code>develop</code> branch which will be later merged into <code>main</code> for a new release by maintainers.</p>
 <h3 id="opening-a-pull-request-pr">Opening a Pull Request (PR)</h3>
 <ol>
 <li>
 <p><strong>Fork the repository</strong>   </p>
 <ul>
 <li>Navigate to the <a href="https://www.github.com/civictechdc/cib-mango-tree">main repository</a> on GitHub.</li>
-<li>Click the <strong>Fork</strong> button in the upper right corner.</li>
+<li>Click the <em>Fork</em> button in the upper right corner.</li>
 <li>This creates a copy of the repository under your GitHub account.</li>
 </ul>
 </li>
@@ -1778,7 +1778,7 @@ git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </
 </code></pre></div>
 </li>
 <li>
-<p><strong>Make changes &amp; push to fork</strong></p>
+<p><strong>Make changes &amp; push to your fork</strong></p>
 <ul>
 <li>Commit changes with clear messages.</li>
 <li>Push the branch to your forked repository.</li>
@@ -1792,20 +1792,20 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 <p><strong>Create a pull request</strong></p>
 <ul>
 <li>Navigate to the original repository on GitHub.</li>
-<li>Click <strong>Pull requests</strong> &gt; <strong>New pull request</strong>.</li>
-<li>Click <strong>compare across forks</strong>.</li>
+<li>Click <em>Pull requests</em> --&gt; <em>New pull request</em>.</li>
+<li>Click <em>Compare across forks</em>.</li>
 <li>Set the base repository to <code>ORIGINAL-OWNER/REPOSITORY-NAME</code> and base branch to <code>develop</code>.</li>
 <li>Set the head repository to <code>YOUR-USERNAME/REPOSITORY-NAME</code> and compare branch to <code>feature/new-feature</code>.</li>
-<li>Click <strong>Create pull request</strong> and fill in the details.</li>
+<li>Click <em>Create pull request</em> and fill in the details.</li>
 <li>Address any review feedback.</li>
 </ul>
 </li>
 <li>
 <p><strong>Keep your fork updated</strong>   </p>
 <p>Regularly sync your fork with the upstream repository:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>checkout<span class="w"> </span>develop
-git<span class="w"> </span>pull<span class="w"> </span>upstream<span class="w"> </span>develop
-git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>develop
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>checkout<span class="w"> </span>develop.<span class="w">       </span><span class="c1"># switch to local develop branch</span>
+git<span class="w"> </span>pull<span class="w"> </span>upstream<span class="w"> </span>develop<span class="w">   </span><span class="c1"># sync the original branch with your local branch</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>develop<span class="w">     </span><span class="c1"># update branch on your remote fork with synced local branch</span>
 </code></pre></div>
 </li>
 <li>
@@ -1819,9 +1819,9 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </code></pre></div>
 </li>
 <li>
-<p>Release</p>
+<p><strong>Release</strong></p>
 <ul>
-<li>When <code>develop</code> is clean and ready for a new major release, maintainers will merge <code>develop</code> into <code>main</code>.</li>
+<li>When <code>develop</code> is clean and ready for a new major release, maintainers will merge <code>develop</code> into <code>main</code> and create a new release (with your contributions included).</li>
 </ul>
 </li>
 </ol>
