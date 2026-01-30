@@ -2,11 +2,11 @@
 
 ## Required Software
 
-- **Python 3.12** - Required for all features to work correctly
-- Node.JS (20.0.0 or above) - Required for the React dashboards
+- **Python 3.12**: Required for all features to work correctly
+- Node.JS (20.0.0 or above): Required for the React dashboards
   to work correctly
-- **Git** - For version control and contributing
-- **Terminal/Command Line** - Application runs in terminal interface
+- **Git**: For version control and contributing
+- **Terminal/Command Line**: Application runs in terminal interface
 
 ## System Requirements
 
@@ -28,19 +28,20 @@ following links for instructions on downloading and installing said packages:
 If you're not sure which packages you already have installed on your system, the
 following commands can be used to figure what packages you already installed:
 
-### Linux & Mac OS
+=== "Linux & Mac OS"
 
-```bash
-which <program_name_here (node|python|git)>
-```
+    ``` bash
+    which <program_name_here (node|python|git)>
+    ```
 
-### Windows
+=== "Windows"
 
-```PowerShell
-where.exe <program_name_here (node|python|git)> 
-```
+    ``` PowerShell
+    where.exe <program_name_here (node|python|git)> 
+    ```
 
-# Installation
+
+# Setting up development environment
 
 ## 1. Clone Repository
 
@@ -55,7 +56,7 @@ cd mango-tango-cli
 python -m venv venv
 ```
 
-**Verify Python version**:
+Verify Python version:
 
 ```bash
 python --version  # Should show Python 3.12.x
@@ -63,17 +64,17 @@ python --version  # Should show Python 3.12.x
 
 ## 3. Bootstrap Development Environment
 
-**Mac OS/Linux (Bash)**:
+=== "Mac OS/Linux"
 
-```bash
-./bootstrap.sh
-```
+    ```bash
+    ./bootstrap.sh
+    ```
 
-**Windows (PowerShell)**:
+=== "Windows (PowerShell)"
 
-```powershell
-./bootstrap.ps1
-```
+    ```powershell
+    ./bootstrap.ps1
+    ```
 
 The bootstrap script will:
 
@@ -87,105 +88,53 @@ The bootstrap script will:
 python -m cibmangotree --noop
 ```
 
-Should output: "No-op flag detected. Exiting successfully."
-
+Should output: 
+```bash
+No-op flag detected. Exiting successfully.
+```
 # Activating Virtual Environment
 
 After Completing the Installation the following commands can be used to activate
 the virtual environment in order to work with the project.
 
-**Mac OS/Linux (Bash)**:
+=== "Mac OS/Linux (Bash)"
 
-```bash
-source ./venv/bin/activate
-```
+    ```bash
+    source ./venv/bin/activate
+    ```
 
-**PowerShell (Windows)**:
+=== "Windows (PowerSheel)"
 
-```PowerShell
-./env/bin/Activate.ps1
-```
+    ```PowerShell
+    ./env/bin/Activate.ps1
+    ```
 
-# Development Environment Setup
 
-## Dependencies Overview
+## Code Formatting
 
-**Production Dependencies** (`requirements.txt`):
+The project uses [Black](https://pypi.org/project/black/) for code style and formatting, [isort](https://pycqa.github.io/isort/index.html) for organization of import modules, and [Pre-commit](https://pre-commit.com/) hooks for automatic formatting applied on every commit.
 
-- `polars==1.9.0` - Primary data processing
-- `pydantic==2.9.1` - Data validation and models
-- `inquirer==3.4.0` - Interactive terminal prompts
-- `tinydb==4.8.0` - Lightweight JSON database
-- `dash==2.18.1` - Web dashboard framework
-- `shiny==1.4.0` - Modern web UI framework
-- `plotly==5.24.1` - Data visualization
-- `XlsxWriter==3.2.0` - Excel export functionality
-
-**Development Dependencies** (`requirements-dev.txt`):
-
-- `black==24.10.0` - Code formatter
-- `isort==5.13.2` - Import organizer
-- `pytest==8.3.4` - Testing framework
-- `pyinstaller==6.14.1` - Executable building
-
-**React Dashboard Dependencies** (app/web_templates/package.json):
-
-- typescript: 5.7.3
-- vite: 6.3.5
-- react: 19.0.0
-- @deck.gl: 9.1.11
-- @visx: 3.12.0
-- @glideapps/glide-data-grid: 6.0.3
-- @radix-ui: (Varies based on component being used)
-- zustand: 5.0.3
-- tailwindcss: 4.0.6
-- lucide-react: 0.475.0
-
-## Code Formatting Setup
-
-The project uses automatic code formatting:
-
-- **Black**: Code style and formatting
-- **isort**: Import organization
-- **Pre-commit hooks**: Automatic formatting on commit
-
-**Manual formatting**:
+If you installed Black and isort, you can manually format the code by running the following commands in the project root:  
 
 ```bash
 isort .
 black .
 ```
 
-## Project Structure Setup
-
-After installation, your project structure should be:
-
-```bash
-mango-tango-cli/
-├── venv/                    # Virtual environment
-├── .serena/                 # Serena semantic analysis
-│   └── memories/           # Project knowledge base
-├── docs/                    # Documentation
-│   ├── ai-context/         # AI assistant context
-│   └── dev-guide.md        # Development guide
-├── app/                     # Application layer
-├── analyzers/              # Analysis modules
-├── components/             # Terminal UI components
-├── storage/                # Data persistence
-├── importing/              # Data import modules
-├── requirements*.txt       # Dependencies
-└── cibmangotree.py         # Main entry point
-```
-
-# Database and Storage Setup
+# Database and Storage
 
 ## Application Data Directory
 
 The application automatically creates data directories:
 
-- **macOS**: `~/Library/Application Support/MangoTango/`
-- **Windows**: `%APPDATA%/Civic Tech DC/MangoTango/`
-- **Linux**: `~/.local/share/MangoTango/`
+=== "MacOS"
+    `~/Library/Application Support/MangoTango/`
+
+=== "Windows"
+    `%APPDATA%/Civic Tech DC/MangoTango/`
+
+=== "Linux"
+    `~/.local/share/MangoTango/`
 
 ## Database Initialization
 
@@ -229,30 +178,6 @@ npm run dev
 cd ./app/web_templates
 pnpm dev
 ```
-
-## Testing Setup
-
-## Run Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run specific test file
-pytest analyzers/hashtags/test_hashtags_analyzer.py
-
-# Run with verbose output
-pytest -v
-
-# Run specific test function
-pytest analyzers/hashtags/test_hashtags_analyzer.py::test_gini
-```
-
-## Test Data
-
-- Test data is co-located with analyzers in `test_data/` directories
-- Each analyzer should include its own test files
-- Tests use sample data to verify functionality
 
 # Build Setup (Optional)
 
