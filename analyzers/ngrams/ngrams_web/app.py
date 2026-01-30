@@ -4,17 +4,17 @@ import polars as pl
 from shiny import reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
-from ..ngram_stats.interface import (
-    COL_NGRAM_DISTINCT_POSTER_COUNT,
-    COL_NGRAM_TOTAL_REPS,
-    COL_NGRAM_WORDS,
-)
 from ..ngrams_base.interface import (
     COL_AUTHOR_ID,
     COL_MESSAGE_TEXT,
     COL_MESSAGE_TIMESTAMP,
     COL_NGRAM_ID,
     COL_NGRAM_LENGTH,
+)
+from ..ngrams_stats.interface import (
+    COL_NGRAM_DISTINCT_POSTER_COUNT,
+    COL_NGRAM_TOTAL_REPS,
+    COL_NGRAM_WORDS,
 )
 
 MANGO_DARK_GREEN = "#609949"
@@ -109,33 +109,35 @@ def _remove_markers(figure_widget: go.FigureWidget) -> go.FigureWidget:
 
 
 def _get_app_layout(ngram_choices_dict: dict):
+
     app_layout = [
         ui.card(
             ui.card_header("N-gram statistics"),
-            ui.layout_columns(
-                ui.input_text(
-                    id="ngram_content_search",
-                    label="Search N-gram Content:",
-                    placeholder="Enter keywords to search",
-                ),
-                ui.input_selectize(
-                    id="ngram_length_selector",
-                    label="Included n-grams:",
-                    choices=ngram_choices_dict,
-                    selected=list(ngram_choices_dict.keys()),
-                    multiple=True,
-                ),
-                ui.div(
-                    ui.input_action_button(
-                        id="reset_button",
-                        label="Clear selection",
-                        fill=False,
+            ui.layout_sidebar(
+                ui.sidebar(
+                    ui.input_text(
+                        id="ngram_content_search",
+                        label="Search N-gram Content:",
+                        placeholder="Enter keywords to search",
                     ),
-                    style="margin-top: 25px;",  # Align with labeled inputs
+                    ui.input_selectize(
+                        id="ngram_length_selector",
+                        label="Included N-grams:",
+                        choices=ngram_choices_dict,
+                        selected=list(ngram_choices_dict.keys()),
+                        multiple=True,
+                    ),
+                    ui.div(
+                        ui.input_action_button(
+                            id="reset_button",
+                            label="Clear selection",
+                            fill=False,
+                        ),
+                        style="margin-top: 25px;",  # Align with labeled inputs
+                    ),
                 ),
-                col_widths=[4, 4, 4],  # Equal width columns
+                output_widget("scatter_plot", height="400px"),
             ),
-            output_widget("scatter_plot", height="400px"),
         ),
         ui.card(
             ui.card_header("Data viewer"),

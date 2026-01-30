@@ -19,7 +19,7 @@
 
 ## Technical Documentation
 
-For in-depth technical docs related to this repository please visit: [https://civictechdc.github.io/mango-tango-cli](https://civictechdc.github.io/mango-tango-cli)
+For in-depth technical docs related to this repository please visit: [https://civictechdc.github.io/cib-mango-tree](https://civictechdc.github.io/cib-mango-tree)
 
 ## Requirements
 
