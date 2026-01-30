@@ -12,7 +12,6 @@ COL_AUTHOR_ID = "user_id"
 COL_MESSAGE_ID = "message_id"
 COL_MESSAGE_SURROGATE_ID = "message_surrogate_id"
 COL_MESSAGE_TEXT = "message_text"
-COL_MESSAGE_NGRAM_COUNT = "count"
 COL_NGRAM_ID = "ngram_id"
 COL_NGRAM_WORDS = "words"
 COL_NGRAM_LENGTH = "n"
@@ -28,20 +27,20 @@ PARAM_MAX_N = "max_n"
 
 interface = AnalyzerInterface(
     id="ngrams",
-    version="0.1.0",
+    version="0.2.0",
     name="N-gram Analysis",
     short_description="Extracts n-grams from text data with multilingual support",
     long_description="""
 The n-gram analysis extracts n-grams (sequences of n words) from the text data
-in the input and counts the occurrences of each n-gram in each message, linking
-the message author to the ngram frequency.
+in the input and counts the occurrences of unique n-grams across posts, linking
+the message author to the n-gram frequency.
 
 This analyzer uses Unicode-aware tokenization with support for multilingual content,
 including proper handling of different scripts (Latin, CJK, Arabic) and social media
 entities (hashtags, mentions, URLs).
 
 The result can be used to see if certain word sequences are more common in
-the corpus of text, and whether certain authors use these sequences more often.
+the collection of social media posts, and whether certain authors use these sequences more often.
   """,
     input=AnalyzerInput(
         columns=[
@@ -102,12 +101,12 @@ the corpus of text, and whether certain authors use these sequences more often.
     outputs=[
         AnalyzerOutput(
             id=OUTPUT_MESSAGE_NGRAMS,
-            name="N-gram count per message",
+            name="Unique n-grams present in message",
             internal=True,
+            description="Maps messages to the unique n-grams they contain (deduplicated within message)",
             columns=[
                 OutputColumn(name=COL_MESSAGE_SURROGATE_ID, data_type="identifier"),
                 OutputColumn(name=COL_NGRAM_ID, data_type="identifier"),
-                OutputColumn(name=COL_MESSAGE_NGRAM_COUNT, data_type="integer"),
             ],
         ),
         AnalyzerOutput(
