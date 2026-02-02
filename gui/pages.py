@@ -1,10 +1,12 @@
 from datetime import datetime
 from traceback import format_exc
-from typing import Optional
+from typing import Callable
 
 from nicegui import ui
-
+import polars as pl
+from importing import importers
 from app import AnalysisContext
+from analyzer_interface import column_automap, get_data_type_compatibility_score
 from components.select_analysis import analysis_label, present_timestamp
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import AnalysisParamsCard, ToggleButtonGroup
@@ -15,16 +17,17 @@ from gui.import_options import ImportOptionsDialog
 def _two_button_choice_fork_content(
     prompt: str,
     left_button_label: str,
-    left_button_on_click: callable,
+    left_button_on_click: Callable[[], None],
     left_button_icon: str,
     right_button_label: str,
-    right_button_on_click: callable,
+    right_button_on_click: Callable[[], None],
     right_button_icon: str,
 ):
-
     # Main content area - centered vertically
-    with ui.column().classes("items-center justify-center").style(
-        "height: 80vh; width: 100%"
+    with (
+        ui.column()
+        .classes("items-center justify-center")
+        .style("height: 80vh; width: 100%")
     ):
         # Prompt label
         ui.label(prompt).classes("q-mb-lg").style("font-size: 1.05rem")
@@ -66,8 +69,10 @@ class StartPage(GuiPage):
     def render_content(self) -> None:
         """Render main page content with action buttons."""
         # Main content area - centered vertically
-        with ui.column().classes("items-center justify-center").style(
-            "height: 80vh; width: 100%"
+        with (
+            ui.column()
+            .classes("items-center justify-center")
+            .style("height: 80vh; width: 100%")
         ):
             # Prompt label
             ui.label("Let's get started! What do you want to do?").classes(
@@ -111,8 +116,10 @@ class SelectProjectPage(GuiPage):
     def render_content(self) -> None:
         """Render projects list with selection interface."""
         # Projects list - centered
-        with ui.row().classes("items-center center-justify").style(
-            "max-width: 600px; margin: 0 auto;"
+        with (
+            ui.row()
+            .classes("items-center center-justify")
+            .style("max-width: 600px; margin: 0 auto;")
         ):
             # Get projects from app via session
             projects = self.session.app.list_projects()
@@ -130,8 +137,12 @@ class SelectProjectPage(GuiPage):
                     project.display_name: project for project in projects
                 }
 
-                with ui.column().classes("items-center justify-center gap-6").style(
-                    "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
+                with (
+                    ui.column()
+                    .classes("items-center justify-center gap-6")
+                    .style(
+                        "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
+                    )
                 ):
                     selected_project = (
                         ui.select(
@@ -170,7 +181,6 @@ class SelectProjectPage(GuiPage):
                             )
 
                     with ui.row().classes("items-center center-justify"):
-
                         ui.button(
                             "Manage Projects",
                             on_click=open_manage_projects,
@@ -187,7 +197,6 @@ class SelectProjectPage(GuiPage):
 
 
 class NewProjectPage(GuiPage):
-
     def __init__(self, session: GuiSession):
         super().__init__(
             session=session,
@@ -200,10 +209,11 @@ class NewProjectPage(GuiPage):
         )
 
     def render_content(self) -> None:
-
         # Main content - centered vertically and horizontally
-        with ui.column().classes("items-center justify-center gap-6").style(
-            "width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;"
+        with (
+            ui.column()
+            .classes("items-center justify-center gap-6")
+            .style("width: 100%; max-width: 600px; margin: 0 auto; height: 80vh;")
         ):
             # Store the input widget locally (not in session)
             new_project_name_input = ui.input(
@@ -264,8 +274,10 @@ class ImportDatasetPage(GuiPage):
         selected_file_path = None
 
         # Main content - centered vertically and horizontally
-        with ui.column().classes("items-center justify-center gap-6").style(
-            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
+        with (
+            ui.column()
+            .classes("items-center justify-center gap-6")
+            .style("width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;")
         ):
             ui.label("Choose a dataset file.").classes("text-lg")
 
@@ -354,14 +366,15 @@ class SelectAnalyzerForkPage(GuiPage):
         super().__init__(
             session=session,
             route=gui_routes.select_analyzer_fork,
-            title=f"{session.current_project.display_name}",
+            title=session.current_project.display_name
+            if session.current_project is not None
+            else "",
             show_back_button=True,
             back_route=gui_routes.select_project,
             show_footer=True,
         )
 
     def render_content(self):
-
         _two_button_choice_fork_content(
             prompt="What do you want to do next?",
             left_button_label="Start a New Test",
@@ -381,10 +394,13 @@ class SelectNewAnalyzerPage(GuiPage):
     """
 
     def __init__(self, session: GuiSession):
+        analyzer_select_title: str = "Select New Analyzer"
         super().__init__(
             session=session,
             route=gui_routes.select_analyzer,
-            title=f"{session.current_project.display_name}: Select New Analyzer",
+            title=f"{session.current_project.display_name}: {analyzer_select_title}"
+            if session.current_project is not None
+            else analyzer_select_title,
             show_back_button=True,
             back_route=gui_routes.select_analyzer_fork,
             show_footer=True,
@@ -405,8 +421,10 @@ class SelectNewAnalyzerPage(GuiPage):
             return
 
         # Main content - centered
-        with ui.column().classes("items-center justify-center gap-6").style(
-            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
+        with (
+            ui.column()
+            .classes("items-center justify-center gap-6")
+            .style("width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;")
         ):
             ui.label("Start a New Analysis").classes("text-lg")
 
@@ -424,13 +442,11 @@ class SelectNewAnalyzerPage(GuiPage):
                 # Create toggle button group for analyzer selection
                 button_group = ToggleButtonGroup()
                 with ui.row().classes("items-center justify-center gap-4"):
-
                     # add a button for each analyzer
                     for analyzer_name in analyzer_options.keys():
                         button_group.add_button(analyzer_name)
 
                 with ui.card().classes("w-full no-shadow"):
-
                     DEFAULT_TEXT = (
                         "No analyzer selected. Click button above to select it."
                     )
@@ -481,13 +497,16 @@ class SelectPreviousAnalyzerPage(GuiPage):
     Page for selecting a previous analysis to review.
     """
 
-    grid: Optional[ui.aggrid] = None
+    grid: ui.aggrid | None = None
 
     def __init__(self, session: GuiSession):
+        select_previous_title: str = "Select Previous Analysis"
         super().__init__(
             session=session,
             route=gui_routes.select_previous_analyzer,
-            title=f"{session.current_project.display_name}: Select Previous Analysis",
+            title=f"{session.current_project.display_name}: {select_previous_title}"
+            if session.current_project is not None
+            else select_previous_title,
             show_back_button=True,
             back_route=gui_routes.select_analyzer_fork,
             show_footer=True,
@@ -502,8 +521,10 @@ class SelectPreviousAnalyzerPage(GuiPage):
             return
 
         # Main content - centered
-        with ui.column().classes("items-center justify-center gap-6").style(
-            "width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;"
+        with (
+            ui.column()
+            .classes("items-center justify-center gap-6")
+            .style("width: 100%; max-width: 800px; margin: 0 auto; height: 80vh;")
         ):
             ui.label("Review a Previous Analysis").classes("text-lg")
 
@@ -530,6 +551,9 @@ class SelectPreviousAnalyzerPage(GuiPage):
                 # Get selected previous analysis if grid exists
                 selected_name = None
                 if analysis_list:
+                    if self.grid is None:
+                        return
+
                     selected_rows = await self.grid.get_selected_rows()
                     if selected_rows:
                         selected_name = selected_rows[0]["name"]
@@ -538,10 +562,9 @@ class SelectPreviousAnalyzerPage(GuiPage):
                 if not selected_name:
                     self.notify_warning("Please select a previous analysis")
                     return
+
                 else:
-                    self.notify("Coming soon!")
-                #   self.session.current_analysis = selected_analysis
-                #   self.navigate_to("/show_output_options")
+                    self.notify_warning("Coming soon!")
 
             ui.button(
                 "Proceed",
@@ -602,9 +625,6 @@ class PreviewDatasetPage(GuiPage):
         )
 
     def render_content(self) -> None:
-        """Render data preview interface with import options."""
-        from importing import importers
-
         # Validate file is selected
         if not self.session.selected_file_path:
             self.notify_warning("No file selected. Redirecting...")
@@ -641,6 +661,9 @@ class PreviewDatasetPage(GuiPage):
             # Retry callback for import options dialog
             async def handle_retry(updated_session):
                 """Handle retry from import options dialog."""
+                if data_preview_container is None:
+                    return
+
                 nonlocal import_preview
 
                 try:
@@ -665,6 +688,12 @@ class PreviewDatasetPage(GuiPage):
 
             # Open import options dialog
             async def open_import_options():
+                if (
+                    self.session.import_session is None
+                    or self.session.selected_file_path is None
+                ):
+                    return
+
                 dialog = ImportOptionsDialog(
                     import_session=self.session.import_session,
                     selected_file_path=self.session.selected_file_path,
@@ -677,7 +706,9 @@ class PreviewDatasetPage(GuiPage):
                 try:
                     # Create project using session data
                     project = self.session.app.create_project(
-                        name=self.session.new_project_name,
+                        name=self.session.new_project_name
+                        if self.session.new_project_name is not None
+                        else "",
                         importer_session=self.session.import_session,
                     )
 
@@ -692,8 +723,12 @@ class PreviewDatasetPage(GuiPage):
                     print(f"Project creation error:\n{format_exc()}")
 
             # Main content area - centered
-            with ui.column().classes("items-center justify-center gap-6").style(
-                "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; min-height: 70vh;"
+            with (
+                ui.column()
+                .classes("items-center justify-center gap-6")
+                .style(
+                    "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; min-height: 70vh;"
+                )
             ):
                 # Data Preview (with container for dynamic updates)
                 data_preview_container = ui.column().classes("w-full")
@@ -744,22 +779,20 @@ class PreviewDatasetPage(GuiPage):
 
 
 class ConfigureAnalysis(GuiPage):
-
     def __init__(self, session: GuiSession):
+        config_analysis_title: str = "Configure Analysis"
         super().__init__(
             session=session,
             route=gui_routes.configure_analysis,
-            title=f"{session.current_project.display_name}: Configure Analysis",
+            title=f"{session.current_project.display_name}: {config_analysis_title}"
+            if session.current_project is not None
+            else config_analysis_title,
             show_back_button=True,
             back_route=gui_routes.select_analyzer_fork,
             show_footer=True,
         )
 
     def render_content(self) -> None:
-        import polars as pl
-
-        from analyzer_interface import column_automap, get_data_type_compatibility_score
-
         # Get analyzer input requirements and user dataset columns
         analyzer = self.session.selected_analyzer
         input_columns = analyzer.input.columns
@@ -770,10 +803,11 @@ class ConfigureAnalysis(GuiPage):
         draft_column_mapping = column_automap(user_columns, input_columns)
 
         # Main content area
-        with ui.column().classes("items-center justify-start gap-6").style(
-            "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
+        with (
+            ui.column()
+            .classes("items-center justify-start gap-6")
+            .style("width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;")
         ):
-
             # Store dropdown widgets for later access
             column_dropdowns = {}
 
@@ -833,7 +867,6 @@ class ConfigureAnalysis(GuiPage):
 
             # Create column mapping UI using grid
             with ui.grid(columns=2).classes("gap-2"):
-
                 # create labels for grid header
                 ui.label("Required Input Information")  # populates row 1, column 1
                 ui.label("Imported Dataset Columns")  # pupolates row 1, column 2
@@ -927,7 +960,6 @@ class ConfigureAnalysis(GuiPage):
 
 
 class ConfigureAnalaysisParams(GuiPage):
-
     def __init__(self, session: GuiSession):
         super().__init__(
             session=session,
@@ -1007,8 +1039,10 @@ class ConfigureAnalaysisParams(GuiPage):
             }
 
         # Main content area
-        with ui.column().classes("items-center justify-start gap-6").style(
-            "width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;"
+        with (
+            ui.column()
+            .classes("items-center justify-start gap-6")
+            .style("width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem;")
         ):
             ui.label(f"Configure {analyzer.name} Parameters").classes("text-xl")
 
