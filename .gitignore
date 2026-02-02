@@ -10,3 +10,4 @@ VERSION
 .env*
 .serena/cache
 .specify/
+node_modules
