@@ -1,9 +1,34 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import checker from "vite-plugin-checker";
+import * as actualVue from "vue";
 
 export default defineConfig({
-  plugins: [vue({}), checker({ vueTsc: true, typescript: true })],
+  plugins: [
+    {
+      name: "inline-vue-shim",
+      enforce: "pre" as const,
+      resolveId(id: string) {
+        if (id === "vue") {
+          return "virtual:vue-shim";
+        }
+      },
+      load(id: string) {
+        if (id === "virtual:vue-shim") {
+          const lines: string[] = ["const Vue = window.Vue;"];
+          for (const exportName of Object.keys(actualVue)) {
+            lines.push(`export const ${exportName} = Vue.${exportName};`);
+          }
+          lines.push("export default Vue;");
+          return lines.join("\n");
+        }
+      },
+    },
+    vue(),
+  ],
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("production"),
+  },
   build: {
     cssCodeSplit: true,
     outDir: "./components/dist",
@@ -16,13 +41,5 @@ export default defineConfig({
       name: "vue_vite",
     },
     minify: false,
-    rollupOptions: {
-      external: ["vue"],
-      output: {
-        entryFileNames: `[name].js`,
-        chunkFileNames: `[name].js`,
-        assetFileNames: `[name].[ext]`,
-      },
-    },
   },
 });

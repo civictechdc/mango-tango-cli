@@ -3,6 +3,7 @@ from datetime import datetime
 from nicegui import ui
 from gui.base import GuiPage, GuiSession, gui_routes, format_file_size
 from gui.file_picker import LocalFilePicker
+from gui.components import UploadButton
 
 
 class ImportDatasetPage(GuiPage):
@@ -97,6 +98,8 @@ class ImportDatasetPage(GuiPage):
                 self.session.selected_file_path = selected_file_path
                 self.navigate_to("/preview_dataset")
 
+            upload_button = UploadButton("Browse Files", icon="folder_open")
+            """
             browse_btn = ui.button(
                 "Browse files",
                 icon="folder_open",
@@ -114,3 +117,4 @@ class ImportDatasetPage(GuiPage):
                     browse_btn.set_visibility(True),
                 ),
             )
+            """
