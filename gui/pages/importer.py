@@ -98,7 +98,16 @@ class ImportDatasetPage(GuiPage):
                 self.session.selected_file_path = selected_file_path
                 self.navigate_to("/preview_dataset")
 
-            upload_button = UploadButton("Browse Files", icon="folder_open")
+            upload_button = UploadButton(
+                "Browse Files",
+                icon="folder_open",
+                on_click=lambda e: print(
+                    f"click event from upload button: {e.args if e is not None else 'None'}"
+                ),
+                on_change=lambda e: print(
+                    f"change event from upload button: {e.args if e is not None else 'None'}"
+                ),
+            )
             """
             browse_btn = ui.button(
                 "Browse files",

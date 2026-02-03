@@ -179,9 +179,11 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     color: {},
     text: {}
   },
-  setup(__props) {
+  emits: ["click", "change"],
+  setup(__props, { emit: __emit }) {
     const props = __props;
     const filePickerRef = ref(null);
+    const emit = __emit;
     const displayText = computed(() => props.text && props.text.length > 0 ? props.text : "Click Me");
     const buttonProps = computed(() => {
       let propsCopy = { ...props };
@@ -189,9 +191,21 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       if (propsCopy.icon == null) delete propsCopy.icon;
       return propsCopy;
     });
-    function handleButtonClick() {
+    const handleButtonClick = () => {
       filePickerRef.value?.click();
-    }
+      emit("click", "test...");
+    };
+    const handleFilePickerChange = (event) => {
+      const target = event.target;
+      if (target.type !== "file") return;
+      if (target.files == null || target.files.length === 0) {
+        emit("change", null);
+        return;
+      }
+      if (target.files.length > 1) return;
+      console.log(target.files[0]);
+      emit("change", target.files[0]?.webkitRelativePath);
+    };
     return (_ctx, _cache) => {
       const _component_q_btn = resolveComponent("q-btn");
       return openBlock(), createElementBlock("div", _hoisted_1, [
@@ -205,8 +219,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
           type: "file",
           ref_key: "filePickerRef",
           ref: filePickerRef,
-          class: "hidden"
-        }, null, 512)
+          class: "hidden",
+          onChange: handleFilePickerChange
+        }, null, 544)
       ]);
     };
   }

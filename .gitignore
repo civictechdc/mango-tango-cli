@@ -11,3 +11,4 @@ VERSION
 .serena/cache
 .specify/
 node_modules
+./gui/components/dist
