@@ -42,6 +42,8 @@ nav:
 theme:
   name: material
   logo: img/favicon.ico
+  palette:
+    scheme: cibmt
   features:
     - navigation.tracking
     - navigation.tabs
@@ -52,6 +54,9 @@ theme:
     - content.code.copy
     - content.tooltips
     - toc.follow
+
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
   - mkdocstrings:
@@ -84,6 +89,7 @@ markdown_extensions:
   - pymdownx.snippets
   - admonition
   - pymdownx.highlight
+  - pymdownx.details
   - pymdownx.superfences:
       custom_fences:
       - name: mermaid
@@ -98,4 +104,3 @@ markdown_extensions:
   - md_in_html # for grids
   - pymdownx.tabbed:
       alternate_style: true
-
