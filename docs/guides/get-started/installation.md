@@ -46,43 +46,97 @@ following commands can be used to figure what packages you already installed:
 ## 1. Clone Repository
 
 ```bash
-git clone https://github.com/CIB-Mango-Tree/mango-tango-cli.git
-cd mango-tango-cli
+git clone https://github.com/civictechdc/cib-mango-tree.git
+cd cib-mango-tree
 ```
 
-## 2. Create Virtual Environment
+## 2. Install uv (Recommended)
 
-```bash
-python -m venv venv
-```
 
-Verify Python version:
 
-```bash
-python --version  # Should show Python 3.12.x
-```
+!!! tip "Skip if you prefer traditional pip"
+    If you don't want to use `uv`, you can skip this step and use the traditional pip method in the next section.
 
-## 3. Bootstrap Development Environment
+## 3. Create Virtual Environment & Install Dependencies
 
-=== "Mac OS/Linux"
+Choose your preferred method for setting up your development environment:
+
+??? info "Installing uv"  
+    
+    `uv` is an extremely fast Python package manager (10-100x faster than pip) that simplifies virtual environment and dependency management.
+
+    === "macOS/Linux"
+
+        ```bash
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        ```
+
+    === "Windows (PowerShell)"
+
+        ```powershell
+        powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+        ```
+
+    === "Alternative (via pip)"
+
+        ```bash
+        pip install uv
+        ```
+
+=== "uv (recommended - faster)"
 
     ```bash
-    ./bootstrap.sh
+    # Create virtual environment
+    uv venv
+
+    #Activate virtual environment (macOS/Linux)
+    source venv/bin/activate
+
+    # OR: if using Windows and PowerShell
+    # venv\Scripts\activate
+    
+    # Install dependencies
+    uv pip install -r requirements-dev.txt  # also includes requirements.txt
     ```
 
-=== "Windows (PowerShell)"
+=== "pip (traditional)"
 
-    ```powershell
-    ./bootstrap.ps1
+    ```bash
+    # Create virtual environment
+    python -m venv venv
+    
+    # Activate virtual environment (macOS/Linux)
+    source venv/bin/activate
+    # OR: if using Windows and PowerShell
+    # venv\Scripts\activate
+    
+    # Install dependencies
+    pip install -r requirements-dev.txt
     ```
 
-The bootstrap script will:
+!!! note "Verify Python version"
+    Ensure you're using Python 3.12.x:
+    ```bash
+    python --version  # Should show Python 3.12.x
+    ```
 
-- Activate the virtual environment
-- Install all dependencies from `requirements-dev.txt`
-- Set up pre-commit hooks for code formatting
+## 4. Set Up Pre-commit Hooks
 
-## 4. Verify Installation
+Pre-commit hooks automatically format your code with Black and isort before each commit.
+
+```bash
+# Install pre-commit hooks
+pre-commit install
+```
+
+!!! tip "Manual formatting"
+    You can also format code manually:
+    ```bash
+    isort .
+    black .
+    ```
+
+## 5. Verify Installation
 
 ```bash
 python -m cibmangotree --noop
@@ -94,27 +148,27 @@ No-op flag detected. Exiting successfully.
 ```
 # Activating Virtual Environment
 
-After Completing the Installation the following commands can be used to activate
+After completing the installation, the following commands can be used to activate
 the virtual environment in order to work with the project.
 
-=== "Mac OS/Linux (Bash)"
+=== "macOS/Linux (Bash)"
 
     ```bash
     source ./venv/bin/activate
     ```
 
-=== "Windows (PowerSheel)"
+=== "Windows (PowerShell)"
 
-    ```PowerShell
-    ./env/bin/Activate.ps1
+    ```powershell
+    ./venv/Scripts/Activate.ps1
     ```
 
 
 ## Code Formatting
 
-The project uses [Black](https://pypi.org/project/black/) for code style and formatting, [isort](https://pycqa.github.io/isort/index.html) for organization of import modules, and [Pre-commit](https://pre-commit.com/) hooks for automatic formatting applied on every commit.
+The project uses [Black](https://pypi.org/project/black/) for code style and formatting, [isort](https://pycqa.github.io/isort/index.html) for organization of import modules, and [pre-commit](https://pre-commit.com/) hooks for automatic formatting applied on every commit.
 
-If you installed Black and isort, you can manually format the code by running the following commands in the project root:  
+These tools are automatically installed as part of `requirements-dev.txt`. If you need to manually format code without committing, run:
 
 ```bash
 isort .
