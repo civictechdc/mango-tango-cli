@@ -15,7 +15,7 @@ nav:
       - "Contributing":
           - "New Contributor Guide": "guides/contributing/new_contributor_guide.md"
           - "Technical Guides":
-            - "Contributing Changes": "guides/contributing/contributing.md"
+            - "Contributing Changes": "guides/contributing/github_workflow.md"
             - "Implementing Analyzers": "guides/contributing/analyzers.md"
             - "Implementing Dashboards":
               - "Shiny": "guides/contributing/dashboards/shiny.md"

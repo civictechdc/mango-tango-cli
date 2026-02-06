@@ -1,13 +1,11 @@
-# GitHub Contribution Workflow (Fork-Based)
+# GitHub Contribution Workflow
 
 Before following this workflow please refer to our [**New Contributor Guide**](./new_contributor_guide.md) page for instructions on installing dependencies and setting up your development environment.
-
-## Overview
 
 All changes should be made in a forked repository, submitted via pull request to the upstream `develop` branch which will be later merged into `main` for a new release by maintainers.
 
 
-## Opening a Pull Request (PR)
+## Opening a pull request (PR)
 
 1. **Fork the repository**   
 
