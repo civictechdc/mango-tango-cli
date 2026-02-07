@@ -707,17 +707,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-install-uv-recommended" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Install uv (recommended)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#3-create-virtual-environment-install-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1932,17 +1921,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-install-uv-recommended" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Install uv (recommended)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#3-create-virtual-environment-install-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2195,6 +2173,7 @@
 
 <h2 id="prerequisites">Prerequisites</h2>
 <h3 id="required-software">Required software</h3>
+<p>You will need the following software installed in order to get started with setting up development environment:  </p>
 <table>
 <thead>
 <tr>
@@ -2249,14 +2228,10 @@ following commands can be used to figure what packages you already installed:</p
 </div>
 <h2 id="setting-up-development-environment">Setting up development environment</h2>
 <h3 id="1-clone-repository">1. Clone repository</h3>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/civictechdc/cib-mango-tree.git
-<span class="nb">cd</span><span class="w"> </span>cib-mango-tree
+<p>First clone the remote repository:  </p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/civictechdc/cib-mango-tree.git<span class="w">  </span><span class="c1"># creates cib-mango-tree folder in the current directory</span>
+<span class="nb">cd</span><span class="w"> </span>cib-mango-tree<span class="w">  </span><span class="c1"># navigate to the folder with cloned repository</span>
 </code></pre></div>
-<h3 id="2-install-uv-recommended">2. Install uv (recommended)</h3>
-<div class="admonition tip">
-<p class="admonition-title">Skip if you prefer traditional pip</p>
-<p>If you don't want to use <code>uv</code>, you can skip this step and use the traditional pip method in the next section.</p>
-</div>
 <h3 id="3-create-virtual-environment-install-dependencies">3. Create virtual environment &amp; install dependencies</h3>
 <p>Choose your preferred method for setting up your development environment:</p>
 <details class="info">
@@ -2337,7 +2312,7 @@ black<span class="w"> </span>.
 </code></pre></div></p>
 <h2 id="starting-the-application">Starting the Application</h2>
 <h3 id="basic-usage">Basic Usage</h3>
-<p>Once you have activate the environment and installed dependecies, invoke the <code>cibmangotree.py</code> script from project root:<br />
+<p>Once you have activated the environment and installed dependecies, invoke the <code>cibmangotree.py</code> script from project root:<br />
 <div class="highlight"><pre><span></span><code><span class="c1"># Start the application</span>
 python<span class="w"> </span>-m<span class="w"> </span>cibmangotree
 </code></pre></div></p>
@@ -2385,7 +2360,7 @@ python<span class="w"> </span>-m<span class="w"> </span>cibmangotree
 <div class="highlight"><pre><span></span><code><span class="c1"># Build standalone executable</span>
 pyinstaller<span class="w"> </span>pyinstaller.spec
 </code></pre></div>
-<p>Output (<code>cibmangotree.app</code> or <code>cimangotree.exe</code>) will be in dist/ directory</p>
+<p>Output (<code>cibmangotree.app</code> or <code>cimangotree.exe</code>) will be in <code>dist</code> directory.</p>
 <h3 id="build-requirements">Build Requirements</h3>
 <ul>
 <li>Included in <code>requirements-dev.txt</code></li>
@@ -2397,11 +2372,11 @@ pyinstaller<span class="w"> </span>pyinstaller.spec
 <p>One common issue when installing the dependencies for python is the installation
 failing due to compatibility issues with the python package <code>pyarrow</code>. The compatibility
 issues are due to a version mismatch between pyarrow and python itself.
-To resolve this issue,you <strong>MUST</strong> be on version <strong>3.12</strong> for python.
-Refer to <a href="#3-create-virtual-environment--install-dependencies">commands above</a> to switch to the correct version.</p>
+To resolve this issue, you must be on version 3.12 for python.
+Refer to <a href="#3-create-virtual-environment-install-dependencies">commands above</a> to switch to the correct version.</p>
 <h2 id="next-steps">Next Steps</h2>
 <p>Once you have everything installed and running without any problems,
-the next step is to check out the <a href="contributing.md">Contributor Workflow</a></p>
+the next step is to check out the <a href="../../contributing/github_workflow/">GitHub Contributor Workflow</a> for contributing changes.</p>
 
 
 
