@@ -1,27 +1,20 @@
-# Mango Tango CLI
 
-## Repository Overview
+CIB Mango Tree is a Python-based, open source toolkit for detecting coordinated inauthentic behavior (CIB) in social media datasets. It is designed for researchers, data journalists, fact-checkers, and watchdogs working to identify manipulation and inauthentic activity online.
 
-**Mango Tango CLI** is a Python terminal-based tool for social media data
-analysis and visualization. It provides a modular, extensible architecture
-that separates core application logic from analysis modules, ensuring
-consistent UX while allowing easy contribution of new analyzers.
-The following documentation in this section is meant to provide a
-general overview of how the codebase for the project is structured,
-and to provide some context on patterns used throughout the project.
+Through an interactive terminal interface, users can import datasets, check data quality, create analysis projects, and explore results in interactive dashboards without having to writing code. This makes peer-reviewed CIB analysis methods accessible to users with little to no programming experience.
 
-### Purpose & Domain
+!["Application welcome screen and logo in the terminal"](../../img/cibmt_splash_logo.png)
+/// caption
+The welcome screen of the application
+///
 
-- **Social Media Analytics**: Hashtag analysis, n-gram analysis, temporal
-  patterns, user coordination
-- **Modular Architecture**: Clear separation between data import/export,
-  analysis, and presentation
-- **Interactive Workflows**: Terminal-based UI with web dashboard capabilities
-- **Extensible Design**: Plugin-like analyzer system for easy expansion
+## Tech Stack
 
-### Tech Stack
+CIB Mango Tree relies on the following packages and data science tooling from the Python ecosystem:  
 
-- **Core**: Python 3.12, Inquirer (CLI), TinyDB (metadata), Starlette & Uvicorn (web-server)
-- **Data**: Polars/Pandas, PyArrow, Parquet files
-- **Web**: Dash, Shiny for Python, Plotly, React
-- **Dev Tools**: Black, isort, pytest, PyInstaller
+| Domain | Technologies |
+|----------|--------------|
+| Core | Python 3.12, Inquirer (TUI), TinyDB (metadata), Starlette & Uvicorn (web-server) |
+| Data | Polars/Pandas, PyArrow, Parquet files |
+| Web | Dash, Shiny for Python, Plotly |
+| Dev Tools | Black, isort, pytest, PyInstaller |
