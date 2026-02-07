@@ -2,6 +2,8 @@
 
 ## Required software
 
+You will need the following software installed in order to get started with setting up development environment:  
+
 | Software  |  Needed for  |
 | --- | --- |
 | Python 3.12 | Required for all features to work correctly |
@@ -43,17 +45,12 @@ following commands can be used to figure what packages you already installed:
 
 ## 1. Clone repository
 
+First clone the remote repository:  
+
 ```bash
-git clone https://github.com/civictechdc/cib-mango-tree.git
-cd cib-mango-tree
+git clone https://github.com/civictechdc/cib-mango-tree.git  # creates cib-mango-tree folder in the current directory
+cd cib-mango-tree  # navigate to the folder with cloned repository
 ```
-
-## 2. Install uv (recommended)
-
-
-
-!!! tip "Skip if you prefer traditional pip"
-    If you don't want to use `uv`, you can skip this step and use the traditional pip method in the next section.
 
 ## 3. Create virtual environment & install dependencies
 
@@ -150,7 +147,7 @@ No-op flag detected. Exiting successfully.
 
 ## Basic Usage
 
-Once you have activate the environment and installed dependecies, invoke the `cibmangotree.py` script from project root:  
+Once you have activated the environment and installed dependecies, invoke the `cibmangotree.py` script from project root:  
 ```bash
 # Start the application
 python -m cibmangotree
@@ -189,7 +186,7 @@ No manual database setup required.
 pyinstaller pyinstaller.spec
 ```
 
-Output (`cibmangotree.app` or `cimangotree.exe`) will be in dist/ directory
+Output (`cibmangotree.app` or `cimangotree.exe`) will be in `dist` directory.
 
 ## Build Requirements
 
@@ -204,11 +201,11 @@ Output (`cibmangotree.app` or `cimangotree.exe`) will be in dist/ directory
 One common issue when installing the dependencies for python is the installation
 failing due to compatibility issues with the python package `pyarrow`. The compatibility
 issues are due to a version mismatch between pyarrow and python itself.
-To resolve this issue,you **MUST** be on version **3.12** for python.
-Refer to [commands above](#3-create-virtual-environment--install-dependencies) to switch to the correct version.
+To resolve this issue, you must be on version 3.12 for python.
+Refer to [commands above](#3-create-virtual-environment-install-dependencies) to switch to the correct version.
 
 
 # Next Steps
 
 Once you have everything installed and running without any problems,
-the next step is to check out the [Contributor Workflow](contributing.md)
+the next step is to check out the [GitHub Contributor Workflow](../contributing/github_workflow.md) for contributing changes.
