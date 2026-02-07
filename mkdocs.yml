@@ -22,6 +22,7 @@ nav:
               - "React (WIP)": "guides/contributing/dashboards/react.md"
             - "Logging": "guides/contributing/logging.md"
             - "Testing": "guides/contributing/testing.md"
+            - "AI-assisted Development": "guides/contributing/ai_assisted_dev.md"
       - "Design Philosophy":
           - "Architecture": "guides/design-philosophy/architecture.md"
           - "Core Domain": "guides/design-philosophy/core-domain.md"
