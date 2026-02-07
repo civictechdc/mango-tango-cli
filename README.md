@@ -1,9 +1,12 @@
-<h2 align="center">CIB Mango Tree</h2>
+<h1 align="center">CIB Mango Tree</h1>
+
 <h3 align="center">An Interactive Command Line and Dashboard Tool for Detecting Coordinated Inauthentic Behavior Datasets of Online Activity</h3>
 
+
 <p align="center">
-<img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG" alt="Mango logo" style="width:200px;"/>
+<img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG" alt="Mango logo" style="width:120px"/>
 </p>
+
 
 <p align="center">
 <a href="https://www.python.org/"><img alt="code" src="https://img.shields.io/badge/Python-3.12-blue?logo=Python"></a>
@@ -17,63 +20,27 @@
 
 ---
 
-## Technical Documentation
+<br>
 
-For in-depth technical docs related to this repository please visit: [https://civictechdc.github.io/cib-mango-tree](https://civictechdc.github.io/cib-mango-tree)
+![](./docs/img/cibmt_splash_logo.png)
 
-## Requirements
+## Download latest release
 
-Python 3.12 (see [requirements.txt](https://github.com/civictechdc/mango-tango-cli/blob/main/requirements.txt))
+The latest release is available under Assets in the Releases tab: 
+  
+[CIB Mango Tree latest](https://github.com/civictechdc/cib-mango-tree/releases/latest)
 
-## Setting up
+## Contributing
 
-- Make sure you have Python 3.12 installed on your system.
-- Create the virtual environment at `venv` using the following command:
+New contributions are welcome! Before contributing, please check out our [CIB Mango Tree Development Guide](civictechdc.github.io/cib-mango-tree). If you are not yet familiar with the project, our [New Contributor Guide](civictechdc.github.io/cib-mango-tree/guides/contributing/new_contributor_guide) is the best place to start.
 
-```shell
-python -m venv venv
-```
+### Installing development version
+If you are already familiar with the bigger picture, head over to the [Installation guide](civictechdc.github.io/cib-mango-tree/guides/get-started/installation/) in our docs to see how to setup your development environment.
 
-- Activate the bootstrap script for your shell environmennt:
-  - PS1: `./bootstrap.ps1`
-  - Bash: `./bootstrap.sh`
 
-  This will install the required dependencies for project development,
-  activate a pre-commit hook that will format the code using `isort` and
-  `black`.
+### AI-assisted development.
 
-## Starting the application
-
-```shell
-python -m cibmangotree
-```
-
-## Development Guide and Documentation
-
-[Development Guide](./docs/guides/contributing/contributing.md)
-
-## AI Development Assistant Setup
-
-This repository includes hybrid AI documentation enhanced with semantic code analysis:
-
-- **For Claude Code users**: See `CLAUDE.md` + Serena MCP integration
-  - **Important**: Always start sessions with "Read the initial instructions"
-- **For Cursor users**: See `.cursorrules` + `.ai-context/`
-- **For other AI tools**: See `.ai-context/README.md`
-- **For deep semantic analysis**: Serena memories in `.serena/memories/`
-
-### Quick Start for Contributors
-
-1. **Claude Code**: Start with "Read the initial instructions", then follow CLAUDE.md
-2. **Cursor**: Reference .cursorrules for quick setup
-3. **Other tools**: Begin with .ai-context/README.md
-
-The AI documentation provides:
-
-- **Symbol-level code navigation** with precise file locations
-- **Architectural insights** from semantic analysis
-- **Context-efficient documentation** for faster onboarding
-- **Cross-tool compatibility** for different AI assistants
+This repository includes hybrid AI documentation enhanced with semantic code analysis. Please see our short [AI-assisted Development Guide](civictechdc.github.io/cib-mango-tree/guides/contributing/ai_assisted_dev).
 
 ## License
 
