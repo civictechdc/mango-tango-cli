@@ -35,6 +35,9 @@
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
       
 
 
@@ -54,6 +57,8 @@
     
       <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -63,7 +68,12 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="cibmt" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -114,8 +124,8 @@
       </div>
     </div>
     
+      
     
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -639,7 +649,7 @@
   <a href="#required-software" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Required Software
+        Required software
       
     </span>
   </a>
@@ -650,18 +660,7 @@
   <a href="#system-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        System Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resources
+        System requirements
       
     </span>
   </a>
@@ -672,7 +671,7 @@
   <a href="#checking-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Checking Dependencies
+        Checking dependencies
       
     </span>
   </a>
@@ -700,7 +699,7 @@
   <a href="#1-clone-repository" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Clone Repository
+        1. Clone repository
       
     </span>
   </a>
@@ -708,10 +707,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-create-virtual-environment" class="md-nav__link">
+  <a href="#3-create-virtual-environment-install-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Create Virtual Environment
+        3. Create virtual environment &amp; install dependencies
       
     </span>
   </a>
@@ -719,10 +718,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-bootstrap-development-environment" class="md-nav__link">
+  <a href="#4-set-up-pre-commit-hooks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Bootstrap Development Environment
+        4. Set up pre-commit hooks
       
     </span>
   </a>
@@ -730,10 +729,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-verify-installation" class="md-nav__link">
+  <a href="#5-verify-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Verify Installation
+        5. Verify installation
       
     </span>
   </a>
@@ -746,22 +745,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#activating-virtual-environment" class="md-nav__link">
+  <a href="#starting-the-application" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Activating Virtual Environment
+        Starting the Application
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Activating Virtual Environment">
+    <nav class="md-nav" aria-label="Starting the Application">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#code-formatting" class="md-nav__link">
+  <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Code Formatting
+        Basic Usage
       
     </span>
   </a>
@@ -774,15 +773,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#database-and-storage" class="md-nav__link">
+  <a href="#project-storage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Database and Storage
+        Project storage
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Database and Storage">
+    <nav class="md-nav" aria-label="Project storage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -813,68 +812,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-the-application" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running the Application
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running the Application">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Usage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#development-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Development Mode
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#development-mode-for-the-react-dashboards" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Development Mode for The React Dashboards
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#build-setup-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Build Setup (Optional)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Build Setup (Optional)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#executable-building" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -883,102 +820,14 @@
     </span>
   </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bundle-building-for-react-dashboard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Bundle Building for React Dashboard
-      
-    </span>
-  </a>
-  
-</li>
+    <nav class="md-nav" aria-label="Executable Building">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#build-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
         Build Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ide-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        IDE Integration
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="IDE Integration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#recommended-ide-settings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recommended IDE Settings
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#git-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Git Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#version-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Version Management
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Version Management">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pyenv" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        pyenv
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#nvm" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        nvm
       
     </span>
   </a>
@@ -1007,28 +856,6 @@
     <span class="md-ellipsis">
       
         Common Dependency Issues
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-common-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other Common Issues
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Environment Variables
       
     </span>
   </a>
@@ -1210,7 +1037,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/contributing/" class="md-nav__link">
+      <a href="../../contributing/github_workflow/" class="md-nav__link">
         
   
   
@@ -1418,6 +1245,34 @@
     
   
     Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/ai_assisted_dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI-assisted Development
   
 
     
@@ -2008,7 +1863,7 @@
   <a href="#required-software" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Required Software
+        Required software
       
     </span>
   </a>
@@ -2019,18 +1874,7 @@
   <a href="#system-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        System Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resources
+        System requirements
       
     </span>
   </a>
@@ -2041,7 +1885,7 @@
   <a href="#checking-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Checking Dependencies
+        Checking dependencies
       
     </span>
   </a>
@@ -2069,7 +1913,7 @@
   <a href="#1-clone-repository" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Clone Repository
+        1. Clone repository
       
     </span>
   </a>
@@ -2077,10 +1921,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-create-virtual-environment" class="md-nav__link">
+  <a href="#3-create-virtual-environment-install-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Create Virtual Environment
+        3. Create virtual environment &amp; install dependencies
       
     </span>
   </a>
@@ -2088,10 +1932,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-bootstrap-development-environment" class="md-nav__link">
+  <a href="#4-set-up-pre-commit-hooks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Bootstrap Development Environment
+        4. Set up pre-commit hooks
       
     </span>
   </a>
@@ -2099,10 +1943,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-verify-installation" class="md-nav__link">
+  <a href="#5-verify-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Verify Installation
+        5. Verify installation
       
     </span>
   </a>
@@ -2115,22 +1959,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#activating-virtual-environment" class="md-nav__link">
+  <a href="#starting-the-application" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Activating Virtual Environment
+        Starting the Application
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Activating Virtual Environment">
+    <nav class="md-nav" aria-label="Starting the Application">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#code-formatting" class="md-nav__link">
+  <a href="#basic-usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Code Formatting
+        Basic Usage
       
     </span>
   </a>
@@ -2143,15 +1987,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#database-and-storage" class="md-nav__link">
+  <a href="#project-storage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Database and Storage
+        Project storage
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Database and Storage">
+    <nav class="md-nav" aria-label="Project storage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2182,68 +2026,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-the-application" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running the Application
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running the Application">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Usage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#development-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Development Mode
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#development-mode-for-the-react-dashboards" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Development Mode for The React Dashboards
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#build-setup-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Build Setup (Optional)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Build Setup (Optional)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#executable-building" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2252,102 +2034,14 @@
     </span>
   </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bundle-building-for-react-dashboard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Bundle Building for React Dashboard
-      
-    </span>
-  </a>
-  
-</li>
+    <nav class="md-nav" aria-label="Executable Building">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#build-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
         Build Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ide-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        IDE Integration
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="IDE Integration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#recommended-ide-settings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recommended IDE Settings
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#git-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Git Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#version-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Version Management
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Version Management">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pyenv" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        pyenv
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#nvm" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        nvm
       
     </span>
   </a>
@@ -2376,28 +2070,6 @@
     <span class="md-ellipsis">
       
         Common Dependency Issues
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-common-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other Common Issues
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Environment Variables
       
     </span>
   </a>
@@ -2500,101 +2172,151 @@
   <h1>Installation</h1>
 
 <h2 id="prerequisites">Prerequisites</h2>
-<h3 id="required-software">Required Software</h3>
+<h3 id="required-software">Required software</h3>
+<p>You will need the following software installed in order to get started with setting up development environment:  </p>
+<table>
+<thead>
+<tr>
+<th>Software</th>
+<th>Needed for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python 3.12</td>
+<td>Required for all features to work correctly</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>Required for version control and contributing</td>
+</tr>
+<tr>
+<td>command line/terminal</td>
+<td>Application runs in terminal</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Installing Python/Git</p>
+<p>If you haven't installed git and/or python yet refer to the
+following links for instructions:</p>
 <ul>
-<li><strong>Python 3.12</strong>: Required for all features to work correctly</li>
-<li>Node.JS (20.0.0 or above): Required for the React dashboards
-  to work correctly</li>
-<li><strong>Git</strong>: For version control and contributing</li>
-<li><strong>Terminal/Command Line</strong>: Application runs in terminal interface</li>
+<li><a href="https://git-scm.com/install/">Git installation</a></li>
+<li><a href="https://www.python.org/downloads/">Python installation</a></li>
 </ul>
-<h3 id="system-requirements">System Requirements</h3>
+</div>
+<h3 id="system-requirements">System requirements</h3>
 <ul>
-<li><strong>Operating System</strong>: Windows (PowerShell), macOS, Linux</li>
-<li><strong>Memory</strong>: 4GB+ RAM (for processing large datasets)</li>
-<li><strong>Storage</strong>: 1GB+ free space (for project data and virtual environment)</li>
+<li>Operating System: Windows (PowerShell), macOS, Linux</li>
+<li>Memory: 4GB+ RAM (for processing large datasets)</li>
+<li>Storage: 1GB+ free space (for project data and virtual environment)</li>
 </ul>
-<h3 id="resources">Resources</h3>
-<p>If you haven't installed git, node.js, and/or python yet refer to the
-following links for instructions on downloading and installing said packages:</p>
-<ul>
-<li><a href="https://codefinity.com/blog/A-step-by-step-guide-to-Git-installation">https://codefinity.com/blog/A-step-by-step-guide-to-Git-installation</a></li>
-<li><a href="https://nodejs.org/en/download">https://nodejs.org/en/download</a></li>
-<li><a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a></li>
-</ul>
-<h3 id="checking-dependencies">Checking Dependencies</h3>
+<h3 id="checking-dependencies">Checking dependencies</h3>
 <p>If you're not sure which packages you already have installed on your system, the
 following commands can be used to figure what packages you already installed:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Linux &amp; Mac OS</label><label for="__tabbed_1_2">Windows</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>which<span class="w"> </span>&lt;program_name_here<span class="w"> </span><span class="o">(</span>node<span class="p">|</span>python<span class="p">|</span>git<span class="o">)</span>&gt;
+<div class="highlight"><pre><span></span><code>which<span class="w"> </span>&lt;program_name_here<span class="w"> </span><span class="o">(</span>python<span class="p">|</span>git<span class="o">)</span>&gt;
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="n">where</span><span class="p">.</span><span class="n">exe</span> <span class="p">&lt;</span><span class="n">program_name_here</span> <span class="p">(</span><span class="n">node</span><span class="p">|</span><span class="n">python</span><span class="p">|</span><span class="n">git</span><span class="p">)&gt;</span> 
+<div class="highlight"><pre><span></span><code><span class="n">where</span><span class="p">.</span><span class="n">exe</span> <span class="p">&lt;</span><span class="n">program_name_here</span> <span class="p">(</span><span class="n">python</span><span class="p">|</span><span class="n">git</span><span class="p">)&gt;</span> 
 </code></pre></div>
 </div>
 </div>
 </div>
 <h2 id="setting-up-development-environment">Setting up development environment</h2>
-<h3 id="1-clone-repository">1. Clone Repository</h3>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/CIB-Mango-Tree/mango-tango-cli.git
-<span class="nb">cd</span><span class="w"> </span>mango-tango-cli
+<h3 id="1-clone-repository">1. Clone repository</h3>
+<p>First clone the remote repository:  </p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/civictechdc/cib-mango-tree.git<span class="w">  </span><span class="c1"># creates cib-mango-tree folder in the current directory</span>
+<span class="nb">cd</span><span class="w"> </span>cib-mango-tree<span class="w">  </span><span class="c1"># navigate to the folder with cloned repository</span>
 </code></pre></div>
-<h3 id="2-create-virtual-environment">2. Create Virtual Environment</h3>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<h3 id="3-create-virtual-environment-install-dependencies">3. Create virtual environment &amp; install dependencies</h3>
+<p>Choose your preferred method for setting up your development environment:</p>
+<details class="info">
+<summary>Installing uv</summary>
+<p><code>uv</code> is an extremely fast Python package manager (10-100x faster than pip) that simplifies virtual environment and dependency management.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">macOS/Linux</label><label for="__tabbed_2_2">Windows (PowerShell)</label><label for="__tabbed_2_3">Alternative (via pip)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
 </code></pre></div>
-<p>Verify Python version:</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">powershell</span> <span class="n">-ExecutionPolicy</span> <span class="n">ByPass</span> <span class="n">-c</span> <span class="s2">&quot;irm https://astral.sh/uv/install.ps1 | iex&quot;</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>uv
+</code></pre></div>
+</div>
+</div>
+</div>
+</details>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">uv (recommended - faster)</label><label for="__tabbed_3_2">pip (traditional)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Create virtual environment</span>
+uv<span class="w"> </span>venv
+
+<span class="c1">#Activate virtual environment (macOS/Linux)</span>
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+
+<span class="c1"># OR: if using Windows and PowerShell</span>
+<span class="c1"># venv\Scripts\activate</span>
+
+<span class="c1"># Install dependencies</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt<span class="w">  </span><span class="c1"># also includes requirements.txt</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Create virtual environment</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+
+<span class="c1"># Activate virtual environment (macOS/Linux)</span>
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+<span class="c1"># OR: if using Windows and PowerShell</span>
+<span class="c1"># venv\Scripts\activate</span>
+
+<span class="c1"># Install dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+</code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Verify Python version</p>
+<p>Ensure you're using Python 3.12.x:
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>--version<span class="w">  </span><span class="c1"># Should show Python 3.12.x</span>
-</code></pre></div>
-<h3 id="3-bootstrap-development-environment">3. Bootstrap Development Environment</h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Mac OS/Linux</label><label for="__tabbed_2_2">Windows (PowerShell)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>./bootstrap.sh
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="p">./</span><span class="n">bootstrap</span><span class="p">.</span><span class="n">ps1</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<p>The bootstrap script will:</p>
-<ul>
-<li>Activate the virtual environment</li>
-<li>Install all dependencies from <code>requirements-dev.txt</code></li>
-<li>Set up pre-commit hooks for code formatting</li>
-</ul>
-<h3 id="4-verify-installation">4. Verify Installation</h3>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>cibmangotree<span class="w"> </span>--noop
-</code></pre></div>
-<p>Should output: 
-<div class="highlight"><pre><span></span><code>No-op<span class="w"> </span>flag<span class="w"> </span>detected.<span class="w"> </span>Exiting<span class="w"> </span>successfully.
 </code></pre></div></p>
-<h2 id="activating-virtual-environment">Activating Virtual Environment</h2>
-<p>After Completing the Installation the following commands can be used to activate
-the virtual environment in order to work with the project.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Mac OS/Linux (Bash)</label><label for="__tabbed_3_2">Windows (PowerSheel)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>./venv/bin/activate
-</code></pre></div>
 </div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="p">./</span><span class="n">env</span><span class="p">/</span><span class="n">bin</span><span class="p">/</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<h3 id="code-formatting">Code Formatting</h3>
-<p>The project uses <a href="https://pypi.org/project/black/">Black</a> for code style and formatting, <a href="https://pycqa.github.io/isort/index.html">isort</a> for organization of import modules, and <a href="https://pre-commit.com/">Pre-commit</a> hooks for automatic formatting applied on every commit.</p>
-<p>If you installed Black and isort, you can manually format the code by running the following commands in the project root:  </p>
+<h3 id="4-set-up-pre-commit-hooks">4. Set up pre-commit hooks</h3>
+<p><a href="https://pre-commit.com/">Pre-commit</a> hooks (in <code>pre-commit-config.yaml</code>) automatically format your code with <a href="https://pypi.org/project/black/">Black</a> and <a href="https://pycqa.github.io/isort/index.html">isort</a> before each commit.</p>
+<p>In the root of the cloned repository install pre-commit:<br />
+<div class="highlight"><pre><span></span><code><span class="c1"># Install pre-commit hooks</span>
+pre-commit<span class="w"> </span>install
+</code></pre></div></p>
+<div class="admonition tip">
+<p class="admonition-title">Manual formatting</p>
+<p>You can also format code manually:
 <div class="highlight"><pre><span></span><code>isort<span class="w"> </span>.
 black<span class="w"> </span>.
+</code></pre></div></p>
+</div>
+<h3 id="5-verify-installation">5. Verify installation</h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>cibmangotree<span class="w"> </span>--noop
 </code></pre></div>
-<h2 id="database-and-storage">Database and Storage</h2>
+<p>If all went well, you should see: 
+<div class="highlight"><pre><span></span><code>No-op<span class="w"> </span>flag<span class="w"> </span>detected.<span class="w"> </span>Exiting<span class="w"> </span>successfully.
+</code></pre></div></p>
+<h2 id="starting-the-application">Starting the Application</h2>
+<h3 id="basic-usage">Basic Usage</h3>
+<p>Once you have activated the environment and installed dependecies, invoke the <code>cibmangotree.py</code> script from project root:<br />
+<div class="highlight"><pre><span></span><code><span class="c1"># Start the application</span>
+python<span class="w"> </span>-m<span class="w"> </span>cibmangotree
+</code></pre></div></p>
+<h2 id="project-storage">Project storage</h2>
 <h3 id="application-data-directory">Application Data Directory</h3>
 <p>The application automatically creates data directories:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="4:3"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><input id="__tabbed_4_3" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">MacOS</label><label for="__tabbed_4_2">Windows</label><label for="__tabbed_4_3">Linux</label></div>
@@ -2611,151 +2333,50 @@ black<span class="w"> </span>.
 </div>
 </div>
 <h3 id="database-initialization">Database Initialization</h3>
-<ul>
-<li><strong>TinyDB</strong>: Automatically initialized on first run</li>
-<li><strong>Project Files</strong>: Created in user data directory</li>
-<li><strong>Parquet Files</strong>: Used for all analysis data storage</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>Storage component</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TinyDB</td>
+<td>Automatically initialized on first run</td>
+</tr>
+<tr>
+<td>Project Files</td>
+<td>Created in user data directory</td>
+</tr>
+<tr>
+<td>Parquet Files</td>
+<td>Used for all analysis data storage</td>
+</tr>
+</tbody>
+</table>
 <p>No manual database setup required.</p>
-<h2 id="running-the-application">Running the Application</h2>
-<h3 id="basic-usage">Basic Usage</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Start the application</span>
-python<span class="w"> </span>-m<span class="w"> </span>cibmangotree
-</code></pre></div>
-<h3 id="development-mode">Development Mode</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run with debugging/development flags</span>
-python<span class="w"> </span>-m<span class="w"> </span>cibmangotree<span class="w"> </span>--noop<span class="w">  </span><span class="c1"># Test mode, exits immediately</span>
-</code></pre></div>
-<h3 id="development-mode-for-the-react-dashboards">Development Mode for The React Dashboards</h3>
-<p>The following commands can be used to start the development vite server for the
-react dashboards that are currently in development.</p>
-<p><strong>npm</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>./app/web_templates
-npm<span class="w"> </span>run<span class="w"> </span>dev
-</code></pre></div>
-<p><strong>pnpm</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>./app/web_templates
-pnpm<span class="w"> </span>dev
-</code></pre></div>
-<h2 id="build-setup-optional">Build Setup (Optional)</h2>
-<h3 id="executable-building">Executable Building</h3>
+<h2 id="executable-building">Executable Building</h2>
 <div class="highlight"><pre><span></span><code><span class="c1"># Build standalone executable</span>
 pyinstaller<span class="w"> </span>pyinstaller.spec
-
-<span class="c1"># Output will be in dist/ directory</span>
 </code></pre></div>
-<h3 id="bundle-building-for-react-dashboard">Bundle Building for React Dashboard</h3>
-<p><strong>npm</strong>:</p>
-<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>run<span class="w"> </span>build
-</code></pre></div>
-<p><strong>pnpm</strong>:</p>
-<div class="highlight"><pre><span></span><code>pnpm<span class="w"> </span>build
-</code></pre></div>
+<p>Output (<code>cibmangotree.app</code> or <code>cimangotree.exe</code>) will be in <code>dist</code> directory.</p>
 <h3 id="build-requirements">Build Requirements</h3>
 <ul>
 <li>Included in <code>requirements-dev.txt</code></li>
 <li>Used primarily for release distribution</li>
 <li>Not required for development</li>
 </ul>
-<h2 id="ide-integration">IDE Integration</h2>
-<h3 id="recommended-ide-settings">Recommended IDE Settings</h3>
-<p><strong>VS Code</strong> (<code>.vscode/</code> configuration):</p>
-<ul>
-<li>Python interpreter: <code>./venv/bin/python</code></li>
-<li>Black formatter integration</li>
-<li>isort integration</li>
-<li>pytest test discovery</li>
-</ul>
-<p><strong>PyCharm</strong>:</p>
-<ul>
-<li>Interpreter: Project virtual environment</li>
-<li>Code style: Black</li>
-<li>Import optimizer: isort</li>
-</ul>
-<h3 id="git-configuration">Git Configuration</h3>
-<p><strong>Pre-commit Hooks</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Hooks are set up automatically by bootstrap script</span>
-<span class="c1"># Manual setup if needed:</span>
-pip<span class="w"> </span>install<span class="w"> </span>pre-commit
-pre-commit<span class="w"> </span>install
-</code></pre></div>
-<p><strong>Git Flow</strong>:</p>
-<ul>
-<li>Branch from <code>develop</code> (not <code>main</code>)</li>
-<li>Feature branches: <code>feature/name</code></li>
-<li>Bug fixes: <code>bugfix/name</code></li>
-</ul>
-<h2 id="version-management">Version Management</h2>
-<p>If you already have Python and Node.JS installed but are on different versions
-from the versions outlined in the <a href="#prerequisites">requirements</a> above you can switch
-to the correct versions for both languages for the project using version managers.
-The version manager for python is <a href="https://github.com/pyenv/pyenv">pyenv</a>.
-Where the version manager that is recommended for Node is <a href="https://github.com/nvm-sh/nvm">nvm</a>.
-Guides for installing both version managers are linked down below if you need
-references to go off of.</p>
-<ul>
-<li><a href="https://www.freecodecamp.org/news/node-version-manager-nvm-install-guide/">https://www.freecodecamp.org/news/node-version-manager-nvm-install-guide/</a></li>
-<li><a href="https://github.com/pyenv/pyenv?tab=readme-ov-file#installation">https://github.com/pyenv/pyenv?tab=readme-ov-file#installation</a></li>
-<li><a href="https://github.com/pyenv-win/pyenv-win?tab=readme-ov-file#installation">https://github.com/pyenv-win/pyenv-win?tab=readme-ov-file#installation</a>
-  (If you're on windows and want to install pyenv)</li>
-</ul>
-<p>Once you have both version managers installed the following commands can be used
-to switch versions.</p>
-<h3 id="pyenv">pyenv</h3>
-<div class="highlight"><pre><span></span><code>pyenv<span class="w"> </span>install<span class="w"> </span><span class="m">3</span>.12
-pyenv<span class="w"> </span><span class="nb">local</span><span class="w"> </span><span class="m">3</span>.12
-</code></pre></div>
-<h3 id="nvm">nvm</h3>
-<div class="highlight"><pre><span></span><code>nvm<span class="w"> </span>install<span class="w"> </span>v21.0.0
-nvm<span class="w"> </span>use<span class="w"> </span>v21.0.0
-</code></pre></div>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <h3 id="common-dependency-issues">Common Dependency Issues</h3>
 <p>One common issue when installing the dependencies for python is the installation
 failing due to compatibility issues with the python package <code>pyarrow</code>. The compatibility
 issues are due to a version mismatch between pyarrow and python itself.
-To resolve this issue,you <strong>MUST</strong> be on version <strong>3.12</strong> for python.
-Refer to <a href="#pyenv">commands above</a> to switch to the correct version.</p>
-<p>Similarly, the installation for node dependencies has been known to fail for
-some developers due to a version mismatch caused by the underlying dependencies
-for the package <code>@glideapps/glide-data-grid</code>. However, getting around this issue
-is more straightforward with node packages. Running the installation command for
-node with the flag <code>--legacy-peer-deps</code> is enough for the installation to work
-if you run into this issue. The commands needed to run the installation manually
-from the project root are as such.</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>./app/web_templates
-npm<span class="w"> </span>install<span class="w"> </span>--legacy-peer-deps
-</code></pre></div>
-<h3 id="other-common-issues">Other Common Issues</h3>
-<p><strong>Import Errors</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Ensure virtual environment is activated</span>
-<span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># macOS/Linux</span>
-venv<span class="se">\S</span>cripts<span class="se">\A</span>ctivate.ps1<span class="w">     </span><span class="c1"># Windows</span>
-
-<span class="c1"># Reinstall dependencies</span>
-pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
-</code></pre></div>
-<p><strong>Formatting Errors in CI</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Run formatters locally before committing</span>
-isort<span class="w"> </span>.
-black<span class="w"> </span>.
-</code></pre></div>
-<p><strong>Test Failures</strong>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Ensure test data is present</span>
-ls<span class="w"> </span>analyzers/*/test_data/
-
-<span class="c1"># Check if specific analyzer tests pass</span>
-pytest<span class="w"> </span>analyzers/hashtags/<span class="w"> </span>-v
-</code></pre></div>
-<h3 id="environment-variables">Environment Variables</h3>
-<p><strong>Optional Configuration</strong>:</p>
-<ul>
-<li><code>MANGOTANGO_DATA_DIR</code> - Override default data directory</li>
-<li><code>MANGOTANGO_LOG_LEVEL</code> - Set logging verbosity</li>
-</ul>
+To resolve this issue, you must be on version 3.12 for python.
+Refer to <a href="#3-create-virtual-environment-install-dependencies">commands above</a> to switch to the correct version.</p>
 <h2 id="next-steps">Next Steps</h2>
 <p>Once you have everything installed and running without any problems,
-the next step is to check out the <a href="contributing.md">Contributor Workflow</a></p>
+the next step is to check out the <a href="../../contributing/github_workflow/">GitHub Contributor Workflow</a> for contributing changes.</p>
 
 
 

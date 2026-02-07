@@ -12,7 +12,7 @@
         <meta name="author" content="CIB Mango Tree">
       
       
-        <link rel="canonical" href="https://cibmangotree.org/guides/contributing/contributing/">
+        <link rel="canonical" href="https://cibmangotree.org/guides/contributing/github_workflow/">
       
       
         <link rel="prev" href="../new_contributor_guide/">
@@ -35,6 +35,9 @@
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
       
 
 
@@ -54,6 +57,8 @@
     
       <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -63,7 +68,12 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="cibmt" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -72,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#github-contribution-workflow-fork-based" class="md-skip">
+        <a href="#github-contribution-workflow" class="md-skip">
           Skip to content
         </a>
       
@@ -114,8 +124,8 @@
       </div>
     </div>
     
+      
     
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -797,33 +807,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#github-contribution-workflow-fork-based" class="md-nav__link">
+  <a href="#github-contribution-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GitHub Contribution Workflow (Fork-Based)
+        GitHub Contribution Workflow
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GitHub Contribution Workflow (Fork-Based)">
+    <nav class="md-nav" aria-label="GitHub Contribution Workflow">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#opening-a-pull-request-pr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Opening a Pull Request (PR)
+        Opening a pull request (PR)
       
     </span>
   </a>
@@ -1031,6 +1030,34 @@
     
   
     Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai_assisted_dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI-assisted Development
   
 
     
@@ -1606,33 +1633,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#github-contribution-workflow-fork-based" class="md-nav__link">
+  <a href="#github-contribution-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GitHub Contribution Workflow (Fork-Based)
+        GitHub Contribution Workflow
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GitHub Contribution Workflow (Fork-Based)">
+    <nav class="md-nav" aria-label="GitHub Contribution Workflow">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#opening-a-pull-request-pr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Opening a Pull Request (PR)
+        Opening a pull request (PR)
       
     </span>
   </a>
@@ -1741,11 +1757,10 @@
 
   <h1>Contributing Changes</h1>
 
-<h2 id="github-contribution-workflow-fork-based">GitHub Contribution Workflow (Fork-Based)</h2>
+<h2 id="github-contribution-workflow">GitHub Contribution Workflow</h2>
 <p>Before following this workflow please refer to our <a href="../new_contributor_guide/"><strong>New Contributor Guide</strong></a> page for instructions on installing dependencies and setting up your development environment.</p>
-<h3 id="overview">Overview</h3>
 <p>All changes should be made in a forked repository, submitted via pull request to the upstream <code>develop</code> branch which will be later merged into <code>main</code> for a new release by maintainers.</p>
-<h3 id="opening-a-pull-request-pr">Opening a Pull Request (PR)</h3>
+<h3 id="opening-a-pull-request-pr">Opening a pull request (PR)</h3>
 <ol>
 <li>
 <p><strong>Fork the repository</strong>   </p>

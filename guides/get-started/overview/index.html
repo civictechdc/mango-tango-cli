@@ -35,6 +35,9 @@
     
       <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
       
 
 
@@ -54,6 +57,8 @@
     
       <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
     <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -63,7 +68,12 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="cibmt" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -72,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mango-tango-cli" class="md-skip">
+        <a href="#tech-stack" class="md-skip">
           Skip to content
         </a>
       
@@ -114,8 +124,8 @@
       </div>
     </div>
     
+      
     
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -596,41 +606,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mango-tango-cli" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mango Tango CLI
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Mango Tango CLI">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#repository-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Repository Overview
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Repository Overview">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#purpose-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Purpose &amp; Domain
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#tech-stack" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -638,16 +613,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -838,7 +803,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/contributing/" class="md-nav__link">
+      <a href="../../contributing/github_workflow/" class="md-nav__link">
         
   
   
@@ -1046,6 +1011,34 @@
     
   
     Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/ai_assisted_dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI-assisted Development
   
 
     
@@ -1621,41 +1614,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mango-tango-cli" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mango Tango CLI
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Mango Tango CLI">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#repository-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Repository Overview
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Repository Overview">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#purpose-domain" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Purpose &amp; Domain
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#tech-stack" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1663,16 +1621,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1755,31 +1703,42 @@
 
   <h1>Overview</h1>
 
-<h2 id="mango-tango-cli">Mango Tango CLI</h2>
-<h3 id="repository-overview">Repository Overview</h3>
-<p><strong>Mango Tango CLI</strong> is a Python terminal-based tool for social media data
-analysis and visualization. It provides a modular, extensible architecture
-that separates core application logic from analysis modules, ensuring
-consistent UX while allowing easy contribution of new analyzers.
-The following documentation in this section is meant to provide a
-general overview of how the codebase for the project is structured,
-and to provide some context on patterns used throughout the project.</p>
-<h4 id="purpose-domain">Purpose &amp; Domain</h4>
-<ul>
-<li><strong>Social Media Analytics</strong>: Hashtag analysis, n-gram analysis, temporal
-  patterns, user coordination</li>
-<li><strong>Modular Architecture</strong>: Clear separation between data import/export,
-  analysis, and presentation</li>
-<li><strong>Interactive Workflows</strong>: Terminal-based UI with web dashboard capabilities</li>
-<li><strong>Extensible Design</strong>: Plugin-like analyzer system for easy expansion</li>
-</ul>
-<h4 id="tech-stack">Tech Stack</h4>
-<ul>
-<li><strong>Core</strong>: Python 3.12, Inquirer (CLI), TinyDB (metadata), Starlette &amp; Uvicorn (web-server)</li>
-<li><strong>Data</strong>: Polars/Pandas, PyArrow, Parquet files</li>
-<li><strong>Web</strong>: Dash, Shiny for Python, Plotly, React</li>
-<li><strong>Dev Tools</strong>: Black, isort, pytest, PyInstaller</li>
-</ul>
+<p>CIB Mango Tree is a Python-based, open source toolkit for detecting coordinated inauthentic behavior (CIB) in social media datasets. It is designed for researchers, data journalists, fact-checkers, and watchdogs working to identify manipulation and inauthentic activity online.</p>
+<p>Through an interactive terminal interface, users can import datasets, check data quality, create analysis projects, and explore results in interactive dashboards without having to writing code. This makes peer-reviewed CIB analysis methods accessible to users with little to no programming experience.</p>
+<figure>
+<p><img alt="&quot;Application welcome screen and logo in the terminal&quot;" src="../../../img/cibmt_splash_logo.png" /></p>
+<figcaption>
+<p>The welcome screen of the application</p>
+</figcaption>
+</figure>
+<h3 id="tech-stack">Tech Stack</h3>
+<p>CIB Mango Tree relies on the following packages and data science tooling from the Python ecosystem:  </p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Technologies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Core</td>
+<td>Python 3.12, Inquirer (TUI), TinyDB (metadata), Starlette &amp; Uvicorn (web-server)</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Polars/Pandas, PyArrow, Parquet files</td>
+</tr>
+<tr>
+<td>Web</td>
+<td>Dash, Shiny for Python, Plotly</td>
+</tr>
+<tr>
+<td>Dev Tools</td>
+<td>Black, isort, pytest, PyInstaller</td>
+</tr>
+</tbody>
+</table>
 
 
 
