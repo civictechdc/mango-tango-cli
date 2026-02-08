@@ -34,6 +34,8 @@ class GuiRoutes(BaseModel):
     configure_analysis: str = "/configure_analysis"
     configure_analysis_parameters: str = "/configure_analysis_parameters"
     preview_dataset: str = "/preview_dataset"
+    run_analysis: str = "/run_analysis"
+    analysis_options: str = "/analysis_options"
 
 
 class GuiColors(BaseModel):
@@ -283,8 +285,10 @@ class GuiPage(BaseModel, abc.ABC):
         - Right: Home button (if not on home page)
         """
         with ui.header(elevated=True):
-            with ui.row().classes("w-full items-center").style(
-                "justify-content: space-between"
+            with (
+                ui.row()
+                .classes("w-full items-center")
+                .style("justify-content: space-between")
             ):
                 # Left: Back button or spacer
                 with ui.element("div").classes("flex items-center"):
@@ -330,8 +334,10 @@ class GuiPage(BaseModel, abc.ABC):
         - Right: External links (GitHub, Instagram)
         """
         with ui.footer(elevated=True):
-            with ui.row().classes("w-full items-center").style(
-                "justify-content: space-between"
+            with (
+                ui.row()
+                .classes("w-full items-center")
+                .style("justify-content: space-between")
             ):
                 # Left: License
                 with ui.element("div").classes("flex items-center"):
