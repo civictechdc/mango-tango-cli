@@ -1,0 +1,2361 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="An interactive python terminal UI wrapper for Mango Tree analyzers.">
+      
+      
+        <meta name="author" content="CIB Mango Tree">
+      
+      
+        <link rel="canonical" href="https://cibmangotree.org/guides/design-philosophy/core-domain/">
+      
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../edge-domain/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Core Domain - CIB Mango Tree</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#core-domain" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CIB Mango Tree
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core Domain
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../get-started/overview/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../reference/analyzer_interface/" class="md-tabs__link">
+          
+  
+  
+  Reference (CLI)
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    CIB Mango Tree
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/analyzers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementing Analyzers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_3" id="__nav_2_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dashboards
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Dashboards
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/dashboards/shiny/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shiny
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/dashboards/react/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React (WIP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Philosophy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design Philosophy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Domain
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Domain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Domain
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Domain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terminal Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage IO
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edge-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Edge Domain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../content-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content Domain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference (CLI)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference (CLI)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/analyzer_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analyzer Interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/preprocessing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preprocessing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/terminal_tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminal Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/importing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Importing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/tokenizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Domain
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Domain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terminal Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage IO
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+      
+        
+  
+  
+    
+    
+      
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../get-started/overview/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Guides
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../architecture/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Design Philosophy
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Core Domain</h1>
+
+<h3 id="core-domain">Core Domain</h3>
+<h4 id="application">Application</h4>
+<p>The Application lives inside the <code>app</code> directory in the project root. This is responsible for defining and executing all capabilities of the application's workspace. Any extension or modification of the application's workspace capabilities should be done here.</p>
+<p>The application code should be free of specific storage implementation and be agnostic about the specifics of the terminal interface and the available analyzers.</p>
+<p>Here's what the entrypoint for the application module looks like</p>
+<p><strong>./app/<strong>init</strong>.py</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">.analysis_context</span> <span class="kn">import</span> <span class="n">AnalysisContext</span>
+<span class="kn">from</span> <span class="nn">.analysis_output_context</span> <span class="kn">import</span> <span class="n">AnalysisOutputContext</span>
+<span class="kn">from</span> <span class="nn">.analysis_webserver_context</span> <span class="kn">import</span> <span class="n">AnalysisWebServerContext</span>
+<span class="kn">from</span> <span class="nn">.app</span> <span class="kn">import</span> <span class="n">App</span>
+<span class="kn">from</span> <span class="nn">.app_context</span> <span class="kn">import</span> <span class="n">AppContext</span>
+<span class="kn">from</span> <span class="nn">.project_context</span> <span class="kn">import</span> <span class="n">ProjectContext</span>
+<span class="kn">from</span> <span class="nn">.settings_context</span> <span class="kn">import</span> <span class="n">SettingsContext</span>
+</code></pre></div>
+<h4 id="terminal-components">Terminal Components</h4>
+<p>The Terminal Components live inside the <code>terminal_tools</code> inside the project root. Their main responsibility is user flow, rendering the terminal interface, and handling user input.</p>
+<p>The user flow understandably depends on the set of capabilities offered by the <a href="#application">Application</a>, so an adjustment there may require an adjustment here.</p>
+<p>Here's what the entrypoint for the termnal module looks like</p>
+<p><strong>./terminal_tools/<strong>init</strong>.py</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">.progress</span> <span class="kn">import</span> <span class="n">ProgressReporter</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clear_printed_lines</span><span class="p">,</span>
+    <span class="n">clear_terminal</span><span class="p">,</span>
+    <span class="n">draw_box</span><span class="p">,</span>
+    <span class="n">enable_windows_ansi_support</span><span class="p">,</span>
+    <span class="n">open_directory_explorer</span><span class="p">,</span>
+    <span class="n">print_ascii_table</span><span class="p">,</span>
+    <span class="n">wait_for_key</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h4 id="storage-io">Storage IO</h4>
+<p>The Storage IO lives Inside the <code>storage</code> directory inside the project root. It is responsible for interacting directly with the file system where the workspace data and data files are stored. It makes decisions on paths, intermediate file formats, and database schema and implementation. It should know as little as possible about how the data is used and should be agnostic about the specifics of the terminal interface and the available analyzers.</p>
+<p>Here's what the entrypoint for the storage module looks like</p>
+<p><strong>./storage/<strong>init</strong>.py</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">platformdirs</span>
+<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">pyarrow.parquet</span> <span class="k">as</span> <span class="nn">pq</span>
+<span class="kn">from</span> <span class="nn">filelock</span> <span class="kn">import</span> <span class="n">FileLock</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span> <span class="nn">tinydb</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">TinyDB</span>
+<span class="kn">from</span> <span class="nn">xlsxwriter</span> <span class="kn">import</span> <span class="n">Workbook</span>
+
+<span class="kn">from</span> <span class="nn">analyzer_interface.interface</span> <span class="kn">import</span> <span class="n">AnalyzerOutput</span>
+<span class="kn">from</span> <span class="nn">analyzer_interface.params</span> <span class="kn">import</span> <span class="n">ParamValue</span>
+
+<span class="kn">from</span> <span class="nn">.file_selector</span> <span class="kn">import</span> <span class="n">FileSelectorStateManager</span>
+
+
+<span class="k">class</span> <span class="nc">ProjectModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;project&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;project&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span> <span class="nc">SettingsModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;settings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;settings&quot;</span>
+    <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">FileSelectionState</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;file_selector_state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;file_selector_state&quot;</span>
+    <span class="n">last_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">AnalysisModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">class_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;analysis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;analysis&quot;</span>
+    <span class="n">analysis_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">primary_analyzer_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">column_mapping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">create_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">param_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParamValue</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">is_draft</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">create_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create_timestamp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_timestamp</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+
+<span class="n">SupportedOutputExtension</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;parquet&quot;</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">Storage</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">app_author</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_data_dir</span> <span class="o">=</span> <span class="n">platformdirs</span><span class="o">.</span><span class="n">user_data_dir</span><span class="p">(</span>
+            <span class="n">appname</span><span class="o">=</span><span class="n">app_name</span><span class="p">,</span> <span class="n">appauthor</span><span class="o">=</span><span class="n">app_author</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span> <span class="o">=</span> <span class="n">platformdirs</span><span class="o">.</span><span class="n">user_cache_dir</span><span class="p">(</span>
+            <span class="n">appname</span><span class="o">=</span><span class="n">app_name</span><span class="p">,</span> <span class="n">appauthor</span><span class="o">=</span><span class="n">app_author</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">TinyDB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_db_path</span><span class="p">())</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bootstrap_analyses_v1</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_selector_state</span> <span class="o">=</span> <span class="n">AppFileSelectorStateManager</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">init_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_temp_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">project_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_unique_project_id</span><span class="p">(</span><span class="n">display_name</span><span class="p">)</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">ProjectModel</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span> <span class="n">display_name</span><span class="o">=</span><span class="n">display_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+
+        <span class="n">project_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">project_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">input_temp_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_input_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">project</span>
+
+    <span class="k">def</span> <span class="nf">list_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">ProjectModel</span><span class="p">(</span><span class="o">**</span><span class="n">project</span><span class="p">)</span> <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">project</span><span class="p">:</span> <span class="n">project</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">((</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">project</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ProjectModel</span><span class="p">(</span><span class="o">**</span><span class="n">project</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">delete_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">))</span>
+        <span class="n">project_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">rename_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;display_name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_project_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_records</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">input_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_input_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">n_rows</span><span class="o">=</span><span class="n">n_records</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_project_input_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">input_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_input_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">scan_parquet</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">count</span><span class="p">())</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">TableStats</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save_project_primary_outputs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">output_id</span><span class="p">,</span> <span class="n">output_df</span> <span class="ow">in</span> <span class="n">outputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_primary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span>
+                    <span class="n">output_id</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">output_df</span><span class="p">,</span>
+                <span class="s2">&quot;parquet&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save_project_secondary_outputs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">output_id</span><span class="p">,</span> <span class="n">output_df</span> <span class="ow">in</span> <span class="n">outputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_secondary_output_root_path</span><span class="p">(</span>
+                        <span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span>
+                    <span class="p">),</span>
+                    <span class="n">output_id</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">output_df</span><span class="p">,</span>
+                <span class="s2">&quot;parquet&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save_project_secondary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_df</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">root_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_secondary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">output_df</span><span class="p">,</span>
+            <span class="n">extension</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_save_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">output_path_without_extension</span><span class="p">,</span>
+        <span class="n">output_df</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">pl</span><span class="o">.</span><span class="n">LazyFrame</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">output_df</span> <span class="o">=</span> <span class="n">output_df</span><span class="o">.</span><span class="n">lazy</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">output_path_without_extension</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path_without_extension</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+            <span class="n">output_df</span><span class="o">.</span><span class="n">sink_parquet</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+            <span class="n">output_df</span><span class="o">.</span><span class="n">sink_csv</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">:</span>
+            <span class="c1"># See https://xlsxwriter.readthedocs.io/working_with_dates_and_time.html#timezone-handling</span>
+            <span class="k">with</span> <span class="n">Workbook</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;remove_timezone&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span> <span class="k">as</span> <span class="n">workbook</span><span class="p">:</span>
+                <span class="n">output_df</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span><span class="o">.</span><span class="n">write_excel</span><span class="p">(</span><span class="n">workbook</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
+            <span class="n">output_df</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output_path</span>
+
+    <span class="k">def</span> <span class="nf">load_project_primary_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_primary_output_parquet_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">output_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_primary_output_parquet_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_primary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_id</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_project_secondary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_secondary_output_parquet_path</span><span class="p">(</span>
+            <span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">,</span> <span class="n">output_id</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_secondary_output_parquet_path</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_secondary_output_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_id</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">export_project_primary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">:</span> <span class="n">AnalyzerOutput</span><span class="p">,</span>
+        <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_output</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_primary_output_parquet_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_exports_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">,</span>
+            <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span>
+            <span class="n">export_chunk_size</span><span class="o">=</span><span class="n">export_chunk_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">export_project_secondary_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span>
+        <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">:</span> <span class="n">AnalyzerOutput</span><span class="p">,</span>
+        <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">exported_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_exports_root_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="n">secondary_id</span>
+                <span class="k">if</span> <span class="n">secondary_id</span> <span class="o">==</span> <span class="n">output_id</span>
+                <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">secondary_id</span><span class="si">}</span><span class="s2">__</span><span class="si">{</span><span class="n">output_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_output</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_secondary_output_parquet_path</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">,</span> <span class="n">output_id</span><span class="p">),</span>
+            <span class="n">exported_path</span><span class="p">,</span>
+            <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">,</span>
+            <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span>
+            <span class="n">export_chunk_size</span><span class="o">=</span><span class="n">export_chunk_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_export_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">extension</span><span class="p">:</span> <span class="n">SupportedOutputExtension</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">:</span> <span class="n">AnalyzerOutput</span><span class="p">,</span>
+        <span class="n">export_chunk_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">with</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="n">num_chunks</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">/</span> <span class="n">export_chunk_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">export_chunk_size</span>
+                <span class="k">else</span> <span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_chunks</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">scan_parquet</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">transform_output</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">extension</span><span class="p">)</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">with</span> <span class="n">pq</span><span class="o">.</span><span class="n">ParquetFile</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="n">get_batches</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">df</span>
+                <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">reader</span><span class="o">.</span><span class="n">iter_batches</span><span class="p">()</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">df</span> <span class="o">:=</span> <span class="n">pl</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">chunk_id</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="n">collect_dataframe_chunks</span><span class="p">(</span><span class="n">get_batches</span><span class="p">,</span> <span class="n">export_chunk_size</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">chunk</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">transform_output</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_save_output</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">chunk_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">chunk_id</span> <span class="o">/</span> <span class="n">num_chunks</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">_[*].</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">list_project_analyses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="n">analysis_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">AnalysisModel</span><span class="p">(</span><span class="o">**</span><span class="n">analysis</span><span class="p">)</span> <span class="k">for</span> <span class="n">analysis</span> <span class="ow">in</span> <span class="n">analysis_models</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">init_analysis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">primary_analyzer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">column_mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">param_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParamValue</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnalysisModel</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">analysis_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_unique_analysis_id</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">display_name</span><span class="p">)</span>
+            <span class="n">analysis</span> <span class="o">=</span> <span class="n">AnalysisModel</span><span class="p">(</span>
+                <span class="n">analysis_id</span><span class="o">=</span><span class="n">analysis_id</span><span class="p">,</span>
+                <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span>
+                <span class="n">display_name</span><span class="o">=</span><span class="n">display_name</span><span class="p">,</span>
+                <span class="n">primary_analyzer_id</span><span class="o">=</span><span class="n">primary_analyzer_id</span><span class="p">,</span>
+                <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;analysis&quot;</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">),</span>
+                <span class="n">column_mapping</span><span class="o">=</span><span class="n">column_mapping</span><span class="p">,</span>
+                <span class="n">create_timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">(),</span>
+                <span class="n">param_values</span><span class="o">=</span><span class="n">param_values</span><span class="p">,</span>
+                <span class="n">is_draft</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">analysis</span>
+
+    <span class="k">def</span> <span class="nf">save_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">analysis</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">analysis_id</span><span class="p">),</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">delete_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis</span><span class="o">.</span><span class="n">analysis_id</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">analysis_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span> <span class="n">analysis</span><span class="o">.</span><span class="n">path</span>
+            <span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">analysis_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_unique_analysis_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_unique_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_slugify_name</span><span class="p">(</span><span class="n">display_name</span><span class="p">),</span>
+            <span class="k">lambda</span> <span class="n">analysis_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_analysis_id_unique</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_is_analysis_id_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">id_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">analysis_id</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dir_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s2">&quot;analysis&quot;</span><span class="p">,</span> <span class="n">analysis_id</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">id_unique</span> <span class="ow">and</span> <span class="n">dir_unique</span>
+
+    <span class="k">def</span> <span class="nf">_bootstrap_analyses_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">legacy_v1_analysis_dirname</span> <span class="o">=</span> <span class="s2">&quot;analyzers&quot;</span>
+        <span class="n">projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_projects</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
+            <span class="n">project_id</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">project_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">v1_analyses</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">legacy_v1_analysis_dirname</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">analyzer_id</span> <span class="ow">in</span> <span class="n">v1_analyses</span><span class="p">:</span>
+                <span class="n">db_analyzer_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;__v1__</span><span class="si">{</span><span class="n">analyzer_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">modified_time</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_path</span><span class="p">,</span> <span class="n">legacy_v1_analysis_dirname</span><span class="p">,</span> <span class="n">analyzer_id</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">upsert</span><span class="p">(</span>
+                    <span class="n">AnalysisModel</span><span class="p">(</span>
+                        <span class="n">analysis_id</span><span class="o">=</span><span class="n">db_analyzer_id</span><span class="p">,</span>
+                        <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span>
+                        <span class="n">display_name</span><span class="o">=</span><span class="n">analyzer_id</span><span class="p">,</span>
+                        <span class="n">primary_analyzer_id</span><span class="o">=</span><span class="n">analyzer_id</span><span class="p">,</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">legacy_v1_analysis_dirname</span><span class="p">,</span> <span class="n">analyzer_id</span><span class="p">),</span>
+                        <span class="n">create_timestamp</span><span class="o">=</span><span class="n">modified_time</span><span class="p">,</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                    <span class="p">(</span><span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;analysis_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">db_analyzer_id</span><span class="p">),</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">list_secondary_analyses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">analyzers</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+                    <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                    <span class="s2">&quot;secondary_outputs&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">analyzers</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_find_unique_project_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn the display name into a unique project ID&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_unique_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_slugify_name</span><span class="p">(</span><span class="n">display_name</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_project_id_unique</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_is_project_id_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the database if the project ID is unique&quot;&quot;&quot;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">id_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+            <span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;project&quot;</span> <span class="ow">and</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">project_id</span>
+        <span class="p">)</span>
+        <span class="n">dir_unique</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">id_unique</span> <span class="ow">and</span> <span class="n">dir_unique</span>
+
+    <span class="k">def</span> <span class="nf">_get_db_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_data_dir</span><span class="p">,</span> <span class="s2">&quot;db.json&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_data_dir</span><span class="p">,</span> <span class="s2">&quot;projects&quot;</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_input_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span> <span class="s2">&quot;input.parquet&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_primary_output_root_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+            <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="s2">&quot;primary_outputs&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_secondary_output_root_path</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">secondary_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+            <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="s2">&quot;secondary_outputs&quot;</span><span class="p">,</span>
+            <span class="n">secondary_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_project_exports_root_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span> <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;exports&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_web_presenter_state_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisModel</span><span class="p">,</span> <span class="n">presenter_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_project_path</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">project_id</span><span class="p">),</span>
+            <span class="n">analysis</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="s2">&quot;web_presenters&quot;</span><span class="p">,</span>
+            <span class="n">presenter_id</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_lock_database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Locks the database to prevent concurrent access, in case multiple instances</span>
+<span class="sd">        of the application are running.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lock_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_dir</span><span class="p">,</span> <span class="s2">&quot;db.lock&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FileLock</span><span class="p">(</span><span class="n">lock_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_settings</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;settings&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SettingsModel</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">SettingsModel</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">save_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock_database</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_settings</span><span class="p">()</span>
+            <span class="n">new_settings</span> <span class="o">=</span> <span class="n">SettingsModel</span><span class="p">(</span>
+                <span class="o">**</span><span class="p">{</span>
+                    <span class="o">**</span><span class="n">settings</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                    <span class="o">**</span><span class="p">{</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">upsert</span><span class="p">(</span><span class="n">new_settings</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;settings&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_slugify_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W+&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_unique_name</span><span class="p">(</span><span class="n">base_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">validator</span><span class="p">(</span><span class="n">base_name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">base_name</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">candidate</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">validator</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">candidate</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+<span class="k">class</span> <span class="nc">TableStats</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">num_rows</span><span class="p">:</span> <span class="nb">int</span>
+
+
+<span class="k">def</span> <span class="nf">collect_dataframe_chunks</span><span class="p">(</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">size_threshold</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="n">output_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">available_space</span> <span class="o">=</span> <span class="n">size_threshold</span> <span class="o">-</span> <span class="n">size</span>
+            <span class="nb">slice</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">available_space</span><span class="p">)</span>
+            <span class="n">output_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">)</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="nb">slice</span><span class="o">.</span><span class="n">height</span>
+            <span class="n">remaining_space</span> <span class="o">=</span> <span class="n">available_space</span> <span class="o">-</span> <span class="nb">slice</span><span class="o">.</span><span class="n">height</span>
+
+            <span class="k">if</span> <span class="n">remaining_space</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">)</span>
+                <span class="n">output_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="nb">slice</span><span class="o">.</span><span class="n">height</span> <span class="o">==</span> <span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="o">-</span><span class="n">available_space</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_buffer</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">output_buffer</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AppFileSelectorStateManager</span><span class="p">(</span><span class="n">FileSelectorStateManager</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">:</span> <span class="s2">&quot;Storage&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">storage</span>
+
+    <span class="k">def</span> <span class="nf">get_current_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_state</span><span class="p">()</span><span class="o">.</span><span class="n">last_path</span>
+
+    <span class="k">def</span> <span class="nf">set_current_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_state</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">()</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;file_selector_state&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FileSelectionState</span><span class="p">(</span><span class="o">**</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">FileSelectionState</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_save_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">upsert</span><span class="p">(</span>
+            <span class="n">FileSelectionState</span><span class="p">(</span><span class="n">last_path</span><span class="o">=</span><span class="n">last_path</span><span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+            <span class="n">Query</span><span class="p">()[</span><span class="s2">&quot;class_&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;file_selector_state&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this section it would be a good idea to review the other domain sections. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="../edge-domain/">Edge Domain</a></li>
+<li><a href="../content-domain/">Content Domain</a></li>
+<li><a href="../dashboards/shiny.md">Shiny Dashboards</a></li>
+<li><a href="../dashboards/react.md">React Dashboards</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 CIB Mango Tree
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.sections", "navigation.top", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
