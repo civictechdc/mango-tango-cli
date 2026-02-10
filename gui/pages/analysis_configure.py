@@ -1,7 +1,8 @@
 import polars as pl
 from nicegui import ui
-from gui.base import GuiPage, GuiSession, gui_routes
+
 from analyzer_interface import column_automap, get_data_type_compatibility_score
+from gui.base import GuiPage, GuiSession, gui_routes
 
 
 class ConfigureAnalysis(GuiPage):
@@ -10,9 +11,11 @@ class ConfigureAnalysis(GuiPage):
         super().__init__(
             session=session,
             route=gui_routes.configure_analysis,
-            title=f"{session.current_project.display_name}: {config_analysis_title}"
-            if session.current_project is not None
-            else config_analysis_title,
+            title=(
+                f"{session.current_project.display_name}: {config_analysis_title}"
+                if session.current_project is not None
+                else config_analysis_title
+            ),
             show_back_button=True,
             back_route=gui_routes.select_analyzer_fork,
             show_footer=True,

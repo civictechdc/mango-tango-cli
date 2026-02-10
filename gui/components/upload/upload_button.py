@@ -1,7 +1,9 @@
-from fastapi import UploadFile, File
-from nicegui import ui, app
+from collections.abc import Awaitable, Callable
+
+from fastapi import File, UploadFile
+from nicegui import app, ui
+
 from gui.component_path import create_vue_dist_path
-from collections.abc import Callable, Awaitable
 
 
 class UploadButton(

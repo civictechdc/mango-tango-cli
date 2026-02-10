@@ -3,8 +3,10 @@ from csv import Sniffer
 from io import BytesIO
 
 import polars as pl
-import terminal_tools.prompts as prompts
 from pydantic import BaseModel, ConfigDict
+
+import terminal_tools.prompts as prompts
+
 from .importer import Importer, ImporterSession
 
 
@@ -247,9 +249,7 @@ class CSVImporterTerminal(CSVImporter):
             default=(
                 previous_value
                 if previous_value in [",", ";", "\t"]
-                else "other"
-                if previous_value is not None
-                else None
+                else "other" if previous_value is not None else None
             ),
         )
         if input is None:
@@ -279,9 +279,7 @@ class CSVImporterTerminal(CSVImporter):
             default=(
                 previous_value
                 if previous_value in ['"', "'"]
-                else "other"
-                if previous_value is not None
-                else None
+                else "other" if previous_value is not None else None
             ),
         )
         if input is None:

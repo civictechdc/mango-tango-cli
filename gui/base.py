@@ -11,17 +11,19 @@ import abc
 from io import BytesIO
 from pathlib import Path
 from typing import Callable
+
 from nicegui import ui
 from pydantic import BaseModel, ConfigDict, Field, SkipValidation
+
 from analyzer_interface import AnalyzerInterface, ParamValue
 from app.project_context import ProjectContext
-from gui.context import GUIContext
 from gui.constants.colors import (
-    MANGO_DARK_GREEN,
-    MANGO_ORANGE_LIGHT,
     ACCENT,
+    MANGO_DARK_GREEN,
     MANGO_ORANGE,
+    MANGO_ORANGE_LIGHT,
 )
+from gui.context import GUIContext
 from importing import ImporterSession
 from storage import AnalysisModel
 

@@ -1,14 +1,13 @@
-from .start import StartPage
-from .project_select import SelectProjectPage
-from .project_new import NewProjectPage
-from .importer import ImportDatasetPage
-from .analyzer_select import SelectAnalyzerForkPage
-from .analyzer_new import SelectNewAnalyzerPage
-from .analyzer_previous import SelectPreviousAnalyzerPage
 from .analysis_configure import ConfigureAnalysis
 from .analysis_params import ConfigureAnalaysisParams
+from .analyzer_new import SelectNewAnalyzerPage
+from .analyzer_previous import SelectPreviousAnalyzerPage
+from .analyzer_select import SelectAnalyzerForkPage
 from .dataset_preview import PreviewDatasetPage
-
+from .importer import ImportDatasetPage
+from .project_new import NewProjectPage
+from .project_select import SelectProjectPage
+from .start import StartPage
 
 __all__ = [
     "StartPage",

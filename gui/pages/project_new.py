@@ -1,4 +1,5 @@
 from nicegui import ui
+
 from gui.base import GuiPage, GuiSession, gui_routes
 
 

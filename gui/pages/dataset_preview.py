@@ -1,10 +1,12 @@
 from io import BytesIO
+from traceback import format_exc
 from typing import cast
+
 from nicegui import ui
+
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.import_options import ImportOptionsDialog
 from importing import importers
-from traceback import format_exc
 
 
 class PreviewDatasetPage(GuiPage):
@@ -118,9 +120,11 @@ class PreviewDatasetPage(GuiPage):
                 try:
                     # Create project using session data
                     project = self.session.app.create_project(
-                        name=self.session.new_project_name
-                        if self.session.new_project_name is not None
-                        else "",
+                        name=(
+                            self.session.new_project_name
+                            if self.session.new_project_name is not None
+                            else ""
+                        ),
                         importer_session=self.session.import_session,
                     )
 

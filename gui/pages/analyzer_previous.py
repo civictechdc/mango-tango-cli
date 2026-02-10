@@ -1,8 +1,10 @@
 from datetime import datetime
+
 from nicegui import ui
-from gui.base import GuiPage, GuiSession, gui_routes
+
 from app.analysis_context import AnalysisContext
 from components.select_analysis import analysis_label, present_timestamp
+from gui.base import GuiPage, GuiSession, gui_routes
 
 
 class SelectPreviousAnalyzerPage(GuiPage):
@@ -17,9 +19,11 @@ class SelectPreviousAnalyzerPage(GuiPage):
         super().__init__(
             session=session,
             route=gui_routes.select_previous_analyzer,
-            title=f"{session.current_project.display_name}: {select_previous_title}"
-            if session.current_project is not None
-            else select_previous_title,
+            title=(
+                f"{session.current_project.display_name}: {select_previous_title}"
+                if session.current_project is not None
+                else select_previous_title
+            ),
             show_back_button=True,
             back_route=gui_routes.select_analyzer_fork,
             show_footer=True,

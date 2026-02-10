@@ -1,8 +1,10 @@
+from tempfile import TemporaryDirectory
+
 from nicegui import ui
+
+from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import AnalysisParamsCard
-from tempfile import TemporaryDirectory
-from context import InputColumnProvider, PrimaryAnalyzerDefaultParametersContext
 
 
 class ConfigureAnalaysisParams(GuiPage):

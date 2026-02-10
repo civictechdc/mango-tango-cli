@@ -1,5 +1,6 @@
 from io import BytesIO
 from typing import cast
+
 import polars as pl
 from fastexcel import read_excel
 from pydantic import BaseModel, ConfigDict

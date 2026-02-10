@@ -1,4 +1,5 @@
 from nicegui import ui
+
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import ToggleButtonGroup
 
@@ -13,9 +14,11 @@ class SelectNewAnalyzerPage(GuiPage):
         super().__init__(
             session=session,
             route=gui_routes.select_analyzer,
-            title=f"{session.current_project.display_name}: {analyzer_select_title}"
-            if session.current_project is not None
-            else analyzer_select_title,
+            title=(
+                f"{session.current_project.display_name}: {analyzer_select_title}"
+                if session.current_project is not None
+                else analyzer_select_title
+            ),
             show_back_button=True,
             back_route=gui_routes.select_analyzer_fork,
             show_footer=True,

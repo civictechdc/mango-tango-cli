@@ -9,9 +9,11 @@ class SelectAnalyzerForkPage(GuiPage):
         super().__init__(
             session=session,
             route=gui_routes.select_analyzer_fork,
-            title=session.current_project.display_name
-            if session.current_project is not None
-            else "",
+            title=(
+                session.current_project.display_name
+                if session.current_project is not None
+                else ""
+            ),
             show_back_button=True,
             back_route=gui_routes.select_project,
             show_footer=True,

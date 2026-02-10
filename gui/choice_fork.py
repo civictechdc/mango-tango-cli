@@ -1,5 +1,6 @@
-from nicegui import ui
 from typing import Callable
+
+from nicegui import ui
 
 
 def two_button_choice_fork_content(

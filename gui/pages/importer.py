@@ -1,6 +1,8 @@
 from io import BytesIO
+
 from fastapi import UploadFile
 from nicegui import ui
+
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import UploadButton
 
