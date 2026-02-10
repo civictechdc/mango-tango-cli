@@ -80,9 +80,9 @@ Vue.callWithErrorHandling;
 Vue.cloneVNode;
 Vue.compatUtils;
 const computed = Vue.computed;
-Vue.createBlock;
+const createBlock = Vue.createBlock;
 Vue.createCommentVNode;
-const createElementBlock = Vue.createElementBlock;
+Vue.createElementBlock;
 const createElementVNode = Vue.createElementVNode;
 Vue.createHydrationRenderer;
 Vue.createPropsRestProxy;
@@ -90,7 +90,7 @@ Vue.createRenderer;
 Vue.createSlots;
 Vue.createStaticVNode;
 Vue.createTextVNode;
-const createVNode = Vue.createVNode;
+Vue.createVNode;
 Vue.defineAsyncComponent;
 const defineComponent = Vue.defineComponent;
 Vue.defineEmits;
@@ -170,59 +170,64 @@ Vue.withDefaults;
 Vue.withDirectives;
 Vue.withMemo;
 Vue.withScopeId;
-const _hoisted_1 = { class: "flex flex-col justify-center items-center" };
-const _hoisted_2 = { class: "ml-1" };
+const _hoisted_1 = { class: "ml-1" };
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "UploadButton",
   props: {
     icon: {},
     color: {},
-    text: {}
+    text: {},
+    url: {}
   },
-  emits: ["click", "change"],
-  setup(__props, { emit: __emit }) {
+  setup(__props) {
     const props = __props;
     const filePickerRef = ref(null);
-    const emit = __emit;
-    const displayText = computed(() => props.text && props.text.length > 0 ? props.text : "Click Me");
+    const displayText = computed(
+      () => props.text && props.text.length > 0 ? props.text : "Click Me"
+    );
     const buttonProps = computed(() => {
       let propsCopy = { ...props };
       delete propsCopy.text;
       if (propsCopy.icon == null) delete propsCopy.icon;
       return propsCopy;
     });
-    const handleButtonClick = () => {
-      filePickerRef.value?.click();
-      emit("click", "test...");
-    };
+    const handleButtonClick = () => filePickerRef.value?.click();
     const handleFilePickerChange = (event) => {
       const target = event.target;
       if (target.type !== "file") return;
-      if (target.files == null || target.files.length === 0) {
-        emit("change", null);
+      if (target.files == null || target.files.length === 0 || target.files.length > 1)
         return;
-      }
-      if (target.files.length > 1) return;
-      console.log(target.files[0]);
-      emit("change", target.files[0]?.webkitRelativePath);
+      const formData = new FormData();
+      formData.append("file", target.files[0]);
+      (async () => {
+        try {
+          const response = await fetch(props.url, {
+            method: "POST",
+            body: formData
+          });
+          const respData = await response.json();
+          if (response.status !== 200) throw respData;
+          window.location.href = respData.href;
+        } catch (err) {
+          console.error(err);
+        }
+      })();
     };
     return (_ctx, _cache) => {
       const _component_q_btn = resolveComponent("q-btn");
-      return openBlock(), createElementBlock("div", _hoisted_1, [
-        createVNode(_component_q_btn, mergeProps(buttonProps.value, { onClick: handleButtonClick }), {
-          default: withCtx(() => [
-            createElementVNode("span", _hoisted_2, toDisplayString(displayText.value), 1)
-          ]),
-          _: 1
-        }, 16),
-        createElementVNode("input", {
-          type: "file",
-          ref_key: "filePickerRef",
-          ref: filePickerRef,
-          class: "hidden",
-          onChange: handleFilePickerChange
-        }, null, 544)
-      ]);
+      return openBlock(), createBlock(_component_q_btn, mergeProps(buttonProps.value, { onClick: handleButtonClick }), {
+        default: withCtx(() => [
+          createElementVNode("span", _hoisted_1, toDisplayString(displayText.value), 1),
+          createElementVNode("input", {
+            type: "file",
+            ref_key: "filePickerRef",
+            ref: filePickerRef,
+            class: "hidden",
+            onChange: handleFilePickerChange
+          }, null, 544)
+        ]),
+        _: 1
+      }, 16);
     };
   }
 });

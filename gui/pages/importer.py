@@ -1,8 +1,7 @@
-import os
-from datetime import datetime
+from io import BytesIO
+from fastapi import UploadFile
 from nicegui import ui
-from gui.base import GuiPage, GuiSession, gui_routes, format_file_size
-from gui.file_picker import LocalFilePicker
+from gui.base import GuiPage, GuiSession, gui_routes
 from gui.components import UploadButton
 
 
@@ -58,72 +57,15 @@ class ImportDatasetPage(GuiPage):
                         "Next: Preview Data", icon="arrow_forward", color="primary"
                     )
 
-            # Browse button
-            async def browse_for_file():
-                nonlocal selected_file_path
-
-                picker = LocalFilePicker(
-                    state=self.session.app.file_selector_state,
-                    file_extensions=[".csv", ".xlsx"],
-                )
-                result = await picker
-
-                if result:
-                    selected_file_path = result
-
-                    # Show file info
-                    file_stats = os.stat(result)
-                    file_size = format_file_size(file_stats.st_size)
-                    file_modified = datetime.fromtimestamp(
-                        file_stats.st_mtime
-                    ).strftime("%Y-%m-%d %H:%M:%S")
-
-                    file_name_label.text = f"Dataset file: {os.path.basename(result)}"
-                    file_path_label.text = f"Location: {result}"
-                    file_size_label.text = f"Size: {file_size}"
-                    file_modified_label.text = f"Modified: {file_modified}"
-
-                    file_info_card.style("display: block;")
-                    browse_btn.set_visibility(False)
-
-                    self.notify_success("File selected successfully")
-
-            def navigate_to_preview():
-                """Navigate to preview page with selected file path."""
-                if not selected_file_path:
-                    self.notify_warning("No file selected")
-                    return
-
-                # Store file path in session
-                self.session.selected_file_path = selected_file_path
-                self.navigate_to("/preview_dataset")
+            async def handle_upload(upload: UploadFile) -> None:
+                file_contents: bytes = await upload.read()
+                self.session.selected_file_content_type = upload.content_type
+                self.session.selected_file_name = upload.filename
+                self.session.selected_file = BytesIO(file_contents)
 
             upload_button = UploadButton(
+                handle_upload,
                 "Browse Files",
                 icon="folder_open",
-                on_click=lambda e: print(
-                    f"click event from upload button: {e.args if e is not None else 'None'}"
-                ),
-                on_change=lambda e: print(
-                    f"change event from upload button: {e.args if e is not None else 'None'}"
-                ),
+                redirect_url=gui_routes.preview_dataset,
             )
-            """
-            browse_btn = ui.button(
-                "Browse files",
-                icon="folder_open",
-                on_click=browse_for_file,
-                color="primary",
-            )
-
-            # Wire up buttons
-            preview_btn.on("click", navigate_to_preview)
-
-            change_file_btn.on(
-                "click",
-                lambda: (
-                    file_info_card.style("display: none;"),
-                    browse_btn.set_visibility(True),
-                ),
-            )
-            """

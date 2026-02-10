@@ -1,6 +1,8 @@
+from io import BytesIO
+from typing import cast
 import polars as pl
 from fastexcel import read_excel
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from .importer import Importer, ImporterSession
 
@@ -11,29 +13,34 @@ class ExcelImporter(Importer["ExcelImportSession"]):
         return "Excel"
 
     def suggest(self, input_path: str) -> bool:
-        return input_path.endswith(".xlsx")
+        return (
+            input_path.endswith(".xlsx")
+            or input_path
+            == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
-    def init_session(self, input_path: str):
+    def init_session(self, input_path: str | BytesIO):
         """
         Initialize Excel import session.
 
         For single-sheet files, automatically selects the sheet.
         For multi-sheet files, returns None (caller must provide sheet selection).
         """
-        reader = read_excel(input_path)
+        reader = read_excel(
+            cast(str, input_path)
+            if type(input_path) is not BytesIO
+            else input_path.getvalue()
+        )
         sheet_names = reader.sheet_names
 
-        if not sheet_names:
+        if not sheet_names or (len(sheet_names) == 0 or len(sheet_names) > 1):
             return None
-        if len(sheet_names) == 1:
-            return ExcelImportSession(
-                input_file=input_path,
-                selected_sheet=sheet_names[0],
-                sheet_names=sheet_names,
-            )
 
-        # Multi-sheet file: return None, let caller handle sheet selection
-        return None
+        return ExcelImportSession(
+            input_file=input_path,
+            selected_sheet=sheet_names[0],
+            sheet_names=sheet_names,
+        )
 
 
 class ExcelImporterTerminal(ExcelImporter):
@@ -42,13 +49,17 @@ class ExcelImporterTerminal(ExcelImporter):
     Extends ExcelImporter with sheet selection and modification capabilities.
     """
 
-    def init_session(self, input_path: str):
+    def init_session(self, input_path: str | BytesIO):
         """
         Initialize Excel import session with terminal prompts for multi-sheet files.
         """
         import terminal_tools.prompts as prompts
 
-        reader = read_excel(input_path)
+        reader = read_excel(
+            cast(str, input_path)
+            if type(input_path) is not BytesIO
+            else input_path.getvalue()
+        )
         sheet_names = reader.sheet_names
 
         if not sheet_names:
@@ -93,9 +104,11 @@ class ExcelImporterTerminal(ExcelImporter):
 
 
 class ExcelImportSession(ImporterSession, BaseModel):
-    input_file: str
+    input_file: str | BytesIO
     selected_sheet: str
     sheet_names: list[str]
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def print_config(self):
         print(f"- Sheet name: {self.selected_sheet}")

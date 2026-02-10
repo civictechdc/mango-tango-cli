@@ -8,14 +8,20 @@ This module provides:
 """
 
 import abc
+from io import BytesIO
 from pathlib import Path
 from typing import Callable
 from nicegui import ui
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SkipValidation
 from analyzer_interface import AnalyzerInterface, ParamValue
 from app.project_context import ProjectContext
 from gui.context import GUIContext
-from gui.constants.colors import MANGO_DARK_GREEN, MANGO_ORANGE_LIGHT, ACCENT
+from gui.constants.colors import (
+    MANGO_DARK_GREEN,
+    MANGO_ORANGE_LIGHT,
+    ACCENT,
+    MANGO_ORANGE,
+)
 from importing import ImporterSession
 from storage import AnalysisModel
 
@@ -45,7 +51,7 @@ class GuiColors(BaseModel):
     accent: str = Field(default=ACCENT, description="Accent color")
 
     # Additional colors for reference
-    mango_orange: str = Field(default="#f3921e", description="Mango orange")
+    mango_orange: str = Field(default=MANGO_ORANGE, description="Mango orange")
 
 
 # Class for Managing Constants (colors and links)
@@ -119,6 +125,9 @@ class GuiSession(BaseModel):
     # Workflow state - project creation
     current_project: ProjectContext | None = None
     selected_file_path: Path | None = None
+    selected_file_name: str | None = None
+    selected_file: BytesIO | None = None
+    selected_file_content_type: str | None = None
     new_project_name: str | None = None
     import_session: ImporterSession | None = None
 

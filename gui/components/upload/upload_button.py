@@ -1,7 +1,7 @@
-from nicegui import ui
-from nicegui.events import GenericEventArguments
+from fastapi import UploadFile, File
+from nicegui import ui, app
 from gui.component_path import create_vue_dist_path
-from collections.abc import Callable
+from collections.abc import Callable, Awaitable
 
 
 class UploadButton(
@@ -9,20 +9,25 @@ class UploadButton(
 ):
     def __init__(
         self,
+        on_upload: Callable[[UploadFile], Awaitable[None]],
         text: str | None = None,
         color: str = "primary",
         icon: str | None = None,
-        on_click: Callable[[GenericEventArguments | None], None] | None = None,
-        on_change: Callable[[GenericEventArguments | None], None] | None = None,
+        redirect_url: str | None = None,
     ) -> None:
         super().__init__()
 
+        url: str = f"/_nicegui/client/{self.client.id}/upload/{self.id}"
         self._props["text"] = text
         self._props["color"] = color
         self._props["icon"] = icon
+        self._props["url"] = url
 
-        if on_click is not None:
-            self.on("click", on_click)
+        @app.post(url)
+        async def upload_route(file: UploadFile = File()) -> dict[str, str]:
+            await on_upload(file)
 
-        if on_change is not None:
-            self.on("change", on_change)
+            if redirect_url is not None and len(redirect_url) > 0:
+                return {"href": redirect_url}
+
+            return {"message": "success"}

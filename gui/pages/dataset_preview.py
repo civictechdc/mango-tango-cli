@@ -1,3 +1,5 @@
+from io import BytesIO
+from typing import cast
 from nicegui import ui
 from gui.base import GuiPage, GuiSession, gui_routes
 from gui.import_options import ImportOptionsDialog
@@ -25,9 +27,16 @@ class PreviewDatasetPage(GuiPage):
             show_footer=True,
         )
 
+    def _selected_file_does_not_exists(self) -> bool:
+        return (
+            not self.session.selected_file_content_type
+            or not self.session.selected_file
+            or not self.session.selected_file_name
+        )
+
     def render_content(self) -> None:
         # Validate file is selected
-        if not self.session.selected_file_path:
+        if self._selected_file_does_not_exists():
             self.notify_warning("No file selected. Redirecting...")
             self.navigate_to(gui_routes.import_dataset)
             return
@@ -35,7 +44,7 @@ class PreviewDatasetPage(GuiPage):
         # Auto-detect importer
         importer = None
         for imp in importers:
-            if imp.suggest(self.session.selected_file_path):
+            if imp.suggest(cast(str, self.session.selected_file_content_type)):
                 importer = imp
                 break
 
@@ -46,7 +55,9 @@ class PreviewDatasetPage(GuiPage):
 
         # Initialize import session and load preview
         try:
-            import_session = importer.init_session(self.session.selected_file_path)
+            import_session = importer.init_session(
+                cast(BytesIO, self.session.selected_file)
+            )
             if not import_session:
                 raise ValueError("Failed to initialize import session")
 
@@ -91,13 +102,13 @@ class PreviewDatasetPage(GuiPage):
             async def open_import_options():
                 if (
                     self.session.import_session is None
-                    or self.session.selected_file_path is None
+                    or self._selected_file_does_not_exists()
                 ):
                     return
 
                 dialog = ImportOptionsDialog(
                     import_session=self.session.import_session,
-                    selected_file_path=self.session.selected_file_path,
+                    selected_file=cast(BytesIO, self.session.selected_file),
                     on_retry=handle_retry,
                 )
                 await dialog
