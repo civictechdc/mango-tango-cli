@@ -1,8 +1,11 @@
 import csv
 from csv import Sniffer
+from io import BytesIO
 
 import polars as pl
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+import terminal_tools.prompts as prompts
 
 from .importer import Importer, ImporterSession
 
@@ -13,15 +16,16 @@ class CSVImporter(Importer["CsvImportSession"]):
         return "CSV"
 
     def suggest(self, input_path: str) -> bool:
-        return input_path.endswith(".csv")
+        return input_path.endswith(".csv") or input_path == "text/csv"
 
-    def _detect_skip_rows_and_dialect(self, input_path: str) -> tuple[int, csv.Dialect]:
+    def _detect_skip_rows_and_dialect(
+        self, input_path: str | BytesIO
+    ) -> tuple[int, csv.Dialect]:
         """Detect the number of rows to skip before CSV data begins and the CSV dialect."""
         skip_rows = 0
 
         try:
             with open(input_path, "r", encoding="utf8") as file:
-
                 MAX_LINES = 50  # check the first 50 lines only
                 lines = [line.strip() for i, line in enumerate(file) if i <= MAX_LINES]
                 total_lines = len(lines)
@@ -138,7 +142,7 @@ class CSVImporter(Importer["CsvImportSession"]):
         # Consider it a CSV header if at least 50% of non-empty fields look like column names
         return header_indicators >= len(non_empty_fields) * 0.5
 
-    def init_session(self, input_path: str):
+    def init_session(self, input_path: str | BytesIO):
         skip_rows, dialect = self._detect_skip_rows_and_dialect(input_path)
 
         return CsvImportSession(
@@ -157,7 +161,6 @@ class CSVImporterTerminal(CSVImporter):
     """
 
     def manual_init_session(self, input_path: str):
-
         separator = self._separator_option(None)
         if separator is None:
             return None
@@ -183,9 +186,6 @@ class CSVImporterTerminal(CSVImporter):
         )
 
     def modify_session(self, import_session: "CsvImportSession", reset_screen):
-
-        import terminal_tools.prompts as prompts
-
         is_first_time = True
         while True:
             reset_screen(import_session)
@@ -267,8 +267,6 @@ class CSVImporterTerminal(CSVImporter):
 
     @staticmethod
     def _quote_char_option(previous_value):
-        from typing import Optional
-
         import terminal_tools.prompts as prompts
 
         input: Optional[str] = prompts.list_input(
@@ -298,7 +296,6 @@ class CSVImporterTerminal(CSVImporter):
         return input
 
     def _header_option(self, previous_value):
-
         import terminal_tools.prompts as prompts
 
         return prompts.list_input(
@@ -312,7 +309,6 @@ class CSVImporterTerminal(CSVImporter):
 
     @staticmethod
     def _skip_rows_option(previous_value):
-
         import terminal_tools.prompts as prompts
         from terminal_tools.utils import print_message
 
@@ -345,11 +341,13 @@ class CSVImporterTerminal(CSVImporter):
 
 
 class CsvImportSession(ImporterSession, BaseModel):
-    input_file: str
+    input_file: str | BytesIO
     separator: str
     quote_char: str
     has_header: bool = True
     skip_rows: int = 0
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def print_config(self):
         """Print configuration to terminal. Only for terminal UI use."""
@@ -405,6 +403,18 @@ class CsvImportSession(ImporterSession, BaseModel):
         )
 
     def import_as_parquet(self, output_path: str) -> None:
+        if isinstance(self.input_file, BytesIO):
+            pl.read_csv(
+                self.input_file,
+                separator=self.separator,
+                quote_char=self.quote_char,
+                has_header=self.has_header,
+                skip_rows=self.skip_rows,
+                truncate_ragged_lines=True,
+                ignore_errors=True,
+            ).write_parquet(output_path)
+            return
+
         lazyframe = pl.scan_csv(
             self.input_file,
             separator=self.separator,

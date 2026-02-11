@@ -93,7 +93,7 @@ def gui_main(app: App):
 
     # Launch in native mode
     ui.run(
-        native=True,
+        native=False,
         window_size=(800, 600),
         title="CIB Mango Tree",
         favicon="🥭",

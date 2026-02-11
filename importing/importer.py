@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Optional, TypeVar
+from io import BytesIO
+from typing import TypeVar
 
 import polars as pl
 
@@ -19,7 +20,7 @@ class ImporterSession(ABC):
         pass
 
     @abstractmethod
-    def load_preview(self, n_records: int) -> Optional[pl.DataFrame]:
+    def load_preview(self, n_records: int) -> pl.DataFrame | None:
         """
         Attempt to load a preview of the data from the input file.
 
@@ -59,7 +60,7 @@ class Importer[SessionType](ABC):
         pass
 
     @abstractmethod
-    def init_session(self, input_path: str) -> Optional[SessionType]:
+    def init_session(self, input_path: str | BytesIO) -> SessionType | None:
         """
         Produces an initial import session object that contains all the configuration
         needed for the import. The user can either accept this configuration or
