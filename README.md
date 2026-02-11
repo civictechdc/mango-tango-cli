@@ -4,7 +4,7 @@
 
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG" alt="Mango logo" style="width:120px"/>
+<img src="https://raw.githubusercontent.com/CIB-Mango-Tree/CIB-Mango-Tree-Website/main/assets/images/mango-text.PNG" alt="Mango logo" style="width:150px"/>
 </p>
 
 
@@ -13,16 +13,20 @@
 <a href="https://docs.astral.sh/ruff/"><img alt="style: black" src="https://img.shields.io/badge/Polars-1.9-skyblue?logo=Polars"></a>
 <a href="https://plotly.com/python/"><img alt="style: black" src="https://img.shields.io/badge/Plotly-5.24.1-purple?logo=Plotly"></a>
 <a href="https://github.com/Textualize/rich"><img alt="style: black" src="https://img.shields.io/badge/Rich-14.0.0-gold?logo=Rich"></a>
-<a href="https://civictechdc.github.io/mango-tango-cli/"><img alt="style: black" src="https://img.shields.io/badge/docs-website-blue"></a>
+<a href="https://civictechdc.github.io/cib-mango-tree/"><img alt="style: black" src="https://img.shields.io/badge/docs-website-blue"></a>
 <a href="https://black.readthedocs.io/en/stable/"><img alt="style: black" src="https://img.shields.io/badge/style-Black-black?logo=Black"></a>
 <a href="https://black.readthedocs.io/en/stable/"><img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
 </p>
 
----
 
-<br>
+## About
 
-![](./docs/img/cibmt_splash_logo.png)
+CIB Mango Tree is a Python-based, iteractive open source toolkit for detecting coordinated inauthentic behavior (CIB) in social media datasets. It is designed for researchers, data journalists, fact-checkers, and watchdogs working to identify inauthentic activity online. For more about the project, visit the project main home page: [cibmangotree.org](https://cibmangotree.org)
+
+
+![CIB Mango Tree orange logo in the terminal welcome display](./docs/img/cibmt_splash_logo.png)
+
+CIB Mango Tree is a project of [Civic Tech DC](https://www.civictechdc.org/), a nonprofit community of volunteers using open-source technology to support civic engagement, strengthen democracy, and empower public-interest initiatives.
 
 ## Download latest release
 
@@ -32,15 +36,15 @@ The latest release is available under Assets in the Releases tab:
 
 ## Contributing
 
-New contributions are welcome! Before contributing, please check out our [CIB Mango Tree Development Guide](civictechdc.github.io/cib-mango-tree). If you are not yet familiar with the project, our [New Contributor Guide](civictechdc.github.io/cib-mango-tree/guides/contributing/new_contributor_guide) is the best place to start.
+New contributions are welcome! Before contributing, please check out our [CIB Mango Tree Development Guide](https://civictechdc.github.io/cib-mango-tree). If you are not yet familiar with the project, our [New Contributor Guide](https://civictechdc.github.io/cib-mango-tree/guides/contributing/new_contributor_guide) is the best place to start.
 
 ### Installing development version
-If you are already familiar with the bigger picture, head over to the [Installation guide](civictechdc.github.io/cib-mango-tree/guides/get-started/installation/) in our docs to see how to setup your development environment.
+If you are already familiar with the bigger picture, head over to the [Installation guide](https://civictechdc.github.io/cib-mango-tree/guides/get-started/installation/) in our docs to see how to setup your development environment.
 
 
 ### AI-assisted development.
 
-This repository includes hybrid AI documentation enhanced with semantic code analysis. Please see our short [AI-assisted Development Guide](civictechdc.github.io/cib-mango-tree/guides/contributing/ai_assisted_dev).
+This repository includes hybrid AI documentation enhanced with semantic code analysis. Please see our short [AI-assisted Development Guide](https://civictechdc.github.io/cib-mango-tree/guides/contributing/ai_assisted_dev).
 
 ## License
 
