@@ -302,13 +302,16 @@ class GuiPage(BaseModel, abc.ABC):
             ):
                 # Left: Back button or spacer
                 with ui.element("div").classes("flex items-center"):
-                    if self.show_back_button and self.back_route and self.back_text:
-                        ui.button(
-                            text=self.back_text,
-                            icon=self.back_icon,
-                            color="accent",
-                            on_click=self._handle_back_click,
-                        ).props("flat")
+                    if self.show_back_button and self.back_route:
+                        # Build button parameters conditionally
+                        btn_kwargs = {
+                            "icon": self.back_icon,
+                            "color": "accent",
+                            "on_click": self._handle_back_click,
+                        }
+                        if self.back_text:
+                            btn_kwargs["text"] = self.back_text
+                        ui.button(**btn_kwargs).props("flat")
 
                 # Center: Title
                 ui.label(self.title).classes("text-h6")
