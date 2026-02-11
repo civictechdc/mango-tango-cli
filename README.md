@@ -32,15 +32,15 @@ The latest release is available under Assets in the Releases tab:
 
 ## Contributing
 
-New contributions are welcome! Before contributing, please check out our [CIB Mango Tree Development Guide](civictechdc.github.io/cib-mango-tree). If you are not yet familiar with the project, our [New Contributor Guide](civictechdc.github.io/cib-mango-tree/guides/contributing/new_contributor_guide) is the best place to start.
+New contributions are welcome! Before contributing, please check out our [CIB Mango Tree Development Guide](https://civictechdc.github.io/cib-mango-tree). If you are not yet familiar with the project, our [New Contributor Guide](https://civictechdc.github.io/cib-mango-tree/guides/contributing/new_contributor_guide) is the best place to start.
 
 ### Installing development version
-If you are already familiar with the bigger picture, head over to the [Installation guide](civictechdc.github.io/cib-mango-tree/guides/get-started/installation/) in our docs to see how to setup your development environment.
+If you are already familiar with the bigger picture, head over to the [Installation guide](https://civictechdc.github.io/cib-mango-tree/guides/get-started/installation/) in our docs to see how to setup your development environment.
 
 
 ### AI-assisted development.
 
-This repository includes hybrid AI documentation enhanced with semantic code analysis. Please see our short [AI-assisted Development Guide](civictechdc.github.io/cib-mango-tree/guides/contributing/ai_assisted_dev).
+This repository includes hybrid AI documentation enhanced with semantic code analysis. Please see our short [AI-assisted Development Guide](https://civictechdc.github.io/cib-mango-tree/guides/contributing/ai_assisted_dev).
 
 ## License
 
