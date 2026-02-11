@@ -1,6 +1,5 @@
 import os
 from traceback import format_exc
-from typing import Optional
 
 import polars as pl
 
@@ -26,7 +25,7 @@ def new_project(context: ViewContext):
             return wait_for_key(True)
 
     with terminal.nest(draw_box("2. Import Options", padding_lines=0)) as scope:
-        importer: Optional[ImporterSession] = importer_flow(
+        importer: ImporterSession | None = importer_flow(
             selected_file, terminal_importers, scope
         )
         if importer is None:
@@ -53,7 +52,7 @@ def new_project(context: ViewContext):
 def importer_flow(
     input_file: str, importers: list[Importer[ImporterSession]], scope: Scope
 ):
-    suggested_importer: Optional[Importer[ImporterSession]] = None
+    suggested_importer: Importer[ImporterSession] | None = None
     for importer in importers:
         if importer.suggest(input_file):
             suggested_importer = importer
@@ -192,7 +191,7 @@ def importer_flow(
                 session.print_config()
 
             import_session = importer.modify_session(
-                input_file, import_session, reset_screen_for_customize_session
+                import_session, reset_screen_for_customize_session
             )
             if import_session is None:
                 continue

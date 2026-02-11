@@ -8,14 +8,21 @@ This module provides:
 """
 
 import abc
+from io import BytesIO
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable
 
 from nicegui import ui
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SkipValidation
 
 from analyzer_interface import AnalyzerInterface, ParamValue
 from app.project_context import ProjectContext
+from gui.constants.colors import (
+    ACCENT,
+    MANGO_DARK_GREEN,
+    MANGO_ORANGE,
+    MANGO_ORANGE_LIGHT,
+)
 from gui.context import GUIContext
 from importing import ImporterSession
 from storage import AnalysisModel
@@ -43,12 +50,12 @@ class GuiColors(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    primary: str = Field(default="#609949", description="Mango dark green")
-    secondary: str = Field(default="#f9bc30", description="Mango orange light")
-    accent: str = Field(default="white", description="Accent color")
+    primary: str = Field(default=MANGO_DARK_GREEN, description="Mango dark green")
+    secondary: str = Field(default=MANGO_ORANGE_LIGHT, description="Mango orange light")
+    accent: str = Field(default=ACCENT, description="Accent color")
 
     # Additional colors for reference
-    mango_orange: str = Field(default="#f3921e", description="Mango orange")
+    mango_orange: str = Field(default=MANGO_ORANGE, description="Mango orange")
 
 
 # Class for Managing Constants (colors and links)
@@ -120,17 +127,20 @@ class GuiSession(BaseModel):
     context: GUIContext
 
     # Workflow state - project creation
-    current_project: Optional[ProjectContext] = None
-    selected_file_path: Optional[Path] = None
-    new_project_name: Optional[str] = None
-    import_session: Optional[ImporterSession] = None
+    current_project: ProjectContext | None = None
+    selected_file_path: Path | None = None
+    selected_file_name: str | None = None
+    selected_file: BytesIO | None = None
+    selected_file_content_type: str | None = None
+    new_project_name: str | None = None
+    import_session: ImporterSession | None = None
 
     # Workflow state - analysis
-    selected_analyzer: Optional[AnalyzerInterface] = None
-    selected_analyzer_name: Optional[str] = None
-    column_mapping: Optional[dict[str, str]] = None
-    current_analysis: Optional[AnalysisModel] = None
-    analysis_params: Optional[dict[str, ParamValue]] = None
+    selected_analyzer: AnalyzerInterface | None = None
+    selected_analyzer_name: str | None = None
+    column_mapping: dict[str, str] | None = None
+    current_analysis: AnalysisModel | None = None
+    analysis_params: dict[str, ParamValue] | None = None
 
     # Allow arbitrary types (for NiceGUI components, ImporterSession, etc.)
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -218,10 +228,10 @@ class GuiPage(BaseModel, abc.ABC):
 
     # Navigation configuration
     show_back_button: bool = False
-    back_route: Optional[str] = None
+    back_route: str | None = None
     back_icon: str = "arrow_back"
-    back_text: Optional[str] = None
-    on_page_exit: Optional[Callable[[], None]] = None
+    back_text: str | None = None
+    on_page_exit: Callable[[], None] | None = None
 
     # Footer configuration
     show_footer: bool = True
@@ -292,7 +302,7 @@ class GuiPage(BaseModel, abc.ABC):
             ):
                 # Left: Back button or spacer
                 with ui.element("div").classes("flex items-center"):
-                    if self.show_back_button and self.back_route:
+                    if self.show_back_button and self.back_route and self.back_text:
                         ui.button(
                             text=self.back_text,
                             icon=self.back_icon,
@@ -316,7 +326,9 @@ class GuiPage(BaseModel, abc.ABC):
         """Handle back button click with optional page exit callback."""
         if self.on_page_exit:
             self.on_page_exit()
-        self.navigate_to(self.back_route)
+
+        if self.back_route:
+            self.navigate_to(self.back_route)
 
     def _handle_home_click(self) -> None:
         """Handle home button click with optional page exit callback."""
@@ -448,11 +460,15 @@ def format_file_size(size_bytes: int) -> str:
         >>> format_file_size(1048576)
         '1.0 MB'
     """
+    output_size: float = float(size_bytes)
+
     for unit in ["B", "KB", "MB", "GB", "TB"]:
-        if size_bytes < 1024.0:
-            return f"{size_bytes:.1f} {unit}"
-        size_bytes /= 1024.0
-    return f"{size_bytes:.1f} PB"
+        if output_size < 1024:
+            return f"{output_size:.1f} {unit}"
+
+        output_size /= 1024
+
+    return f"{output_size:.1f} PB"
 
 
 def present_separator(value: str) -> str:

@@ -1,79 +1,6 @@
-from typing import Optional
-
 from nicegui import ui
 
 from analyzer_interface import AnalyzerParam, IntegerParam, ParamValue, TimeBinningValue
-
-MANGO_DARK_GREEN = "#609949"
-MANGO_ORANGE = "#f3921e"
-MANGO_ORANGE_LIGHT = "#f9bc30"
-ACCENT = "white"
-
-
-class ToggleButton(ui.button):
-
-    def __init__(self, *args, group=None, **kwargs) -> None:
-        self._state = False
-        self._group = group
-        super().__init__(*args, **kwargs)
-        self.on("click", self._handle_click)
-
-    def _handle_click(self) -> None:
-        """Handle button click, coordinating with group if present."""
-        if self._group:
-            self._group.select(self)
-        else:
-            self.toggle()
-
-    def toggle(self) -> None:
-        """Toggle the button state."""
-        self._state = not self._state
-        self.update()
-
-    def set_active(self, active: bool) -> None:
-        """Set the button state externally."""
-        self._state = active
-        self.update()
-
-    def update(self) -> None:
-        if self._group:
-            # Group mode: green when active, grey when inactive
-            self.props(f'color={"primary" if self._state else "grey"}')
-        else:
-            # Standalone mode: orange/red toggle
-            self.props(f'color={"primary" if self._state else "red"}')
-        super().update()
-
-
-class ToggleButtonGroup:
-    """Manages a group of toggle buttons with mutual exclusivity."""
-
-    def __init__(self):
-        self.buttons = []
-        self.selected = None
-        self.selected_text = None
-
-    def add_button(self, text: str, **kwargs) -> ToggleButton:
-        """Add a button to the group."""
-        btn = ToggleButton(text, group=self, **kwargs)
-        self.buttons.append(btn)
-        return btn
-
-    def select(self, button: ToggleButton) -> None:
-        """Select a button, deselecting all others."""
-        for btn in self.buttons:
-            btn.set_active(False)
-        button.set_active(True)
-        self.selected = button
-        self.selected_text = button.text
-
-    def get_selected(self) -> ToggleButton | None:
-        """Get the currently selected button."""
-        return self.selected
-
-    def get_selected_text(self) -> str | None:
-        """Get the text of the currently selected button."""
-        return self.selected.text if self.selected else None
 
 
 class AnalysisParamsCard:
@@ -106,7 +33,6 @@ class AnalysisParamsCard:
     def _build_card(self):
         """Build the parameter configuration card."""
         with ui.card().classes("w-full"):
-
             if not self.params:
                 ui.label("This analyzer has no configurable parameters.").classes(
                     "text-grey-7"
@@ -140,7 +66,7 @@ class AnalysisParamsCard:
         self,
         param: AnalyzerParam,
         param_type: IntegerParam,
-        default_value: Optional[int],
+        default_value: int | None,
     ):
         """Build integer parameter control."""
         number_input = ui.number(
@@ -159,7 +85,7 @@ class AnalysisParamsCard:
         self.param_widgets[param.id] = ("integer", number_input)
 
     def _build_time_binning_control(
-        self, param: AnalyzerParam, default_value: Optional[TimeBinningValue]
+        self, param: AnalyzerParam, default_value: TimeBinningValue | None
     ):
         """Build time binning parameter control."""
         with ui.row().classes("gap-2"):

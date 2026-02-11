@@ -4,6 +4,7 @@ Import options dialog for modifying CSV/Excel import configuration.
 Allows users to adjust import settings and retry preview with updated parameters.
 """
 
+from io import BytesIO
 from traceback import format_exc
 from typing import Callable
 
@@ -38,7 +39,7 @@ class ImportOptionsDialog(ui.dialog):
     def __init__(
         self,
         import_session: CsvImportSession | ExcelImportSession,
-        selected_file_path: str,
+        selected_file: BytesIO,
         on_retry: Callable[[CsvImportSession | ExcelImportSession], None],
     ):
         """
@@ -53,12 +54,13 @@ class ImportOptionsDialog(ui.dialog):
         super().__init__()
 
         self.import_session = import_session
-        self.selected_file_path = selected_file_path
+        self.selected_file = selected_file
         self.on_retry = on_retry
 
         # Build dialog UI
-        with self, ui.card().classes("w-full").style(
-            "min-width: 600px; max-width: 800px"
+        with (
+            self,
+            ui.card().classes("w-full").style("min-width: 600px; max-width: 800px"),
         ):
             ui.label("Import Configuration").classes("text-h5 mb-4")
 
@@ -113,8 +115,10 @@ class ImportOptionsDialog(ui.dialog):
 
         # Row 3: Has Header
         with ui.row().classes(ROW_LAYOUT):
-            with ui.label("Has header:").classes("text-base font-bold").style(
-                "min-width: 160px"
+            with (
+                ui.label("Has header:")
+                .classes("text-base font-bold")
+                .style("min-width: 160px")
             ):
                 ui.tooltip("Whether the file has a header row with column names")
             self.header_toggle = ui.toggle(
@@ -167,7 +171,7 @@ class ImportOptionsDialog(ui.dialog):
 
                 # Create new session with updated config
                 updated_session = CsvImportSession(
-                    input_file=self.selected_file_path,
+                    input_file=self.selected_file,
                     separator=new_separator,
                     quote_char=new_quote_char,
                     has_header=new_has_header,

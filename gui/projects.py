@@ -61,7 +61,7 @@ class ManageProjectsDialog(ui.dialog):
 
                 ui.button("Delete", on_click=self._handle_delete, color="primary")
 
-    async def _handle_delete(self):
+    async def _handle_delete(self) -> None:
         """Handle delete button click - show confirmation then delete selected project."""
         # Get selected row
         selected_rows = await self.grid.get_selected_rows()
