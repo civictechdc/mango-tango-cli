@@ -1,0 +1,2707 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="An interactive python terminal UI wrapper for Mango Tree analyzers.">
+      
+      
+        <meta name="author" content="CIB Mango Tree">
+      
+      
+        <link rel="canonical" href="https://cibmangotree.org/guides/contributing/analyzers/">
+      
+      
+        <link rel="prev" href="../contributing/">
+      
+      
+        <link rel="next" href="../dashboards/shiny/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Implementing Analyzers - CIB Mango Tree</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#analyzers-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CIB Mango Tree" class="md-header__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CIB Mango Tree
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Implementing Analyzers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../get-started/overview/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../reference/analyzer_interface/" class="md-tabs__link">
+          
+  
+  
+  Reference (CLI)
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CIB Mango Tree" class="md-nav__button md-logo" aria-label="CIB Mango Tree" data-md-component="logo">
+      
+  <img src="../../../img/favicon.ico" alt="logo">
+
+    </a>
+    CIB Mango Tree
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/civictechdc/mango-tango-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributor Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementing Analyzers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementing Analyzers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#analyzers-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyzers Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Analyzers Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Analyzers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Primary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#declaration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secondary Analyzers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secondary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-presenters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web Presenters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web Presenters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shiny-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shiny Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-factory-for-react-dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Factory for React Dashboards
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Factory for React Dashboards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-output-api-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Output API Factory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Analyzers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Primary Analyzers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Secondary Analyzers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-to-the-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding to the Suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_3" id="__nav_2_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dashboards
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Dashboards
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboards/shiny/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shiny
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboards/react/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React (WIP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design Philosophy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design Philosophy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/core-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Domain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/edge-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Edge Domain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design-philosophy/content-domain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content Domain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference (CLI)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference (CLI)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/analyzer_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analyzer Interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/preprocessing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preprocessing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/terminal_tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminal Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/importing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Importing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/tokenizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#analyzers-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyzers Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Analyzers Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Analyzers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Primary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#declaration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secondary Analyzers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secondary Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-presenters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web Presenters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web Presenters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-definition_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Definition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shiny-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shiny Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-factory-for-react-dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Factory for React Dashboards
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Factory for React Dashboards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-output-api-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Output API Factory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Analyzers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Analyzers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-primary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Primary Analyzers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-secondary-analyzers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Secondary Analyzers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interface-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-to-the-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding to the Suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+      
+        
+  
+  
+    
+    
+      
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../get-started/overview/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Guides
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../contributing/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Implementing Analyzers</h1>
+
+<h2 id="analyzers-guide">Analyzers Guide</h2>
+<p>Analyzers are the core data processing components of the platform. They follow a three-tier architecture that separates data processing, analysis, and presentation concerns.</p>
+<h3 id="architecture-overview">Architecture Overview</h3>
+<p>The analyzer system consists of three types of components:</p>
+<ol>
+<li><strong>Primary Analyzer</strong>: Performs the core data analysis and outputs structured results</li>
+<li><strong>Secondary Analyzer</strong>: Processes primary analyzer outputs for specific use cases or exports</li>
+<li><strong>Web Presenter</strong>: Creates interactive dashboards and visualizations</li>
+</ol>
+<p>This separation allows for:</p>
+<ul>
+<li>Reusable analysis logic</li>
+<li>Multiple presentation formats for the same analysis</li>
+<li>Collaborative development where different contributors can focus on different layers</li>
+</ul>
+<h3 id="primary-analyzers">Primary Analyzers</h3>
+<p>Primary analyzers perform the core data analysis. They read user input data, process it according to their algorithm, and output structured results in parquet format.</p>
+<h4 id="interface-definition">Interface Definition</h4>
+<p>Every primary analyzer must define an interface that specifies:</p>
+<ul>
+<li>Input columns required from the user</li>
+<li>Parameters the analyzer accepts</li>
+<li>Output tables the analyzer produces</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">analyzer_interface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalyzerInput</span><span class="p">,</span>
+    <span class="n">AnalyzerInterface</span><span class="p">,</span> 
+    <span class="n">AnalyzerOutput</span><span class="p">,</span>
+    <span class="n">AnalyzerParam</span><span class="p">,</span>
+    <span class="n">InputColumn</span><span class="p">,</span>
+    <span class="n">OutputColumn</span><span class="p">,</span>
+    <span class="n">IntegerParam</span>
+<span class="p">)</span>
+
+<span class="n">interface</span> <span class="o">=</span> <span class="n">AnalyzerInterface</span><span class="p">(</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;example_analyzer&quot;</span><span class="p">,</span>  <span class="c1"># Must be globally unique</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Example Analyzer&quot;</span><span class="p">,</span>
+    <span class="n">short_description</span><span class="o">=</span><span class="s2">&quot;Counts characters in messages&quot;</span><span class="p">,</span>
+    <span class="n">long_description</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">This analyzer demonstrates the basic structure by counting </span>
+<span class="s2">characters in each message and marking long messages.</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="nb">input</span><span class="o">=</span><span class="n">AnalyzerInput</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">InputColumn</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;message_id&quot;</span><span class="p">,</span>
+                <span class="n">human_readable_name</span><span class="o">=</span><span class="s2">&quot;Unique Message ID&quot;</span><span class="p">,</span> 
+                <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;identifier&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The unique identifier of the message&quot;</span><span class="p">,</span>
+                <span class="n">name_hints</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;tweet&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">InputColumn</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;message_text&quot;</span><span class="p">,</span>
+                <span class="n">human_readable_name</span><span class="o">=</span><span class="s2">&quot;Message Text&quot;</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> 
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The text content of the message&quot;</span><span class="p">,</span>
+                <span class="n">name_hints</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">),</span>
+    <span class="n">params</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">AnalyzerParam</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;fudge_factor&quot;</span><span class="p">,</span>
+            <span class="n">human_readable_name</span><span class="o">=</span><span class="s2">&quot;Character Count Adjustment&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Adds to the character count for testing purposes&quot;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">IntegerParam</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1000</span><span class="p">),</span>
+            <span class="n">default</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+    <span class="p">],</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">AnalyzerOutput</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;character_count&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Character Count Per Message&quot;</span><span class="p">,</span> 
+            <span class="n">internal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Not shown in export list</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">OutputColumn</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;message_id&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;integer&quot;</span><span class="p">),</span>
+                <span class="n">OutputColumn</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;character_count&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;integer&quot;</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</code></pre></div>
+<h4 id="implementation">Implementation</h4>
+<p>The main function receives a context object with access to input data and output paths:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">analyzer_interface.context</span> <span class="kn">import</span> <span class="n">PrimaryAnalyzerContext</span>
+<span class="kn">from</span> <span class="nn">terminal_tools</span> <span class="kn">import</span> <span class="n">ProgressReporter</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">PrimaryAnalyzerContext</span><span class="p">):</span>
+    <span class="c1"># Read and preprocess input data</span>
+    <span class="n">input_reader</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">input</span><span class="p">()</span>
+    <span class="n">df_input</span> <span class="o">=</span> <span class="n">input_reader</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">input_reader</span><span class="o">.</span><span class="n">parquet_path</span><span class="p">))</span>
+
+    <span class="c1"># Access parameters</span>
+    <span class="n">fudge_factor</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fudge_factor&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fudge_factor</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;Fudge factor must be an integer&quot;</span>
+
+    <span class="c1"># Perform analysis with progress reporting</span>
+    <span class="k">with</span> <span class="n">ProgressReporter</span><span class="p">(</span><span class="s2">&quot;Counting characters&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">df_count</span> <span class="o">=</span> <span class="n">df_input</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;message_id&quot;</span><span class="p">),</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;message_text&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len_chars</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fudge_factor</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;character_count&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Write output to specified path</span>
+    <span class="n">df_count</span><span class="o">.</span><span class="n">write_parquet</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="s2">&quot;character_count&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="declaration">Declaration</h4>
+<p>Finally, create the analyzer declaration:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">analyzer_interface</span> <span class="kn">import</span> <span class="n">AnalyzerDeclaration</span>
+<span class="kn">from</span> <span class="nn">.interface</span> <span class="kn">import</span> <span class="n">interface</span>
+<span class="kn">from</span> <span class="nn">.main</span> <span class="kn">import</span> <span class="n">main</span>
+
+<span class="n">example_analyzer</span> <span class="o">=</span> <span class="n">AnalyzerDeclaration</span><span class="p">(</span>
+    <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span>
+    <span class="n">main</span><span class="o">=</span><span class="n">main</span><span class="p">,</span>
+    <span class="n">is_distributed</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># Set to True for production analyzers</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="secondary-analyzers">Secondary Analyzers</h3>
+<p>Secondary analyzers process the output of primary analyzers to create user-friendly exports or perform additional analysis.</p>
+<h4 id="interface-definition_1">Interface Definition</h4>
+<p>Secondary analyzers specify their base primary analyzer and their own outputs:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">analyzer_interface</span> <span class="kn">import</span> <span class="n">AnalyzerOutput</span><span class="p">,</span> <span class="n">OutputColumn</span><span class="p">,</span> <span class="n">SecondaryAnalyzerInterface</span>
+<span class="kn">from</span> <span class="nn">..example_base.interface</span> <span class="kn">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">example_base</span>
+
+<span class="n">interface</span> <span class="o">=</span> <span class="n">SecondaryAnalyzerInterface</span><span class="p">(</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;example_report&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span> 
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Example Report&quot;</span><span class="p">,</span>
+    <span class="n">short_description</span><span class="o">=</span><span class="s2">&quot;Adds &#39;is_long&#39; flag to character count analysis&quot;</span><span class="p">,</span>
+    <span class="n">base_analyzer</span><span class="o">=</span><span class="n">example_base</span><span class="p">,</span>  <span class="c1"># Reference to primary analyzer</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">AnalyzerOutput</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;example_report&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Example Report&quot;</span><span class="p">,</span> 
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">OutputColumn</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;message_id&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;integer&quot;</span><span class="p">),</span>
+                <span class="n">OutputColumn</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;character_count&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;integer&quot;</span><span class="p">),</span>
+                <span class="n">OutputColumn</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;is_long&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;boolean&quot;</span><span class="p">)</span>  <span class="c1"># New column</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</code></pre></div>
+<h4 id="implementation_1">Implementation</h4>
+<p>Secondary analyzers read primary outputs and create enhanced results:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">analyzer_interface.context</span> <span class="kn">import</span> <span class="n">SecondaryAnalyzerContext</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">SecondaryAnalyzerContext</span><span class="p">):</span>
+    <span class="c1"># Read primary analyzer output</span>
+    <span class="n">df_character_count</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;character_count&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Add derived columns</span>
+    <span class="n">df_export</span> <span class="o">=</span> <span class="n">df_character_count</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;character_count&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;is_long&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Access primary analyzer parameters if needed</span>
+    <span class="n">fudge_factor</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">base_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fudge_factor&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Write enhanced output</span>
+    <span class="n">df_export</span><span class="o">.</span><span class="n">write_parquet</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="s2">&quot;example_report&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="web-presenters">Web Presenters</h3>
+<p>Web presenters create interactive dashboards using either Dash or Shiny frameworks.</p>
+<h4 id="interface-definition_2">Interface Definition</h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">analyzer_interface</span> <span class="kn">import</span> <span class="n">WebPresenterInterface</span>
+<span class="kn">from</span> <span class="nn">..example_base</span> <span class="kn">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">example_base</span>
+<span class="kn">from</span> <span class="nn">..example_report</span> <span class="kn">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">example_report</span>
+
+<span class="n">interface</span> <span class="o">=</span> <span class="n">WebPresenterInterface</span><span class="p">(</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;example_web&quot;</span><span class="p">,</span> 
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Message Length Histogram&quot;</span><span class="p">,</span>
+    <span class="n">short_description</span><span class="o">=</span><span class="s2">&quot;Shows distribution of message lengths&quot;</span><span class="p">,</span>
+    <span class="n">base_analyzer</span><span class="o">=</span><span class="n">example_base</span><span class="p">,</span>
+    <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">example_report</span><span class="p">]</span>  <span class="c1"># Secondary analyzers used</span>
+<span class="p">)</span>
+</code></pre></div>
+<h4 id="shiny-implementation">Shiny Implementation</h4>
+<p>For more interactive dashboards:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">shiny</span> <span class="kn">import</span> <span class="n">reactive</span><span class="p">,</span> <span class="n">render</span><span class="p">,</span> <span class="n">ui</span>
+<span class="kn">from</span> <span class="nn">shinywidgets</span> <span class="kn">import</span> <span class="n">output_widget</span><span class="p">,</span> <span class="n">render_widget</span>
+<span class="kn">from</span> <span class="nn">analyzer_interface.context</span> <span class="kn">import</span> <span class="n">WebPresenterContext</span><span class="p">,</span> <span class="n">FactoryOutputContext</span><span class="p">,</span> <span class="n">ShinyContext</span>
+
+<span class="k">def</span> <span class="nf">factory</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">WebPresenterContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FactoryOutputContext</span><span class="p">:</span>
+    <span class="c1"># Load data</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;character_count&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span><span class="p">)</span>
+
+    <span class="c1"># Define UI components</span>
+    <span class="n">analysis_panel</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">card</span><span class="p">(</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">card_header</span><span class="p">(</span><span class="s2">&quot;Character Count Analysis&quot;</span><span class="p">),</span>
+        <span class="n">ui</span><span class="o">.</span><span class="n">input_checkbox</span><span class="p">(</span><span class="s2">&quot;show_details&quot;</span><span class="p">,</span> <span class="s2">&quot;Show detailed view&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">output_widget</span><span class="p">(</span><span class="s2">&quot;histogram&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;400px&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">server</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="nd">@render_widget</span>
+        <span class="k">def</span> <span class="nf">histogram</span><span class="p">():</span>
+            <span class="c1"># Create interactive plot based on inputs</span>
+            <span class="n">show_details</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">show_details</span><span class="p">()</span>
+            <span class="c1"># ... create plotly figure ...</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+        <span class="nd">@render</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">def</span> <span class="nf">summary</span><span class="p">():</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Total messages: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">FactoryOutputContext</span><span class="p">(</span>
+        <span class="n">shiny</span><span class="o">=</span><span class="n">ShinyContext</span><span class="p">(</span>
+            <span class="n">server_handler</span><span class="o">=</span><span class="n">server</span><span class="p">,</span>
+            <span class="n">panel</span><span class="o">=</span><span class="n">nav_panel</span><span class="p">(</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">,</span> <span class="n">analysis_panel</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h4 id="api-factory-for-react-dashboards">API Factory for React Dashboards</h4>
+<p>Web presenters can also implement an <code>api_factory</code> function to provide structured data for React-based frontends through REST API endpoints:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">..utils.pop</span> <span class="kn">import</span> <span class="n">pop_unnecessary_fields</span>
+
+<span class="k">def</span> <span class="nf">api_factory</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">WebPresenterContext</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provides structured data for React dashboards via API endpoints.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        context: WebPresenterContext with access to analyzer outputs</span>
+<span class="sd">        options: Optional parameters from API requests (filters, etc.)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict with presenter metadata and processed data arrays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract API options/filters</span>
+    <span class="n">filter_value</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;matcher&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">options</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Load data</span>
+    <span class="n">data_frame</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;character_count&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span><span class="p">)</span>
+
+    <span class="c1"># Apply filters if provided</span>
+    <span class="k">if</span> <span class="n">filter_value</span><span class="p">:</span>
+        <span class="c1"># Apply filtering logic based on the filter_value</span>
+        <span class="n">data_frame</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;message_text&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">filter_value</span><span class="p">))</span>
+
+    <span class="c1"># Build presenter model with metadata</span>
+    <span class="n">presenter_model</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">web_presenter</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+
+    <span class="c1"># Add visualization configuration</span>
+    <span class="n">presenter_model</span><span class="p">[</span><span class="s2">&quot;figure_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;histogram&quot;</span>
+    <span class="n">presenter_model</span><span class="p">[</span><span class="s2">&quot;axis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Message Character Count&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;message_character_count&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of Messages&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;number_of_messages&quot;</span><span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Add data arrays for the frontend</span>
+    <span class="n">presenter_model</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s2">&quot;character_count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+
+    <span class="c1"># Remove internal fields not needed by frontend</span>
+    <span class="k">return</span> <span class="n">FactoryOutputContext</span><span class="p">(</span>
+        <span class="n">api</span><span class="o">=</span><span class="n">pop_unnecessary_fields</span><span class="p">(</span><span class="n">presenter_model</span><span class="p">)</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h5 id="multi-output-api-factory">Multi-Output API Factory</h5>
+<p>For analyzers with multiple outputs, return a dictionary with different data views:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">api_factory</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">WebPresenterContext</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">filter_value</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;matcher&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">options</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Load different data sources</span>
+    <span class="n">df_stats</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">dependency</span><span class="p">(</span><span class="n">ngram_stats</span><span class="p">)</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">OUTPUT_NGRAM_STATS</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span>
+    <span class="p">)</span>
+    <span class="n">df_full</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">dependency</span><span class="p">(</span><span class="n">ngram_stats</span><span class="p">)</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">OUTPUT_NGRAM_FULL</span><span class="p">)</span><span class="o">.</span><span class="n">parquet_path</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Apply filtering to both datasets</span>
+    <span class="k">if</span> <span class="n">filter_value</span><span class="p">:</span>
+        <span class="n">matcher</span> <span class="o">=</span> <span class="n">create_word_matcher</span><span class="p">(</span><span class="n">filter_value</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">COL_NGRAM_WORDS</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">matcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df_stats</span> <span class="o">=</span> <span class="n">df_stats</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">matcher</span><span class="p">)</span>
+            <span class="n">df_full</span> <span class="o">=</span> <span class="n">df_full</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">matcher</span><span class="p">)</span>
+
+    <span class="c1"># Create separate presenter models for each output</span>
+    <span class="n">stats_model</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">web_presenter</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+    <span class="n">full_model</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">web_presenter</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+
+    <span class="c1"># Configure stats view</span>
+    <span class="n">stats_model</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="s2">&quot;figure_type&quot;</span><span class="p">:</span> <span class="s2">&quot;scatter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;total_repetition&quot;</span><span class="p">:</span> <span class="s2">&quot;N-grams to the right are repeated by more users...&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;amplification_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;N-grams higher up are repeated more times...&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;axis&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;User Count&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;user_count&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Total Repetition&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;total_repetition&quot;</span><span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">df_stats</span><span class="p">[</span><span class="n">COL_NGRAM_DISTINCT_POSTER_COUNT</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;total_repetition&quot;</span><span class="p">:</span> <span class="n">df_stats</span><span class="p">[</span><span class="n">COL_NGRAM_TOTAL_REPS</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+            <span class="s2">&quot;amplification_factor&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">df_stats</span><span class="p">[</span><span class="n">COL_NGRAM_TOTAL_REPS</span><span class="p">]</span> <span class="o">/</span> 
+                <span class="n">df_stats</span><span class="p">[</span><span class="n">COL_NGRAM_DISTINCT_POSTER_COUNT</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;ngrams&quot;</span><span class="p">:</span> <span class="n">df_stats</span><span class="p">[</span><span class="n">COL_NGRAM_WORDS</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+    <span class="p">})</span>
+
+    <span class="c1"># Configure full data view  </span>
+    <span class="n">full_model</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="s2">&quot;figure_type&quot;</span><span class="p">:</span> <span class="s2">&quot;scatter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ids&quot;</span><span class="p">:</span> <span class="n">df_full</span><span class="p">[</span><span class="n">COL_NGRAM_ID</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+        <span class="s2">&quot;timestamps&quot;</span><span class="p">:</span> <span class="n">df_full</span><span class="p">[</span><span class="n">COL_MESSAGE_TIMESTAMP</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="n">df_full</span><span class="p">[</span><span class="n">COL_MESSAGE_TEXT</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+        <span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="n">df_full</span><span class="p">[</span><span class="n">COL_AUTHOR_ID</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+        <span class="c1"># ... additional fields for detailed view</span>
+    <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">FactoryOutputContext</span><span class="p">(</span>
+        <span class="n">api</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;default_output&quot;</span><span class="p">:</span> <span class="n">OUTPUT_NGRAM_STATS</span><span class="p">,</span>
+            <span class="n">OUTPUT_NGRAM_STATS</span><span class="p">:</span> <span class="n">pop_unnecessary_fields</span><span class="p">(</span><span class="n">stats_model</span><span class="p">),</span>
+            <span class="n">OUTPUT_NGRAM_FULL</span><span class="p">:</span> <span class="n">pop_unnecessary_fields</span><span class="p">(</span><span class="n">full_model</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h5 id="api-endpoints">API Endpoints</h5>
+<p>The API factory data is automatically exposed through REST endpoints:</p>
+<ul>
+<li><code>GET /api/presenters</code> - List all presenter data</li>
+<li><code>GET /api/presenters/{id}</code> - Get specific presenter data</li>
+<li><code>GET /api/presenters/{id}/download/{format}</code> - Download data as CSV/JSON/Excel</li>
+</ul>
+<p>Query parameters:</p>
+<ul>
+<li><code>output</code> - Specify which output to return (for multi-output presenters)</li>
+<li><code>filter_field</code> &amp; <code>filter_value</code> - Apply filtering</li>
+<li><code>matcher</code> - Text matching filter (passed to api_factory options)</li>
+</ul>
+<p>Example API usage:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get basic presenter data</span>
+curl<span class="w"> </span><span class="s2">&quot;/api/presenters/ngram_repetition_by_poster&quot;</span>
+
+<span class="c1"># Get filtered data</span>
+curl<span class="w"> </span><span class="s2">&quot;/api/presenters/ngram_repetition_by_poster?filter_value=climate&amp;matcher=climate&quot;</span>
+
+<span class="c1"># Get specific output</span>
+curl<span class="w"> </span><span class="s2">&quot;/api/presenters/ngram_repetition_by_poster?output=ngram_full&quot;</span>
+
+<span class="c1"># Download as CSV</span>
+curl<span class="w"> </span><span class="s2">&quot;/api/presenters/ngram_repetition_by_poster/download/csv&quot;</span>
+</code></pre></div>
+<h3 id="testing-analyzers">Testing Analyzers</h3>
+<h4 id="testing-primary-analyzers">Testing Primary Analyzers</h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">testing</span> <span class="kn">import</span> <span class="n">CsvTestData</span><span class="p">,</span> <span class="n">test_primary_analyzer</span>
+<span class="kn">from</span> <span class="nn">.interface</span> <span class="kn">import</span> <span class="n">interface</span>
+<span class="kn">from</span> <span class="nn">.main</span> <span class="kn">import</span> <span class="n">main</span>
+
+<span class="k">def</span> <span class="nf">test_example_analyzer</span><span class="p">():</span>
+    <span class="n">test_primary_analyzer</span><span class="p">(</span>
+        <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span>
+        <span class="n">main</span><span class="o">=</span><span class="n">main</span><span class="p">,</span>
+        <span class="nb">input</span><span class="o">=</span><span class="n">CsvTestData</span><span class="p">(</span>
+            <span class="s2">&quot;test_input.csv&quot;</span><span class="p">,</span>
+            <span class="n">semantics</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;message_id&quot;</span><span class="p">:</span> <span class="n">identifier</span><span class="p">}</span>
+        <span class="p">),</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fudge_factor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+        <span class="n">outputs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;character_count&quot;</span><span class="p">:</span> <span class="n">CsvTestData</span><span class="p">(</span><span class="s2">&quot;expected_output.csv&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h4 id="testing-secondary-analyzers">Testing Secondary Analyzers</h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">testing</span> <span class="kn">import</span> <span class="n">test_secondary_analyzer</span><span class="p">,</span> <span class="n">ParquetTestData</span>
+
+<span class="k">def</span> <span class="nf">test_example_report</span><span class="p">():</span>
+    <span class="n">test_secondary_analyzer</span><span class="p">(</span>
+        <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span>
+        <span class="n">main</span><span class="o">=</span><span class="n">main</span><span class="p">,</span>
+        <span class="n">primary_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fudge_factor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+        <span class="n">primary_outputs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;character_count&quot;</span><span class="p">:</span> <span class="n">ParquetTestData</span><span class="p">(</span><span class="s2">&quot;primary_output.parquet&quot;</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="n">expected_outputs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;example_report&quot;</span><span class="p">:</span> <span class="n">ParquetTestData</span><span class="p">(</span><span class="s2">&quot;expected_report.parquet&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h3 id="best-practices">Best Practices</h3>
+<h4 id="data-processing">Data Processing</h4>
+<ul>
+<li>Always call <code>input_reader.preprocess()</code> on input data in primary analyzers</li>
+<li>Use <code>ProgressReporter</code> for long-running operations</li>
+<li>Handle missing or null data gracefully</li>
+<li>Use appropriate data types (avoid defaulting to small integer types)</li>
+</ul>
+<h4 id="interface-design">Interface Design</h4>
+<ul>
+<li>Choose descriptive, globally unique IDs</li>
+<li>Provide comprehensive <code>name_hints</code> for better column matching</li>
+<li>Mark internal outputs that users shouldn't see directly</li>
+<li>Include helpful parameter descriptions and validation</li>
+</ul>
+<h4 id="performance">Performance</h4>
+<ul>
+<li>Use lazy evaluation with Polars when possible</li>
+<li>Process data in chunks for large datasets</li>
+<li>Consider memory usage when designing algorithms</li>
+<li>Use appropriate file formats (parquet for structured data)</li>
+</ul>
+<h4 id="error-handling">Error Handling</h4>
+<ul>
+<li>Validate parameters and input data</li>
+<li>Provide meaningful error messages</li>
+<li>Handle edge cases (empty datasets, missing columns)</li>
+<li>Use assertions for internal consistency checks</li>
+</ul>
+<h3 id="adding-to-the-suite">Adding to the Suite</h3>
+<p>Register all analyzers in <code>analyzers/__init__.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">analyzer_interface</span> <span class="kn">import</span> <span class="n">AnalyzerSuite</span>
+<span class="kn">from</span> <span class="nn">.example.example_base</span> <span class="kn">import</span> <span class="n">example_base</span>
+<span class="kn">from</span> <span class="nn">.example.example_report</span> <span class="kn">import</span> <span class="n">example_report</span>  
+<span class="kn">from</span> <span class="nn">.example.example_web</span> <span class="kn">import</span> <span class="n">example_web</span>
+
+<span class="n">suite</span> <span class="o">=</span> <span class="n">AnalyzerSuite</span><span class="p">(</span>
+    <span class="n">all_analyzers</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">example_base</span><span class="p">,</span>
+        <span class="n">example_report</span><span class="p">,</span> 
+        <span class="n">example_web</span><span class="p">,</span>
+        <span class="c1"># ... other analyzers</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>This creates a complete analysis pipeline that users can run through the application interface, from data input through interactive visualization.</p>
+<h2 id="next-steps">Next Steps</h2>
+<p>Once you finish reading this it would be a good idea to review the sections for each domain. Might also be a good idea to review the sections that discuss implementing  <a href="https://shiny.posit.co/py/">Shiny</a>, and <a href="https://react.dev">React</a> dashboards.</p>
+<ul>
+<li><a href="./domains/core-domain.md">Core Domain</a></li>
+<li><a href="./domains/edge-domain.md">Edge Domain</a></li>
+<li><a href="./domains/content-domain.md">Content Domain</a></li>
+<li><a href="../dashboards/shiny/">Shiny Dashboards</a></li>
+<li><a href="../dashboards/react/">React Dashboards</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 CIB Mango Tree
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "navigation.sections", "navigation.top", "content.code.copy", "content.tooltips", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
