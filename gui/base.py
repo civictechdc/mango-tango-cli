@@ -361,7 +361,7 @@ class GuiPage(BaseModel, abc.ABC):
         with ui.element("div").classes("flex items-center gap-3"):
             # GitHub button
             with ui.link(target=gui_urls.github_url, new_tab=True).classes(
-                "inline-flex items-center justify-center text-white no-underline rounded-full size-5"
+                "inline-flex items-center justify-center text-white no-underline size-5"
             ):
                 ui.html(self._load_svg_icon("github"), sanitize=False).classes(
                     "size-full fill-current"
@@ -369,7 +369,7 @@ class GuiPage(BaseModel, abc.ABC):
                 ui.tooltip("Visit our GitHub")
 
             with ui.link(target=gui_urls.instagram_url, new_tab=True).classes(
-                "inline-flex items-center justify-center text-white no-underline rounded-full size-5"
+                "inline-flex items-center justify-center text-white no-underline size-5"
             ):
                 ui.html(self._load_svg_icon("instagram"), sanitize=False).classes(
                     "size-full fill-current"
