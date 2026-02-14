@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Callable
 
 from nicegui import ui
+from nicegui.elements.link import Link
 from pydantic import BaseModel, ConfigDict, Field, SkipValidation
 
 from analyzer_interface import AnalyzerInterface, ParamValue
@@ -64,11 +65,11 @@ class GuiURLS(BaseModel):
 
     # External URLs
     github_url: str = Field(
-        default="https://github.com/civictechdc/mango-tango-cli",
+        default="https://github.com/civictechdc/cib-mango-tree",
         description="GitHub repository URL",
     )
     instagram_url: str = Field(
-        default="https://www.instagram.com/civictechdc/",
+        default="https://www.instagram.com/cibmangotree",
         description="Instagram profile URL",
     )
 
@@ -293,11 +294,7 @@ class GuiPage(BaseModel, abc.ABC):
         - Right: Home button (if not on home page)
         """
         with ui.header(elevated=True):
-            with (
-                ui.row()
-                .classes("w-full items-center")
-                .style("justify-content: space-between")
-            ):
+            with ui.row().classes("w-full items-center justify-between"):
                 # Left: Back button or spacer
                 with ui.element("div").classes("flex items-center"):
                     if self.show_back_button and self.back_route and self.back_text:
@@ -361,28 +358,21 @@ class GuiPage(BaseModel, abc.ABC):
 
     def _render_footer_links(self) -> None:
         """Render social media links in footer."""
-        with ui.element("div").classes("flex items-center gap-2"):
+        with ui.element("div").classes("flex items-center gap-3"):
             # GitHub button
-            github_btn = ui.button(
-                color="accent",
-                on_click=lambda: self.navigate_to_external(gui_urls.github_url),
-            ).props("flat round")
-            with github_btn:
-                github_svg = self._load_svg_icon("github")
-                ui.html(github_svg, sanitize=False).style(
-                    "width: 20px; height: 20px; fill: currentColor"
+            with ui.link(target=gui_urls.github_url, new_tab=True).classes(
+                "inline-flex items-center justify-center text-white no-underline rounded-full size-5"
+            ):
+                ui.html(self._load_svg_icon("github"), sanitize=False).classes(
+                    "size-full fill-current"
                 )
                 ui.tooltip("Visit our GitHub")
 
-            # Instagram button
-            instagram_btn = ui.button(
-                color="accent",
-                on_click=lambda: self.navigate_to_external(gui_urls.instagram_url),
-            ).props("flat round")
-            with instagram_btn:
-                instagram_svg = self._load_svg_icon("instagram")
-                ui.html(instagram_svg, sanitize=False).style(
-                    "width: 20px; height: 20px; fill: currentColor"
+            with ui.link(target=gui_urls.instagram_url, new_tab=True).classes(
+                "inline-flex items-center justify-center text-white no-underline rounded-full size-5"
+            ):
+                ui.html(self._load_svg_icon("instagram"), sanitize=False).classes(
+                    "size-full fill-current"
                 )
                 ui.tooltip("Follow us on Instagram")
 
