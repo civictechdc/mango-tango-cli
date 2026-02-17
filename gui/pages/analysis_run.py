@@ -171,6 +171,7 @@ class RunAnalysisPage(GuiPage):
 
                 # Update buttons
                 success_btn.set_visibility(True)
+                return_btn.set_visibility(True)
                 cancel_btn.disable()
 
                 self.notify_success("Analysis completed!")
