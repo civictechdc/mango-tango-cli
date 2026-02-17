@@ -10,7 +10,7 @@ class ConfigureAnalysisDatasetPage(GuiPage):
         config_analysis_title: str = "Configure Analysis"
         super().__init__(
             session=session,
-            route=gui_routes.configure_analysis,
+            route=gui_routes.configure_analysis_dataset,
             title=(
                 f"{session.current_project.display_name}: {config_analysis_title}"
                 if session.current_project is not None

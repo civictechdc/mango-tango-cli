@@ -14,7 +14,7 @@ class ConfigureAnalaysisParams(GuiPage):
             route=gui_routes.configure_analysis_parameters,
             title=f"{session.current_project.display_name}: Configure Parameters",
             show_back_button=True,
-            back_route=gui_routes.configure_analysis,
+            back_route=gui_routes.configure_analysis_dataset,
             show_footer=True,
         )
 
@@ -27,7 +27,7 @@ class ConfigureAnalaysisParams(GuiPage):
 
         if not self.session.column_mapping:
             self.notify_warning("Column mapping not configured. Redirecting...")
-            self.navigate_to(gui_routes.configure_analysis)
+            self.navigate_to(gui_routes.configure_analysis_dataset)
             return
 
         analyzer = self.session.selected_analyzer
