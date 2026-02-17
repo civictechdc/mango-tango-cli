@@ -100,7 +100,7 @@ class SelectNewAnalyzerPage(GuiPage):
                         self.session.selected_analyzer = selected_analyzer
                         self.session.selected_analyzer_name = new_selection
 
-                        self.navigate_to(gui_routes.configure_analysis)
+                        self.navigate_to(gui_routes.configure_analysis_dataset)
 
                     ui.button(
                         "Configure Analysis",
