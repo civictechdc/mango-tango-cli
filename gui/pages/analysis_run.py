@@ -5,6 +5,9 @@ from nicegui import ui
 
 from gui.base import GuiPage, GuiSession, gui_routes
 
+# Small delay to ensure UI elements are fully rendered before starting analysis
+UI_RENDER_DELAY = 0.1
+
 
 class RunAnalysisPage(GuiPage):
     """
@@ -201,4 +204,4 @@ class RunAnalysisPage(GuiPage):
                     analysis.delete()
 
         # Start the analysis task after a short delay to allow UI to render
-        ui.timer(0.1, run_analysis_task, once=True)
+        ui.timer(UI_RENDER_DELAY, run_analysis_task, once=True)
