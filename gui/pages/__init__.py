@@ -1,4 +1,4 @@
-from .analysis_configure import ConfigureAnalysisDatasetPage
+from .analysis_dataset import ConfigureAnalysisDatasetPage
 from .analysis_params import ConfigureAnalaysisParams
 from .analysis_run import RunAnalysisPage
 from .analyzer_new import SelectNewAnalyzerPage
