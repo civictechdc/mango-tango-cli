@@ -13,6 +13,7 @@ from gui.pages import (
     ImportDatasetPage,
     NewProjectPage,
     PreviewDatasetPage,
+    RunAnalysisPage,
     SelectAnalyzerForkPage,
     SelectNewAnalyzerPage,
     SelectPreviousAnalyzerPage,
@@ -91,10 +92,15 @@ def gui_main(app: App):
         page = ConfigureAnalaysisParams(session=gui_session)
         page.render()
 
+    @ui.page(gui_routes.configure_analysis)
+    def run_analysis():
+        page = RunAnalysisPage(session=gui_session)
+        page.render()
+
     # Launch in native mode
     ui.run(
-        native=False,
-        window_size=(800, 600),
+        native=True,
+        fullscreen=True,
         title="CIB Mango Tree",
         favicon="🥭",
         reload=False,
