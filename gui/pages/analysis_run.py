@@ -123,6 +123,7 @@ class RunAnalysisPage(GuiPage):
                         gui_routes.configure_analysis_parameters
                     ),
                 )
+                return_btn.set_visibility(False)
 
                 # Success button (initially hidden)
                 success_btn = ui.button(
@@ -131,7 +132,7 @@ class RunAnalysisPage(GuiPage):
                     color="primary",
                     on_click=lambda: self.navigate_to(gui_routes.analysis_options),
                 )
-                success_btn.disable()
+                success_btn.set_visibility(False)
 
         # Run analysis asynchronously
         async def run_analysis_task():
@@ -166,7 +167,7 @@ class RunAnalysisPage(GuiPage):
                 self.session.current_analysis = analysis
 
                 # Update buttons
-                success_btn.enable()
+                success_btn.set_visibility(True)
                 cancel_btn.disable()
 
                 self.notify_success("Analysis completed!")
