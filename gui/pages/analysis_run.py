@@ -183,8 +183,8 @@ class RunAnalysisPage(GuiPage):
                 print(f"Analysis error:\n{format_exc()}")
 
                 # Update buttons
-                cancel_btn.enable()
-                return_btn.enable()
+                cancel_btn.disable()
+                return_btn.set_visibility(True)
 
             finally:
                 # Cleanup: delete draft analysis if not completed
