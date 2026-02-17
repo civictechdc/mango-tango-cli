@@ -9,10 +9,11 @@ from gui.base import GuiSession, gui_routes
 from gui.context import GUIContext
 from gui.pages import (
     ConfigureAnalaysisParams,
-    ConfigureAnalysis,
+    ConfigureAnalysisDatasetPage,
     ImportDatasetPage,
     NewProjectPage,
     PreviewDatasetPage,
+    RunAnalysisPage,
     SelectAnalyzerForkPage,
     SelectNewAnalyzerPage,
     SelectPreviousAnalyzerPage,
@@ -81,20 +82,28 @@ def gui_main(app: App):
         page = SelectPreviousAnalyzerPage(session=gui_session)
         page.render()
 
-    @ui.page(gui_routes.configure_analysis)
-    def configure_analysis():
-        page = ConfigureAnalysis(session=gui_session)
+    @ui.page(gui_routes.configure_analysis_dataset)
+    def configure_analysis_dataset():
+        """Renders page where user selects dataset columns and previews."""
+        page = ConfigureAnalysisDatasetPage(session=gui_session)
         page.render()
 
     @ui.page(gui_routes.configure_analysis_parameters)
     def configure_analysis_parameters():
+        """Render page to allow user to configure analysis parameters."""
         page = ConfigureAnalaysisParams(session=gui_session)
+        page.render()
+
+    @ui.page(gui_routes.run_analysis)
+    def run_analysis():
+        """Render page that runs the analysis with selected parameters."""
+        page = RunAnalysisPage(session=gui_session)
         page.render()
 
     # Launch in native mode
     ui.run(
-        native=False,
-        window_size=(800, 600),
+        native=True,
+        fullscreen=True,
         title="CIB Mango Tree",
         favicon="🥭",
         reload=False,

@@ -39,9 +39,11 @@ class GuiRoutes(BaseModel):
     select_analyzer_fork: str = "/select_analyzer_fork"
     select_analyzer: str = "/select_analyzer"
     select_previous_analyzer: str = "/select_previous_analyzer"
-    configure_analysis: str = "/configure_analysis"
+    configure_analysis_dataset: str = "/configure_analysis_dataset"
     configure_analysis_parameters: str = "/configure_analysis_parameters"
     preview_dataset: str = "/preview_dataset"
+    run_analysis: str = "/run_analysis"
+    analysis_options: str = "/analysis_options"
 
 
 class GuiColors(BaseModel):
@@ -297,13 +299,16 @@ class GuiPage(BaseModel, abc.ABC):
             with ui.row().classes("w-full items-center justify-between"):
                 # Left: Back button or spacer
                 with ui.element("div").classes("flex items-center"):
-                    if self.show_back_button and self.back_route and self.back_text:
-                        ui.button(
-                            text=self.back_text,
-                            icon=self.back_icon,
-                            color="accent",
-                            on_click=self._handle_back_click,
-                        ).props("flat")
+                    if self.show_back_button and self.back_route:
+                        # Build button parameters conditionally
+                        btn_kwargs = {
+                            "icon": self.back_icon,
+                            "color": "accent",
+                            "on_click": self._handle_back_click,
+                        }
+                        if self.back_text:
+                            btn_kwargs["text"] = self.back_text
+                        ui.button(**btn_kwargs).props("flat")
 
                 # Center: Title
                 ui.label(self.title).classes("text-h6")
