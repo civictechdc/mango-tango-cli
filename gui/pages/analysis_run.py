@@ -68,7 +68,14 @@ class RunAnalysisPage(GuiPage):
         total_steps = 1 + len(secondary_analyzers)  # primary + secondaries
 
         # State tracking for cancellation
-        cancel_requested = [False]  # Use list to allow mutation in nested function
+        cancel_requested = False
+
+        def request_cancel():
+            """Handle cancel button click."""
+            nonlocal cancel_requested
+            cancel_requested = True
+            cancel_btn.text = "Canceling..."
+            cancel_btn.disable()
 
         # Main content area
         with (
@@ -104,7 +111,7 @@ class RunAnalysisPage(GuiPage):
                     "Cancel Analysis",
                     icon="stop",
                     color="secondary",
-                    on_click=lambda: self._request_cancel(cancel_requested, cancel_btn),
+                    on_click=request_cancel,
                 ).props("outline")
 
                 # Return button for errors (initially hidden)
@@ -128,12 +135,13 @@ class RunAnalysisPage(GuiPage):
 
         # Run analysis asynchronously
         async def run_analysis_task():
+            nonlocal cancel_requested
             current_step = 0
 
             try:
                 for event in analysis.run():
                     # Check for cancellation
-                    if cancel_requested[0]:
+                    if cancel_requested:
                         with log_container:
                             ui.label("Analysis canceled by user").classes(
                                 "text-warning text-sm"
@@ -193,9 +201,3 @@ class RunAnalysisPage(GuiPage):
 
         # Start the analysis task after a short delay to allow UI to render
         ui.timer(0.1, run_analysis_task, once=True)
-
-    def _request_cancel(self, cancel_requested: list, cancel_btn) -> None:
-        """Handle cancel button click."""
-        cancel_requested[0] = True
-        cancel_btn.text = "Canceling..."
-        cancel_btn.disable()
