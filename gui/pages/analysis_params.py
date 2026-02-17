@@ -106,7 +106,7 @@ class ConfigureAnalaysisParams(GuiPage):
                     self.session.analysis_params = final_params
 
                     # TODO: Navigate to next step (run analysis or review page)
-                    self.notify_success("Coming soon!")
+                    self.navigate_to(gui_routes.run_analysis)
 
                 ui.button(
                     "Proceed to Run Analysis",
