@@ -39,7 +39,7 @@ class GuiRoutes(BaseModel):
     select_analyzer_fork: str = "/select_analyzer_fork"
     select_analyzer: str = "/select_analyzer"
     select_previous_analyzer: str = "/select_previous_analyzer"
-    configure_analysis: str = "/configure_analysis"
+    configure_analysis_dataset: str = "/configure_analysis_dataset"
     configure_analysis_parameters: str = "/configure_analysis_parameters"
     preview_dataset: str = "/preview_dataset"
     run_analysis: str = "/run_analysis"
